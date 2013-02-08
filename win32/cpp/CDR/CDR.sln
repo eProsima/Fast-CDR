@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CDR", "CDR\CDR.vcxproj", "{D6523184-F3F2-44CD-ADE2-F5F98FE3016D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		DebugDLL|Win32 = DebugDLL|Win32
+		DebugDLL|x64 = DebugDLL|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+		ReleaseDLL|Win32 = ReleaseDLL|Win32
+		ReleaseDLL|x64 = ReleaseDLL|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D6523184-F3F2-44CD-ADE2-F5F98FE3016D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D6523184-F3F2-44CD-ADE2-F5F98FE3016D}.Debug|Win32.Build.0 = Debug|Win32
+		{D6523184-F3F2-44CD-ADE2-F5F98FE3016D}.Debug|x64.ActiveCfg = Debug|x64
+		{D6523184-F3F2-44CD-ADE2-F5F98FE3016D}.Debug|x64.Build.0 = Debug|x64
+		{D6523184-F3F2-44CD-ADE2-F5F98FE3016D}.DebugDLL|Win32.ActiveCfg = DebugDLL|Win32
+		{D6523184-F3F2-44CD-ADE2-F5F98FE3016D}.DebugDLL|Win32.Build.0 = DebugDLL|Win32
+		{D6523184-F3F2-44CD-ADE2-F5F98FE3016D}.DebugDLL|x64.ActiveCfg = DebugDLL|x64
+		{D6523184-F3F2-44CD-ADE2-F5F98FE3016D}.DebugDLL|x64.Build.0 = DebugDLL|x64
+		{D6523184-F3F2-44CD-ADE2-F5F98FE3016D}.Release|Win32.ActiveCfg = Release|Win32
+		{D6523184-F3F2-44CD-ADE2-F5F98FE3016D}.Release|Win32.Build.0 = Release|Win32
+		{D6523184-F3F2-44CD-ADE2-F5F98FE3016D}.Release|x64.ActiveCfg = Release|x64
+		{D6523184-F3F2-44CD-ADE2-F5F98FE3016D}.Release|x64.Build.0 = Release|x64
+		{D6523184-F3F2-44CD-ADE2-F5F98FE3016D}.ReleaseDLL|Win32.ActiveCfg = ReleaseDLL|Win32
+		{D6523184-F3F2-44CD-ADE2-F5F98FE3016D}.ReleaseDLL|Win32.Build.0 = ReleaseDLL|Win32
+		{D6523184-F3F2-44CD-ADE2-F5F98FE3016D}.ReleaseDLL|x64.ActiveCfg = ReleaseDLL|x64
+		{D6523184-F3F2-44CD-ADE2-F5F98FE3016D}.ReleaseDLL|x64.Build.0 = ReleaseDLL|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

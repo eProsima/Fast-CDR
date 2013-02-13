@@ -7,12 +7,6 @@ namespace eProsima
     {
     }
 
-    inline
-    bool CDR::checkSpace(size_t dataSize)
-    {
-        return (m_cdrBuffer.m_bufferLength - (m_cdrBuffer.m_currentPosition - m_cdrBuffer.m_buffer) >= dataSize);
-    }
-
     bool CDR::read_encapsulation()
     {
         bool returnedValue = true;
@@ -68,15 +62,15 @@ namespace eProsima
 
     bool CDR::jump(uint32_t numBytes)
     {
-         bool returnedValue = false;
+        bool returnedValue = false;
 
-         if(checkSpace(sizeof(numBytes)))
+        if(checkSpace(sizeof(numBytes)))
         {
             m_cdrBuffer.m_currentPosition += numBytes;
             returnedValue = true;
         }
 
-          return returnedValue;
+        return returnedValue;
     }
 
     char* CDR::getCurrentPosition()
@@ -94,36 +88,52 @@ namespace eProsima
         m_cdrBuffer.m_currentPosition = state.m_currentPosition;
     }
 
-    bool CDR::operator>>(uint8_t &octet)
+    bool CDR::deserialize(uint8_t &octet_t, CDRBuffer::Endianess endianess)
     {
         bool returnedValue = false;
 
-        if(checkSpace(sizeof(octet)))
+        if(checkSpace(sizeof(octet_t)))
         {
-            octet = *m_cdrBuffer.m_currentPosition++;
+            octet_t = *m_cdrBuffer.m_currentPosition++;
             returnedValue = true;
         }
 
         return returnedValue;
     }
 
-    bool CDR::operator>>(uint16_t &ushort)
+    bool CDR::deserialize(char &char_t, CDRBuffer::Endianess endianess)
     {
         bool returnedValue = false;
 
-        if(checkSpace(sizeof(ushort)))
+        if(checkSpace(sizeof(char_t)))
         {
-            char *dst = reinterpret_cast<char*>(&ushort);
+            char_t = *m_cdrBuffer.m_currentPosition++;
+            returnedValue = true;
+        }
 
-            if(!m_cdrBuffer.m_swapBytes)
+        return returnedValue;
+    }
+
+    bool CDR::deserialize(uint16_t &ushort_t, CDRBuffer::Endianess endianess)
+    {
+        bool returnedValue = false;
+
+        if(checkSpace(sizeof(ushort_t)))
+        {
+            makeAlign(sizeof(ushort_t));
+            char *dst = reinterpret_cast<char*>(&ushort_t);
+
+            if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
+                (m_cdrBuffer != endianess && !m_cdrBuffer.m_swapBytes))
             {    
-                dst[0] = *m_cdrBuffer.m_currentPosition++;
                 dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
             }
             else
             {
-                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                // TODO Improve
                 dst[0] = *m_cdrBuffer.m_currentPosition++;
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
             }
 
             returnedValue = true;
@@ -132,19 +142,42 @@ namespace eProsima
         return returnedValue;
     }
 
-    inline
-    bool CDR::operator>>(uint32_t &ulong)
-    {
-        return deserialize(ulong);
-    }
-
-    bool CDR::deserialize(uint32_t &ulong, CDRBuffer::Endianess endianess)
+    bool CDR::deserialize(int16_t &short_t, CDRBuffer::Endianess endianess)
     {
         bool returnedValue = false;
 
-        if(checkSpace(sizeof(ulong)))
+        if(checkSpace(sizeof(short_t)))
         {
-            char *dst = reinterpret_cast<char*>(&ulong);
+            makeAlign(sizeof(short_t));
+            char *dst = reinterpret_cast<char*>(&short_t);
+
+            if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
+                (m_cdrBuffer != endianess && !m_cdrBuffer.m_swapBytes))
+            {    
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+            }
+            else
+            {
+                // TODO Improve
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+            }
+
+            returnedValue = true;
+        }
+
+        return returnedValue;
+    }
+
+    bool CDR::deserialize(uint32_t &ulong_t, CDRBuffer::Endianess endianess)
+    {
+        bool returnedValue = false;
+
+        if(checkSpace(sizeof(ulong_t)))
+        {
+            makeAlign(sizeof(ulong_t));
+            char *dst = reinterpret_cast<char*>(&ulong_t);
 
             if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
                 (m_cdrBuffer != endianess && !m_cdrBuffer.m_swapBytes))
@@ -156,10 +189,195 @@ namespace eProsima
             }
             else
             {
+                // TODO Improve
                 dst[0] = *m_cdrBuffer.m_currentPosition++;
                 dst[1] = *m_cdrBuffer.m_currentPosition++;
                 dst[2] = *m_cdrBuffer.m_currentPosition++;
                 dst[3] = *m_cdrBuffer.m_currentPosition++;
+            }
+
+            returnedValue = true;
+        }
+
+        return returnedValue;
+    }
+
+    bool CDR::deserialize(int32_t &long_t, CDRBuffer::Endianess endianess)
+    {
+        bool returnedValue = false;
+
+        if(checkSpace(sizeof(long_t)))
+        {
+            makeAlign(sizeof(long_t));
+            char *dst = reinterpret_cast<char*>(&long_t);
+
+            if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
+                (m_cdrBuffer != endianess && !m_cdrBuffer.m_swapBytes))
+            {
+                dst[3] = *m_cdrBuffer.m_currentPosition++;
+                dst[2] = *m_cdrBuffer.m_currentPosition++;
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+            }
+            else
+            {
+                // TODO Improve
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[2] = *m_cdrBuffer.m_currentPosition++;
+                dst[3] = *m_cdrBuffer.m_currentPosition++;
+            }
+
+            returnedValue = true;
+        }
+
+        return returnedValue;
+    }
+
+    bool CDR::deserialize(uint64_t &ulonglong_t, CDRBuffer::Endianess endianess)
+    {
+        bool returnedValue = false;
+
+        if(checkSpace(sizeof(ulonglong_t)))
+        {
+            makeAlign(sizeof(ulonglong_t));
+            char *dst = reinterpret_cast<char*>(&ulonglong_t);
+
+            if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
+                (m_cdrBuffer != endianess && !m_cdrBuffer.m_swapBytes))
+            {
+                dst[7] = *m_cdrBuffer.m_currentPosition++;
+                dst[6] = *m_cdrBuffer.m_currentPosition++;
+                dst[5] = *m_cdrBuffer.m_currentPosition++;
+                dst[4] = *m_cdrBuffer.m_currentPosition++;
+                dst[3] = *m_cdrBuffer.m_currentPosition++;
+                dst[2] = *m_cdrBuffer.m_currentPosition++;
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+            }
+            else
+            {
+                // TODO Improve
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[2] = *m_cdrBuffer.m_currentPosition++;
+                dst[3] = *m_cdrBuffer.m_currentPosition++;
+                dst[4] = *m_cdrBuffer.m_currentPosition++;
+                dst[5] = *m_cdrBuffer.m_currentPosition++;
+                dst[6] = *m_cdrBuffer.m_currentPosition++;
+                dst[7] = *m_cdrBuffer.m_currentPosition++;
+            }
+
+            returnedValue = true;
+        }
+
+        return returnedValue;
+    }
+
+    bool CDR::deserialize(int64_t &longlong_t, CDRBuffer::Endianess endianess)
+    {
+        bool returnedValue = false;
+
+        if(checkSpace(sizeof(longlong_t)))
+        {
+            makeAlign(sizeof(longlong_t));
+            char *dst = reinterpret_cast<char*>(&longlong_t);
+
+            if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
+                (m_cdrBuffer != endianess && !m_cdrBuffer.m_swapBytes))
+            {
+                dst[7] = *m_cdrBuffer.m_currentPosition++;
+                dst[6] = *m_cdrBuffer.m_currentPosition++;
+                dst[5] = *m_cdrBuffer.m_currentPosition++;
+                dst[4] = *m_cdrBuffer.m_currentPosition++;
+                dst[3] = *m_cdrBuffer.m_currentPosition++;
+                dst[2] = *m_cdrBuffer.m_currentPosition++;
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+            }
+            else
+            {
+                // TODO Improve
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[2] = *m_cdrBuffer.m_currentPosition++;
+                dst[3] = *m_cdrBuffer.m_currentPosition++;
+                dst[4] = *m_cdrBuffer.m_currentPosition++;
+                dst[5] = *m_cdrBuffer.m_currentPosition++;
+                dst[6] = *m_cdrBuffer.m_currentPosition++;
+                dst[7] = *m_cdrBuffer.m_currentPosition++;
+            }
+
+            returnedValue = true;
+        }
+
+        return returnedValue;
+    }
+
+    bool CDR::deserialize(float &float_t, CDRBuffer::Endianess endianess)
+    {
+        bool returnedValue = false;
+
+        if(checkSpace(sizeof(float_t)))
+        {
+            makeAlign(sizeof(float_t));
+            char *dst = reinterpret_cast<char*>(&float_t);
+
+            if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
+                (m_cdrBuffer != endianess && !m_cdrBuffer.m_swapBytes))
+            {
+                dst[3] = *m_cdrBuffer.m_currentPosition++;
+                dst[2] = *m_cdrBuffer.m_currentPosition++;
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+            }
+            else
+            {
+                // TODO Improve
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[2] = *m_cdrBuffer.m_currentPosition++;
+                dst[3] = *m_cdrBuffer.m_currentPosition++;
+            }
+
+            returnedValue = true;
+        }
+
+        return returnedValue;
+    }
+
+    bool CDR::deserialize(double &double_t, CDRBuffer::Endianess endianess)
+    {
+        bool returnedValue = false;
+
+        if(checkSpace(sizeof(double_t)))
+        {
+            makeAlign(sizeof(double_t));
+            char *dst = reinterpret_cast<char*>(&double_t);
+
+            if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
+                (m_cdrBuffer != endianess && !m_cdrBuffer.m_swapBytes))
+            {
+                dst[7] = *m_cdrBuffer.m_currentPosition++;
+                dst[6] = *m_cdrBuffer.m_currentPosition++;
+                dst[5] = *m_cdrBuffer.m_currentPosition++;
+                dst[4] = *m_cdrBuffer.m_currentPosition++;
+                dst[3] = *m_cdrBuffer.m_currentPosition++;
+                dst[2] = *m_cdrBuffer.m_currentPosition++;
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+            }
+            else
+            {
+                // TODO Improve
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[2] = *m_cdrBuffer.m_currentPosition++;
+                dst[3] = *m_cdrBuffer.m_currentPosition++;
+                dst[4] = *m_cdrBuffer.m_currentPosition++;
+                dst[5] = *m_cdrBuffer.m_currentPosition++;
+                dst[6] = *m_cdrBuffer.m_currentPosition++;
+                dst[7] = *m_cdrBuffer.m_currentPosition++;
             }
 
             returnedValue = true;
@@ -181,7 +399,7 @@ namespace eProsima
         }
         else
         {
-            string = std::string(m_cdrBuffer.m_currentPosition, length);
+            string = std::string(m_cdrBuffer.m_currentPosition, length - (m_cdrBuffer.m_currentPosition[length-1] == '\0' ? 1 : 0));
             m_cdrBuffer.m_currentPosition += length;
         }
 

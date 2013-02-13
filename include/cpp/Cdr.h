@@ -72,28 +72,120 @@ namespace eProsima
          /*!
           * @brief This function deserialize an octet.
           */
-         bool operator>>(uint8_t &octet);
+         inline bool operator>>(uint8_t &octet_t){return deserialize(octet_t);}
+
+         /*!
+          * @brief This function deserialize an char.
+          */
+         inline bool operator>>(char &char_t){return deserialize(char_t);}
 
          /*!
           * @brief This function deserialize a unsigned short.
           */
-         bool operator>>(uint16_t &ushort);
+         inline bool operator>>(uint16_t &ushort_t){return deserialize(ushort_t);}
 
-        /*!
+         /*!
+          * @brief This function deserialize a short.
+          */
+         inline bool operator>>(int16_t &short_t){return deserialize(short_t);}
+
+         /*!
           * @brief This function deserialize a unsigned long.
           */
-         bool operator>>(uint32_t &ulong);
+         inline bool operator>>(uint32_t &ulong_t){return deserialize(ulong_t);}
 
-        /*!
-          * @brief This function deserialize a unsigned long.
+         /*!
+          * @brief This function deserialize a long.
           */
-        bool deserialize(uint32_t &ulong, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+         inline bool operator>>(int32_t &long_t){return deserialize(long_t);}
 
+         /*!
+          * @brief This function deserialize a unsigned long long.
+          */
+         inline bool operator>>(uint64_t &ulonglong_t){return deserialize(ulonglong_t);}
+
+         /*!
+          * @brief This function deserialize a long long.
+          */
+         inline bool operator>>(int64_t &longlong_t){return deserialize(longlong_t);}
+
+         /*!
+          * @brief This function deserialize a float.
+          */
+         inline bool operator>>(float &float_t){return deserialize(float_t);}
+
+         /*!
+          * @brief This function deserialize a double.
+          */
+         inline bool operator>>(double &double_t){return deserialize(double_t);}
+
+         
         bool operator>>(std::string &string);
+
+         /*!
+          * @brief This function deserialize an octet.
+          */
+        bool deserialize(uint8_t &octet_t, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        /*!
+          * @brief This function deserialize an char.
+          */
+        bool deserialize(char &char_t, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        /*!
+          * @brief This function deserialize a unsigned short.
+          */
+        bool deserialize(uint16_t &ushort_t, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        /*!
+          * @brief This function deserialize a short.
+          */
+        bool deserialize(int16_t &short_t, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        /*!
+          * @brief This function deserialize a unsigned long.
+          */
+        bool deserialize(uint32_t &ulong_t, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        /*!
+          * @brief This function deserialize a long.
+          */
+        bool deserialize(int32_t &long_t, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        /*!
+          * @brief This function deserialize a unsigned long long.
+          */
+        bool deserialize(uint64_t &ulonglong_t, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        /*!
+          * @brief This function deserialize a long long.
+          */
+        bool deserialize(int64_t &longlong_t, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        /*!
+          * @brief This function deserialize a float.
+          */
+        bool deserialize(float &float_t, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        /*!
+          * @brief This function deserialize a double.
+          */
+        bool deserialize(double &double_t, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
     private:
 
         //! @brief This function cheks the remaining space in the buffer.
-        bool checkSpace(size_t dataSize);
+        inline bool checkSpace(size_t dataSize){return (m_cdrBuffer.m_bufferLength - (m_cdrBuffer.m_currentPosition - m_cdrBuffer.m_buffer) >= (dataSize + align(dataSize)));}
+
+        /*!
+         * @brief This function returns the extra bytes regarding the allign.
+         */
+        inline uint32_t align(size_t dataSize){return (dataSize - ((m_cdrBuffer.m_currentPosition - m_cdrBuffer.m_buffer) % dataSize)) & (dataSize-1);}
+
+        /*!
+         * @brief This function jumps the number of bytes of the align for the desired size.
+         */
+        inline void makeAlign(size_t dataSize){m_cdrBuffer.m_currentPosition += align(dataSize);}
 
         //! @brief Reference to the buffer that will be serialized/deserialized.
         CDRBuffer &m_cdrBuffer;

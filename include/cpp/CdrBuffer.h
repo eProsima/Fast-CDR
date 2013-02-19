@@ -2,6 +2,7 @@
 #define _CPP_CDRBUFFER_H_
 
 #include "eProsima_cpp/eProsima_cpp_dll.h"
+#include <stdint.h>
 
 namespace eProsima
 {
@@ -47,9 +48,27 @@ namespace eProsima
         */
         CDRBuffer(char* const buffer, const size_t bufferLength, const Endianess endianess = DEFAULT_ENDIAN);
 
-        bool operator==(Endianess &endianess);
+		//! @brief This function cheks the remaining space in the buffer.
+        inline bool checkSpace(size_t dataSize){return (m_bufferLength - (m_currentPosition - m_buffer) >= (dataSize + align(dataSize)));}
 
-        bool operator!=(Endianess &endianess);
+        /*!
+         * @brief This function returns the extra bytes regarding the allign.
+         */
+        inline uint32_t align(size_t dataSize){return (dataSize - ((m_currentPosition - m_alignPosition) % dataSize)) & (dataSize-1);}
+
+        /*!
+         * @brief This function jumps the number of bytes of the align for the desired size.
+         */
+        inline void makeAlign(size_t dataSize){m_currentPosition += align(dataSize);}
+
+		/*!
+		 * @brief This function resets the align position for calculations to current position.
+		 */
+		inline void resetAlign(){m_alignPosition = m_currentPosition;}
+
+		inline bool operator==(Endianess &endianess){return (endianess == CDRBuffer::NO_ENDIAN) || (m_endianess == endianess);}
+
+		inline bool operator!=(Endianess &endianess){return !(endianess == CDRBuffer::NO_ENDIAN) && !(m_endianess == endianess);}
 
     private:
 
@@ -61,6 +80,9 @@ namespace eProsima
 
         //! @brief The current position in the serialization/deserialization process.
         char *m_currentPosition;
+
+		//! @brief The position from the aligment is calculated.
+		char *m_alignPosition;
 
         //! @brief The endianess that will be applied over the buffer.
         unsigned char m_endianess;

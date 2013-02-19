@@ -54,6 +54,11 @@ namespace eProsima
          */
         bool jump(uint32_t numBytes);
 
+		/*!
+		 * @brief This function resets the alignment to current position.
+		 */
+		void resetAlignment();
+
         /*!
          * @brief This function returns the current position in the CDR stream;
          */
@@ -173,19 +178,6 @@ namespace eProsima
         bool deserialize(double &double_t, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
 
     private:
-
-        //! @brief This function cheks the remaining space in the buffer.
-        inline bool checkSpace(size_t dataSize){return (m_cdrBuffer.m_bufferLength - (m_cdrBuffer.m_currentPosition - m_cdrBuffer.m_buffer) >= (dataSize + align(dataSize)));}
-
-        /*!
-         * @brief This function returns the extra bytes regarding the allign.
-         */
-        inline uint32_t align(size_t dataSize){return (dataSize - ((m_cdrBuffer.m_currentPosition - m_cdrBuffer.m_buffer) % dataSize)) & (dataSize-1);}
-
-        /*!
-         * @brief This function jumps the number of bytes of the align for the desired size.
-         */
-        inline void makeAlign(size_t dataSize){m_cdrBuffer.m_currentPosition += align(dataSize);}
 
         //! @brief Reference to the buffer that will be serialized/deserialized.
         CDRBuffer &m_cdrBuffer;

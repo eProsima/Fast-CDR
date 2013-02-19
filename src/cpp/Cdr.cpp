@@ -64,7 +64,7 @@ namespace eProsima
     {
         bool returnedValue = false;
 
-        if(checkSpace(sizeof(numBytes)))
+        if(m_cdrBuffer.checkSpace(sizeof(numBytes)))
         {
             m_cdrBuffer.m_currentPosition += numBytes;
             returnedValue = true;
@@ -72,6 +72,11 @@ namespace eProsima
 
         return returnedValue;
     }
+
+	void CDR::resetAlignment()
+	{
+		m_cdrBuffer.resetAlign();
+	}
 
     char* CDR::getCurrentPosition()
     {
@@ -92,7 +97,7 @@ namespace eProsima
     {
         bool returnedValue = false;
 
-        if(checkSpace(sizeof(octet_t)))
+        if(m_cdrBuffer.checkSpace(sizeof(octet_t)))
         {
             octet_t = *m_cdrBuffer.m_currentPosition++;
             returnedValue = true;
@@ -105,7 +110,7 @@ namespace eProsima
     {
         bool returnedValue = false;
 
-        if(checkSpace(sizeof(char_t)))
+        if(m_cdrBuffer.checkSpace(sizeof(char_t)))
         {
             char_t = *m_cdrBuffer.m_currentPosition++;
             returnedValue = true;
@@ -118,9 +123,9 @@ namespace eProsima
     {
         bool returnedValue = false;
 
-        if(checkSpace(sizeof(ushort_t)))
+        if(m_cdrBuffer.checkSpace(sizeof(ushort_t)))
         {
-            makeAlign(sizeof(ushort_t));
+            m_cdrBuffer.makeAlign(sizeof(ushort_t));
             char *dst = reinterpret_cast<char*>(&ushort_t);
 
             if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
@@ -146,9 +151,9 @@ namespace eProsima
     {
         bool returnedValue = false;
 
-        if(checkSpace(sizeof(short_t)))
+        if(m_cdrBuffer.checkSpace(sizeof(short_t)))
         {
-            makeAlign(sizeof(short_t));
+            m_cdrBuffer.makeAlign(sizeof(short_t));
             char *dst = reinterpret_cast<char*>(&short_t);
 
             if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
@@ -174,9 +179,9 @@ namespace eProsima
     {
         bool returnedValue = false;
 
-        if(checkSpace(sizeof(ulong_t)))
+        if(m_cdrBuffer.checkSpace(sizeof(ulong_t)))
         {
-            makeAlign(sizeof(ulong_t));
+            m_cdrBuffer.makeAlign(sizeof(ulong_t));
             char *dst = reinterpret_cast<char*>(&ulong_t);
 
             if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
@@ -206,9 +211,9 @@ namespace eProsima
     {
         bool returnedValue = false;
 
-        if(checkSpace(sizeof(long_t)))
+        if(m_cdrBuffer.checkSpace(sizeof(long_t)))
         {
-            makeAlign(sizeof(long_t));
+            m_cdrBuffer.makeAlign(sizeof(long_t));
             char *dst = reinterpret_cast<char*>(&long_t);
 
             if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
@@ -238,9 +243,9 @@ namespace eProsima
     {
         bool returnedValue = false;
 
-        if(checkSpace(sizeof(ulonglong_t)))
+        if(m_cdrBuffer.checkSpace(sizeof(ulonglong_t)))
         {
-            makeAlign(sizeof(ulonglong_t));
+            m_cdrBuffer.makeAlign(sizeof(ulonglong_t));
             char *dst = reinterpret_cast<char*>(&ulonglong_t);
 
             if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
@@ -278,9 +283,9 @@ namespace eProsima
     {
         bool returnedValue = false;
 
-        if(checkSpace(sizeof(longlong_t)))
+        if(m_cdrBuffer.checkSpace(sizeof(longlong_t)))
         {
-            makeAlign(sizeof(longlong_t));
+            m_cdrBuffer.makeAlign(sizeof(longlong_t));
             char *dst = reinterpret_cast<char*>(&longlong_t);
 
             if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
@@ -318,9 +323,9 @@ namespace eProsima
     {
         bool returnedValue = false;
 
-        if(checkSpace(sizeof(float_t)))
+        if(m_cdrBuffer.checkSpace(sizeof(float_t)))
         {
-            makeAlign(sizeof(float_t));
+            m_cdrBuffer.makeAlign(sizeof(float_t));
             char *dst = reinterpret_cast<char*>(&float_t);
 
             if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
@@ -350,9 +355,9 @@ namespace eProsima
     {
         bool returnedValue = false;
 
-        if(checkSpace(sizeof(double_t)))
+        if(m_cdrBuffer.checkSpace(sizeof(double_t)))
         {
-            makeAlign(sizeof(double_t));
+            m_cdrBuffer.makeAlign(sizeof(double_t));
             char *dst = reinterpret_cast<char*>(&double_t);
 
             if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||

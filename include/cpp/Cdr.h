@@ -5,6 +5,7 @@
 #include "CdrBuffer.h"
 #include <stdint.h>
 #include <string>
+#include <array>
 
 namespace eProsima
 {
@@ -74,58 +75,66 @@ namespace eProsima
          */
         void setState(CDRBuffer::State state);
 
-         /*!
-          * @brief This function deserialize an octet.
-          */
-         inline bool operator>>(uint8_t &octet_t){return deserialize(octet_t);}
+        /*!
+        * @brief This function deserialize an octet.
+        */
+        inline bool operator>>(uint8_t &octet_t){return deserialize(octet_t);}
 
-         /*!
-          * @brief This function deserialize an char.
-          */
-         inline bool operator>>(char &char_t){return deserialize(char_t);}
+        /*!
+        * @brief This function deserialize an char.
+        */
+        inline bool operator>>(char &char_t){return deserialize(char_t);}
 
-         /*!
-          * @brief This function deserialize a unsigned short.
-          */
-         inline bool operator>>(uint16_t &ushort_t){return deserialize(ushort_t);}
+        /*!
+        * @brief This function deserialize a unsigned short.
+        */
+        inline bool operator>>(uint16_t &ushort_t){return deserialize(ushort_t);}
 
-         /*!
-          * @brief This function deserialize a short.
-          */
-         inline bool operator>>(int16_t &short_t){return deserialize(short_t);}
+        /*!
+        * @brief This function deserialize a short.
+        */
+        inline bool operator>>(int16_t &short_t){return deserialize(short_t);}
 
-         /*!
-          * @brief This function deserialize a unsigned long.
-          */
-         inline bool operator>>(uint32_t &ulong_t){return deserialize(ulong_t);}
+        /*!
+        * @brief This function deserialize a unsigned long.
+        */
+        inline bool operator>>(uint32_t &ulong_t){return deserialize(ulong_t);}
 
-         /*!
-          * @brief This function deserialize a long.
-          */
-         inline bool operator>>(int32_t &long_t){return deserialize(long_t);}
+        /*!
+        * @brief This function deserialize a long.
+        */
+        inline bool operator>>(int32_t &long_t){return deserialize(long_t);}
 
-         /*!
-          * @brief This function deserialize a unsigned long long.
-          */
-         inline bool operator>>(uint64_t &ulonglong_t){return deserialize(ulonglong_t);}
+        /*!
+        * @brief This function deserialize a unsigned long long.
+        */
+        inline bool operator>>(uint64_t &ulonglong_t){return deserialize(ulonglong_t);}
 
-         /*!
-          * @brief This function deserialize a long long.
-          */
-         inline bool operator>>(int64_t &longlong_t){return deserialize(longlong_t);}
+        /*!
+        * @brief This function deserialize a long long.
+        */
+        inline bool operator>>(int64_t &longlong_t){return deserialize(longlong_t);}
 
-         /*!
-          * @brief This function deserialize a float.
-          */
-         inline bool operator>>(float &float_t){return deserialize(float_t);}
+        /*!
+        * @brief This function deserialize a float.
+        */
+        inline bool operator>>(float &float_t){return deserialize(float_t);}
 
-         /*!
-          * @brief This function deserialize a double.
+        /*!
+        * @brief This function deserialize a double.
+        */
+        inline bool operator>>(double &double_t){return deserialize(double_t);}
+
+        /*!
+          * @brief This function deserialize a boolean.
           */
-         inline bool operator>>(double &double_t){return deserialize(double_t);}
+        inline bool operator>>(bool &bool_t){return deserialize(bool_t);}
 
          
-        bool operator>>(std::string &string);
+        inline bool operator>>(std::string &string_t){return deserialize(string_t);}
+
+        template<class _T, size_t _Size>
+        inline bool operator>>(std::array<_T, _Size> &array_t){return deserialize<_T, _Size>(array_t);}
 
          /*!
           * @brief This function deserialize an octet.
@@ -177,7 +186,30 @@ namespace eProsima
           */
         bool deserialize(double &double_t, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
 
+        /*!
+          * @brief This function deserialize a bool.
+          */
+        bool deserialize(bool &bool_t, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        /*!
+          * @brief This function deserialize a string.
+          */
+        bool deserialize(std::string &string_t, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        template<class _T, size_t _Size>
+        inline bool deserialize(std::array<_T, _Size> &array_t, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN)
+        { return deserializeArray(array_t[0], array_t.size(), endianess);}
+
     private:
+
+        template<class _T, size_t _Size>
+        bool deserializeArray(std::array<_T, _Size> &array_t, size_t numElements, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        template<typename _T>
+        bool deserializeArray(_T &t, size_t numElements, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        /*template<class T>
+        bool deserialize(T *array_pointer, uint32_t numElements, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);*/
 
         //! @brief Reference to the buffer that will be serialized/deserialized.
         CDRBuffer &m_cdrBuffer;

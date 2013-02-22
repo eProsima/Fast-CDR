@@ -49,7 +49,7 @@ namespace eProsima
         CDRBuffer(char* const buffer, const size_t bufferLength, const Endianess endianess = DEFAULT_ENDIAN);
 
 		//! @brief This function cheks the remaining space in the buffer.
-        inline bool checkSpace(size_t dataSize){return (m_bufferLength - (m_currentPosition - m_buffer) >= (dataSize + align(dataSize)));}
+        inline bool checkSpace(size_t dataSize, uint32_t numElements = 1){return (m_bufferLength - (m_currentPosition - m_buffer) >= (dataSize * numElements) + align(dataSize));}
 
         /*!
          * @brief This function returns the extra bytes regarding the allign.

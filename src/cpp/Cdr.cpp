@@ -396,7 +396,7 @@ bool CDR::deserialize(bool &bool_t, CDRBuffer::Endianess endianess)
     bool returnedValue = false;
     uint8_t value = 0;
 
-    if(m_cdrBuffer.checkSpace(sizeof(uint8_t)))
+    if(m_cdrBuffer.checkSpace(sizeof(bool_t)))
     {
         value = *m_cdrBuffer.m_currentPosition++;
 
@@ -435,21 +435,318 @@ bool CDR::deserialize(std::string &string_t, CDRBuffer::Endianess endianess)
     return returnedValue;
 }
 
-template<class _T, size_t _Size>
-bool CDR::deserializeArray(std::array<_T, _Size> &array_t, size_t numElements, CDRBuffer::Endianess endianess)
+bool CDR::deserializeArray(uint8_t *octet_t, size_t numElements, CDRBuffer::Endianess endianess)
 {
-    //return deserializeArray(array_t[0], numElements * array_t.size(), endianess);
-    return true;
+    bool returnedValue = false;
+
+    if(m_cdrBuffer.checkSpace(sizeof(*octet_t), numElements))
+    {
+        memcpy(octet_t, m_cdrBuffer.m_currentPosition, sizeof(*octet_t)*numElements);
+        m_cdrBuffer.m_currentPosition += sizeof(*octet_t)*numElements;
+        returnedValue = true;
+    }
+
+    return returnedValue;
 }
 
-template<typename _T>
-bool CDR::deserializeArray(_T &t, size_t numElements, CDRBuffer::Endianess endianess)
+bool CDR::deserializeArray(uint16_t *ushort_t, size_t numElements, CDRBuffer::Endianess endianess)
 {
-    return true;
+    bool returnedValue = false;
+
+    if(m_cdrBuffer.checkSpace(sizeof(*ushort_t), numElements))
+    {
+        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
+        m_cdrBuffer.makeAlign(sizeof(*ushort_t));
+
+        if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
+            (m_cdrBuffer != endianess && !m_cdrBuffer.m_swapBytes))
+        {
+            char *dst = reinterpret_cast<char*>(&ushort_t);
+            char *end = dst + (sizeof(*ushort_t) * numElements);
+
+            for(; dst < end; dst += sizeof(*ushort_t))
+            {
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+            }
+        }
+        else
+        {
+            memcpy(ushort_t, m_cdrBuffer.m_currentPosition, sizeof(*ushort_t)*numElements);
+            m_cdrBuffer.m_currentPosition += sizeof(*ushort_t)*numElements;
+        }
+
+        returnedValue = true;
+    }
+
+    return returnedValue;
 }
 
-/*template<class T, size_t Size>
-bool CDR::deserialize<T, Size>(T *array_pointer, uint32_t numElements, CDRBuffer::Endianess endianess)
+bool CDR::deserializeArray(int16_t *short_t, size_t numElements, CDRBuffer::Endianess endianess)
 {
-    return true;
-}*/
+    bool returnedValue = false;
+
+    if(m_cdrBuffer.checkSpace(sizeof(*short_t), numElements))
+    {
+        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
+        m_cdrBuffer.makeAlign(sizeof(*short_t));
+
+        if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
+            (m_cdrBuffer != endianess && !m_cdrBuffer.m_swapBytes))
+        {
+            char *dst = reinterpret_cast<char*>(&short_t);
+            char *end = dst + (sizeof(*short_t) * numElements);
+
+            for(; dst < end; dst += sizeof(*short_t))
+            {
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+            }
+        }
+        else
+        {
+            memcpy(short_t, m_cdrBuffer.m_currentPosition, sizeof(*short_t)*numElements);
+            m_cdrBuffer.m_currentPosition += sizeof(*short_t)*numElements;
+        }
+
+        returnedValue = true;
+    }
+
+    return returnedValue;
+}
+
+bool CDR::deserializeArray(uint32_t *ulong_t, size_t numElements, CDRBuffer::Endianess endianess)
+{
+    bool returnedValue = false;
+
+    if(m_cdrBuffer.checkSpace(sizeof(*ulong_t), numElements))
+    {
+        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
+        m_cdrBuffer.makeAlign(sizeof(*ulong_t));
+
+        if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
+            (m_cdrBuffer != endianess && !m_cdrBuffer.m_swapBytes))
+        {
+            char *dst = reinterpret_cast<char*>(&ulong_t);
+            char *end = dst + (sizeof(*ulong_t) * numElements);
+
+            for(; dst < end; dst += sizeof(*ulong_t))
+            {
+                dst[3] = *m_cdrBuffer.m_currentPosition++;
+                dst[2] = *m_cdrBuffer.m_currentPosition++;
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+            }
+        }
+        else
+        {
+            memcpy(ulong_t, m_cdrBuffer.m_currentPosition, sizeof(*ulong_t)*numElements);
+            m_cdrBuffer.m_currentPosition += sizeof(*ulong_t)*numElements;
+        }
+
+        returnedValue = true;
+    }
+
+    return returnedValue;
+}
+
+bool CDR::deserializeArray(int32_t *long_t, size_t numElements, CDRBuffer::Endianess endianess)
+{
+    bool returnedValue = false;
+
+    if(m_cdrBuffer.checkSpace(sizeof(*long_t), numElements))
+    {
+        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
+        m_cdrBuffer.makeAlign(sizeof(*long_t));
+
+        if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
+            (m_cdrBuffer != endianess && !m_cdrBuffer.m_swapBytes))
+        {
+            char *dst = reinterpret_cast<char*>(&long_t);
+            char *end = dst + (sizeof(*long_t) * numElements);
+
+            for(; dst < end; dst += sizeof(*long_t))
+            {
+                dst[3] = *m_cdrBuffer.m_currentPosition++;
+                dst[2] = *m_cdrBuffer.m_currentPosition++;
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+            }
+        }
+        else
+        {
+            memcpy(long_t, m_cdrBuffer.m_currentPosition, sizeof(*long_t)*numElements);
+            m_cdrBuffer.m_currentPosition += sizeof(*long_t)*numElements;
+        }
+
+        returnedValue = true;
+    }
+
+    return returnedValue;
+}
+
+bool CDR::deserializeArray(uint64_t *ulonglong_t, size_t numElements, CDRBuffer::Endianess endianess)
+{
+    bool returnedValue = false;
+
+    if(m_cdrBuffer.checkSpace(sizeof(*ulonglong_t), numElements))
+    {
+        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
+        m_cdrBuffer.makeAlign(sizeof(*ulonglong_t));
+
+        if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
+            (m_cdrBuffer != endianess && !m_cdrBuffer.m_swapBytes))
+        {
+            char *dst = reinterpret_cast<char*>(&ulonglong_t);
+            char *end = dst + (sizeof(*ulonglong_t) * numElements);
+
+            for(; dst < end; dst += sizeof(*ulonglong_t))
+            {
+                dst[7] = *m_cdrBuffer.m_currentPosition++;
+                dst[6] = *m_cdrBuffer.m_currentPosition++;
+                dst[5] = *m_cdrBuffer.m_currentPosition++;
+                dst[4] = *m_cdrBuffer.m_currentPosition++;
+                dst[3] = *m_cdrBuffer.m_currentPosition++;
+                dst[2] = *m_cdrBuffer.m_currentPosition++;
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+            }
+        }
+        else
+        {
+            memcpy(ulonglong_t, m_cdrBuffer.m_currentPosition, sizeof(*ulonglong_t)*numElements);
+            m_cdrBuffer.m_currentPosition += sizeof(*ulonglong_t)*numElements;
+        }
+
+        returnedValue = true;
+    }
+
+    return returnedValue;
+}
+
+bool CDR::deserializeArray(int64_t *longlong_t, size_t numElements, CDRBuffer::Endianess endianess)
+{
+    bool returnedValue = false;
+
+    if(m_cdrBuffer.checkSpace(sizeof(*longlong_t), numElements))
+    {
+        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
+        m_cdrBuffer.makeAlign(sizeof(*longlong_t));
+
+        if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
+            (m_cdrBuffer != endianess && !m_cdrBuffer.m_swapBytes))
+        {
+            char *dst = reinterpret_cast<char*>(&longlong_t);
+            char *end = dst + (sizeof(*longlong_t) * numElements);
+
+            for(; dst < end; dst += sizeof(*longlong_t))
+            {
+                dst[7] = *m_cdrBuffer.m_currentPosition++;
+                dst[6] = *m_cdrBuffer.m_currentPosition++;
+                dst[5] = *m_cdrBuffer.m_currentPosition++;
+                dst[4] = *m_cdrBuffer.m_currentPosition++;
+                dst[3] = *m_cdrBuffer.m_currentPosition++;
+                dst[2] = *m_cdrBuffer.m_currentPosition++;
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+            }
+        }
+        else
+        {
+            memcpy(longlong_t, m_cdrBuffer.m_currentPosition, sizeof(*longlong_t)*numElements);
+            m_cdrBuffer.m_currentPosition += sizeof(*longlong_t)*numElements;
+        }
+
+        returnedValue = true;
+    }
+
+    return returnedValue;
+}
+
+bool CDR::deserializeArray(char *char_t, size_t numElements, CDRBuffer::Endianess endianess)
+{
+    bool returnedValue = false;
+
+    if(m_cdrBuffer.checkSpace(sizeof(*char_t), numElements))
+    {
+        memcpy(char_t, m_cdrBuffer.m_currentPosition, sizeof(*char_t)*numElements);
+        m_cdrBuffer.m_currentPosition += sizeof(*char_t)*numElements;
+        returnedValue = true;
+    }
+
+    return returnedValue;
+}
+
+bool CDR::deserializeArray(float *float_t, size_t numElements, CDRBuffer::Endianess endianess)
+{
+    bool returnedValue = false;
+
+    if(m_cdrBuffer.checkSpace(sizeof(*float_t), numElements))
+    {
+        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
+        m_cdrBuffer.makeAlign(sizeof(*float_t));
+
+        if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
+            (m_cdrBuffer != endianess && !m_cdrBuffer.m_swapBytes))
+        {
+            char *dst = reinterpret_cast<char*>(&float_t);
+            char *end = dst + (sizeof(*float_t) * numElements);
+
+            for(; dst < end; dst += sizeof(*float_t))
+            {
+                dst[3] = *m_cdrBuffer.m_currentPosition++;
+                dst[2] = *m_cdrBuffer.m_currentPosition++;
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+            }
+        }
+        else
+        {
+            memcpy(float_t, m_cdrBuffer.m_currentPosition, sizeof(*float_t)*numElements);
+            m_cdrBuffer.m_currentPosition += sizeof(*float_t)*numElements;
+        }
+
+        returnedValue = true;
+    }
+
+    return returnedValue;
+}
+
+bool CDR::deserializeArray(double *double_t, size_t numElements, CDRBuffer::Endianess endianess)
+{
+    bool returnedValue = false;
+
+    if(m_cdrBuffer.checkSpace(sizeof(*double_t), numElements))
+    {
+        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
+        m_cdrBuffer.makeAlign(sizeof(*double_t));
+
+        if((m_cdrBuffer == endianess && m_cdrBuffer.m_swapBytes) ||
+            (m_cdrBuffer != endianess && !m_cdrBuffer.m_swapBytes))
+        {
+            char *dst = reinterpret_cast<char*>(&double_t);
+            char *end = dst + (sizeof(*double_t) * numElements);
+
+            for(; dst < end; dst += sizeof(*double_t))
+            {
+                dst[7] = *m_cdrBuffer.m_currentPosition++;
+                dst[6] = *m_cdrBuffer.m_currentPosition++;
+                dst[5] = *m_cdrBuffer.m_currentPosition++;
+                dst[4] = *m_cdrBuffer.m_currentPosition++;
+                dst[3] = *m_cdrBuffer.m_currentPosition++;
+                dst[2] = *m_cdrBuffer.m_currentPosition++;
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+            }
+        }
+        else
+        {
+            memcpy(double_t, m_cdrBuffer.m_currentPosition, sizeof(*double_t)*numElements);
+            m_cdrBuffer.m_currentPosition += sizeof(*double_t)*numElements;
+        }
+
+        returnedValue = true;
+    }
+
+    return returnedValue;
+}

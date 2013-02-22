@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <string>
 #include <array>
+#include <vector>
 
 namespace eProsima
 {
@@ -136,6 +137,9 @@ namespace eProsima
         template<class _T, size_t _Size>
         inline bool operator>>(std::array<_T, _Size> &array_t){return deserialize<_T, _Size>(array_t);}
 
+        template<class _T>
+        inline bool operator>>(std::vector<_T> &vector_t){return deserialize<_T>(vector_t);}
+
          /*!
           * @brief This function deserialize an octet.
           */
@@ -200,13 +204,100 @@ namespace eProsima
         inline bool deserialize(std::array<_T, _Size> &array_t, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN)
         { return deserializeArray(array_t[0], array_t.size(), endianess);}
 
+        template<class _T>
+        bool deserialize(std::vector<_T> &vector_t, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN)
+        {
+            bool returnedValue = false;
+            uint32_t seqLength = 0;
+
+            if(*this >> seqLength)
+            {
+                vector_t.resize(seqLength);
+                returnedValue = deserializeArray(vector_t.data(), vector_t.size(), endianess);
+            }
+
+            return returnedValue;
+        }
+
+        /*!
+          * @brief This function deserialize an array of octets.
+          */
+        bool deserializeArray(uint8_t *octet_t, size_t numElements, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        /*!
+          * @brief This function deserialize an array of unsigned short.
+          */
+        bool deserializeArray(uint16_t *ushort_t, size_t numElements, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        /*!
+          * @brief This function deserialize an array of shorts.
+          */
+        bool deserializeArray(int16_t *short_t, size_t numElements, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        /*!
+          * @brief This function deserialize an array of unsigned longs.
+          */
+        bool deserializeArray(uint32_t *ulong_t, size_t numElements, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        /*!
+          * @brief This function deserialize an array of longs.
+          */
+        bool deserializeArray(int32_t *long_t, size_t numElements, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        /*!
+          * @brief This function deserialize an array of unsigned long longs.
+          */
+        bool deserializeArray(uint64_t *ulonglong_t, size_t numElements, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        /*!
+          * @brief This function deserialize an array of long longs.
+          */
+        bool deserializeArray(int64_t *longlong_t, size_t numElements, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        /*!
+          * @brief This function deserialize an array of chars.
+          */
+        bool deserializeArray(char *char_t, size_t numElements, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        /*!
+          * @brief This function deserialize an array of chars.
+          */
+        bool deserializeArray(float *float_t, size_t numElements, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        /*!
+          * @brief This function deserialize an array of chars.
+          */
+        bool deserializeArray(double *double_t, size_t numElements, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+
+        /*!
+          * @brief This function deserialize a sequence of basic types.
+          */
+        template<typename _T>
+        bool deserializeSequence(_T *t, size_t maxNumElements, size_t &numElements, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN)
+        {
+            bool returnedValue = false;
+
+            if(cdr >> numElements && numElements <= maxNumElements)
+            {
+                returnedValue = deserializeArray(t, numElements, endianess)
+            }
+
+            return returnedValue;
+        }
+
     private:
 
         template<class _T, size_t _Size>
-        bool deserializeArray(std::array<_T, _Size> &array_t, size_t numElements, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+        bool deserializeArray(std::array<_T, _Size> &array_t, size_t numElements, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN)
+        {
+            return deserializeArray(array_t[0], numElements * array_t.size(), endianess);
+        }
 
         template<typename _T>
-        bool deserializeArray(_T &t, size_t numElements, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);
+        bool deserializeArray(_T &t, size_t numElements, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN)
+        {
+            return deserializeArray(&t, numElements, endianess);
+        }
 
         /*template<class T>
         bool deserialize(T *array_pointer, uint32_t numElements, CDRBuffer::Endianess endianess = CDRBuffer::NO_ENDIAN);*/

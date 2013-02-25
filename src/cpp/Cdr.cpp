@@ -1,4 +1,5 @@
 #include "Cdr.h"
+#include <string.h>
 
 using namespace eProsima;
 

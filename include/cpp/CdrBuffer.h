@@ -3,6 +3,7 @@
 
 #include "eProsima_cpp/eProsima_cpp_dll.h"
 #include <stdint.h>
+#include <cstdio>
 
 namespace eProsima
 {
@@ -18,15 +19,15 @@ namespace eProsima
         //! @brief This enumeration represents endianess.
         typedef enum
         {
-            BIG_ENDIAN = 0x0,
-            LITTLE_ENDIAN = 0x1,
-            NO_ENDIAN = 0xF
+            BIG_ENDIANESS = 0x0,
+            LITTLE_ENDIANESS = 0x1,
+            NO_ENDIANESS = 0xF
         } Endianess;
 
 #if defined(__LITTLE_ENDIAN__)
-        static const Endianess DEFAULT_ENDIAN = LITTLE_ENDIAN;
+        static const Endianess DEFAULT_ENDIAN = LITTLE_ENDIANESS;
 #elif defined (__BIG_ENDIAN__)
-        static const Endianess DEFAULT_ENDIAN = BIG_ENDIAN;
+        static const Endianess DEFAULT_ENDIAN = BIG_ENDIANESS;
 #endif
 
         class State
@@ -66,9 +67,9 @@ namespace eProsima
 		 */
 		inline void resetAlign(){m_alignPosition = m_currentPosition;}
 
-		inline bool operator==(Endianess &endianess){return (endianess == CDRBuffer::NO_ENDIAN) || (m_endianess == endianess);}
+		inline bool operator==(Endianess &endianess){return (endianess == CDRBuffer::NO_ENDIANESS) || (m_endianess == endianess);}
 
-		inline bool operator!=(Endianess &endianess){return !(endianess == CDRBuffer::NO_ENDIAN) && !(m_endianess == endianess);}
+		inline bool operator!=(Endianess &endianess){return !(endianess == CDRBuffer::NO_ENDIANESS) && !(m_endianess == endianess);}
 
     private:
 

@@ -12,7 +12,7 @@ namespace eProsima
     * a CDR representation. This class is used by an object eProsima::CDR to serialize
     * or deserialize a CDR representation.
     */
-    class eProsima_cpp_DllExport CDRBuffer
+    class eProsima_cpp_DllVariable CDRBuffer
     {
         friend class CDR;
     public:
@@ -20,15 +20,10 @@ namespace eProsima
         typedef enum
         {
             BIG_ENDIANESS = 0x0,
-            LITTLE_ENDIANESS = 0x1,
-            NO_ENDIANESS = 0xF
+            LITTLE_ENDIANESS = 0x1
         } Endianess;
 
-#if defined(__LITTLE_ENDIAN__)
-        static const Endianess DEFAULT_ENDIAN = LITTLE_ENDIANESS;
-#elif defined (__BIG_ENDIAN__)
-        static const Endianess DEFAULT_ENDIAN = BIG_ENDIANESS;
-#endif
+        static const Endianess DEFAULT_ENDIAN;
 
         class State
         {
@@ -50,34 +45,34 @@ namespace eProsima
         CDRBuffer(char* const buffer, const size_t bufferLength, const Endianess endianess = DEFAULT_ENDIAN);
 
 		//! @brief This function cheks the remaining space in the buffer.
-        inline bool checkSpace(size_t dataSize, size_t numElements = 1){return (m_bufferLength - (m_currentPosition - m_buffer) >= (dataSize * numElements) + align(dataSize));}
+        inline bool checkSpace(size_t dataSize){return m_bufferLength >= dataSize;}
 
         /*!
          * @brief This function returns the extra bytes regarding the allign.
          */
-        inline size_t align(size_t dataSize){return (dataSize - ((m_currentPosition - m_alignPosition) % dataSize)) & (dataSize-1);}
+        inline size_t align(size_t dataSize){return dataSize > m_lastDataSize ? (dataSize - ((m_currentPosition - m_alignPosition) % dataSize)) & (dataSize-1) : 0;}
 
         /*!
          * @brief This function jumps the number of bytes of the align for the desired size.
          */
-        inline void makeAlign(size_t dataSize){m_currentPosition += align(dataSize);}
+        inline void makeAlign(size_t align){m_currentPosition += align;}
 
 		/*!
 		 * @brief This function resets the align position for calculations to current position.
 		 */
 		inline void resetAlign(){m_alignPosition = m_currentPosition;}
 
-		inline bool operator==(Endianess &endianess){return (endianess == CDRBuffer::NO_ENDIANESS) || (m_endianess == endianess);}
-
-		inline bool operator!=(Endianess &endianess){return !(endianess == CDRBuffer::NO_ENDIANESS) && !(m_endianess == endianess);}
+        void reset();
 
     private:
 
         //! @brief Pointer to the stream of bytes that contains the CDR representation.
         char *m_buffer;
 
-        //! @brief The length of the stream of bytes.
-        const size_t m_bufferLength;
+        const size_t m_bufferSize;
+
+        //! @brief The remaining bytes in the stream.
+        size_t m_bufferLength;
 
         //! @brief The current position in the serialization/deserialization process.
         char *m_currentPosition;
@@ -90,6 +85,9 @@ namespace eProsima
 
         //! @brief This attribute specified if it is needed to swap the bytes.
         bool m_swapBytes;
+
+        //! Storage the last datasize serialized/deserialized.
+        size_t m_lastDataSize;
     };
 };
 

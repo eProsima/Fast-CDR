@@ -1,0 +1,18 @@
+/*!
+ * @mainpage CDR Serializer
+ *
+ * <center><b>CDR Serializer Library</b></center><br/>
+ * 
+ * @image html logoEprosimaBlueRTI.gif
+ *
+ * <br/><center><a href="http://www.eprosima.com">eProsima</a></center>
+ *
+ * CDR Serializer is a little and fast library that serializes data using CDR format. Its API provides you an easy way
+ * to serialize common basic types of data. This first release of this library is implemented in C++11.
+ *
+ */
+
+ /*!
+ * @defgroup CDRAPIREFERENCE CDR Serializer API Reference
+ * @brief CDR Serializer internal API groped in modules.
+ */

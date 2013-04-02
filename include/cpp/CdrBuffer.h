@@ -32,7 +32,8 @@ namespace eProsima
         static const Endianess DEFAULT_ENDIAN;
 
         /*!
-         * brief This class stores a state of a eProsima::CDRBuffer.
+         * @brief This class stores a state of a eProsima::CDRBuffer.
+         * @ingroup CDRAPIREFERENCE
          */
         class State
         {
@@ -111,7 +112,7 @@ namespace eProsima
         //! @brief This attribute specified if it is needed to swap the bytes.
         bool m_swapBytes;
 
-        //! Stores the last datasize serialized/deserialized. It's used to optimize.
+        //! @brief Stores the last datasize serialized/deserialized. It's used to optimize.
         size_t m_lastDataSize;
     };
 };

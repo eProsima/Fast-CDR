@@ -47,44 +47,55 @@ namespace eProsima
 
         /*!
          * @brief This function reads the encapsulation of the CDR stream.
-         *         If the CDR stream contains a encapsulation, then this function would call before starting to deserialize.
+         *        If the CDR stream contains a encapsulation, then this function would call before starting to deserialize.
+         * @return True value is returned when the deserialization operation works succesfully. In other case false value is returned.
          */
          bool read_encapsulation();
 
         /*!
-         * @brief This function return the parameter list flag when the CDR type is DDS_CDR.
+         * @brief This function returns the parameter list flag when the CDR type is eProsima::DDS_CDR.
+         * @return The flag that specifies if the content is a parameter list.
          */
         DDSCdrPlFlag getDDSCdrPlFlag() const;
 
         /*!
-         * @brief This function returns the option flags when the CDR type is DDS_CDR.
+         * @brief This function returns the option flags when the CDR type is eProsima::DDS_CDR.
+         * @return The option flag.
          */
         uint16_t getDDSCdrOptions() const;
 
         /*!
-         * @brief This function skip a number of bytes in the CDR stream.
+         * @brief This function skips a number of bytes in the CDR stream buffer.
+         * @numBytes The number of bytes that will be jumped.
+         * @return True value is returned when the jump operation works succesfully. In other case false value is returned.
          */
         bool jump(uint32_t numBytes);
 
 		/*!
-		 * @brief This function resets the alignment to current position.
+		 * @brief This function resets the alignment to current position in the buffer.
 		 */
 		void resetAlignment();
 
+        /*!
+		 * @brief This function resets the current position in the buffer to the begining.
+		 */
         void reset();
 
         /*!
-         * @brief This function returns the current position in the CDR stream;
+         * @brief This function returns the current position in the CDR stream.
+         * @return Pointer to the current position in the buffer.
          */
         char* getCurrentPosition();
 
         /*!
          * @brief This function returns the current state of the CDR stream.
+         * @return The current state of the buffer.
          */
         CDRBuffer::State getState() const;
 
         /*!
-         * @brief This function set a previous state of the CDR stream;
+         * @brief This function sets a previous state of the CDR stream;
+         * @param state Previous state that will be set again.
          */
         void setState(CDRBuffer::State state);
 

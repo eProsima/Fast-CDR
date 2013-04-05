@@ -2,7 +2,7 @@
 #define _CPP_CDR_H_
 
 #include "eProsima_cpp/eProsima_cpp_dll.h"
-#include "CdrBuffer.h"
+#include "cpp/CdrBuffer.h"
 #include <stdint.h>
 #include <string>
 #include <array>

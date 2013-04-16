@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <malloc.h>
 #include <limits>
 #include <string>
 #include <array>
@@ -9,7 +10,7 @@
 
 using namespace eProsima;
 
-#define BUFFER_LENGTH 2000
+#define INIT_BUFFER_LENGTH 1
 
 const uint8_t octet_t = 32;
 const char char_t =  'Z';
@@ -54,13 +55,26 @@ const std::vector<int64_t> longlong_vector_t(longlong_array_2_t, longlong_array_
 const std::vector<float> float_vector_t(float_array_2_t, float_array_2_t + sizeof(float_array_2_t) / sizeof(float));
 const std::vector<double> double_vector_t(double_array_2_t, double_array_2_t + sizeof(double_array_2_t) / sizeof(double));
 
+bool ResizeTestAllocator(char **buffer, size_t *bufferSize, size_t minSizeInc)
+{
+    *buffer = (char*)realloc(*buffer, *bufferSize + minSizeInc);
+
+    if(*buffer != NULL)
+    {
+        *bufferSize = *bufferSize + minSizeInc;
+        return true;
+    }
+
+    return false;
+}
+
 int main()
 {
     bool returnedValue = true;
-    char buffer[BUFFER_LENGTH];
+    char *buffer = (char*)malloc(INIT_BUFFER_LENGTH);
 
     // Serialization.
-    CDRBuffer cdrbuffer_ser(buffer, BUFFER_LENGTH);
+    CDRBuffer cdrbuffer_ser(buffer, INIT_BUFFER_LENGTH, ResizeTestAllocator);
     CDR cdr_ser(cdrbuffer_ser);
 
     returnedValue &= cdr_ser << octet_t;
@@ -107,7 +121,7 @@ int main()
     returnedValue &= cdr_ser << double_vector_t;
 
         // Deseriazliation.
-    CDRBuffer cdrbuffer_des(buffer, BUFFER_LENGTH);
+    CDRBuffer cdrbuffer_des(cdrbuffer_ser.getBuffer(), cdrbuffer_ser.getBufferSize());
     CDR cdr_des(cdrbuffer_des);
 
     uint8_t octet_value = 0;

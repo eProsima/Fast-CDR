@@ -3,6 +3,7 @@
 
 #include "eProsima_cpp/eProsima_cpp_dll.h"
 #include "cpp/CdrBuffer.h"
+#include "cpp/AbstractDataTypes.h"
 #include <stdint.h>
 #include <string>
 #include <array>
@@ -311,15 +312,15 @@ namespace eProsima
         }
 
         /*!
-         * @brief This function serializes an octet with a different endianess.
+         * @brief This function serializes an octet with a different endianness.
          * @param octet_t The value of the octet that will be serialized in the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
         inline
-        bool serialize(const uint8_t octet_t, CDRBuffer::Endianess endianess)
+        bool serialize(const uint8_t octet_t, CDRBuffer::Endianness endianness)
         {
-            return serialize((char)octet_t, endianess);
+            return serialize((char)octet_t, endianness);
         }
 
         /*!
@@ -330,13 +331,13 @@ namespace eProsima
         bool serialize(const char char_t);
 
         /*!
-         * @brief This function serializes a char with a different endianess.
+         * @brief This function serializes a char with a different endianness.
          * @param char_t The value of the character that will be serialized in the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
         inline
-        bool serialize(const char char_t, CDRBuffer::Endianess endianess)
+        bool serialize(const char char_t, CDRBuffer::Endianness endianness)
         {
             return serialize(char_t);
         }
@@ -353,15 +354,15 @@ namespace eProsima
         }
 
         /*!
-         * @brief This function serializes a unsigned short with a different endianess.
+         * @brief This function serializes a unsigned short with a different endianness.
          * @param ushort_t The value of the unsigned short that will be serialized in the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
         inline
-        bool serialize(const uint16_t ushort_t, CDRBuffer::Endianess endianess)
+        bool serialize(const uint16_t ushort_t, CDRBuffer::Endianness endianness)
         {
-            return serialize((int16_t)ushort_t, endianess);
+            return serialize((int16_t)ushort_t, endianness);
         }
 
         /*!
@@ -372,12 +373,12 @@ namespace eProsima
         bool serialize(const int16_t short_t);
 
         /*!
-         * @brief This function serializes a short with a different endianess.
+         * @brief This function serializes a short with a different endianness.
          * @param short_t The value of the short that will be serialized in the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
-        bool serialize(const int16_t short_t, CDRBuffer::Endianess endianess);
+        bool serialize(const int16_t short_t, CDRBuffer::Endianness endianness);
 
         /*!
          * @brief This function serializes a unsigned long.
@@ -391,15 +392,15 @@ namespace eProsima
         }
 
         /*!
-         * @brief This function serializes a unsigned long with a different endianess.
+         * @brief This function serializes a unsigned long with a different endianness.
          * @param ulong_t The value of the unsigned long that will be serialized in the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
         inline
-        bool serialize(const uint32_t ulong_t, CDRBuffer::Endianess endianess)
+        bool serialize(const uint32_t ulong_t, CDRBuffer::Endianness endianness)
         {
-            return serialize((int32_t)ulong_t, endianess);
+            return serialize((int32_t)ulong_t, endianness);
         }
 
         /*!
@@ -410,12 +411,12 @@ namespace eProsima
         bool serialize(const int32_t long_t);
 
         /*!
-         * @brief This function serializes a long with a different endianess.
+         * @brief This function serializes a long with a different endianness.
          * @param long_t The value of the long that will be serialized in the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
-        bool serialize(const int32_t long_t, CDRBuffer::Endianess endianess);
+        bool serialize(const int32_t long_t, CDRBuffer::Endianness endianness);
 
         /*!
          * @brief This function serializes a unsigned long long.
@@ -429,15 +430,15 @@ namespace eProsima
         }
 
         /*!
-         * @brief This function serializes a unsigned long long with a different endianess.
+         * @brief This function serializes a unsigned long long with a different endianness.
          * @param ulonglong_t The value of the unsigned long long that will be serialized in the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
         inline
-        bool serialize(const uint64_t ulonglong_t, CDRBuffer::Endianess endianess)
+        bool serialize(const uint64_t ulonglong_t, CDRBuffer::Endianness endianness)
         {
-            return serialize((int64_t)ulonglong_t, endianess);
+            return serialize((int64_t)ulonglong_t, endianness);
         }
 
         /*!
@@ -448,12 +449,12 @@ namespace eProsima
         bool serialize(const int64_t longlong_t);
 
         /*!
-         * @brief This function serializes a long long with a different endianess.
+         * @brief This function serializes a long long with a different endianness.
          * @param longlong_t The value of the long long that will be serialized in the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
-        bool serialize(const int64_t longlong_t, CDRBuffer::Endianess endianess);
+        bool serialize(const int64_t longlong_t, CDRBuffer::Endianness endianness);
 
         /*!
          * @brief This function serializes a float.
@@ -463,12 +464,12 @@ namespace eProsima
         bool serialize(const float float_t);
 
         /*!
-         * @brief This function serializes a float with a different endianess.
+         * @brief This function serializes a float with a different endianness.
          * @param float_t The value of the float that will be serialized in the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
-        bool serialize(const float float_t, CDRBuffer::Endianess endianess);
+        bool serialize(const float float_t, CDRBuffer::Endianness endianness);
 
         /*!
          * @brief This function serializes a double.
@@ -478,12 +479,12 @@ namespace eProsima
         bool serialize(const double double_t);
 
         /*!
-         * @brief This function serializes a double with a different endianess.
+         * @brief This function serializes a double with a different endianness.
          * @param double_t The value of the double that will be serialized in the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
-        bool serialize(const double double_t, CDRBuffer::Endianess endianess);
+        bool serialize(const double double_t, CDRBuffer::Endianness endianness);
 
         /*!
          * @brief This function serializes a boolean.
@@ -493,13 +494,13 @@ namespace eProsima
         bool serialize(const bool bool_t);
 
         /*!
-         * @brief This function serializes a boolean with a different endianess.
+         * @brief This function serializes a boolean with a different endianness.
          * @param bool_t The value of the boolean that will be serialized in the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
         inline
-        bool serialize(const bool bool_t, CDRBuffer::Endianess endianess)
+        bool serialize(const bool bool_t, CDRBuffer::Endianness endianness)
         {
             return serialize(bool_t);
         }
@@ -512,12 +513,31 @@ namespace eProsima
         bool serialize(const std::string &string_t);
 
         /*!
-         * @brief This function serializes a string with a different endianess.
+         * @brief This function serializes a string with a different endianness.
          * @param bool_t The string that will be serialized in the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
-        bool serialize(const std::string &string_t, CDRBuffer::Endianess endianess);
+        bool serialize(const std::string &string_t, CDRBuffer::Endianness endianness);
+
+        /*!
+         * @brief This function serializes a string defined by the user.
+         * @param userString The variable that stores the user's string. Cannot be NULL.
+         * @param userStringLength The length of the internal memory of the user's string that it wants to be serialized.
+         * @param funcGetData Function pointer that will be called to access to the internal memory of the user's string.
+         * @return 0 value is returned when the serialization operation works succesfully. In other case -1 value is returned.
+         */
+        int serialize(User_CString *userString, size_t userStringLength, User_CString_FuncGetData funcGetData);
+
+        /*!
+         * @brief This function serializes a string defined by the user.
+         * @param userString The variable that stores the user's string. Cannot be NULL.
+         * @param userStringLength The length of the internal memory of the user's string that it wants to be serialized.
+         * @param funcGetData Function pointer that will be called to access to the internal memory of the user's string.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return 0 value is returned when the serialization operation works succesfully. In other case -1 value is returned.
+         */
+        int serialize(User_CString *userString, size_t userStringSize, User_CString_FuncGetData funcGetData, CDRBuffer::Endianness endianness);
 
         /*!
          * @brief This function template serializes an array.
@@ -529,14 +549,14 @@ namespace eProsima
         { return serializeArray(array_t[0], array_t.size());}
 
         /*!
-         * @brief This function template serializes an array with a different endianess.
+         * @brief This function template serializes an array with a different endianness.
          * @param array_t The array that will be serialized in the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
         template<class _T, size_t _Size>
-        inline bool serialize(const std::array<_T, _Size> &array_t, CDRBuffer::Endianess endianess)
-        { return serializeArray(array_t[0], array_t.size(), endianess);}
+        inline bool serialize(const std::array<_T, _Size> &array_t, CDRBuffer::Endianness endianness)
+        { return serializeArray(array_t[0], array_t.size(), endianness);}
 
         /*!
          * @brief This function template serializes a sequence.
@@ -557,19 +577,19 @@ namespace eProsima
         }
 
         /*!
-         * @brief This function template serializes a sequence with a different endianess.
+         * @brief This function template serializes a sequence with a different endianness.
          * @param vector_t The sequence that will be serialized in the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
         template<class _T>
-        bool serialize(const std::vector<_T> &vector_t, CDRBuffer::Endianess endianess)
+        bool serialize(const std::vector<_T> &vector_t, CDRBuffer::Endianness endianness)
         {
             bool returnedValue = false;
 
-            if(serialize((uint32_t)vector_t.size(), endianess))
+            if(serialize((uint32_t)vector_t.size(), endianness))
             {
-                returnedValue = serializeArray(vector_t.data(), vector_t.size(), endianess);
+                returnedValue = serializeArray(vector_t.data(), vector_t.size(), endianness);
             }
 
             return returnedValue;
@@ -588,14 +608,14 @@ namespace eProsima
         }
 
         /*!
-         * @brief This function serializes an array of octets with a different endianess.
+         * @brief This function serializes an array of octets with a different endianness.
          * @param octet_t The array of octets  that will be serialized in the buffer.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
         inline
-        bool serializeArray(const uint8_t *octet_t, size_t numElements, CDRBuffer::Endianess endianess)
+        bool serializeArray(const uint8_t *octet_t, size_t numElements, CDRBuffer::Endianness endianness)
         {
             return serializeArray((const char*)octet_t, numElements);
         }
@@ -609,14 +629,14 @@ namespace eProsima
         bool serializeArray(const char *char_t, size_t numElements);
 
         /*!
-         * @brief This function serializes an array of characteres with a different endianess.
+         * @brief This function serializes an array of characteres with a different endianness.
          * @param char_t The array of characteres  that will be serialized in the buffer.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
         inline
-        bool serializeArray(const char *char_t, size_t numElements, CDRBuffer::Endianess endianess)
+        bool serializeArray(const char *char_t, size_t numElements, CDRBuffer::Endianness endianness)
         {
             return serializeArray(char_t, numElements);
         }
@@ -634,16 +654,16 @@ namespace eProsima
         }
 
         /*!
-         * @brief This function serializes an array of unsigned shorts with a different endianess.
+         * @brief This function serializes an array of unsigned shorts with a different endianness.
          * @param ushort_t The array of unsigned shorts  that will be serialized in the buffer.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
         inline
-        bool serializeArray(const uint16_t *ushort_t, size_t numElements, CDRBuffer::Endianess endianess)
+        bool serializeArray(const uint16_t *ushort_t, size_t numElements, CDRBuffer::Endianness endianness)
         {
-            return serializeArray((const int16_t*)ushort_t, numElements, endianess);
+            return serializeArray((const int16_t*)ushort_t, numElements, endianness);
         }
 
         /*!
@@ -655,13 +675,13 @@ namespace eProsima
         bool serializeArray(const int16_t *short_t, size_t numElements);
 
         /*!
-         * @brief This function serializes an array of shorts with a different endianess.
+         * @brief This function serializes an array of shorts with a different endianness.
          * @param short_t The array of shorts  that will be serialized in the buffer.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
-        bool serializeArray(const int16_t *short_t, size_t numElements, CDRBuffer::Endianess endianess);
+        bool serializeArray(const int16_t *short_t, size_t numElements, CDRBuffer::Endianness endianness);
 
         /*!
          * @brief This function serializes an array of unsigned longs.
@@ -676,16 +696,16 @@ namespace eProsima
         }
 
         /*!
-         * @brief This function serializes an array of unsigned longs with a different endianess.
+         * @brief This function serializes an array of unsigned longs with a different endianness.
          * @param ulong_t The array of unsigned longs  that will be serialized in the buffer.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
         inline
-        bool serializeArray(const uint32_t *ulong_t, size_t numElements, CDRBuffer::Endianess endianess)
+        bool serializeArray(const uint32_t *ulong_t, size_t numElements, CDRBuffer::Endianness endianness)
         {
-            return serializeArray((const int32_t*)ulong_t, numElements, endianess);
+            return serializeArray((const int32_t*)ulong_t, numElements, endianness);
         }
 
         /*!
@@ -697,13 +717,13 @@ namespace eProsima
         bool serializeArray(const int32_t *long_t, size_t numElements);
 
         /*!
-         * @brief This function serializes an array of longs with a different endianess.
+         * @brief This function serializes an array of longs with a different endianness.
          * @param long_t The array of longs  that will be serialized in the buffer.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
-        bool serializeArray(const int32_t *long_t, size_t numElements, CDRBuffer::Endianess endianess);
+        bool serializeArray(const int32_t *long_t, size_t numElements, CDRBuffer::Endianness endianness);
 
         /*!
          * @brief This function serializes an array of unsigned long longs.
@@ -718,16 +738,16 @@ namespace eProsima
         }
 
         /*!
-         * @brief This function serializes an array of unsigned long longs with a different endianess.
+         * @brief This function serializes an array of unsigned long longs with a different endianness.
          * @param ulonglong_t The array of unsigned long longs  that will be serialized in the buffer.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
         inline
-        bool serializeArray(const uint64_t *ulonglong_t, size_t numElements, CDRBuffer::Endianess endianess)
+        bool serializeArray(const uint64_t *ulonglong_t, size_t numElements, CDRBuffer::Endianness endianness)
         {
-            return serializeArray((const int64_t*)ulonglong_t, numElements, endianess);
+            return serializeArray((const int64_t*)ulonglong_t, numElements, endianness);
         }
 
         /*!
@@ -739,13 +759,13 @@ namespace eProsima
         bool serializeArray(const int64_t *longlong_t, size_t numElements);
 
         /*!
-         * @brief This function serializes an array of long longs with a different endianess.
+         * @brief This function serializes an array of long longs with a different endianness.
          * @param longlong_t The array of  long longs  that will be serialized in the buffer.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
-        bool serializeArray(const int64_t *longlong_t, size_t numElements, CDRBuffer::Endianess endianess);
+        bool serializeArray(const int64_t *longlong_t, size_t numElements, CDRBuffer::Endianness endianness);
 
         /*!
          * @brief This function serializes an array of floats.
@@ -756,13 +776,13 @@ namespace eProsima
         bool serializeArray(const float *float_t, size_t numElements);
 
         /*!
-         * @brief This function serializes an array of floats with a different endianess.
+         * @brief This function serializes an array of floats with a different endianness.
          * @param float_t The array of floats that will be serialized in the buffer.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
-        bool serializeArray(const float *float_t, size_t numElements, CDRBuffer::Endianess endianess);
+        bool serializeArray(const float *float_t, size_t numElements, CDRBuffer::Endianness endianness);
 
         /*!
          * @brief This function serializes an array of doubles.
@@ -773,13 +793,13 @@ namespace eProsima
         bool serializeArray(const double *double_t, size_t numElements);
 
         /*!
-         * @brief This function serializes an array of doubles with a different endianess.
+         * @brief This function serializes an array of doubles with a different endianness.
          * @param double_t The array of doubles that will be serialized in the buffer.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
-        bool serializeArray(const double *double_t, size_t numElements, CDRBuffer::Endianess endianess);
+        bool serializeArray(const double *double_t, size_t numElements, CDRBuffer::Endianness endianness);
 
         /*!
           * @brief This function deserialize a sequence of basic types.
@@ -797,14 +817,14 @@ namespace eProsima
             return returnedValue;
         }
         template<typename _T>
-        bool serializeSequence(const _T *t, size_t numElements, CDRBuffer::Endianess endianess)
+        bool serializeSequence(const _T *t, size_t numElements, CDRBuffer::Endianness endianness)
         {
             bool returnedValue = false;
 
             //TODO Error
             if(*this << numElements)
             {
-                returnedValue = serializeArray(t, numElements, endianess);
+                returnedValue = serializeArray(t, numElements, endianness);
             }
 
             return returnedValue;
@@ -822,15 +842,15 @@ namespace eProsima
         }
 
         /*!
-         * @brief This function deserializes an octet with a different endianess.
+         * @brief This function deserializes an octet with a different endianness.
          * @param octet_t The variable that will store the octet readed from the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
         inline
-        bool deserialize(uint8_t &octet_t, CDRBuffer::Endianess endianess)
+        bool deserialize(uint8_t &octet_t, CDRBuffer::Endianness endianness)
         {
-            return deserialize((char&)octet_t, endianess);
+            return deserialize((char&)octet_t, endianness);
         }
 
         /*!
@@ -841,13 +861,13 @@ namespace eProsima
         bool deserialize(char &char_t);
 
         /*!
-         * @brief This function deserializes a characteres with a different endianess.
+         * @brief This function deserializes a characteres with a different endianness.
          * @param char_t The variable that will store the character readed from the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
         inline
-        bool deserialize(char &char_t, CDRBuffer::Endianess endianess)
+        bool deserialize(char &char_t, CDRBuffer::Endianness endianness)
         {
             return deserialize(char_t);
         }
@@ -864,15 +884,15 @@ namespace eProsima
         }
 
         /*!
-         * @brief This function deserializes a unsigned short with a different endianess.
+         * @brief This function deserializes a unsigned short with a different endianness.
          * @param ushort_t The variable that will store the unsigned short readed from the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
         inline
-        bool deserialize(uint16_t &ushort_t, CDRBuffer::Endianess endianess)
+        bool deserialize(uint16_t &ushort_t, CDRBuffer::Endianness endianness)
         {
-            return deserialize((int16_t&)ushort_t, endianess);
+            return deserialize((int16_t&)ushort_t, endianness);
         }
 
         /*!
@@ -883,12 +903,12 @@ namespace eProsima
         bool deserialize(int16_t &short_t);
 
         /*!
-         * @brief This function deserializes a short with a different endianess.
+         * @brief This function deserializes a short with a different endianness.
          * @param short_t The variable that will store the short readed from the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
-        bool deserialize(int16_t &short_t, CDRBuffer::Endianess endianess);
+        bool deserialize(int16_t &short_t, CDRBuffer::Endianness endianness);
 
         /*!
          * @brief This function deserializes a unsigned long.
@@ -902,15 +922,15 @@ namespace eProsima
         }
 
         /*!
-         * @brief This function deserializes a unsigned long with a different endianess.
+         * @brief This function deserializes a unsigned long with a different endianness.
          * @param ulong_t The variable that will store the unsigned long readed from the buffer..
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
         inline
-        bool deserialize(uint32_t &ulong_t, CDRBuffer::Endianess endianess)
+        bool deserialize(uint32_t &ulong_t, CDRBuffer::Endianness endianness)
         {
-            return deserialize((int32_t&)ulong_t, endianess);
+            return deserialize((int32_t&)ulong_t, endianness);
         }
 
         /*!
@@ -921,12 +941,12 @@ namespace eProsima
         bool deserialize(int32_t &long_t);
 
         /*!
-         * @brief This function deserializes a long with a different endianess.
+         * @brief This function deserializes a long with a different endianness.
          * @param long_t The variable that will store the long readed from the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
-        bool deserialize(int32_t &long_t, CDRBuffer::Endianess endianess);
+        bool deserialize(int32_t &long_t, CDRBuffer::Endianness endianness);
 
         /*!
          * @brief This function deserializes a unsigned long long.
@@ -940,15 +960,15 @@ namespace eProsima
         }
 
         /*!
-         * @brief This function deserializes a unsigned long long with a different endianess.
+         * @brief This function deserializes a unsigned long long with a different endianness.
          * @param ulonglong_t The variable that will store the unsigned long long readed from the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
         inline
-        bool deserialize(uint64_t &ulonglong_t, CDRBuffer::Endianess endianess)
+        bool deserialize(uint64_t &ulonglong_t, CDRBuffer::Endianness endianness)
         {
-            return deserialize((int64_t&)ulonglong_t, endianess);
+            return deserialize((int64_t&)ulonglong_t, endianness);
         }
 
         /*!
@@ -959,12 +979,12 @@ namespace eProsima
         bool deserialize(int64_t &longlong_t);
 
         /*!
-         * @brief This function deserializes a long long with a different endianess.
+         * @brief This function deserializes a long long with a different endianness.
          * @param longlong_t The variable that will store the long long readed from the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
-        bool deserialize(int64_t &longlong_t, CDRBuffer::Endianess endianess);
+        bool deserialize(int64_t &longlong_t, CDRBuffer::Endianness endianness);
 
         /*!
          * @brief This function deserializes a float.
@@ -974,12 +994,12 @@ namespace eProsima
         bool deserialize(float &float_t);
 
         /*!
-         * @brief This function deserializes a float with a different endianess.
+         * @brief This function deserializes a float with a different endianness.
          * @param float_t The variable that will store the float readed from the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
-        bool deserialize(float &float_t, CDRBuffer::Endianess endianess);
+        bool deserialize(float &float_t, CDRBuffer::Endianness endianness);
 
         /*!
          * @brief This function deserializes a double.
@@ -989,12 +1009,12 @@ namespace eProsima
         bool deserialize(double &double_t);
 
         /*!
-         * @brief This function deserializes a double with a different endianess.
+         * @brief This function deserializes a double with a different endianness.
          * @param double_t The variable that will store the double readed from the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
-        bool deserialize(double &double_t, CDRBuffer::Endianess endianess);
+        bool deserialize(double &double_t, CDRBuffer::Endianness endianness);
 
         /*!
          * @brief This function deserializes a boolean.
@@ -1004,13 +1024,13 @@ namespace eProsima
         bool deserialize(bool &bool_t);
 
         /*!
-         * @brief This function deserializes a boolean with a different endianess.
+         * @brief This function deserializes a boolean with a different endianness.
          * @param bool_t The variable that will store the boolean readed from the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
         inline
-        bool deserialize(bool &bool_t, CDRBuffer::Endianess endianess)
+        bool deserialize(bool &bool_t, CDRBuffer::Endianness endianness)
         {
             return deserialize(bool_t);
         };
@@ -1023,12 +1043,33 @@ namespace eProsima
         bool deserialize(std::string &string_t);
 
         /*!
-         * @brief This function deserializes a string with a different endianess.
+         * @brief This function deserializes a string with a different endianness.
          * @param string_t The variable that will store the string readed from the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization operation works succesfully. In other case false value is returned.
          */
-        bool deserialize(std::string &string_t, CDRBuffer::Endianess endianess);
+        bool deserialize(std::string &string_t, CDRBuffer::Endianness endianness);
+
+        /*!
+         * @brief This function deserializes a string defined by the user.
+         * @param userString The variable that will store the user's string readed from the buffer. Cannot be NULL.
+         * @param userStringSize The current size of the internal memory of the user's string.
+         * @param funcGetData Function pointer that will be called to access to the internal memory of the user's string.
+         * @param funcAllocator Function pointer that will be called if the internal memory of the user's string needs to grow.
+         * @return 0 value is returned when the serialization operation works succesfully. In other case -1 value is returned.
+         */
+        int deserialize(User_CString *userString, size_t userStringSize, User_CString_FuncGetData funcGetData, User_CString_FuncAllocator funcAllocator);
+
+        /*!
+         * @brief This function deserializes a string defined by the user.
+         * @param userString The variable that will store the user's string readed from the buffer. Cannot be NULL.
+         * @param userStringSize The current size of the internal memory of the user's string.
+         * @param funcGetData Function pointer that will be called to access to the internal memory of the user's string.
+         * @param funcAllocator Function pointer that will be called if the internal memory of the user's string needs to grow.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return 0 value is returned when the serialization operation works succesfully. In other case -1 value is returned.
+         */
+        int deserialize(User_CString *userString, size_t userStringSize, User_CString_FuncGetData funcGetData, User_CString_FuncAllocator funcAllocator, CDRBuffer::Endianness endianness);
 
         /*!
          * @brief This function template deserializes an array.
@@ -1040,14 +1081,14 @@ namespace eProsima
         { return deserializeArray(array_t[0], array_t.size());}
 
         /*!
-         * @brief This function template deserializes an array with a different endianess.
+         * @brief This function template deserializes an array with a different endianness.
          * @param array_t The variable that will store the array readed from the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
         template<class _T, size_t _Size>
-        inline bool deserialize(std::array<_T, _Size> &array_t, CDRBuffer::Endianess endianess)
-        { return deserializeArray(array_t[0], array_t.size(), endianess);}
+        inline bool deserialize(std::array<_T, _Size> &array_t, CDRBuffer::Endianness endianness)
+        { return deserializeArray(array_t[0], array_t.size(), endianness);}
 
         /*!
          * @brief This function template deserializes a sequence.
@@ -1070,21 +1111,21 @@ namespace eProsima
         }
 
         /*!
-         * @brief This function template deserializes a sequence with a different endianess.
+         * @brief This function template deserializes a sequence with a different endianness.
          * @param vector_t The variable that will store the sequence readed from the buffer.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
         template<class _T>
-        bool deserialize(std::vector<_T> &vector_t, CDRBuffer::Endianess endianess)
+        bool deserialize(std::vector<_T> &vector_t, CDRBuffer::Endianness endianness)
         {
             bool returnedValue = false;
             uint32_t seqLength = 0;
 
-            if(deserialize(seqLength, endianess))
+            if(deserialize(seqLength, endianness))
             {
                 vector_t.resize(seqLength);
-                returnedValue = deserializeArray(vector_t.data(), vector_t.size(), endianess);
+                returnedValue = deserializeArray(vector_t.data(), vector_t.size(), endianness);
             }
 
             return returnedValue;
@@ -1103,16 +1144,16 @@ namespace eProsima
         }
 
         /*!
-         * @brief This function deserializes an array of octets with a different endianess.
+         * @brief This function deserializes an array of octets with a different endianness.
          * @param octet_t The variable that will store the array of octets readed from the buffer.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
         inline
-        bool deserializeArray(uint8_t *octet_t, size_t numElements, CDRBuffer::Endianess endianess)
+        bool deserializeArray(uint8_t *octet_t, size_t numElements, CDRBuffer::Endianness endianness)
         {
-            return deserializeArray((char*)octet_t, numElements, endianess);
+            return deserializeArray((char*)octet_t, numElements, endianness);
         }
 
         /*!
@@ -1124,14 +1165,14 @@ namespace eProsima
         bool deserializeArray(char *char_t, size_t numElements);
 
         /*!
-         * @brief This function deserializes an array of characteres with a different endianess.
+         * @brief This function deserializes an array of characteres with a different endianness.
          * @param char_t The variable that will store the array of characteres readed from the buffer.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
         inline
-        bool deserializeArray(char *char_t, size_t numElements, CDRBuffer::Endianess endianess)
+        bool deserializeArray(char *char_t, size_t numElements, CDRBuffer::Endianness endianness)
         {
             return deserializeArray(char_t, numElements);
         }
@@ -1149,16 +1190,16 @@ namespace eProsima
         }
 
         /*!
-         * @brief This function deserializes an array of unsigned short with a different endianess.
+         * @brief This function deserializes an array of unsigned short with a different endianness.
          * @param ushort_t The variable that will store the array of unsigned short readed from the buffer.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
         inline
-        bool deserializeArray(uint16_t *ushort_t, size_t numElements, CDRBuffer::Endianess endianess)
+        bool deserializeArray(uint16_t *ushort_t, size_t numElements, CDRBuffer::Endianness endianness)
         {
-            return deserializeArray((int16_t*)ushort_t, numElements, endianess);
+            return deserializeArray((int16_t*)ushort_t, numElements, endianness);
         }
 
         /*!
@@ -1170,13 +1211,13 @@ namespace eProsima
         bool deserializeArray(int16_t *short_t, size_t numElements);
 
         /*!
-         * @brief This function deserializes an array of short with a different endianess.
+         * @brief This function deserializes an array of short with a different endianness.
          * @param short_t The variable that will store the array of short readed from the buffer.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
-        bool deserializeArray(int16_t *short_t, size_t numElements, CDRBuffer::Endianess endianess);
+        bool deserializeArray(int16_t *short_t, size_t numElements, CDRBuffer::Endianness endianness);
 
         /*!
          * @brief This function deserializes an array of unsigned long.
@@ -1191,16 +1232,16 @@ namespace eProsima
         }
 
         /*!
-         * @brief This function deserializes an array of unsigned long with a different endianess.
+         * @brief This function deserializes an array of unsigned long with a different endianness.
          * @param ulong_t The variable that will store the array of unsigned long readed from the buffer.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
         inline
-        bool deserializeArray(uint32_t *ulong_t, size_t numElements, CDRBuffer::Endianess endianess)
+        bool deserializeArray(uint32_t *ulong_t, size_t numElements, CDRBuffer::Endianness endianness)
         {
-            return deserializeArray((int32_t*)ulong_t, numElements, endianess);
+            return deserializeArray((int32_t*)ulong_t, numElements, endianness);
         }
 
         /*!
@@ -1212,13 +1253,13 @@ namespace eProsima
         bool deserializeArray(int32_t *long_t, size_t numElements);
 
         /*!
-         * @brief This function deserializes an array of long with a different endianess.
+         * @brief This function deserializes an array of long with a different endianness.
          * @param long_t The variable that will store the array of long readed from the buffer.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
-        bool deserializeArray(int32_t *long_t, size_t numElements, CDRBuffer::Endianess endianess);
+        bool deserializeArray(int32_t *long_t, size_t numElements, CDRBuffer::Endianness endianness);
 
         /*!
          * @brief This function deserializes an array of unsigned long long.
@@ -1233,16 +1274,16 @@ namespace eProsima
         }
 
         /*!
-         * @brief This function deserializes an array of unsigned long long with a different endianess.
+         * @brief This function deserializes an array of unsigned long long with a different endianness.
          * @param ulonglong_t The variable that will store the array of unsigned long long readed from the buffer.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
         inline
-        bool deserializeArray(uint64_t *ulonglong_t, size_t numElements, CDRBuffer::Endianess endianess)
+        bool deserializeArray(uint64_t *ulonglong_t, size_t numElements, CDRBuffer::Endianness endianness)
         {
-            return deserializeArray((int64_t*)ulonglong_t, numElements, endianess);
+            return deserializeArray((int64_t*)ulonglong_t, numElements, endianness);
         }
 
         /*!
@@ -1254,13 +1295,13 @@ namespace eProsima
         bool deserializeArray(int64_t *longlong_t, size_t numElements);
 
         /*!
-         * @brief This function deserializes an array of long long with a different endianess.
+         * @brief This function deserializes an array of long long with a different endianness.
          * @param longlong_t The variable that will store the array of long long readed from the buffer.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
-        bool deserializeArray(int64_t *longlong_t, size_t numElements, CDRBuffer::Endianess endianess);
+        bool deserializeArray(int64_t *longlong_t, size_t numElements, CDRBuffer::Endianness endianness);
 
         /*!
          * @brief This function deserializes an array of float.
@@ -1271,13 +1312,13 @@ namespace eProsima
         bool deserializeArray(float *float_t, size_t numElements);
 
         /*!
-         * @brief This function deserializes an array of float with a different endianess.
+         * @brief This function deserializes an array of float with a different endianness.
          * @param float_t The variable that will store the array of float readed from the buffer.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
-        bool deserializeArray(float *float_t, size_t numElements, CDRBuffer::Endianess endianess);
+        bool deserializeArray(float *float_t, size_t numElements, CDRBuffer::Endianness endianness);
 
         /*!
          * @brief This function deserializes an array of double.
@@ -1288,13 +1329,13 @@ namespace eProsima
         bool deserializeArray(double *double_t, size_t numElements);
 
         /*!
-         * @brief This function deserializes an array of double with a different endianess.
+         * @brief This function deserializes an array of double with a different endianness.
          * @param double_t The variable that will store the array of double readed from the buffer.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
-        bool deserializeArray(double *double_t, size_t numElements, CDRBuffer::Endianess endianess);
+        bool deserializeArray(double *double_t, size_t numElements, CDRBuffer::Endianness endianness);
 
         /*!
           * @brief This function deserialize a sequence of basic types.
@@ -1312,14 +1353,14 @@ namespace eProsima
             return returnedValue;
         }
         template<typename _T>
-        bool deserializeSequence(_T *t, size_t maxNumElements, size_t &numElements, CDRBuffer::Endianess endianess)
+        bool deserializeSequence(_T *t, size_t maxNumElements, size_t &numElements, CDRBuffer::Endianness endianness)
         {
             bool returnedValue = false;
 
             // TODO Error
             if(*this >> numElements && numElements <= maxNumElements)
             {
-                returnedValue = deserializeArray(t, numElements, endianess);
+                returnedValue = deserializeArray(t, numElements, endianness);
             }
 
             return returnedValue;
@@ -1340,16 +1381,16 @@ namespace eProsima
         }
 
         /*!
-         * @brief This function template detects the content type of an array and serializes the array with a different endianess.
+         * @brief This function template detects the content type of an array and serializes the array with a different endianness.
          * @param array_t The array that will be serialized in the buffer.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
         template<class _T, size_t _Size>
-        bool serializeArray(const std::array<_T, _Size> &array_t, size_t numElements, CDRBuffer::Endianess endianess)
+        bool serializeArray(const std::array<_T, _Size> &array_t, size_t numElements, CDRBuffer::Endianness endianness)
         {
-            return serializeArray(array_t[0], numElements * array_t.size(), endianess);
+            return serializeArray(array_t[0], numElements * array_t.size(), endianness);
         }
 
         /*!
@@ -1365,16 +1406,16 @@ namespace eProsima
         }
 
         /*!
-         * @brief This function template detects is used to detect the content type of an array and serializes the array with a different endianess.
+         * @brief This function template detects is used to detect the content type of an array and serializes the array with a different endianness.
          * @param t Reference to the first element of the array.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
         template<typename _T>
-        bool serializeArray(const _T &t, size_t numElements, CDRBuffer::Endianess endianess)
+        bool serializeArray(const _T &t, size_t numElements, CDRBuffer::Endianness endianness)
         {
-            return serializeArray(&t, numElements, endianess);
+            return serializeArray(&t, numElements, endianness);
         }
 
         /*!
@@ -1390,16 +1431,16 @@ namespace eProsima
         }
 
         /*!
-         * @brief This function template detects the content type of an array and deserializes the array with a different endianess.
+         * @brief This function template detects the content type of an array and deserializes the array with a different endianness.
          * @param array_t The variable that will store the array readed from the buffer.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
         template<class _T, size_t _Size>
-        bool deserializeArray(std::array<_T, _Size> &array_t, size_t numElements, CDRBuffer::Endianess endianess)
+        bool deserializeArray(std::array<_T, _Size> &array_t, size_t numElements, CDRBuffer::Endianness endianness)
         {
-            return deserializeArray(array_t[0], numElements * array_t.size(), endianess);
+            return deserializeArray(array_t[0], numElements * array_t.size(), endianness);
         }
 
 
@@ -1416,16 +1457,16 @@ namespace eProsima
         }
 
         /*!
-         * @brief This function template is used to detect the content type of an array and deserializes the array with a different endianess.
+         * @brief This function template is used to detect the content type of an array and deserializes the array with a different endianness.
          * @param t Reference to the first element of the array.
          * @param numElements Number of the elements in the array.
-         * @param endianess Endianess that will be used in the serialization of this value.
+         * @param endianness Endianness that will be used in the serialization of this value.
          * @return True value is returned when the serialization  operation works succesfully. In other case false value is returned.
          */
         template<typename _T>
-        bool deserializeArray(_T &t, size_t numElements, CDRBuffer::Endianess endianess)
+        bool deserializeArray(_T &t, size_t numElements, CDRBuffer::Endianness endianness)
         {
-            return deserializeArray(&t, numElements, endianess);
+            return deserializeArray(&t, numElements, endianness);
         }
 
         //! @brief Reference to the buffer that will be serialized/deserialized.

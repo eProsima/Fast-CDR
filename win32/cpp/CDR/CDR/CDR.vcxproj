@@ -365,6 +365,7 @@
     <ClCompile Include="..\..\..\..\src\cpp\CdrBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\include\cpp\AbstractDataTypes.h" />
     <ClInclude Include="..\..\..\..\include\cpp\Cdr.h" />
     <ClInclude Include="..\..\..\..\include\cpp\CdrBuffer.h" />
   </ItemGroup>

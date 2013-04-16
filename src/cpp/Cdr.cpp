@@ -24,11 +24,11 @@ bool CDR::read_encapsulation()
 
     if(returnedValue)
     {
-        // If it is a different endianess, make changes.
-        if(m_cdrBuffer.m_endianess != (encapsulationKind & 0x1))
+        // If it is a different endianness, make changes.
+        if(m_cdrBuffer.m_endianness != (encapsulationKind & 0x1))
         {
             m_cdrBuffer.m_swapBytes = !m_cdrBuffer.m_swapBytes;
-            m_cdrBuffer.m_endianess = encapsulationKind;
+            m_cdrBuffer.m_endianness = encapsulationKind;
         }
 
         // If it is DDS_CDR type, view if contains a parameter list.
@@ -96,7 +96,7 @@ void CDR::setState(CDRBuffer::State state)
 
 bool CDR::serialize(const char char_t)
 {
-    if(m_cdrBuffer.checkSpace(sizeof(char_t)))
+    if(m_cdrBuffer.checkSpace(sizeof(char_t)) || m_cdrBuffer.resize(sizeof(char_t)))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(char_t);
@@ -114,7 +114,7 @@ bool CDR::serialize(const int16_t short_t)
     size_t align = m_cdrBuffer.align(sizeof(short_t));
     size_t sizeAligned = sizeof(short_t) + align;
 
-    if(m_cdrBuffer.checkSpace(sizeAligned))
+    if(m_cdrBuffer.checkSpace(sizeAligned) || m_cdrBuffer.resize(sizeAligned))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(short_t);
@@ -142,10 +142,10 @@ bool CDR::serialize(const int16_t short_t)
     return false;
 }
 
-bool CDR::serialize(const int16_t short_t, CDRBuffer::Endianess endianess)
+bool CDR::serialize(const int16_t short_t, CDRBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
-    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess == endianess)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess != endianess));
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = serialize(short_t);
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
@@ -156,7 +156,7 @@ bool CDR::serialize(const int32_t long_t)
     size_t align = m_cdrBuffer.align(sizeof(long_t));
     size_t sizeAligned = sizeof(long_t) + align;
 
-    if(m_cdrBuffer.checkSpace(sizeAligned))
+    if(m_cdrBuffer.checkSpace(sizeAligned) || m_cdrBuffer.resize(sizeAligned))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(long_t);
@@ -186,10 +186,10 @@ bool CDR::serialize(const int32_t long_t)
     return false;
 }
 
-bool CDR::serialize(const int32_t long_t, CDRBuffer::Endianess endianess)
+bool CDR::serialize(const int32_t long_t, CDRBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
-    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess == endianess)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess != endianess));
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = serialize(long_t);
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
@@ -200,7 +200,7 @@ bool CDR::serialize(const int64_t longlong_t)
     size_t align = m_cdrBuffer.align(sizeof(longlong_t));
     size_t sizeAligned = sizeof(longlong_t) + align;
 
-    if(m_cdrBuffer.checkSpace(sizeAligned))
+    if(m_cdrBuffer.checkSpace(sizeAligned) || m_cdrBuffer.resize(sizeAligned))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(longlong_t);
@@ -234,10 +234,10 @@ bool CDR::serialize(const int64_t longlong_t)
     return false;
 }
 
-bool CDR::serialize(const int64_t longlong_t, CDRBuffer::Endianess endianess)
+bool CDR::serialize(const int64_t longlong_t, CDRBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
-    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess == endianess)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess != endianess));
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = serialize(longlong_t);
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
@@ -248,7 +248,7 @@ bool CDR::serialize(const float float_t)
     size_t align = m_cdrBuffer.align(sizeof(float_t));
     size_t sizeAligned = sizeof(float_t) + align;
 
-    if(m_cdrBuffer.checkSpace(sizeAligned))
+    if(m_cdrBuffer.checkSpace(sizeAligned) || m_cdrBuffer.resize(sizeAligned))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(float_t);
@@ -278,10 +278,10 @@ bool CDR::serialize(const float float_t)
     return false;
 }
 
-bool CDR::serialize(const float float_t, CDRBuffer::Endianess endianess)
+bool CDR::serialize(const float float_t, CDRBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
-    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess == endianess)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess != endianess));
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = serialize(float_t);
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
@@ -292,7 +292,7 @@ bool CDR::serialize(const double double_t)
     size_t align = m_cdrBuffer.align(sizeof(double_t));
     size_t sizeAligned = sizeof(double_t) + align;
 
-    if(m_cdrBuffer.checkSpace(sizeAligned))
+    if(m_cdrBuffer.checkSpace(sizeAligned) || m_cdrBuffer.resize(sizeAligned))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(double_t);
@@ -326,10 +326,10 @@ bool CDR::serialize(const double double_t)
     return false;
 }
 
-bool CDR::serialize(const double double_t, CDRBuffer::Endianess endianess)
+bool CDR::serialize(const double double_t, CDRBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
-    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess == endianess)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess != endianess));
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = serialize(double_t);
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
@@ -339,7 +339,7 @@ bool CDR::serialize(const bool bool_t)
 {
     uint8_t value = 0;
 
-    if(m_cdrBuffer.checkSpace(sizeof(uint8_t)))
+    if(m_cdrBuffer.checkSpace(sizeof(uint8_t)) || m_cdrBuffer.resize(sizeof(uint8_t)))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(uint8_t);
@@ -362,7 +362,7 @@ bool CDR::serialize(const std::string &string_t)
 
     returnedValue &= *this << length;
 
-    if(length > 0 && m_cdrBuffer.checkSpace(length))
+    if(length > 0 && (m_cdrBuffer.checkSpace(length) || m_cdrBuffer.resize(length)))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(uint8_t);
@@ -375,11 +375,50 @@ bool CDR::serialize(const std::string &string_t)
     return returnedValue;
 }
 
-bool CDR::serialize(const std::string &string_t, CDRBuffer::Endianess endianess)
+bool CDR::serialize(const std::string &string_t, CDRBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
-    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess == endianess)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess != endianess));
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = serialize(string_t);
+    m_cdrBuffer.m_swapBytes = auxSwap;
+    return returnedValue;
+}
+
+int CDR::serialize(User_CString *userString, size_t userStringLength, User_CString_FuncGetData funcGetData)
+{
+    uint32_t length = (uint32_t)userStringLength;
+    char *data = NULL;
+
+    if(*this << length)
+    {
+        if(length > 0)
+        {
+            if(m_cdrBuffer.checkSpace(length) || m_cdrBuffer.resize(length))
+            {
+                if((data = funcGetData(userString)) != NULL)
+                {
+                    // Save last datasize.
+                    m_cdrBuffer.m_lastDataSize = sizeof(uint8_t);
+
+                    memcpy(m_cdrBuffer.m_currentPosition, data, length);
+                    m_cdrBuffer.m_currentPosition += length;
+                    m_cdrBuffer.m_bufferLength -= length;
+                    return 0;
+                }
+            }
+        }
+        else
+            return 0;
+    }
+
+    return -1;
+}
+
+int CDR::serialize(User_CString *userString, size_t userStringSize, User_CString_FuncGetData funcGetData, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+    int returnedValue = serialize(userString, userStringSize, funcGetData) ? 0 : -1;
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
 }
@@ -388,7 +427,7 @@ bool CDR::serializeArray(const char *char_t, size_t numElements)
 {
     size_t totalSize = sizeof(*char_t)*numElements;
 
-    if(m_cdrBuffer.checkSpace(totalSize))
+    if(m_cdrBuffer.checkSpace(totalSize) || m_cdrBuffer.resize(totalSize))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(char_t);
@@ -408,7 +447,7 @@ bool CDR::serializeArray(const int16_t *short_t, size_t numElements)
     size_t totalSize = sizeof(*short_t) * numElements;
     size_t sizeAligned = totalSize + align;
 
-    if(m_cdrBuffer.checkSpace(sizeAligned))
+    if(m_cdrBuffer.checkSpace(sizeAligned) || m_cdrBuffer.resize(sizeAligned))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(short_t);
@@ -442,10 +481,10 @@ bool CDR::serializeArray(const int16_t *short_t, size_t numElements)
     return false;
 }
 
-bool CDR::serializeArray(const int16_t *short_t, size_t numElements, CDRBuffer::Endianess endianess)
+bool CDR::serializeArray(const int16_t *short_t, size_t numElements, CDRBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
-    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess == endianess)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess != endianess));
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = serializeArray(short_t, numElements);
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
@@ -457,7 +496,7 @@ bool CDR::serializeArray(const int32_t *long_t, size_t numElements)
     size_t totalSize = sizeof(*long_t) * numElements;
     size_t sizeAligned = totalSize + align;
 
-    if(m_cdrBuffer.checkSpace(sizeAligned))
+    if(m_cdrBuffer.checkSpace(sizeAligned) || m_cdrBuffer.resize(sizeAligned))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(long_t);
@@ -493,10 +532,10 @@ bool CDR::serializeArray(const int32_t *long_t, size_t numElements)
     return false;
 }
 
-bool CDR::serializeArray(const int32_t *long_t, size_t numElements, CDRBuffer::Endianess endianess)
+bool CDR::serializeArray(const int32_t *long_t, size_t numElements, CDRBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
-    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess == endianess)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess != endianess));
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = serializeArray(long_t, numElements);
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
@@ -508,7 +547,7 @@ bool CDR::serializeArray(const int64_t *longlong_t, size_t numElements)
     size_t totalSize = sizeof(*longlong_t) * numElements;
     size_t sizeAligned = totalSize + align;
 
-    if(m_cdrBuffer.checkSpace(sizeAligned))
+    if(m_cdrBuffer.checkSpace(sizeAligned) || m_cdrBuffer.resize(sizeAligned))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(longlong_t);
@@ -548,10 +587,10 @@ bool CDR::serializeArray(const int64_t *longlong_t, size_t numElements)
     return false;
 }
 
-bool CDR::serializeArray(const int64_t *longlong_t, size_t numElements, CDRBuffer::Endianess endianess)
+bool CDR::serializeArray(const int64_t *longlong_t, size_t numElements, CDRBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
-    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess == endianess)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess != endianess));
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = serializeArray(longlong_t, numElements);
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
@@ -563,7 +602,7 @@ bool CDR::serializeArray(const float *float_t, size_t numElements)
     size_t totalSize = sizeof(*float_t) * numElements;
     size_t sizeAligned = totalSize + align;
 
-    if(m_cdrBuffer.checkSpace(sizeAligned))
+    if(m_cdrBuffer.checkSpace(sizeAligned) || m_cdrBuffer.resize(sizeAligned))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(float_t);
@@ -599,10 +638,10 @@ bool CDR::serializeArray(const float *float_t, size_t numElements)
     return false;
 }
 
-bool CDR::serializeArray(const float *float_t, size_t numElements, CDRBuffer::Endianess endianess)
+bool CDR::serializeArray(const float *float_t, size_t numElements, CDRBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
-    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess == endianess)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess != endianess));
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = serializeArray(float_t, numElements);
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
@@ -614,7 +653,7 @@ bool CDR::serializeArray(const double *double_t, size_t numElements)
     size_t totalSize = sizeof(*double_t) * numElements;
     size_t sizeAligned = totalSize + align;
 
-    if(m_cdrBuffer.checkSpace(sizeAligned))
+    if(m_cdrBuffer.checkSpace(sizeAligned) || m_cdrBuffer.resize(sizeAligned))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(double_t);
@@ -654,10 +693,10 @@ bool CDR::serializeArray(const double *double_t, size_t numElements)
     return false;
 }
 
-bool CDR::serializeArray(const double *double_t, size_t numElements, CDRBuffer::Endianess endianess)
+bool CDR::serializeArray(const double *double_t, size_t numElements, CDRBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
-    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess == endianess)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess != endianess));
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = serializeArray(double_t, numElements);
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
@@ -711,10 +750,10 @@ bool CDR::deserialize(int16_t &short_t)
     return false;
 }
 
-bool CDR::deserialize(int16_t &short_t, CDRBuffer::Endianess endianess)
+bool CDR::deserialize(int16_t &short_t, CDRBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
-    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess == endianess)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess != endianess));
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = deserialize(short_t);
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
@@ -755,10 +794,10 @@ bool CDR::deserialize(int32_t &long_t)
     return false;
 }
 
-bool CDR::deserialize(int32_t &long_t, CDRBuffer::Endianess endianess)
+bool CDR::deserialize(int32_t &long_t, CDRBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
-    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess == endianess)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess != endianess));
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = deserialize(long_t);
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
@@ -803,10 +842,10 @@ bool CDR::deserialize(int64_t &longlong_t)
     return false;
 }
 
-bool CDR::deserialize(int64_t &longlong_t, CDRBuffer::Endianess endianess)
+bool CDR::deserialize(int64_t &longlong_t, CDRBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
-    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess == endianess)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess != endianess));
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = deserialize(longlong_t);
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
@@ -847,10 +886,10 @@ bool CDR::deserialize(float &float_t)
     return false;
 }
 
-bool CDR::deserialize(float &float_t, CDRBuffer::Endianess endianess)
+bool CDR::deserialize(float &float_t, CDRBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
-    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess == endianess)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess != endianess));
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = deserialize(float_t);
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
@@ -895,10 +934,10 @@ bool CDR::deserialize(double &double_t)
     return false;
 }
 
-bool CDR::deserialize(double &double_t, CDRBuffer::Endianess endianess)
+bool CDR::deserialize(double &double_t, CDRBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
-    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess == endianess)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess != endianess));
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = deserialize(double_t);
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
@@ -942,7 +981,7 @@ bool CDR::deserialize(std::string &string_t)
     {
         string_t = "";
     }
-    else if(m_cdrBuffer.checkSpace(length))
+    else if(returnedValue &= m_cdrBuffer.checkSpace(length))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(uint8_t);
@@ -955,11 +994,62 @@ bool CDR::deserialize(std::string &string_t)
     return returnedValue;
 }
 
-bool CDR::deserialize(std::string &string_t, CDRBuffer::Endianess endianess)
+bool CDR::deserialize(std::string &string_t, CDRBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
-    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess == endianess)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess != endianess));
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = deserialize(string_t);
+    m_cdrBuffer.m_swapBytes = auxSwap;
+    return returnedValue;
+}
+
+int CDR::deserialize(User_CString *userString, size_t userStringSize, User_CString_FuncGetData funcGetData, User_CString_FuncAllocator funcAllocator)
+{
+    uint32_t length = 0;
+    char *data = NULL;
+
+    if(*this >> length)
+    {
+        if(length == 0)
+        {
+            if((userStringSize > 0) || (funcAllocator(userString, 1) == 0))
+            {
+                if((data = funcGetData(userString)) != NULL)
+                {
+                    data[0] = '\0';
+                    return 0;
+                }
+            }
+        }
+        else if(m_cdrBuffer.checkSpace(length))
+        {
+            uint32_t addition = length + (m_cdrBuffer.m_currentPosition[length-1] == '\0' ? 0 : 1);
+
+            if((userStringSize >= addition) || (funcAllocator(userString, addition) == 0))
+            {
+                if((data = funcGetData(userString)) != NULL)
+                {
+                    // Save last datasize.
+                    m_cdrBuffer.m_lastDataSize = sizeof(uint8_t);
+
+                    memcpy(data, m_cdrBuffer.m_currentPosition, length);
+                    data[addition-1] = '\0';
+                    m_cdrBuffer.m_currentPosition += length;
+                    m_cdrBuffer.m_bufferLength -= length;
+                    return 0;
+                }
+            }
+        }
+    }
+
+    return -1;
+}
+
+int CDR::deserialize(User_CString *userString, size_t userStringSize, User_CString_FuncGetData funcGetData, User_CString_FuncAllocator funcAllocator, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+    int returnedValue = deserialize(userString, userStringSize, funcGetData, funcAllocator) ? 0 : -1;
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
 }
@@ -1022,10 +1112,10 @@ bool CDR::deserializeArray(int16_t *short_t, size_t numElements)
     return false;
 }
 
-bool CDR::deserializeArray(int16_t *short_t, size_t numElements, CDRBuffer::Endianess endianess)
+bool CDR::deserializeArray(int16_t *short_t, size_t numElements, CDRBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
-    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess == endianess)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess != endianess));
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = deserializeArray(short_t, numElements);
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
@@ -1073,10 +1163,10 @@ bool CDR::deserializeArray(int32_t *long_t, size_t numElements)
     return false;
 }
 
-bool CDR::deserializeArray(int32_t *long_t, size_t numElements, CDRBuffer::Endianess endianess)
+bool CDR::deserializeArray(int32_t *long_t, size_t numElements, CDRBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
-    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess == endianess)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess != endianess));
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = deserializeArray(long_t, numElements);
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
@@ -1128,10 +1218,10 @@ bool CDR::deserializeArray(int64_t *longlong_t, size_t numElements)
     return false;
 }
 
-bool CDR::deserializeArray(int64_t *longlong_t, size_t numElements, CDRBuffer::Endianess endianess)
+bool CDR::deserializeArray(int64_t *longlong_t, size_t numElements, CDRBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
-    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess == endianess)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess != endianess));
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = deserializeArray(longlong_t, numElements);
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
@@ -1179,10 +1269,10 @@ bool CDR::deserializeArray(float *float_t, size_t numElements)
     return false;
 }
 
-bool CDR::deserializeArray(float *float_t, size_t numElements, CDRBuffer::Endianess endianess)
+bool CDR::deserializeArray(float *float_t, size_t numElements, CDRBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
-    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess == endianess)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess != endianess));
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = deserializeArray(float_t, numElements);
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
@@ -1234,10 +1324,10 @@ bool CDR::deserializeArray(double *double_t, size_t numElements)
     return false;
 }
 
-bool CDR::deserializeArray(double *double_t, size_t numElements, CDRBuffer::Endianess endianess)
+bool CDR::deserializeArray(double *double_t, size_t numElements, CDRBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
-    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess == endianess)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianess != endianess));
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = deserializeArray(double_t, numElements);
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;

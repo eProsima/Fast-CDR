@@ -33,8 +33,8 @@ namespace eProsima
     {
         if(m_funcAllocator != NULL)
         {
-            ptrdiff_t currentPositionDiff = m_currentPosition - m_buffer;
-            ptrdiff_t alignPositionDiff = m_alignPosition - m_buffer;
+            std::ptrdiff_t currentPositionDiff = m_currentPosition - m_buffer;
+            std::ptrdiff_t alignPositionDiff = m_alignPosition - m_buffer;
             size_t oldBufferSize = m_bufferSize;
 
             if(m_funcAllocator(&m_buffer, &m_bufferSize, minSizeInc))

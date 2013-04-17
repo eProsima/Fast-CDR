@@ -1,7 +1,8 @@
-﻿#include "cpp/CDR.h"
+﻿#include "cpp/Cdr.h"
 
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 #include <limits>
 #include <string>
 #include <array>
@@ -70,5 +71,13 @@ int main()
     returnedValue &= strncmp(staticStringSer, dynamicStringDes, strlen(staticStringSer) + 1) == 0 ? true : false;
     returnedValue &= strncmp(staticStringSer, notEndStringDes, strlen(staticStringSer) + 1) == 0 ? true : false;
 
-    return returnedValue;
+    if(returnedValue)
+    {
+        printf("TEST SUCCESSFUL\n");
+        return 0;
+    }
+    else
+        printf("TEST FAILED\n");
+
+    return -1;
 }

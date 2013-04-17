@@ -1,4 +1,4 @@
-﻿#include "cpp/CDR.h"
+﻿#include "cpp/Cdr.h"
 
 #include <stdio.h>
 #include <stdint.h>
@@ -17,31 +17,31 @@ const uint16_t ushort_t = 65500;
 const int16_t short_t = -32700;
 const uint32_t ulong_t = 4294967200;
 const int32_t long_t = -2147483600;
-const uint64_t ulonglong_t = 18446744073709551600;
+const uint64_t ulonglong_t = 18446744073709551600u;
 const int64_t longlong_t = -9223372036800;
 const float float_t = std::numeric_limits<float>::min();
 const double double_t = std::numeric_limits<double>::min();
 const bool bool_t = true;
 const std::string string_t = "Hola a todos, esto es un test";
-const std::array<uint8_t, 5> octet_array_t = {1, 2, 3, 4, 5};
+const std::array<uint8_t, 5> octet_array_t = {{1, 2, 3, 4, 5}};
 const uint8_t octet_array_2_t[5] = {5, 4, 3, 2, 1};
-const std::array<char, 5> char_array_t = {'A', 'B', 'C', 'D', 'E'};
+const std::array<char, 5> char_array_t = {{'A', 'B', 'C', 'D', 'E'}};
 const char char_array_2_t[5] = {'E', 'D', 'C', 'B', 'A'};
-const std::array<uint16_t, 5> ushort_array_t = {65500, 65501, 65502, 65503, 65504};
+const std::array<uint16_t, 5> ushort_array_t = {{65500, 65501, 65502, 65503, 65504}};
 const uint16_t ushort_array_2_t[5] = {65504, 65503, 65502, 65501, 65500};
-const std::array<int16_t, 5> short_array_t = {-32700, -32701, -32702, -32703, -32704};
+const std::array<int16_t, 5> short_array_t = {{-32700, -32701, -32702, -32703, -32704}};
 const int16_t short_array_2_t[5] = {-32704, -32703, -32702, -32701, -32700};
-const std::array<uint32_t, 5> ulong_array_t = {4294967200, 4294967201, 4294967202, 4294967203, 4294967204};
+const std::array<uint32_t, 5> ulong_array_t = {{4294967200, 4294967201, 4294967202, 4294967203, 4294967204}};
 const uint32_t ulong_array_2_t[5] = {4294967204, 4294967203, 4294967202, 4294967201, 4294967200};
-const std::array<int32_t, 5> long_array_t = {-2147483600, -2147483601, -2147483602, -2147483603, -2147483604};
+const std::array<int32_t, 5> long_array_t = {{-2147483600, -2147483601, -2147483602, -2147483603, -2147483604}};
 const int32_t long_array_2_t[5] = {-2147483604, -2147483603, -2147483602, -2147483601, -2147483600};
-const std::array<uint64_t, 5> ulonglong_array_t = {18446744073709551600, 18446744073709551601, 18446744073709551602, 18446744073709551603, 18446744073709551604};
-const uint64_t ulonglong_array_2_t[5] = {18446744073709551604, 18446744073709551603, 18446744073709551602, 18446744073709551601, 18446744073709551600};
-const std::array<int64_t, 5> longlong_array_t = {-9223372036800, -9223372036801, -9223372036802, -9223372036803, -9223372036804};
+const std::array<uint64_t, 5> ulonglong_array_t = {{18446744073709551600u, 18446744073709551601u, 18446744073709551602u, 18446744073709551603u, 18446744073709551604u}};
+const uint64_t ulonglong_array_2_t[5] = {18446744073709551604u, 18446744073709551603u, 18446744073709551602u, 18446744073709551601u, 18446744073709551600u};
+const std::array<int64_t, 5> longlong_array_t = {{-9223372036800, -9223372036801, -9223372036802, -9223372036803, -9223372036804}};
 const int64_t longlong_array_2_t[5] = {-9223372036804, -9223372036803, -9223372036802, -9223372036801, -9223372036800};
-const std::array<float, 5> float_array_t = {float_t, float_t + 1, float_t + 2, float_t + 3, float_t + 4};
+const std::array<float, 5> float_array_t = {{float_t, float_t + 1, float_t + 2, float_t + 3, float_t + 4}};
 const float float_array_2_t[5] = {float_t + 4, float_t + 3, float_t + 2, float_t + 1, float_t};
-const std::array<double, 5> double_array_t = {double_t, double_t + 1, double_t + 2, double_t + 3, double_t + 4};
+const std::array<double, 5> double_array_t = {{double_t, double_t + 1, double_t + 2, double_t + 3, double_t + 4}};
 const double double_array_2_t[5] = {double_t + 4, double_t + 3, double_t + 2, double_t + 1, double_t};
 const std::vector<uint8_t> octet_vector_t(octet_array_2_t, octet_array_2_t + sizeof(octet_array_2_t) / sizeof(uint8_t));
 const std::vector<char> char_vector_t(char_array_2_t, char_array_2_t + sizeof(char_array_2_t) / sizeof(char));
@@ -358,6 +358,13 @@ int main()
     returnedValue &= double_vector_value[3] == double_vector_t[3];
     returnedValue &= double_vector_value[4] == double_vector_t[4];
 
+    if(returnedValue)
+    {
+        printf("TEST SUCCESSFUL\n");
+        return 0;
+    }
+    else
+        printf("TEST FAILED\n");
 
-    return returnedValue;
+    return -1;
 }

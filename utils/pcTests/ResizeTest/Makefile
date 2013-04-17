@@ -94,7 +94,7 @@ $(RESIZETEST_OUTDIR_DEBUG)/%.cpp.o:%.cpp
 	@echo Calculating dependencies \(DEBUG mode\) $<
 	@$(CPP) $(RESIZETEST_CFLAGS_DEBUG) -MM $(RESIZETEST_INCLUDE_DIRS) $< | sed "s/^.*:/$(RESIZETEST_SED_OUTPUT_DIR_DEBUG)\/&/g" > $(@:%.o=%.d)
 	@echo Compiling \(DEBUG mode\) $<
-	$(CPP) $(RESIZETEST_CFLAGS_DEBUG) $(RESIZETEST_INCLUDE_DIRS) $< -o $@
+	@$(CPP) $(RESIZETEST_CFLAGS_DEBUG) $(RESIZETEST_INCLUDE_DIRS) $< -o $@
 
 $(RESIZETEST_OUTDIR_RELEASE)/%.cpp.o:%.cpp
 	@echo Calculating dependencies \(RELEASE mode\) $<

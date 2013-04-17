@@ -53,6 +53,7 @@ const std::vector<uint64_t> ulonglong_vector_t(ulonglong_array_2_t, ulonglong_ar
 const std::vector<int64_t> longlong_vector_t(longlong_array_2_t, longlong_array_2_t + sizeof(longlong_array_2_t) / sizeof(int64_t));
 const std::vector<float> float_vector_t(float_array_2_t, float_array_2_t + sizeof(float_array_2_t) / sizeof(float));
 const std::vector<double> double_vector_t(double_array_2_t, double_array_2_t + sizeof(double_array_2_t) / sizeof(double));
+const std::array<std::array<std::array<uint32_t, 3>, 2>, 2> triple_ulong_array_t = {{ {{ {{1, 2, 3}}, {{4, 5, 6}} }}, {{ {{7, 8, 9}}, {{10, 11, 12}} }} }};
 
 int main()
 {
@@ -105,6 +106,7 @@ int main()
     returnedValue &= cdr_ser << longlong_vector_t;
     returnedValue &= cdr_ser << float_vector_t;
     returnedValue &= cdr_ser << double_vector_t;
+    returnedValue &= cdr_ser << triple_ulong_array_t;
 
         // Deseriazliation.
     CDRBuffer cdrbuffer_des(buffer, BUFFER_LENGTH);
@@ -152,6 +154,7 @@ int main()
     std::vector<int64_t> longlong_vector_value;
     std::vector<float> float_vector_value;
     std::vector<double> double_vector_value;
+    std::array<std::array<std::array<uint32_t, 3>, 2>, 2> triple_ulong_array_value;
 
     returnedValue &= cdr_des >> octet_value;
     returnedValue &= octet_value == octet_t;
@@ -178,11 +181,7 @@ int main()
     returnedValue &= cdr_des >> string_value;
     returnedValue &= string_value == string_t;
     returnedValue &= cdr_des >> octet_array_value;
-    returnedValue &= octet_array_value[0] == octet_array_t[0];
-    returnedValue &= octet_array_value[1] == octet_array_t[1];
-    returnedValue &= octet_array_value[2] == octet_array_t[2];
-    returnedValue &= octet_array_value[3] == octet_array_t[3];
-    returnedValue &= octet_array_value[4] == octet_array_t[4];
+    returnedValue &= octet_array_value == octet_array_t;
     returnedValue &= cdr_des.deserializeArray(octet_array_2_value, 5);
     returnedValue &= octet_array_2_value[0] == octet_array_2_t[0];
     returnedValue &= octet_array_2_value[1] == octet_array_2_t[1];
@@ -190,11 +189,7 @@ int main()
     returnedValue &= octet_array_2_value[3] == octet_array_2_t[3];
     returnedValue &= octet_array_2_value[4] == octet_array_2_t[4];
     returnedValue &= cdr_des >> char_array_value;
-    returnedValue &= char_array_value[0] == char_array_t[0];
-    returnedValue &= char_array_value[1] == char_array_t[1];
-    returnedValue &= char_array_value[2] == char_array_t[2];
-    returnedValue &= char_array_value[3] == char_array_t[3];
-    returnedValue &= char_array_value[4] == char_array_t[4];
+    returnedValue &= char_array_value == char_array_t;
     returnedValue &= cdr_des.deserializeArray(char_array_2_value, 5);
     returnedValue &= char_array_2_value[0] == char_array_2_t[0];
     returnedValue &= char_array_2_value[1] == char_array_2_t[1];
@@ -202,11 +197,7 @@ int main()
     returnedValue &= char_array_2_value[3] == char_array_2_t[3];
     returnedValue &= char_array_2_value[4] == char_array_2_t[4];
     returnedValue &= cdr_des >> ushort_array_value;
-    returnedValue &= ushort_array_value[0] == ushort_array_t[0];
-    returnedValue &= ushort_array_value[1] == ushort_array_t[1];
-    returnedValue &= ushort_array_value[2] == ushort_array_t[2];
-    returnedValue &= ushort_array_value[3] == ushort_array_t[3];
-    returnedValue &= ushort_array_value[4] == ushort_array_t[4];
+    returnedValue &= ushort_array_value == ushort_array_t;
     returnedValue &= cdr_des.deserializeArray(ushort_array_2_value, 5);
     returnedValue &= ushort_array_2_value[0] == ushort_array_2_t[0];
     returnedValue &= ushort_array_2_value[1] == ushort_array_2_t[1];
@@ -214,11 +205,7 @@ int main()
     returnedValue &= ushort_array_2_value[3] == ushort_array_2_t[3];
     returnedValue &= ushort_array_2_value[4] == ushort_array_2_t[4];
     returnedValue &= cdr_des >> short_array_value;
-    returnedValue &= short_array_value[0] == short_array_t[0];
-    returnedValue &= short_array_value[1] == short_array_t[1];
-    returnedValue &= short_array_value[2] == short_array_t[2];
-    returnedValue &= short_array_value[3] == short_array_t[3];
-    returnedValue &= short_array_value[4] == short_array_t[4];
+    returnedValue &= short_array_value == short_array_t;
     returnedValue &= cdr_des.deserializeArray(short_array_2_value, 5);
     returnedValue &= short_array_2_value[0] == short_array_2_t[0];
     returnedValue &= short_array_2_value[1] == short_array_2_t[1];
@@ -226,11 +213,7 @@ int main()
     returnedValue &= short_array_2_value[3] == short_array_2_t[3];
     returnedValue &= short_array_2_value[4] == short_array_2_t[4];
     returnedValue &= cdr_des >> ulong_array_value;
-    returnedValue &= ulong_array_value[0] == ulong_array_t[0];
-    returnedValue &= ulong_array_value[1] == ulong_array_t[1];
-    returnedValue &= ulong_array_value[2] == ulong_array_t[2];
-    returnedValue &= ulong_array_value[3] == ulong_array_t[3];
-    returnedValue &= ulong_array_value[4] == ulong_array_t[4];
+    returnedValue &= ulong_array_value == ulong_array_t;
     returnedValue &= cdr_des.deserializeArray(ulong_array_2_value, 5);
     returnedValue &= ulong_array_2_value[0] == ulong_array_2_t[0];
     returnedValue &= ulong_array_2_value[1] == ulong_array_2_t[1];
@@ -238,11 +221,7 @@ int main()
     returnedValue &= ulong_array_2_value[3] == ulong_array_2_t[3];
     returnedValue &= ulong_array_2_value[4] == ulong_array_2_t[4];
     returnedValue &= cdr_des >> long_array_value;
-    returnedValue &= long_array_value[0] == long_array_t[0];
-    returnedValue &= long_array_value[1] == long_array_t[1];
-    returnedValue &= long_array_value[2] == long_array_t[2];
-    returnedValue &= long_array_value[3] == long_array_t[3];
-    returnedValue &= long_array_value[4] == long_array_t[4];
+    returnedValue &= long_array_value == long_array_t;
     returnedValue &= cdr_des.deserializeArray(long_array_2_value, 5);
     returnedValue &= long_array_2_value[0] == long_array_2_t[0];
     returnedValue &= long_array_2_value[1] == long_array_2_t[1];
@@ -250,11 +229,7 @@ int main()
     returnedValue &= long_array_2_value[3] == long_array_2_t[3];
     returnedValue &= long_array_2_value[4] == long_array_2_t[4];
     returnedValue &= cdr_des >> ulonglong_array_value;
-    returnedValue &= ulonglong_array_value[0] == ulonglong_array_t[0];
-    returnedValue &= ulonglong_array_value[1] == ulonglong_array_t[1];
-    returnedValue &= ulonglong_array_value[2] == ulonglong_array_t[2];
-    returnedValue &= ulonglong_array_value[3] == ulonglong_array_t[3];
-    returnedValue &= ulonglong_array_value[4] == ulonglong_array_t[4];
+    returnedValue &= ulonglong_array_value == ulonglong_array_t;
     returnedValue &= cdr_des.deserializeArray(ulonglong_array_2_value, 5);
     returnedValue &= ulonglong_array_2_value[0] == ulonglong_array_2_t[0];
     returnedValue &= ulonglong_array_2_value[1] == ulonglong_array_2_t[1];
@@ -262,11 +237,7 @@ int main()
     returnedValue &= ulonglong_array_2_value[3] == ulonglong_array_2_t[3];
     returnedValue &= ulonglong_array_2_value[4] == ulonglong_array_2_t[4];
     returnedValue &= cdr_des >> longlong_array_value;
-    returnedValue &= longlong_array_value[0] == longlong_array_t[0];
-    returnedValue &= longlong_array_value[1] == longlong_array_t[1];
-    returnedValue &= longlong_array_value[2] == longlong_array_t[2];
-    returnedValue &= longlong_array_value[3] == longlong_array_t[3];
-    returnedValue &= longlong_array_value[4] == longlong_array_t[4];
+    returnedValue &= longlong_array_value == longlong_array_t;
     returnedValue &= cdr_des.deserializeArray(longlong_array_2_value, 5);
     returnedValue &= longlong_array_2_value[0] == longlong_array_2_t[0];
     returnedValue &= longlong_array_2_value[1] == longlong_array_2_t[1];
@@ -274,11 +245,7 @@ int main()
     returnedValue &= longlong_array_2_value[3] == longlong_array_2_t[3];
     returnedValue &= longlong_array_2_value[4] == longlong_array_2_t[4];
     returnedValue &= cdr_des >> float_array_value;
-    returnedValue &= float_array_value[0] == float_array_t[0];
-    returnedValue &= float_array_value[1] == float_array_t[1];
-    returnedValue &= float_array_value[2] == float_array_t[2];
-    returnedValue &= float_array_value[3] == float_array_t[3];
-    returnedValue &= float_array_value[4] == float_array_t[4];
+    returnedValue &= float_array_value == float_array_t;
     returnedValue &= cdr_des.deserializeArray(float_array_2_value, 5);
     returnedValue &= float_array_2_value[0] == float_array_2_t[0];
     returnedValue &= float_array_2_value[1] == float_array_2_t[1];
@@ -286,11 +253,7 @@ int main()
     returnedValue &= float_array_2_value[3] == float_array_2_t[3];
     returnedValue &= float_array_2_value[4] == float_array_2_t[4];
     returnedValue &= cdr_des >> double_array_value;
-    returnedValue &= double_array_value[0] == double_array_t[0];
-    returnedValue &= double_array_value[1] == double_array_t[1];
-    returnedValue &= double_array_value[2] == double_array_t[2];
-    returnedValue &= double_array_value[3] == double_array_t[3];
-    returnedValue &= double_array_value[4] == double_array_t[4];
+    returnedValue &= double_array_value == double_array_t;
     returnedValue &= cdr_des.deserializeArray(double_array_2_value, 5);
     returnedValue &= double_array_2_value[0] == double_array_2_t[0];
     returnedValue &= double_array_2_value[1] == double_array_2_t[1];
@@ -357,6 +320,8 @@ int main()
     returnedValue &= double_vector_value[2] == double_vector_t[2];
     returnedValue &= double_vector_value[3] == double_vector_t[3];
     returnedValue &= double_vector_value[4] == double_vector_t[4];
+    returnedValue &= cdr_des >> triple_ulong_array_value;
+    returnedValue &= triple_ulong_array_t == triple_ulong_array_value;
 
     if(returnedValue)
     {

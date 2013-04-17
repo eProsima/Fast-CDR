@@ -94,7 +94,7 @@ $(SIMPLETEST_OUTDIR_DEBUG)/%.cpp.o:%.cpp
 	@echo Calculating dependencies \(DEBUG mode\) $<
 	@$(CPP) $(SIMPLETEST_CFLAGS_DEBUG) -MM $(SIMPLETEST_INCLUDE_DIRS) $< | sed "s/^.*:/$(SIMPLETEST_SED_OUTPUT_DIR_DEBUG)\/&/g" > $(@:%.o=%.d)
 	@echo Compiling \(DEBUG mode\) $<
-	$(CPP) $(SIMPLETEST_CFLAGS_DEBUG) $(SIMPLETEST_INCLUDE_DIRS) $< -o $@
+	@$(CPP) $(SIMPLETEST_CFLAGS_DEBUG) $(SIMPLETEST_INCLUDE_DIRS) $< -o $@
 
 $(SIMPLETEST_OUTDIR_RELEASE)/%.cpp.o:%.cpp
 	@echo Calculating dependencies \(RELEASE mode\) $<

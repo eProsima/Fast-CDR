@@ -44,7 +44,8 @@ namespace eProsima
         typedef bool (*CDRBufferFuncAllocator)(char **buffer, size_t *bufferSize, size_t minSizeInc);
 
         /*!
-         * @brief This class stores a state of a eProsima::CDRBuffer.
+         * @brief This class stores a state of a eProsima::CDRBuffer. Its usage is dangerours when the eProsima::CDRBuffer can use
+         * a user's function to allocate dynamically memory.
          * @ingroup CDRAPIREFERENCE
          */
         class State
@@ -56,10 +57,23 @@ namespace eProsima
              * @brief Default constructor.
              * @param cdrBuffer The buffer that will be used to create the new state.
              */
-            State(CDRBuffer &cdrBuffer) : m_currentPosition(cdrBuffer.m_currentPosition) {}
+            State(CDRBuffer &cdrBuffer) : m_bufferLength(cdrBuffer.m_bufferLength), m_currentPosition(cdrBuffer.m_currentPosition),
+                 m_alignPosition(cdrBuffer.m_alignPosition), m_swapBytes(cdrBuffer.m_swapBytes), m_lastDataSize(cdrBuffer.m_lastDataSize) {}
+
+             //! @brief The remaining bytes in the stream when the state was created.
+            size_t m_bufferLength;
 
             //! @brief The position in the buffer when the state was created.
             char *m_currentPosition;
+
+		    //! @brief The position from the aligment is calculated,  when the state was created..
+		    char *m_alignPosition;
+
+            //! @brief This attribute specified if it is needed to swap the bytes when the state was created..
+            bool m_swapBytes;
+
+            //! @brief Stores the last datasize serialized/deserialized when the state was created.
+            size_t m_lastDataSize;
         };
 
         /*!

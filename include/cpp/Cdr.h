@@ -38,6 +38,17 @@ namespace eProsima
         } DDSCdrPlFlag;
 
         /*!
+         * @brief Function pointer used to call a user's definition function that
+         * allocates dynamically an array that is used to store a sequence but its size is insufficient.
+         * @param sequence When the function is called this parameter contains the current pointer to the array that the user passed.
+         * This value cannot be NULL. When the function returns, it is expected that this parameter contains the pointer to the new resized raw buffer.
+         * @param sequenceSize This parameter contains the current size of the user's array.
+         * @param neededSize This parameter contains the total size that the library need to store the sequence.
+         * @return True value has to be returned if the operation works successful. In other case false value has to be returned.
+         */
+        typedef bool (*SequenceFuncAllocator)(char **sequence, size_t sequenceSize, size_t neededSize);
+
+        /*!
          * @brief This constructor creates a eProsima::CDR object that could serialize/deserialize
          * the assigned buffer.
          *
@@ -98,7 +109,7 @@ namespace eProsima
          * @brief This function sets a previous state of the CDR stream;
          * @param state Previous state that will be set again.
          */
-        void setState(CDRBuffer::State state);
+        void setState(CDRBuffer::State &state);
 
         /*!
          * @brief This operator serializes an octet.
@@ -568,7 +579,7 @@ namespace eProsima
         {
             bool returnedValue = false;
 
-            if(*this << (uint32_t)vector_t.size())
+            if(*this << (int32_t)vector_t.size())
             {
                 returnedValue = serializeArray(vector_t.data(), vector_t.size());
             }
@@ -587,7 +598,7 @@ namespace eProsima
         {
             bool returnedValue = false;
 
-            if(serialize((uint32_t)vector_t.size(), endianness))
+            if(serialize((int32_t)vector_t.size(), endianness))
             {
                 returnedValue = serializeArray(vector_t.data(), vector_t.size(), endianness);
             }
@@ -802,33 +813,206 @@ namespace eProsima
         bool serializeArray(const double *double_t, size_t numElements, CDRBuffer::Endianness endianness);
 
         /*!
-          * @brief This function deserialize a sequence of basic types.
-          */
-        template<typename _T>
-        bool serializeSequence(const _T *t, size_t numElements)
+         * @brief This function serializes a sequence of octet.
+         * @param octet_t The sequence of octets that will be serialized in the buffer.
+         * @param numElements Number of the elements in the sequence.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool serializeSequence(const uint8_t *octet_t, size_t numElements)
         {
-            bool returnedValue = false;
-
-            if(*this << numElements)
-            {
-                returnedValue = serializeArray(t, numElements);
-            }
-
-            return returnedValue;
+            return serializeSequence((const char*)octet_t, numElements);
         }
-        template<typename _T>
-        bool serializeSequence(const _T *t, size_t numElements, CDRBuffer::Endianness endianness)
+
+        /*!
+         * @brief This function serializes a sequence of octets with a different endianness.
+         * @param octet_t The sequence of octets that will be serialized in the buffer.
+         * @param numElements Number of the elements in the sequence.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool serializeSequence(const uint8_t *octet_t, size_t numElements, CDRBuffer::Endianness endianness)
         {
-            bool returnedValue = false;
-
-            //TODO Error
-            if(*this << numElements)
-            {
-                returnedValue = serializeArray(t, numElements, endianness);
-            }
-
-            return returnedValue;
+            return serializeSequence((const char*)octet_t, numElements, endianness);
         }
+
+        /*!
+         * @brief This function serializes a sequence of characters.
+         * @param char_t The sequence of characters that will be serialized in the buffer.
+         * @param numElements Number of the elements in the sequence.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool serializeSequence(const char *char_t, size_t numElements);
+
+        /*!
+         * @brief This function serializes a sequence of characters with a different endianness.
+         * @param char_t The sequence of characters that will be serialized in the buffer.
+         * @param numElements Number of the elements in the sequence.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool serializeSequence(const char *char_t, size_t numElements, CDRBuffer::Endianness endianness);
+
+        /*!
+         * @brief This function serializes a sequence of unsigned shorts.
+         * @param ushort_t The sequence of unsigned shorts that will be serialized in the buffer.
+         * @param numElements Number of the elements in the sequence.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool serializeSequence(const uint16_t *ushort_t, size_t numElements)
+        {
+            return serializeSequence((int16_t*)ushort_t, numElements);
+        }
+
+        /*!
+         * @brief This function serializes a sequence of unsigned shorts with a different endianness.
+         * @param ushort_t The sequence of unsigned shorts that will be serialized in the buffer.
+         * @param numElements Number of the elements in the sequence.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool serializeSequence(const uint16_t *ushort_t, size_t numElements, CDRBuffer::Endianness endianness)
+        {
+            return serializeSequence((int16_t*)ushort_t, numElements, endianness);
+        }
+
+        /*!
+         * @brief This function serializes a sequence of shorts.
+         * @param short_t The sequence of shorts that will be serialized in the buffer.
+         * @param numElements Number of the elements in the sequence.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool serializeSequence(const int16_t *short_t, size_t numElements);
+
+        /*!
+         * @brief This function serializes a sequence of shorts with a different endianness.
+         * @param short_t The sequence of shorts that will be serialized in the buffer.
+         * @param numElements Number of the elements in the sequence.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool serializeSequence(const int16_t *short_t, size_t numElements, CDRBuffer::Endianness endianness);
+
+        /*!
+         * @brief This function serializes a sequence of unsigned longs.
+         * @param ulong_t The sequence of unsigned longs that will be serialized in the buffer.
+         * @param numElements Number of the elements in the sequence.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool serializeSequence(const uint32_t *ulong_t, size_t numElements)
+        {
+            return serializeSequence((int32_t*)ulong_t, numElements);
+        }
+
+        /*!
+         * @brief This function serializes a sequence of unsigned longs with a different endianness.
+         * @param ulong_t The sequence of unsigned longs that will be serialized in the buffer.
+         * @param numElements Number of the elements in the sequence.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool serializeSequence(const uint32_t *ulong_t, size_t numElements, CDRBuffer::Endianness endianness)
+        {
+            return serializeSequence((int32_t*)ulong_t, numElements, endianness);
+        }
+
+        /*!
+         * @brief This function serializes a sequence of longs.
+         * @param long_t The sequence of longs that will be serialized in the buffer.
+         * @param numElements Number of the elements in the sequence.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool serializeSequence(const int32_t *long_t, size_t numElements);
+
+        /*!
+         * @brief This function serializes a sequence of longs with a different endianness.
+         * @param long_t The sequence of longs that will be serialized in the buffer.
+         * @param numElements Number of the elements in the sequence.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool serializeSequence(const int32_t *long_t, size_t numElements, CDRBuffer::Endianness endianness);
+
+        /*!
+         * @brief This function serializes a sequence of unsigned long longs.
+         * @param ulonglong_t The sequence of unsigned long longs that will be serialized in the buffer.
+         * @param numElements Number of the elements in the sequence.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool serializeSequence(const uint64_t *ulonglong_t, size_t numElements)
+        {
+            return serializeSequence((int64_t*)ulonglong_t, numElements);
+        }
+
+        /*!
+         * @brief This function serializes a sequence of unsigned long longs with a different endianness.
+         * @param ulonglong_t The sequence of unsigned long longs that will be serialized in the buffer.
+         * @param numElements Number of the elements in the sequence.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool serializeSequence(const uint64_t *ulonglong_t, size_t numElements, CDRBuffer::Endianness endianness)
+        {
+            return serializeSequence((int64_t*)ulonglong_t, numElements, endianness);
+        }
+
+        /*!
+         * @brief This function serializes a sequence of long longs.
+         * @param longlong_t The sequence of long longs that will be serialized in the buffer.
+         * @param numElements Number of the elements in the sequence.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool serializeSequence(const int64_t *longlong_t, size_t numElements);
+
+        /*!
+         * @brief This function serializes a sequence of long longs with a different endianness.
+         * @param longlong_t The sequence of long longs that will be serialized in the buffer.
+         * @param numElements Number of the elements in the sequence.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool serializeSequence(const int64_t *longlong_t, size_t numElements, CDRBuffer::Endianness endianness);
+
+        /*!
+         * @brief This function serializes a sequence of floats.
+         * @param float_t The sequence of floats that will be serialized in the buffer.
+         * @param numElements Number of the elements in the sequence.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool serializeSequence(const float *float_t, size_t numElements);
+
+        /*!
+         * @brief This function serializes a sequence of floats with a different endianness.
+         * @param float_t The sequence of floats that will be serialized in the buffer.
+         * @param numElements Number of the elements in the sequence.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool serializeSequence(const float *float_t, size_t numElements, CDRBuffer::Endianness endianness);
+
+        /*!
+         * @brief This function serializes a sequence of doubles.
+         * @param double_t The sequence of doubles that will be serialized in the buffer.
+         * @param numElements Number of the elements in the sequence.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool serializeSequence(const double *double_t, size_t numElements);
+
+        /*!
+         * @brief This function serializes a sequence of doubles with a different endianness.
+         * @param double_t The sequence of doubles that will be serialized in the buffer.
+         * @param numElements Number of the elements in the sequence.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool serializeSequence(const double *double_t, size_t numElements, CDRBuffer::Endianness endianness);
 
         /*!
          * @brief This function deserializes an octet.
@@ -1338,33 +1522,468 @@ namespace eProsima
         bool deserializeArray(double *double_t, size_t numElements, CDRBuffer::Endianness endianness);
 
         /*!
-          * @brief This function deserialize a sequence of basic types.
-          */
-        template<typename _T>
-        bool deserializeSequence(_T *t, size_t maxNumElements, size_t &numElements)
+         * @brief This function deserializes a sequence of octets.
+         * @param octet_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool deserializeSequence(uint8_t *octet_t, size_t maxNumElements, size_t &numElements)
         {
-            bool returnedValue = false;
-
-            if(*this >> numElements && numElements <= maxNumElements)
-            {
-                returnedValue = deserializeArray(t, numElements);
-            }
-
-            return returnedValue;
+            return deserializeSequence((char*)octet_t, maxNumElements, numElements);
         }
-        template<typename _T>
-        bool deserializeSequence(_T *t, size_t maxNumElements, size_t &numElements, CDRBuffer::Endianness endianness)
+
+        /*!
+         * @brief This function deserializes a sequence octets with a different endianness.
+         * @param octet_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool deserializeSequence(uint8_t *octet_t, size_t maxNumElements, size_t &numElements, CDRBuffer::Endianness endianness)
         {
-            bool returnedValue = false;
-
-            // TODO Error
-            if(*this >> numElements && numElements <= maxNumElements)
-            {
-                returnedValue = deserializeArray(t, numElements, endianness);
-            }
-
-            return returnedValue;
+            return deserializeSequence((char*)octet_t, maxNumElements, numElements, endianness);
         }
+
+        /*!
+         * @brief This function deserializes a sequence of octets. Also support resize the user's array dynamically.
+         * @param octet_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param sequenceFuncAllocator User's function that will be call when its array needs to be resized.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool deserializeSequence(uint8_t *octet_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator)
+        {
+            return deserializeSequence((char*)octet_t, maxNumElements, numElements, sequenceFuncAllocator);
+        }
+
+        /*!
+         * @brief This function deserializes a sequence octets with a different endianness. Also support resize the user's array dynamically.
+         * @param octet_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param sequenceFuncAllocator User's function that will be call when its array needs to be resized.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool deserializeSequence(uint8_t *octet_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator, CDRBuffer::Endianness endianness)
+        {
+            return deserializeSequence((char*)octet_t, maxNumElements, numElements, sequenceFuncAllocator, endianness);
+        }
+
+        /*!
+         * @brief This function deserializes a sequence of characters.
+         * @param char_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(char *char_t, size_t maxNumElements, size_t &numElements);
+
+        /*!
+         * @brief This function deserializes a sequence of characters with a different endianness.
+         * @param char_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(char *char_t, size_t maxNumElements, size_t &numElements, CDRBuffer::Endianness endianness);
+
+        /*!
+         * @brief This function deserializes a sequence of characters. Also support resize the user's array dynamically
+         * @param char_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param sequenceFuncAllocator User's function that will be call when its array needs to be resized.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(char *char_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator);
+
+        /*!
+         * @brief This function deserializes a sequence of characters with a different endianness. Also support resize the user's array dynamically.
+         * @param char_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param sequenceFuncAllocator User's function that will be call when its array needs to be resized.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(char *char_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator, CDRBuffer::Endianness endianness);
+
+        /*!
+         * @brief This function deserializes a sequence of unsigned short.
+         * @param ushort_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool deserializeSequence(uint16_t *ushort_t, size_t maxNumElements, size_t &numElements)
+        {
+            return deserializeSequence((int16_t*)ushort_t, maxNumElements, numElements);
+        }
+
+        /*!
+         * @brief This function deserializes a sequence unsigned short with a different endianness.
+         * @param ushort_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool deserializeSequence(uint16_t *ushort_t, size_t maxNumElements, size_t &numElements, CDRBuffer::Endianness endianness)
+        {
+            return deserializeSequence((int16_t*)ushort_t, maxNumElements, numElements, endianness);
+        }
+
+        /*!
+         * @brief This function deserializes a sequence of unsigned short. Also support resize the user's array dynamically.
+         * @param ushort_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param sequenceFuncAllocator User's function that will be call when its array needs to be resized.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool deserializeSequence(uint16_t *ushort_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator)
+        {
+            return deserializeSequence((int16_t*)ushort_t, maxNumElements, numElements, sequenceFuncAllocator);
+        }
+
+        /*!
+         * @brief This function deserializes a sequence unsigned short with a different endianness. Also support resize the user's array dynamically.
+         * @param ushort_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param sequenceFuncAllocator User's function that will be call when its array needs to be resized.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool deserializeSequence(uint16_t *ushort_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator, CDRBuffer::Endianness endianness)
+        {
+            return deserializeSequence((int16_t*)ushort_t, maxNumElements, numElements, sequenceFuncAllocator, endianness);
+        }
+
+        /*!
+         * @brief This function deserializes a sequence of shorts.
+         * @param short_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(int16_t *short_t, size_t maxNumElements, size_t &numElements);
+
+        /*!
+         * @brief This function deserializes a sequence of shorts with a different endianness.
+         * @param short_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(int16_t *short_t, size_t maxNumElements, size_t &numElements, CDRBuffer::Endianness endianness);
+
+        /*!
+         * @brief This function deserializes a sequence of shorts. Also support resize the user's array dynamically.
+         * @param short_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param sequenceFuncAllocator User's function that will be call when its array needs to be resized.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(int16_t *short_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator);
+
+        /*!
+         * @brief This function deserializes a sequence of shorts with a different endianness. Also support resize the user's array dynamically.
+         * @param short_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param sequenceFuncAllocator User's function that will be call when its array needs to be resized.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(int16_t *short_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator, CDRBuffer::Endianness endianness);
+
+        /*!
+         * @brief This function deserializes a sequence of unsigned longs.
+         * @param ulong_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool deserializeSequence(uint32_t *ulong_t, size_t maxNumElements, size_t &numElements)
+        {
+            return deserializeSequence((int32_t*)ulong_t, maxNumElements, numElements);
+        }
+
+        /*!
+         * @brief This function deserializes a sequence unsigned longs with a different endianness.
+         * @param ulong_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool deserializeSequence(uint32_t *ulong_t, size_t maxNumElements, size_t &numElements, CDRBuffer::Endianness endianness)
+        {
+            return deserializeSequence((int32_t*)ulong_t, maxNumElements, numElements, endianness);
+        }
+
+        /*!
+         * @brief This function deserializes a sequence of unsigned longs. Also support resize the user's array dynamically.
+         * @param ulong_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param sequenceFuncAllocator User's function that will be call when its array needs to be resized.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool deserializeSequence(uint32_t *ulong_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator)
+        {
+            return deserializeSequence((int32_t*)ulong_t, maxNumElements, numElements, sequenceFuncAllocator);
+        }
+
+        /*!
+         * @brief This function deserializes a sequence unsigned longs with a different endianness. Also support resize the user's array dynamically.
+         * @param ulong_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param sequenceFuncAllocator User's function that will be call when its array needs to be resized.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool deserializeSequence(uint32_t *ulong_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator, CDRBuffer::Endianness endianness)
+        {
+            return deserializeSequence((int32_t*)ulong_t, maxNumElements, numElements, sequenceFuncAllocator, endianness);
+        }
+
+        /*!
+         * @brief This function deserializes a sequence of longs.
+         * @param long_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(int32_t *long_t, size_t maxNumElements, size_t &numElements);
+
+        /*!
+         * @brief This function deserializes a sequence of longs with a different endianness.
+         * @param long_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(int32_t *long_t, size_t maxNumElements, size_t &numElements, CDRBuffer::Endianness endianness);
+
+        /*!
+         * @brief This function deserializes a sequence of longs. Also support resize the user's array dynamically.
+         * @param long_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param sequenceFuncAllocator User's function that will be call when its array needs to be resized.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(int32_t *long_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator);
+
+        /*!
+         * @brief This function deserializes a sequence of longs with a different endianness. Also support resize the user's array dynamically.
+         * @param long_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param sequenceFuncAllocator User's function that will be call when its array needs to be resized.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(int32_t *long_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator, CDRBuffer::Endianness endianness);
+
+        /*!
+         * @brief This function deserializes a sequence of unsigned long longs.
+         * @param ulonglong_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool deserializeSequence(uint64_t *ulonglong_t, size_t maxNumElements, size_t &numElements)
+        {
+            return deserializeSequence((int64_t*)ulonglong_t, maxNumElements, numElements);
+        }
+
+        /*!
+         * @brief This function deserializes a sequence unsigned long longs with a different endianness.
+         * @param ulonglong_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool deserializeSequence(uint64_t *ulonglong_t, size_t maxNumElements, size_t &numElements, CDRBuffer::Endianness endianness)
+        {
+            return deserializeSequence((int64_t*)ulonglong_t, maxNumElements, numElements, endianness);
+        }
+
+        /*!
+         * @brief This function deserializes a sequence of unsigned long longs. Also support resize the user's array dynamically.
+         * @param ulonglong_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param sequenceFuncAllocator User's function that will be call when its array needs to be resized.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool deserializeSequence(uint64_t *ulonglong_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator)
+        {
+            return deserializeSequence((int64_t*)ulonglong_t, maxNumElements, numElements, sequenceFuncAllocator);
+        }
+
+        /*!
+         * @brief This function deserializes a sequence unsigned long longs with a different endianness. Also support resize the user's array dynamically.
+         * @param ulonglong_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param sequenceFuncAllocator User's function that will be call when its array needs to be resized.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        inline
+        bool deserializeSequence(uint64_t *ulonglong_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator, CDRBuffer::Endianness endianness)
+        {
+            return deserializeSequence((int64_t*)ulonglong_t, maxNumElements, numElements, sequenceFuncAllocator, endianness);
+        }
+
+        /*!
+         * @brief This function deserializes a sequence of long longs.
+         * @param longlong_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(int64_t *longlong_t, size_t maxNumElements, size_t &numElements);
+
+        /*!
+         * @brief This function deserializes a sequence of long longs with a different endianness.
+         * @param longlong_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(int64_t *longlong_t, size_t maxNumElements, size_t &numElements, CDRBuffer::Endianness endianness);
+
+        /*!
+         * @brief This function deserializes a sequence of long longs. Also support resize the user's array dynamically.
+         * @param longlong_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param sequenceFuncAllocator User's function that will be call when its array needs to be resized.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(int64_t *longlong_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator);
+
+        /*!
+         * @brief This function deserializes a sequence of long longs with a different endianness. Also support resize the user's array dynamically.
+         * @param longlong_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param sequenceFuncAllocator User's function that will be call when its array needs to be resized.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(int64_t *longlong_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator, CDRBuffer::Endianness endianness);
+
+        /*!
+         * @brief This function deserializes a sequence of floats.
+         * @param float_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(float *float_t, size_t maxNumElements, size_t &numElements);
+
+        /*!
+         * @brief This function deserializes a sequence of floats with a different endianness.
+         * @param longlong_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(float *float_t, size_t maxNumElements, size_t &numElements, CDRBuffer::Endianness endianness);
+
+        /*!
+         * @brief This function deserializes a sequence of floats. Also support resize the user's array dynamically.
+         * @param float_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param sequenceFuncAllocator User's function that will be call when its array needs to be resized.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(float *float_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator);
+
+        /*!
+         * @brief This function deserializes a sequence of floats with a different endianness. Also support resize the user's array dynamically.
+         * @param longlong_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param sequenceFuncAllocator User's function that will be call when its array needs to be resized.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(float *float_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator, CDRBuffer::Endianness endianness);
+
+        /*!
+         * @brief This function deserializes a sequence of doubles.
+         * @param double_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(double *double_t, size_t maxNumElements, size_t &numElements);
+
+        /*!
+         * @brief This function deserializes a sequence of doubles with a different endianness.
+         * @param double_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(double *double_t, size_t maxNumElements, size_t &numElements, CDRBuffer::Endianness endianness);
+
+        /*!
+         * @brief This function deserializes a sequence of doubles. Also support resize the user's array dynamically.
+         * @param double_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param sequenceFuncAllocator User's function that will be call when its array needs to be resized.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(double *double_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator);
+
+        /*!
+         * @brief This function deserializes a sequence of doubles with a different endianness. Also support resize the user's array dynamically.
+         * @param double_t The array that will store the sequence read from the buffer.
+         * @param maxNumElements The size of the array that user passes. This size value will be the maximum number of elements that the serialized sequence could have.
+         * @param numElements Returns the number of the elements in the serialized sequence.
+         * @param sequenceFuncAllocator User's function that will be call when its array needs to be resized.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return True value is returned when the serialization  operation works successfully. In other case false value is returned.
+         */
+        bool deserializeSequence(double *double_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator, CDRBuffer::Endianness endianness);
 
     private:
 

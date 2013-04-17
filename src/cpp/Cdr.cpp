@@ -89,9 +89,13 @@ CDRBuffer::State CDR::getState() const
     return CDRBuffer::State(m_cdrBuffer);
 }
 
-void CDR::setState(CDRBuffer::State state)
+void CDR::setState(CDRBuffer::State &state)
 {
     m_cdrBuffer.m_currentPosition = state.m_currentPosition;
+    m_cdrBuffer.m_bufferLength = state.m_bufferLength;
+    m_cdrBuffer.m_alignPosition = state.m_alignPosition;
+    m_cdrBuffer.m_swapBytes = state.m_swapBytes;
+    m_cdrBuffer.m_lastDataSize = state.m_lastDataSize;
 }
 
 bool CDR::serialize(const char char_t)
@@ -698,6 +702,132 @@ bool CDR::serializeArray(const double *double_t, size_t numElements, CDRBuffer::
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = serializeArray(double_t, numElements);
+    m_cdrBuffer.m_swapBytes = auxSwap;
+    return returnedValue;
+}
+
+bool CDR::serializeSequence(const char *char_t, size_t numElements)
+{
+    bool returnedValue = false;
+
+    if(*this << (int32_t)numElements)
+    {
+        returnedValue = serializeArray(char_t, numElements);
+    }
+
+    return returnedValue;
+}
+
+bool CDR::serializeSequence(const char *char_t, size_t numElements, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+    bool returnedValue = serializeSequence(char_t, numElements);
+    m_cdrBuffer.m_swapBytes = auxSwap;
+    return returnedValue;
+}
+
+bool CDR::serializeSequence(const int16_t *short_t, size_t numElements)
+{
+    bool returnedValue = false;
+
+    if(*this << (int32_t)numElements)
+    {
+        returnedValue = serializeArray(short_t, numElements);
+    }
+
+    return returnedValue;
+}
+
+bool CDR::serializeSequence(const int16_t *short_t, size_t numElements, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+    bool returnedValue = serializeSequence(short_t, numElements);
+    m_cdrBuffer.m_swapBytes = auxSwap;
+    return returnedValue;
+}
+
+bool CDR::serializeSequence(const int32_t *long_t, size_t numElements)
+{
+    bool returnedValue = false;
+
+    if(*this << (int32_t)numElements)
+    {
+        returnedValue = serializeArray(long_t, numElements);
+    }
+
+    return returnedValue;
+}
+
+bool CDR::serializeSequence(const int32_t *long_t, size_t numElements, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+    bool returnedValue = serializeSequence(long_t, numElements);
+    m_cdrBuffer.m_swapBytes = auxSwap;
+    return returnedValue;
+}
+
+bool CDR::serializeSequence(const int64_t *longlong_t, size_t numElements)
+{
+    bool returnedValue = false;
+
+    if(*this << (int32_t)numElements)
+    {
+        returnedValue = serializeArray(longlong_t, numElements);
+    }
+
+    return returnedValue;
+}
+
+bool CDR::serializeSequence(const int64_t *longlong_t, size_t numElements, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+    bool returnedValue = serializeSequence(longlong_t, numElements);
+    m_cdrBuffer.m_swapBytes = auxSwap;
+    return returnedValue;
+}
+
+bool CDR::serializeSequence(const float *float_t, size_t numElements)
+{
+    bool returnedValue = false;
+
+    if(*this << (int32_t)numElements)
+    {
+        returnedValue = serializeArray(float_t, numElements);
+    }
+
+    return returnedValue;
+}
+
+bool CDR::serializeSequence(const float *float_t, size_t numElements, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+    bool returnedValue = serializeSequence(float_t, numElements);
+    m_cdrBuffer.m_swapBytes = auxSwap;
+    return returnedValue;
+}
+
+bool CDR::serializeSequence(const double *double_t, size_t numElements)
+{
+    bool returnedValue = false;
+
+    if(*this << (int32_t)numElements)
+    {
+        returnedValue = serializeArray(double_t, numElements);
+    }
+
+    return returnedValue;
+}
+
+bool CDR::serializeSequence(const double *double_t, size_t numElements, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+    bool returnedValue = serializeSequence(double_t, numElements);
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
 }
@@ -1329,6 +1459,324 @@ bool CDR::deserializeArray(double *double_t, size_t numElements, CDRBuffer::Endi
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
     bool returnedValue = deserializeArray(double_t, numElements);
+    m_cdrBuffer.m_swapBytes = auxSwap;
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(char *char_t, size_t maxNumElements, size_t &numElements)
+{
+    bool returnedValue = false;
+    CDRBuffer::State state(m_cdrBuffer);
+
+    if(*this >> (int32_t&)numElements)
+    {
+        if(numElements <= maxNumElements)
+        {
+            returnedValue = deserializeArray(char_t, numElements);
+        }
+        else
+        {
+            setState(state);
+        }
+    }
+
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(char *char_t, size_t maxNumElements, size_t &numElements, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+    bool returnedValue = deserializeSequence(char_t, maxNumElements, numElements);
+    m_cdrBuffer.m_swapBytes = auxSwap;
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(char *char_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator)
+{
+    bool returnedValue = false;
+
+    if(*this >> (int32_t&)numElements)
+    {
+        if(numElements <= maxNumElements || (sequenceFuncAllocator != NULL && sequenceFuncAllocator((char**)&char_t, maxNumElements, numElements)))
+        {
+            returnedValue = deserializeArray(char_t, numElements);
+        }
+    }
+
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(char *char_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+    bool returnedValue = deserializeSequence(char_t, maxNumElements, numElements, sequenceFuncAllocator);
+    m_cdrBuffer.m_swapBytes = auxSwap;
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(int16_t *short_t, size_t maxNumElements, size_t &numElements)
+{
+    bool returnedValue = false;
+    CDRBuffer::State state(m_cdrBuffer);
+
+    if(*this >> (int32_t&)numElements)
+    {
+        if(numElements <= maxNumElements)
+        {
+            returnedValue = deserializeArray(short_t, numElements);
+        }
+        else
+        {
+            setState(state);
+        }
+    }
+
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(int16_t *short_t, size_t maxNumElements, size_t &numElements, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+    bool returnedValue = deserializeSequence(short_t, maxNumElements, numElements);
+    m_cdrBuffer.m_swapBytes = auxSwap;
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(int16_t *short_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator)
+{
+    bool returnedValue = false;
+
+    if(*this >> (int32_t&)numElements)
+    {
+        if(numElements <= maxNumElements || (sequenceFuncAllocator != NULL && sequenceFuncAllocator((char**)&short_t, maxNumElements, numElements)))
+        {
+            returnedValue = deserializeArray(short_t, numElements);
+        }
+    }
+
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(int16_t *short_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+    bool returnedValue = deserializeSequence(short_t, maxNumElements, numElements, sequenceFuncAllocator);
+    m_cdrBuffer.m_swapBytes = auxSwap;
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(int32_t *long_t, size_t maxNumElements, size_t &numElements)
+{
+    bool returnedValue = false;
+    CDRBuffer::State state(m_cdrBuffer);
+
+    if(*this >> (int32_t&)numElements)
+    {
+        if(numElements <= maxNumElements)
+        {
+            returnedValue = deserializeArray(long_t, numElements);
+        }
+        else
+        {
+            setState(state);
+        }
+    }
+
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(int32_t *long_t, size_t maxNumElements, size_t &numElements, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+    bool returnedValue = deserializeSequence(long_t, maxNumElements, numElements);
+    m_cdrBuffer.m_swapBytes = auxSwap;
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(int32_t *long_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator)
+{
+    bool returnedValue = false;
+
+    if(*this >> (int32_t&)numElements)
+    {
+        if(numElements <= maxNumElements || (sequenceFuncAllocator != NULL && sequenceFuncAllocator((char**)&long_t, maxNumElements, numElements)))
+        {
+            returnedValue = deserializeArray(long_t, numElements);
+        }
+    }
+
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(int32_t *long_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+    bool returnedValue = deserializeSequence(long_t, maxNumElements, numElements, sequenceFuncAllocator);
+    m_cdrBuffer.m_swapBytes = auxSwap;
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(int64_t *longlong_t, size_t maxNumElements, size_t &numElements)
+{
+    bool returnedValue = false;
+    CDRBuffer::State state(m_cdrBuffer);
+
+    if(*this >> (int32_t&)numElements)
+    {
+        if(numElements <= maxNumElements)
+        {
+            returnedValue = deserializeArray(longlong_t, numElements);
+        }
+        else
+        {
+            setState(state);
+        }
+    }
+
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(int64_t *longlong_t, size_t maxNumElements, size_t &numElements, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+    bool returnedValue = deserializeSequence(longlong_t, maxNumElements, numElements);
+    m_cdrBuffer.m_swapBytes = auxSwap;
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(int64_t *longlong_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator)
+{
+    bool returnedValue = false;
+
+    if(*this >> (int32_t&)numElements)
+    {
+        if(numElements <= maxNumElements || (sequenceFuncAllocator != NULL && sequenceFuncAllocator((char**)&longlong_t, maxNumElements, numElements)))
+        {
+            returnedValue = deserializeArray(longlong_t, numElements);
+        }
+    }
+
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(int64_t *longlong_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+    bool returnedValue = deserializeSequence(longlong_t, maxNumElements, numElements, sequenceFuncAllocator);
+    m_cdrBuffer.m_swapBytes = auxSwap;
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(float *float_t, size_t maxNumElements, size_t &numElements)
+{
+    bool returnedValue = false;
+    CDRBuffer::State state(m_cdrBuffer);
+
+    if(*this >> (int32_t&)numElements)
+    {
+        if(numElements <= maxNumElements)
+        {
+            returnedValue = deserializeArray(float_t, numElements);
+        }
+        else
+        {
+            setState(state);
+        }
+    }
+
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(float *float_t, size_t maxNumElements, size_t &numElements, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+    bool returnedValue = deserializeSequence(float_t, maxNumElements, numElements);
+    m_cdrBuffer.m_swapBytes = auxSwap;
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(float *float_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator)
+{
+    bool returnedValue = false;
+
+    if(*this >> (int32_t&)numElements)
+    {
+        if(numElements <= maxNumElements || (sequenceFuncAllocator != NULL && sequenceFuncAllocator((char**)&float_t, maxNumElements, numElements)))
+        {
+            returnedValue = deserializeArray(float_t, numElements);
+        }
+    }
+
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(float *float_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+    bool returnedValue = deserializeSequence(float_t, maxNumElements, numElements, sequenceFuncAllocator);
+    m_cdrBuffer.m_swapBytes = auxSwap;
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(double *double_t, size_t maxNumElements, size_t &numElements)
+{
+    bool returnedValue = false;
+    CDRBuffer::State state(m_cdrBuffer);
+
+    if(*this >> (int32_t&)numElements)
+    {
+        if(numElements <= maxNumElements)
+        {
+            returnedValue = deserializeArray(double_t, numElements);
+        }
+        else
+        {
+            setState(state);
+        }
+    }
+
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(double *double_t, size_t maxNumElements, size_t &numElements, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+    bool returnedValue = deserializeSequence(double_t, maxNumElements, numElements);
+    m_cdrBuffer.m_swapBytes = auxSwap;
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(double *double_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator)
+{
+    bool returnedValue = false;
+
+    if(*this >> (int32_t&)numElements)
+    {
+        if(numElements <= maxNumElements || (sequenceFuncAllocator != NULL && sequenceFuncAllocator((char**)&double_t, maxNumElements, numElements)))
+        {
+            returnedValue = deserializeArray(double_t, numElements);
+        }
+    }
+
+    return returnedValue;
+}
+
+bool CDR::deserializeSequence(double *double_t, size_t maxNumElements, size_t &numElements, SequenceFuncAllocator sequenceFuncAllocator, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+    bool returnedValue = deserializeSequence(double_t, maxNumElements, numElements, sequenceFuncAllocator);
     m_cdrBuffer.m_swapBytes = auxSwap;
     return returnedValue;
 }

@@ -32,18 +32,6 @@ namespace eProsima
         static const Endianness DEFAULT_ENDIAN;
 
         /*!
-         * @brief Function pointer used to call a user's definition function that
-         * allocates dynamically the raw buffer when it is necessary.
-         * @param buffer When the function is called this parameter contains the current pointer to the raw buffer where the data is serialized.
-         * This value cannot be NULL. When the function returns, it is expected that this parameter contains the pointer to the new resized raw buffer.
-         * @param bufferSize When the function is called this parameter contains the current size of the raw buffer. When the function returns,
-         * it is expected that this parameter contains the new size of the buffer.
-         * @param minSizeInc The minimun growth expected of the current raw buffer.
-         * @return True value has to be returned if the operation works successful. In other case false value has to be returned.
-         */
-        typedef bool (*CDRBufferFuncAllocator)(char **buffer, size_t *bufferSize, size_t minSizeInc);
-
-        /*!
          * @brief This class stores a state of a eProsima::CDRBuffer. Its usage is dangerours when the eProsima::CDRBuffer can use
          * a user's function to allocate dynamically memory.
          * @ingroup CDRAPIREFERENCE
@@ -57,11 +45,10 @@ namespace eProsima
              * @brief Default constructor.
              * @param cdrBuffer The buffer that will be used to create the new state.
              */
-            State(CDRBuffer &cdrBuffer) : m_bufferLength(cdrBuffer.m_bufferLength), m_currentPosition(cdrBuffer.m_currentPosition),
-                 m_alignPosition(cdrBuffer.m_alignPosition), m_swapBytes(cdrBuffer.m_swapBytes), m_lastDataSize(cdrBuffer.m_lastDataSize) {}
+            State(CDRBuffer &cdrBuffer);
 
              //! @brief The remaining bytes in the stream when the state was created.
-            size_t m_bufferLength;
+            size_t m_bufferRemainLength;
 
             //! @brief The position in the buffer when the state was created.
             char *m_currentPosition;
@@ -77,7 +64,17 @@ namespace eProsima
         };
 
         /*!
+         * @brief This constructor creates an internal stream and assigns it to the eProsima::CDRBuffer object.
+         * The user can obtain this internal stream using the function eProsima::CDRBuffer::getBuffer(). Be careful because this internal stream
+         * is deleted in the destruction of the eProsima::CDRBuffer object.
+         *
+         * @param endianness The initial endianness that will be used. By default is the endianness of the system.
+         */
+        CDRBuffer(const Endianness endianness = DEFAULT_ENDIAN);
+
+        /*!
          * @brief This constructor assigns the user's stream of bytes to the eProsima::CDRBuffer object.
+         * The user's stream will be used to serialize.
          *
          * @param buffer The user's buffer that will be used. This buffer is not deallocated in the object's destruction. Cannot be NULL.
          * @param bufferSize The length of user's buffer.
@@ -86,19 +83,27 @@ namespace eProsima
         CDRBuffer(char* const buffer, const size_t bufferSize, const Endianness endianness = DEFAULT_ENDIAN);
 
         /*!
-         * @brief This constructor assigns the user's stream of bytes to the eProsima::CDRBuffer object.
-         * This constructor will provide memory reallocation to eProsima::CDRBuffer object using a user's defined function.
-         *
-         * @param buffer The user's buffer that will be used. This buffer is not deallocated in the object's destruction. Cannot be NULL.
-         * @param bufferSize The length of user's buffer.
-         * @param funcAllocator User's defined function that will be called when the raw buffer has to grow.
-         * @param endianness The initial endianness that will be used. By default is the endianness of the system.
+         * @brief This function returns the stream that the eProsima::CDRBuffer uses to serialize data.
+         * @return The stream used by eProsima::CDRBuffer to serialize data.
          */
-        CDRBuffer(char* const buffer, const size_t bufferSize, CDRBufferFuncAllocator funcAllocator, const Endianness endianness = DEFAULT_ENDIAN);
-
         inline char* getBuffer() const { return m_buffer;}
 
+        /*!
+         * @brief This function returns the size of the allocated memory of the stream that the eProsima::CDRBuffer uses to serialize data.
+         * @return The size of the allocated memory of the stream used by the eProsima::CDRBuffer to serialize data.
+         */
         inline size_t getBufferSize() const { return m_bufferSize;}
+
+        /*!
+         * @brief This function returns the length of the serialized data inside the stream.
+         * @return The length of the serialized data.
+         */
+        inline size_t getSerializedDataLength() const { return m_currentPosition - m_buffer;}
+
+        /*!
+		 * @brief This function resets the eProsima::CDRBuffer object. The serialization process starts at the beginning.
+		 */
+        void reset();
 
     private:
 
@@ -107,7 +112,7 @@ namespace eProsima
          * @param dataSize The spected size to be available.
          * @return True value if the space is available. In other case false value is returned.
          */
-        inline bool checkSpace(size_t dataSize){return m_bufferLength >= dataSize;}
+        inline bool checkSpace(size_t dataSize){return m_bufferRemainLength >= dataSize;}
 
         /*!
          * @brief This function returns the extra bytes regarding the allign.
@@ -128,11 +133,6 @@ namespace eProsima
 		inline void resetAlign(){m_alignPosition = m_currentPosition;}
 
         /*!
-		 * @brief This function resets the current position in the buffer to the begining.
-		 */
-        void reset();
-
-        /*!
          * @brief This function resizes the raw buffer. It will call the user's defined function to make this job.
          * @param minSizeInc The minimun growth expected of the current raw buffer.
          * @return True value has to be returned if the operation works successful. In other case false value has to be returned.
@@ -146,7 +146,7 @@ namespace eProsima
         size_t m_bufferSize;
 
         //! @brief The remaining bytes in the stream.
-        size_t m_bufferLength;
+        size_t m_bufferRemainLength;
 
         //! @brief The current position in the serialization/deserialization process.
         char *m_currentPosition;
@@ -163,8 +163,8 @@ namespace eProsima
         //! @brief Stores the last datasize serialized/deserialized. It's used to optimize.
         size_t m_lastDataSize;
 
-        //! @brief This function pointer is called when it's not NULL to resize the raw buffer when it is necessary.
-        CDRBufferFuncAllocator m_funcAllocator;
+        //! @brief This variable indicates if the managed buffer is internal or is from the user.
+        bool m_internalBuffer;
     };
 };
 

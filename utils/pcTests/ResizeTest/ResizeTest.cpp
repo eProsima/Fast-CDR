@@ -10,8 +10,6 @@
 
 using namespace eProsima;
 
-#define INIT_BUFFER_LENGTH 1
-
 const uint8_t octet_t = 32;
 const char char_t =  'Z';
 const uint16_t ushort_t = 65500;
@@ -56,26 +54,12 @@ const std::vector<float> float_vector_t(float_array_2_t, float_array_2_t + sizeo
 const std::vector<double> double_vector_t(double_array_2_t, double_array_2_t + sizeof(double_array_2_t) / sizeof(double));
 const std::array<std::array<std::array<uint32_t, 3>, 2>, 2> triple_ulong_array_t = {{ {{ {{1, 2, 3}}, {{4, 5, 6}} }}, {{ {{7, 8, 9}}, {{10, 11, 12}} }} }};
 
-bool ResizeTestAllocator(char **buffer, size_t *bufferSize, size_t minSizeInc)
-{
-    *buffer = (char*)realloc(*buffer, *bufferSize + minSizeInc);
-
-    if(*buffer != NULL)
-    {
-        *bufferSize = *bufferSize + minSizeInc;
-        return true;
-    }
-
-    return false;
-}
-
 int main()
 {
     bool returnedValue = true;
-    char *buffer = (char*)malloc(INIT_BUFFER_LENGTH);
 
     // Serialization.
-    CDRBuffer cdrbuffer_ser(buffer, INIT_BUFFER_LENGTH, ResizeTestAllocator);
+    CDRBuffer cdrbuffer_ser;
     CDR cdr_ser(cdrbuffer_ser);
 
     returnedValue &= cdr_ser << octet_t;

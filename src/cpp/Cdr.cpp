@@ -92,7 +92,7 @@ CDRBuffer::State CDR::getState() const
 void CDR::setState(CDRBuffer::State &state)
 {
     m_cdrBuffer.m_currentPosition = state.m_currentPosition;
-    m_cdrBuffer.m_bufferLength = state.m_bufferLength;
+    m_cdrBuffer.m_bufferRemainLength = state.m_bufferRemainLength;
     m_cdrBuffer.m_alignPosition = state.m_alignPosition;
     m_cdrBuffer.m_swapBytes = state.m_swapBytes;
     m_cdrBuffer.m_lastDataSize = state.m_lastDataSize;
@@ -106,7 +106,7 @@ bool CDR::serialize(const char char_t)
         m_cdrBuffer.m_lastDataSize = sizeof(char_t);
 
         *m_cdrBuffer.m_currentPosition++ = char_t;
-        m_cdrBuffer.m_bufferLength -= sizeof(char_t);
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(char_t);
         return true;
     }
 
@@ -138,7 +138,7 @@ bool CDR::serialize(const int16_t short_t)
             m_cdrBuffer.m_currentPosition += sizeof(short_t);
         }
 
-        m_cdrBuffer.m_bufferLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
 
         return true;
     }
@@ -182,7 +182,7 @@ bool CDR::serialize(const int32_t long_t)
             m_cdrBuffer.m_currentPosition += sizeof(long_t);
         }
 
-        m_cdrBuffer.m_bufferLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
 
         return true;
     }
@@ -230,7 +230,7 @@ bool CDR::serialize(const int64_t longlong_t)
             m_cdrBuffer.m_currentPosition += sizeof(longlong_t);
         }
 
-        m_cdrBuffer.m_bufferLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
 
         return true;
     }
@@ -274,7 +274,7 @@ bool CDR::serialize(const float float_t)
             m_cdrBuffer.m_currentPosition += sizeof(float_t);
         }
 
-        m_cdrBuffer.m_bufferLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
 
         return true;
     }
@@ -322,7 +322,7 @@ bool CDR::serialize(const double double_t)
             m_cdrBuffer.m_currentPosition += sizeof(double_t);
         }
 
-        m_cdrBuffer.m_bufferLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
 
         return true;
     }
@@ -351,7 +351,7 @@ bool CDR::serialize(const bool bool_t)
         if(bool_t)
             value = 1;
         *m_cdrBuffer.m_currentPosition++ = value;
-        m_cdrBuffer.m_bufferLength -= sizeof(uint8_t);
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(uint8_t);
 
         return true;
     }
@@ -373,7 +373,7 @@ bool CDR::serialize(const std::string &string_t)
 
         memcpy(m_cdrBuffer.m_currentPosition, string_t.c_str(), length);
         m_cdrBuffer.m_currentPosition += length;
-        m_cdrBuffer.m_bufferLength -= length;
+        m_cdrBuffer.m_bufferRemainLength -= length;
     }
 
     return returnedValue;
@@ -406,7 +406,7 @@ int CDR::serialize(User_CString *userString, size_t userStringLength, User_CStri
 
                     memcpy(m_cdrBuffer.m_currentPosition, data, length);
                     m_cdrBuffer.m_currentPosition += length;
-                    m_cdrBuffer.m_bufferLength -= length;
+                    m_cdrBuffer.m_bufferRemainLength -= length;
                     return 0;
                 }
             }
@@ -438,7 +438,7 @@ bool CDR::serializeArray(const char *char_t, size_t numElements)
 
         memcpy(m_cdrBuffer.m_currentPosition, char_t, totalSize);
         m_cdrBuffer.m_currentPosition += totalSize;
-        m_cdrBuffer.m_bufferLength -= totalSize;
+        m_cdrBuffer.m_bufferRemainLength -= totalSize;
         return true;
     }
 
@@ -477,7 +477,7 @@ bool CDR::serializeArray(const int16_t *short_t, size_t numElements)
             m_cdrBuffer.m_currentPosition += totalSize;
         }
 
-        m_cdrBuffer.m_bufferLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
 
         return true;
     }
@@ -528,7 +528,7 @@ bool CDR::serializeArray(const int32_t *long_t, size_t numElements)
             m_cdrBuffer.m_currentPosition += totalSize;
         }
 
-        m_cdrBuffer.m_bufferLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
 
         return true;
     }
@@ -583,7 +583,7 @@ bool CDR::serializeArray(const int64_t *longlong_t, size_t numElements)
             m_cdrBuffer.m_currentPosition += totalSize;
         }
 
-        m_cdrBuffer.m_bufferLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
 
         return true;
     }
@@ -634,7 +634,7 @@ bool CDR::serializeArray(const float *float_t, size_t numElements)
             m_cdrBuffer.m_currentPosition += totalSize;
         }
 
-        m_cdrBuffer.m_bufferLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
 
         return true;
     }
@@ -689,7 +689,7 @@ bool CDR::serializeArray(const double *double_t, size_t numElements)
             m_cdrBuffer.m_currentPosition += totalSize;
         }
 
-        m_cdrBuffer.m_bufferLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
 
         return true;
     }
@@ -840,7 +840,7 @@ bool CDR::deserialize(char &char_t)
         m_cdrBuffer.m_lastDataSize = sizeof(char_t);
 
         char_t = *m_cdrBuffer.m_currentPosition++;
-        m_cdrBuffer.m_bufferLength -= sizeof(char_t);
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(char_t);
         return true;
     }
 
@@ -872,7 +872,7 @@ bool CDR::deserialize(int16_t &short_t)
             m_cdrBuffer.m_currentPosition += sizeof(short_t);
         }
 
-        m_cdrBuffer.m_bufferLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
 
         return true;
     }
@@ -916,7 +916,7 @@ bool CDR::deserialize(int32_t &long_t)
             m_cdrBuffer.m_currentPosition += sizeof(long_t);
         }
 
-        m_cdrBuffer.m_bufferLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
 
         return true;
     }
@@ -964,7 +964,7 @@ bool CDR::deserialize(int64_t &longlong_t)
             m_cdrBuffer.m_currentPosition += sizeof(longlong_t);
         }
 
-        m_cdrBuffer.m_bufferLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
 
         return true;
     }
@@ -1008,7 +1008,7 @@ bool CDR::deserialize(float &float_t)
             m_cdrBuffer.m_currentPosition += sizeof(float_t);
         }
 
-        m_cdrBuffer.m_bufferLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
 
         return true;
     }
@@ -1056,7 +1056,7 @@ bool CDR::deserialize(double &double_t)
             m_cdrBuffer.m_currentPosition += sizeof(double_t);
         }
 
-        m_cdrBuffer.m_bufferLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
 
         return true;
     }
@@ -1083,7 +1083,7 @@ bool CDR::deserialize(bool &bool_t)
         m_cdrBuffer.m_lastDataSize = sizeof(uint8_t);
 
         value = *m_cdrBuffer.m_currentPosition++;
-        m_cdrBuffer.m_bufferLength -= sizeof(uint8_t);
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(uint8_t);
 
         if(value == 1)
         {
@@ -1118,7 +1118,7 @@ bool CDR::deserialize(std::string &string_t)
 
         string_t = std::string(m_cdrBuffer.m_currentPosition, length - (m_cdrBuffer.m_currentPosition[length-1] == '\0' ? 1 : 0));
         m_cdrBuffer.m_currentPosition += length;
-        m_cdrBuffer.m_bufferLength -= length;
+        m_cdrBuffer.m_bufferRemainLength -= length;
     }
 
     return returnedValue;
@@ -1165,7 +1165,7 @@ int CDR::deserialize(User_CString *userString, size_t userStringSize, User_CStri
                     memcpy(data, m_cdrBuffer.m_currentPosition, length);
                     data[addition-1] = '\0';
                     m_cdrBuffer.m_currentPosition += length;
-                    m_cdrBuffer.m_bufferLength -= length;
+                    m_cdrBuffer.m_bufferRemainLength -= length;
                     return 0;
                 }
             }
@@ -1195,7 +1195,7 @@ bool CDR::deserializeArray(char *char_t, size_t numElements)
 
         memcpy(char_t, m_cdrBuffer.m_currentPosition, totalSize);
         m_cdrBuffer.m_currentPosition += totalSize;
-        m_cdrBuffer.m_bufferLength -= totalSize;
+        m_cdrBuffer.m_bufferRemainLength -= totalSize;
         return true;
     }
 
@@ -1234,7 +1234,7 @@ bool CDR::deserializeArray(int16_t *short_t, size_t numElements)
             m_cdrBuffer.m_currentPosition += totalSize;
         }
 
-        m_cdrBuffer.m_bufferLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
 
         return true;
     }
@@ -1285,7 +1285,7 @@ bool CDR::deserializeArray(int32_t *long_t, size_t numElements)
             m_cdrBuffer.m_currentPosition += totalSize;
         }
 
-        m_cdrBuffer.m_bufferLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
 
         return true;
     }
@@ -1340,7 +1340,7 @@ bool CDR::deserializeArray(int64_t *longlong_t, size_t numElements)
             m_cdrBuffer.m_currentPosition += totalSize;
         }
 
-        m_cdrBuffer.m_bufferLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
 
         return true;
     }
@@ -1391,7 +1391,7 @@ bool CDR::deserializeArray(float *float_t, size_t numElements)
             m_cdrBuffer.m_currentPosition += totalSize;
         }
 
-        m_cdrBuffer.m_bufferLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
 
         return true;
     }
@@ -1446,7 +1446,7 @@ bool CDR::deserializeArray(double *double_t, size_t numElements)
             m_cdrBuffer.m_currentPosition += totalSize;
         }
 
-        m_cdrBuffer.m_bufferLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
 
         return true;
     }

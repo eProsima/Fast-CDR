@@ -363,11 +363,16 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\cpp\Cdr.cpp" />
     <ClCompile Include="..\..\..\..\src\cpp\CdrBuffer.cpp" />
+    <ClCompile Include="..\..\..\..\src\cpp\exceptions\BadParamException.cpp" />
+    <ClCompile Include="..\..\..\..\src\cpp\exceptions\Exception.cpp" />
+    <ClCompile Include="..\..\..\..\src\cpp\exceptions\NotEnoughMemoryException.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\include\cpp\AbstractDataTypes.h" />
     <ClInclude Include="..\..\..\..\include\cpp\Cdr.h" />
     <ClInclude Include="..\..\..\..\include\cpp\CdrBuffer.h" />
+    <ClInclude Include="..\..\..\..\include\cpp\exceptions\BadParamException.h" />
+    <ClInclude Include="..\..\..\..\include\cpp\exceptions\NotEnoughMemoryException.h" />
+    <ClInclude Include="..\..\..\..\include\exceptions\Exception.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

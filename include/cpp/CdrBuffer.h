@@ -36,7 +36,7 @@ namespace eProsima
          * a user's function to allocate dynamically memory.
          * @ingroup CDRAPIREFERENCE
          */
-        class State
+        class eProsima_cpp_DllVariable State
         {
             friend class CDR;
         private:

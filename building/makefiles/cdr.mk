@@ -16,8 +16,11 @@ CDR_CFLAGS_DEBUG += $(CFLAGS_DEBUG) -std=c++0x
 CDR_INCLUDE_DIRS= $(INCLUDE_DIRS) -I$(BASEDIR)/include \
 		  -I$(EPROSIMADIR)/code
 
-CDR_SRC_CPPFILES= $(BASEDIR)/src/cpp/Cdr.c \
-			$(BASEDIR)/src/cpp/CdrBuffer.c
+CDR_SRC_CPPFILES= $(BASEDIR)/src/cpp/Cdr.cpp \
+		  $(BASEDIR)/src/cpp/CdrBuffer.cpp \
+		  $(BASEDIR)/src/cpp/exceptions/Exception.cpp \
+		  $(BASEDIR)/src/cpp/exceptions/NotEnoughMemoryException.cpp \
+		  $(BASEDIR)/src/cpp/exceptions/BadParamException.cpp
 
 # Project sources are copied to the current directory
 CDR_SRCS= $(CDR_SRC_CFILES) $(CDR_SRC_CPPFILES)

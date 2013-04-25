@@ -14,7 +14,7 @@
 namespace eProsima
 {
 	/**
-		* @brief This class is thrown as an exception when there is an error initializating an object.
+		* @brief This class is thrown as an exception when the buffer's internal memory reachs its size limit.
         * @ingroup EXCEPTIONMODULE
 		*/
     class eProsima_cpp_DllVariable NotEnoughMemoryException : public Exception
@@ -38,28 +38,28 @@ namespace eProsima
 		/**
 			* \brief Default copy constructor.
 			*
-			* \param ex InitializeException that will be copied.
+			* \param ex NotEnoughMemoryException that will be copied.
 			*/
 		NotEnoughMemoryException(const NotEnoughMemoryException &ex);
 
 		/**
 			* \brief Default move constructor.
 			*
-			* \param ex InitializeException that will be moved.
+			* \param ex NotEnoughMemoryException that will be moved.
 			*/
 		NotEnoughMemoryException(NotEnoughMemoryException&& ex);
 
 		/**
 			* \brief Assigment operation.
 			*
-			* \param ex InitializeException that will be copied.
+			* \param ex NotEnoughMemoryException that will be copied.
 			*/
 		NotEnoughMemoryException& operator=(const NotEnoughMemoryException &ex);
 
 		/**
 			* \brief Assigment operation.
 			*
-			* \param ex InitializeException that will be moved.
+			* \param ex NotEnoughMemoryException that will be moved.
 			*/
 		NotEnoughMemoryException& operator=(NotEnoughMemoryException&& ex);
 

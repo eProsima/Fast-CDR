@@ -14,7 +14,7 @@
 namespace eProsima
 {
 	/**
-		* @brief This class is thrown as an exception when there is an error initializating an object.
+		* @brief This class is thrown as an exception when a invalid parameter was being serialized.
         * @ingroup EXCEPTIONMODULE
 		*/
     class eProsima_cpp_DllVariable BadParamException : public Exception
@@ -38,28 +38,28 @@ namespace eProsima
 		/**
 			* \brief Default copy constructor.
 			*
-			* \param ex InitializeException that will be copied.
+			* \param ex BadParamException that will be copied.
 			*/
 		BadParamException(const BadParamException &ex);
 
 		/**
 			* \brief Default move constructor.
 			*
-			* \param ex InitializeException that will be moved.
+			* \param ex BadParamException that will be moved.
 			*/
 		BadParamException(BadParamException&& ex);
 
 		/**
 			* \brief Assigment operation.
 			*
-			* \param ex InitializeException that will be copied.
+			* \param ex BadParamException that will be copied.
 			*/
 		BadParamException& operator=(const BadParamException &ex);
 
 		/**
 			* \brief Assigment operation.
 			*
-			* \param ex InitializeException that will be moved.
+			* \param ex BadParamException that will be moved.
 			*/
 		BadParamException& operator=(BadParamException&& ex);
 

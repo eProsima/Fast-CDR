@@ -3,7 +3,7 @@
  *
  * <center><b>CDR Serializer Library</b></center><br/>
  * 
- * @image html logoEprosimaBlueRTI.gif
+ * @image html eProsimaLogo.png
  *
  * <br/><center><a href="http://www.eprosima.com">eProsima</a></center>
  *
@@ -15,4 +15,11 @@
  /*!
  * @defgroup CDRAPIREFERENCE CDR Serializer API Reference
  * @brief CDR Serializer internal API groped in modules.
+ */
+
+ /*!
+ * @defgroup EXCEPTIONMODULE Exceptions
+ * @ingroup CDRAPIREFERENCE
+ * @brief Exceptions used by the CDR API.
+ * All exceptions defined in this module are thrown by the CDR library.
  */

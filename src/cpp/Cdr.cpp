@@ -184,6 +184,53 @@ CDR& CDR::serialize(const int16_t short_t, CDRBuffer::Endianness endianness)
     return *this;
 }
 
+CDR& CDR::serializeFast(const int16_t short_t)
+{
+    if(m_cdrBuffer.checkSpace(sizeof(short_t)) || m_cdrBuffer.resize(sizeof(short_t)))
+    {
+        // Save last datasize.
+        m_cdrBuffer.m_lastDataSize = sizeof(short_t);
+
+        const char *dst = reinterpret_cast<const char*>(&short_t);
+
+        if(m_cdrBuffer.m_swapBytes)
+        {    
+            *m_cdrBuffer.m_currentPosition++ = dst[1];
+            *m_cdrBuffer.m_currentPosition++ = dst[0];
+        }
+        else
+        {
+            memcpy(m_cdrBuffer.m_currentPosition, dst, sizeof(short_t));
+            m_cdrBuffer.m_currentPosition += sizeof(short_t);
+        }
+
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(short_t);
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+}
+
+CDR& CDR::serializeFast(const int16_t short_t, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+    
+    try
+    {
+        serializeFast(short_t);
+        m_cdrBuffer.m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_cdrBuffer.m_swapBytes = auxSwap;
+        ex.raise();
+    }
+    
+    return *this;
+}
+
 CDR& CDR::serialize(const int32_t long_t)
 {
     size_t align = m_cdrBuffer.align(sizeof(long_t));
@@ -227,6 +274,55 @@ CDR& CDR::serialize(const int32_t long_t, CDRBuffer::Endianness endianness)
     try
     {
         serialize(long_t);
+        m_cdrBuffer.m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_cdrBuffer.m_swapBytes = auxSwap;
+        ex.raise();
+    }
+    
+    return *this;
+}
+
+CDR& CDR::serializeFast(const int32_t long_t)
+{
+    if(m_cdrBuffer.checkSpace(sizeof(long_t)) || m_cdrBuffer.resize(sizeof(long_t)))
+    {
+        // Save last datasize.
+        m_cdrBuffer.m_lastDataSize = sizeof(long_t);
+    
+        const char *dst = reinterpret_cast<const char*>(&long_t);
+
+        if(m_cdrBuffer.m_swapBytes)
+        {
+            *m_cdrBuffer.m_currentPosition++ = dst[3];
+            *m_cdrBuffer.m_currentPosition++ = dst[2];
+            *m_cdrBuffer.m_currentPosition++ = dst[1];
+            *m_cdrBuffer.m_currentPosition++ = dst[0];
+        }
+        else
+        {
+            memcpy(m_cdrBuffer.m_currentPosition, dst, sizeof(long_t));
+            m_cdrBuffer.m_currentPosition += sizeof(long_t);
+        }
+
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(long_t);
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+}
+
+CDR& CDR::serializeFast(const int32_t long_t, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+
+    try
+    {
+        serializeFast(long_t);
         m_cdrBuffer.m_swapBytes = auxSwap;
     }
     catch(Exception &ex)
@@ -296,6 +392,59 @@ CDR& CDR::serialize(const int64_t longlong_t, CDRBuffer::Endianness endianness)
     return *this;
 }
 
+CDR& CDR::serializeFast(const int64_t longlong_t)
+{
+    if(m_cdrBuffer.checkSpace(sizeof(longlong_t)) || m_cdrBuffer.resize(sizeof(longlong_t)))
+    {
+        // Save last datasize.
+        m_cdrBuffer.m_lastDataSize = sizeof(longlong_t);
+    
+        const char *dst = reinterpret_cast<const char*>(&longlong_t);
+
+        if(m_cdrBuffer.m_swapBytes)
+        {
+            *m_cdrBuffer.m_currentPosition++ = dst[7];
+            *m_cdrBuffer.m_currentPosition++ = dst[6];
+            *m_cdrBuffer.m_currentPosition++ = dst[5];
+            *m_cdrBuffer.m_currentPosition++ = dst[4];
+            *m_cdrBuffer.m_currentPosition++ = dst[3];
+            *m_cdrBuffer.m_currentPosition++ = dst[2];
+            *m_cdrBuffer.m_currentPosition++ = dst[1];
+            *m_cdrBuffer.m_currentPosition++ = dst[0];
+        }
+        else
+        {
+            memcpy(m_cdrBuffer.m_currentPosition, dst, sizeof(longlong_t));
+            m_cdrBuffer.m_currentPosition += sizeof(longlong_t);
+        }
+
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(longlong_t);
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+}
+
+CDR& CDR::serializeFast(const int64_t longlong_t, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+
+    try
+    {
+        serializeFast(longlong_t);
+        m_cdrBuffer.m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_cdrBuffer.m_swapBytes = auxSwap;
+        ex.raise();
+    }
+    
+    return *this;
+}
+
 CDR& CDR::serialize(const float float_t)
 {
     size_t align = m_cdrBuffer.align(sizeof(float_t));
@@ -339,6 +488,55 @@ CDR& CDR::serialize(const float float_t, CDRBuffer::Endianness endianness)
     try
     {
         serialize(float_t);
+        m_cdrBuffer.m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_cdrBuffer.m_swapBytes = auxSwap;
+        ex.raise();
+    }
+    
+    return *this;
+}
+
+CDR& CDR::serializeFast(const float float_t)
+{
+    if(m_cdrBuffer.checkSpace(sizeof(float_t)) || m_cdrBuffer.resize(sizeof(float_t)))
+    {
+        // Save last datasize.
+        m_cdrBuffer.m_lastDataSize = sizeof(float_t);
+    
+        const char *dst = reinterpret_cast<const char*>(&float_t);
+
+        if(m_cdrBuffer.m_swapBytes)
+        {
+            *m_cdrBuffer.m_currentPosition++ = dst[3];
+            *m_cdrBuffer.m_currentPosition++ = dst[2];
+            *m_cdrBuffer.m_currentPosition++ = dst[1];
+            *m_cdrBuffer.m_currentPosition++ = dst[0];
+        }
+        else
+        {
+            memcpy(m_cdrBuffer.m_currentPosition, dst, sizeof(float_t));
+            m_cdrBuffer.m_currentPosition += sizeof(float_t);
+        }
+
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(float_t);
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+}
+
+CDR& CDR::serializeFast(const float float_t, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+
+    try
+    {
+        serializeFast(float_t);
         m_cdrBuffer.m_swapBytes = auxSwap;
     }
     catch(Exception &ex)
@@ -408,6 +606,59 @@ CDR& CDR::serialize(const double double_t, CDRBuffer::Endianness endianness)
     return *this;
 }
 
+CDR& CDR::serializeFast(const double double_t)
+{
+    if(m_cdrBuffer.checkSpace(sizeof(double_t)) || m_cdrBuffer.resize(sizeof(double_t)))
+    {
+        // Save last datasize.
+        m_cdrBuffer.m_lastDataSize = sizeof(double_t);
+    
+        const char *dst = reinterpret_cast<const char*>(&double_t);
+
+        if(m_cdrBuffer.m_swapBytes)
+        {
+            *m_cdrBuffer.m_currentPosition++ = dst[7];
+            *m_cdrBuffer.m_currentPosition++ = dst[6];
+            *m_cdrBuffer.m_currentPosition++ = dst[5];
+            *m_cdrBuffer.m_currentPosition++ = dst[4];
+            *m_cdrBuffer.m_currentPosition++ = dst[3];
+            *m_cdrBuffer.m_currentPosition++ = dst[2];
+            *m_cdrBuffer.m_currentPosition++ = dst[1];
+            *m_cdrBuffer.m_currentPosition++ = dst[0];
+        }
+        else
+        {
+            memcpy(m_cdrBuffer.m_currentPosition, dst, sizeof(double_t));
+            m_cdrBuffer.m_currentPosition += sizeof(double_t);
+        }
+
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(double_t);
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+}
+
+CDR& CDR::serializeFast(const double double_t, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+
+    try
+    {
+        serializeFast(double_t);
+        m_cdrBuffer.m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_cdrBuffer.m_swapBytes = auxSwap;
+        ex.raise();
+    }
+    
+    return *this;
+}
+
 CDR& CDR::serialize(const bool bool_t)
 {
     uint8_t value = 0;
@@ -464,6 +715,53 @@ CDR& CDR::serialize(const std::string &string_t, CDRBuffer::Endianness endiannes
     try
     {
         serialize(string_t);
+        m_cdrBuffer.m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_cdrBuffer.m_swapBytes = auxSwap;
+        ex.raise();
+    }
+    
+    return *this;
+}
+
+CDR& CDR::serializeFast(const std::string &string_t)
+{
+    uint32_t length = (uint32_t)string_t.length();
+    CDRBuffer::State state(m_cdrBuffer);
+
+    serializeFast(length);
+
+    if(length > 0)
+    {
+        if(m_cdrBuffer.checkSpace(length) || m_cdrBuffer.resize(length))
+        {
+            // Save last datasize.
+            m_cdrBuffer.m_lastDataSize = sizeof(uint8_t);
+
+            memcpy(m_cdrBuffer.m_currentPosition, string_t.c_str(), length);
+            m_cdrBuffer.m_currentPosition += length;
+            m_cdrBuffer.m_bufferRemainLength -= length;
+        }
+        else
+        {
+            setState(state);
+            throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+        }
+    }
+
+    return *this;
+}
+
+CDR& CDR::serializeFast(const std::string &string_t, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+
+    try
+    {
+        serializeFast(string_t);
         m_cdrBuffer.m_swapBytes = auxSwap;
     }
     catch(Exception &ex)
@@ -552,6 +850,59 @@ CDR& CDR::serializeArray(const int16_t *short_t, size_t numElements, CDRBuffer::
     return *this;
 }
 
+CDR& CDR::serializeArrayFast(const int16_t *short_t, size_t numElements)
+{
+    size_t totalSize = sizeof(*short_t) * numElements;
+
+    if(m_cdrBuffer.checkSpace(totalSize) || m_cdrBuffer.resize(totalSize))
+    {
+        // Save last datasize.
+        m_cdrBuffer.m_lastDataSize = sizeof(short_t);
+
+        if(m_cdrBuffer.m_swapBytes)
+        {
+            const char *dst = reinterpret_cast<const char*>(&short_t);
+            const char *end = dst + totalSize;
+
+            for(; dst < end; dst += sizeof(*short_t))
+            {
+                *m_cdrBuffer.m_currentPosition++ = dst[1];
+                *m_cdrBuffer.m_currentPosition++ = dst[0];
+            }
+        }
+        else
+        {
+            memcpy(m_cdrBuffer.m_currentPosition, short_t, totalSize);
+            m_cdrBuffer.m_currentPosition += totalSize;
+        }
+
+        m_cdrBuffer.m_bufferRemainLength -= totalSize;
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+}
+
+CDR& CDR::serializeArrayFast(const int16_t *short_t, size_t numElements, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+
+    try
+    {
+        serializeArrayFast(short_t, numElements);
+        m_cdrBuffer.m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_cdrBuffer.m_swapBytes = auxSwap;
+        ex.raise();
+    }
+    
+    return *this;
+}
+
 CDR& CDR::serializeArray(const int32_t *long_t, size_t numElements)
 {
     size_t align = m_cdrBuffer.align(sizeof(long_t));
@@ -602,6 +953,61 @@ CDR& CDR::serializeArray(const int32_t *long_t, size_t numElements, CDRBuffer::E
     try
     {
         serializeArray(long_t, numElements);
+        m_cdrBuffer.m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_cdrBuffer.m_swapBytes = auxSwap;
+        ex.raise();
+    }
+    
+    return *this;
+}
+
+CDR& CDR::serializeArrayFast(const int32_t *long_t, size_t numElements)
+{
+    size_t totalSize = sizeof(*long_t) * numElements;
+
+    if(m_cdrBuffer.checkSpace(totalSize) || m_cdrBuffer.resize(totalSize))
+    {
+        // Save last datasize.
+        m_cdrBuffer.m_lastDataSize = sizeof(long_t);
+
+        if(m_cdrBuffer.m_swapBytes)
+        {
+            const char *dst = reinterpret_cast<const char*>(&long_t);
+            const char *end = dst + totalSize;
+
+            for(; dst < end; dst += sizeof(*long_t))
+            {
+                *m_cdrBuffer.m_currentPosition++ = dst[3];
+                *m_cdrBuffer.m_currentPosition++ = dst[2];
+                *m_cdrBuffer.m_currentPosition++ = dst[1];
+                *m_cdrBuffer.m_currentPosition++ = dst[0];
+            }
+        }
+        else
+        {
+            memcpy(m_cdrBuffer.m_currentPosition, long_t, totalSize);
+            m_cdrBuffer.m_currentPosition += totalSize;
+        }
+
+        m_cdrBuffer.m_bufferRemainLength -= totalSize;
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+}
+
+CDR& CDR::serializeArrayFast(const int32_t *long_t, size_t numElements, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+
+    try
+    {
+        serializeArrayFast(long_t, numElements);
         m_cdrBuffer.m_swapBytes = auxSwap;
     }
     catch(Exception &ex)
@@ -678,6 +1084,65 @@ CDR& CDR::serializeArray(const int64_t *longlong_t, size_t numElements, CDRBuffe
     return *this;
 }
 
+CDR& CDR::serializeArrayFast(const int64_t *longlong_t, size_t numElements)
+{
+    size_t totalSize = sizeof(*longlong_t) * numElements;
+
+    if(m_cdrBuffer.checkSpace(totalSize) || m_cdrBuffer.resize(totalSize))
+    {
+        // Save last datasize.
+        m_cdrBuffer.m_lastDataSize = sizeof(longlong_t);
+
+        if(m_cdrBuffer.m_swapBytes)
+        {
+            const char *dst = reinterpret_cast<const char*>(&longlong_t);
+            const char *end = dst + totalSize;
+
+            for(; dst < end; dst += sizeof(*longlong_t))
+            {
+                *m_cdrBuffer.m_currentPosition++ = dst[7];
+                *m_cdrBuffer.m_currentPosition++ = dst[6];
+                *m_cdrBuffer.m_currentPosition++ = dst[5];
+                *m_cdrBuffer.m_currentPosition++ = dst[4];
+                *m_cdrBuffer.m_currentPosition++ = dst[3];
+                *m_cdrBuffer.m_currentPosition++ = dst[2];
+                *m_cdrBuffer.m_currentPosition++ = dst[1];
+                *m_cdrBuffer.m_currentPosition++ = dst[0];
+            }
+        }
+        else
+        {
+            memcpy(m_cdrBuffer.m_currentPosition, longlong_t, totalSize);
+            m_cdrBuffer.m_currentPosition += totalSize;
+        }
+
+        m_cdrBuffer.m_bufferRemainLength -= totalSize;
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+}
+
+CDR& CDR::serializeArrayFast(const int64_t *longlong_t, size_t numElements, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+
+    try
+    {
+        serializeArrayFast(longlong_t, numElements);
+        m_cdrBuffer.m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_cdrBuffer.m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
 CDR& CDR::serializeArray(const float *float_t, size_t numElements)
 {
     size_t align = m_cdrBuffer.align(sizeof(float_t));
@@ -728,6 +1193,61 @@ CDR& CDR::serializeArray(const float *float_t, size_t numElements, CDRBuffer::En
     try
     {
         serializeArray(float_t, numElements);
+        m_cdrBuffer.m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_cdrBuffer.m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+CDR& CDR::serializeArrayFast(const float *float_t, size_t numElements)
+{
+    size_t totalSize = sizeof(*float_t) * numElements;
+
+    if(m_cdrBuffer.checkSpace(totalSize) || m_cdrBuffer.resize(totalSize))
+    {
+        // Save last datasize.
+        m_cdrBuffer.m_lastDataSize = sizeof(float_t);
+
+        if(m_cdrBuffer.m_swapBytes)
+        {
+            const char *dst = reinterpret_cast<const char*>(&float_t);
+            const char *end = dst + totalSize;
+
+            for(; dst < end; dst += sizeof(*float_t))
+            {
+                *m_cdrBuffer.m_currentPosition++ = dst[3];
+                *m_cdrBuffer.m_currentPosition++ = dst[2];
+                *m_cdrBuffer.m_currentPosition++ = dst[1];
+                *m_cdrBuffer.m_currentPosition++ = dst[0];
+            }
+        }
+        else
+        {
+            memcpy(m_cdrBuffer.m_currentPosition, float_t, totalSize);
+            m_cdrBuffer.m_currentPosition += totalSize;
+        }
+
+        m_cdrBuffer.m_bufferRemainLength -= totalSize;
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+}
+
+CDR& CDR::serializeArrayFast(const float *float_t, size_t numElements, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+
+    try
+    {
+        serializeArrayFast(float_t, numElements);
         m_cdrBuffer.m_swapBytes = auxSwap;
     }
     catch(Exception &ex)
@@ -793,6 +1313,65 @@ CDR& CDR::serializeArray(const double *double_t, size_t numElements, CDRBuffer::
     try
     {
         serializeArray(double_t, numElements);
+        m_cdrBuffer.m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_cdrBuffer.m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+CDR& CDR::serializeArrayFast(const double *double_t, size_t numElements)
+{
+    size_t totalSize = sizeof(*double_t) * numElements;
+
+    if(m_cdrBuffer.checkSpace(totalSize) || m_cdrBuffer.resize(totalSize))
+    {
+        // Save last datasize.
+        m_cdrBuffer.m_lastDataSize = sizeof(double_t);
+
+        if(m_cdrBuffer.m_swapBytes)
+        {
+            const char *dst = reinterpret_cast<const char*>(&double_t);
+            const char *end = dst + totalSize;
+
+            for(; dst < end; dst += sizeof(*double_t))
+            {
+                *m_cdrBuffer.m_currentPosition++ = dst[7];
+                *m_cdrBuffer.m_currentPosition++ = dst[6];
+                *m_cdrBuffer.m_currentPosition++ = dst[5];
+                *m_cdrBuffer.m_currentPosition++ = dst[4];
+                *m_cdrBuffer.m_currentPosition++ = dst[3];
+                *m_cdrBuffer.m_currentPosition++ = dst[2];
+                *m_cdrBuffer.m_currentPosition++ = dst[1];
+                *m_cdrBuffer.m_currentPosition++ = dst[0];
+            }
+        }
+        else
+        {
+            memcpy(m_cdrBuffer.m_currentPosition, double_t, totalSize);
+            m_cdrBuffer.m_currentPosition += totalSize;
+        }
+
+        m_cdrBuffer.m_bufferRemainLength -= totalSize;
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+}
+
+CDR& CDR::serializeArrayFast(const double *double_t, size_t numElements, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+
+    try
+    {
+        serializeArrayFast(double_t, numElements);
         m_cdrBuffer.m_swapBytes = auxSwap;
     }
     catch(Exception &ex)
@@ -871,6 +1450,53 @@ CDR& CDR::deserialize(int16_t &short_t, CDRBuffer::Endianness endianness)
     return *this;
 }
 
+CDR& CDR::deserializeFast(int16_t &short_t)
+{
+    if(m_cdrBuffer.checkSpace(sizeof(short_t)))
+    {
+        // Save last datasize.
+        m_cdrBuffer.m_lastDataSize = sizeof(short_t);
+
+        char *dst = reinterpret_cast<char*>(&short_t);
+
+        if(m_cdrBuffer.m_swapBytes)
+        {    
+            dst[1] = *m_cdrBuffer.m_currentPosition++;
+            dst[0] = *m_cdrBuffer.m_currentPosition++;
+        }
+        else
+        {
+            memcpy(dst, m_cdrBuffer.m_currentPosition, sizeof(short_t));
+            m_cdrBuffer.m_currentPosition += sizeof(short_t);
+        }
+
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(short_t);
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+}
+
+CDR& CDR::deserializeFast(int16_t &short_t, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+
+    try
+    {
+        deserializeFast(short_t);
+        m_cdrBuffer.m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_cdrBuffer.m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
 CDR& CDR::deserialize(int32_t &long_t)
 {
     size_t align = m_cdrBuffer.align(sizeof(long_t));
@@ -881,8 +1507,6 @@ CDR& CDR::deserialize(int32_t &long_t)
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(long_t);
 
-        // Align.
-        m_cdrBuffer.makeAlign(align);
         char *dst = reinterpret_cast<char*>(&long_t);
 
         if(m_cdrBuffer.m_swapBytes)
@@ -914,6 +1538,55 @@ CDR& CDR::deserialize(int32_t &long_t, CDRBuffer::Endianness endianness)
     try
     {
         deserialize(long_t);
+        m_cdrBuffer.m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_cdrBuffer.m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+CDR& CDR::deserializeFast(int32_t &long_t)
+{
+    if(m_cdrBuffer.checkSpace(sizeof(long_t)))
+    {
+        // Save last datasize.
+        m_cdrBuffer.m_lastDataSize = sizeof(long_t);
+
+        char *dst = reinterpret_cast<char*>(&long_t);
+
+        if(m_cdrBuffer.m_swapBytes)
+        {
+            dst[3] = *m_cdrBuffer.m_currentPosition++;
+            dst[2] = *m_cdrBuffer.m_currentPosition++;
+            dst[1] = *m_cdrBuffer.m_currentPosition++;
+            dst[0] = *m_cdrBuffer.m_currentPosition++;
+        }
+        else
+        {
+            memcpy(dst, m_cdrBuffer.m_currentPosition, sizeof(long_t));
+            m_cdrBuffer.m_currentPosition += sizeof(long_t);
+        }
+
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(long_t);
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+}
+
+CDR& CDR::deserializeFast(int32_t &long_t, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+
+    try
+    {
+        deserializeFast(long_t);
         m_cdrBuffer.m_swapBytes = auxSwap;
     }
     catch(Exception &ex)
@@ -983,6 +1656,59 @@ CDR& CDR::deserialize(int64_t &longlong_t, CDRBuffer::Endianness endianness)
     return *this;
 }
 
+CDR& CDR::deserializeFast(int64_t &longlong_t)
+{
+    if(m_cdrBuffer.checkSpace(sizeof(longlong_t)))
+    {
+        // Save last datasize.
+        m_cdrBuffer.m_lastDataSize = sizeof(longlong_t);
+
+        char *dst = reinterpret_cast<char*>(&longlong_t);
+
+        if(m_cdrBuffer.m_swapBytes)
+        {
+            dst[7] = *m_cdrBuffer.m_currentPosition++;
+            dst[6] = *m_cdrBuffer.m_currentPosition++;
+            dst[5] = *m_cdrBuffer.m_currentPosition++;
+            dst[4] = *m_cdrBuffer.m_currentPosition++;
+            dst[3] = *m_cdrBuffer.m_currentPosition++;
+            dst[2] = *m_cdrBuffer.m_currentPosition++;
+            dst[1] = *m_cdrBuffer.m_currentPosition++;
+            dst[0] = *m_cdrBuffer.m_currentPosition++;
+        }
+        else
+        {
+            memcpy(dst, m_cdrBuffer.m_currentPosition, sizeof(longlong_t));
+            m_cdrBuffer.m_currentPosition += sizeof(longlong_t);
+        }
+
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(longlong_t);
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+}
+
+CDR& CDR::deserializeFast(int64_t &longlong_t, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+
+    try
+    {
+        deserializeFast(longlong_t);
+        m_cdrBuffer.m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_cdrBuffer.m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
 CDR& CDR::deserialize(float &float_t)
 {
     size_t align = m_cdrBuffer.align(sizeof(float_t));
@@ -1026,6 +1752,55 @@ CDR& CDR::deserialize(float &float_t, CDRBuffer::Endianness endianness)
     try
     {
         deserialize(float_t);
+        m_cdrBuffer.m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_cdrBuffer.m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+CDR& CDR::deserializeFast(float &float_t)
+{
+    if(m_cdrBuffer.checkSpace(sizeof(float_t)))
+    {
+        // Save last datasize.
+        m_cdrBuffer.m_lastDataSize = sizeof(float_t);
+
+        char *dst = reinterpret_cast<char*>(&float_t);
+
+        if(m_cdrBuffer.m_swapBytes)
+        {
+            dst[3] = *m_cdrBuffer.m_currentPosition++;
+            dst[2] = *m_cdrBuffer.m_currentPosition++;
+            dst[1] = *m_cdrBuffer.m_currentPosition++;
+            dst[0] = *m_cdrBuffer.m_currentPosition++;
+        }
+        else
+        {
+            memcpy(dst, m_cdrBuffer.m_currentPosition, sizeof(float_t));
+            m_cdrBuffer.m_currentPosition += sizeof(float_t);
+        }
+
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(float_t);
+
+        return *this;
+    }
+
+   throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+}
+
+CDR& CDR::deserializeFast(float &float_t, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+
+    try
+    {
+        deserializeFast(float_t);
         m_cdrBuffer.m_swapBytes = auxSwap;
     }
     catch(Exception &ex)
@@ -1084,6 +1859,59 @@ CDR& CDR::deserialize(double &double_t, CDRBuffer::Endianness endianness)
     try
     {
         deserialize(double_t);
+        m_cdrBuffer.m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_cdrBuffer.m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+CDR& CDR::deserializeFast(double &double_t)
+{
+    if(m_cdrBuffer.checkSpace(sizeof(double_t)))
+    {
+        // Save last datasize.
+        m_cdrBuffer.m_lastDataSize = sizeof(double_t);
+
+        char *dst = reinterpret_cast<char*>(&double_t);
+
+        if(m_cdrBuffer.m_swapBytes)
+        {
+            dst[7] = *m_cdrBuffer.m_currentPosition++;
+            dst[6] = *m_cdrBuffer.m_currentPosition++;
+            dst[5] = *m_cdrBuffer.m_currentPosition++;
+            dst[4] = *m_cdrBuffer.m_currentPosition++;
+            dst[3] = *m_cdrBuffer.m_currentPosition++;
+            dst[2] = *m_cdrBuffer.m_currentPosition++;
+            dst[1] = *m_cdrBuffer.m_currentPosition++;
+            dst[0] = *m_cdrBuffer.m_currentPosition++;
+        }
+        else
+        {
+            memcpy(dst, m_cdrBuffer.m_currentPosition, sizeof(double_t));
+            m_cdrBuffer.m_currentPosition += sizeof(double_t);
+        }
+
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(double_t);
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+}
+
+CDR& CDR::deserializeFast(double &double_t, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+
+    try
+    {
+        deserializeFast(double_t);
         m_cdrBuffer.m_swapBytes = auxSwap;
     }
     catch(Exception &ex)
@@ -1159,6 +1987,52 @@ CDR& CDR::deserialize(std::string &string_t, CDRBuffer::Endianness endianness)
     try
     {
         deserialize(string_t);
+        m_cdrBuffer.m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_cdrBuffer.m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+CDR& CDR::deserializeFast(std::string &string_t)
+{
+    uint32_t length = 0;
+    CDRBuffer::State state(m_cdrBuffer);
+
+    deserializeFast(length);
+
+    if(length == 0)
+    {
+        string_t = "";
+        return *this;
+    }
+    else if(m_cdrBuffer.checkSpace(length))
+    {
+        // Save last datasize.
+        m_cdrBuffer.m_lastDataSize = sizeof(uint8_t);
+
+        string_t = std::string(m_cdrBuffer.m_currentPosition, length - (m_cdrBuffer.m_currentPosition[length-1] == '\0' ? 1 : 0));
+        m_cdrBuffer.m_currentPosition += length;
+        m_cdrBuffer.m_bufferRemainLength -= length;
+        return *this;
+    }
+
+    setState(state);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+}
+
+CDR& CDR::deserializeFast(std::string &string_t, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+
+    try
+    {
+        deserializeFast(string_t);
         m_cdrBuffer.m_swapBytes = auxSwap;
     }
     catch(Exception &ex)
@@ -1247,6 +2121,59 @@ CDR& CDR::deserializeArray(int16_t *short_t, size_t numElements, CDRBuffer::Endi
     return *this;
 }
 
+CDR& CDR::deserializeArrayFast(int16_t *short_t, size_t numElements)
+{
+    size_t totalSize = sizeof(*short_t) * numElements;
+
+    if(m_cdrBuffer.checkSpace(totalSize))
+    {
+        // Save last datasize.
+        m_cdrBuffer.m_lastDataSize = sizeof(short_t);
+
+        if(m_cdrBuffer.m_swapBytes)
+        {
+            char *dst = reinterpret_cast<char*>(&short_t);
+            char *end = dst + totalSize;
+
+            for(; dst < end; dst += sizeof(*short_t))
+            {
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+            }
+        }
+        else
+        {
+            memcpy(short_t, m_cdrBuffer.m_currentPosition, totalSize);
+            m_cdrBuffer.m_currentPosition += totalSize;
+        }
+
+        m_cdrBuffer.m_bufferRemainLength -= totalSize;
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+}
+
+CDR& CDR::deserializeArrayFast(int16_t *short_t, size_t numElements, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+
+    try
+    {
+        deserializeArrayFast(short_t, numElements);
+        m_cdrBuffer.m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_cdrBuffer.m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
 CDR& CDR::deserializeArray(int32_t *long_t, size_t numElements)
 {
     size_t align = m_cdrBuffer.align(sizeof(long_t));
@@ -1297,6 +2224,61 @@ CDR& CDR::deserializeArray(int32_t *long_t, size_t numElements, CDRBuffer::Endia
     try
     {
         deserializeArray(long_t, numElements);
+        m_cdrBuffer.m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_cdrBuffer.m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+CDR& CDR::deserializeArrayFast(int32_t *long_t, size_t numElements)
+{
+    size_t totalSize = sizeof(*long_t) * numElements;
+
+    if(m_cdrBuffer.checkSpace(totalSize))
+    {
+        // Save last datasize.
+        m_cdrBuffer.m_lastDataSize = sizeof(long_t);
+
+        if(m_cdrBuffer.m_swapBytes)
+        {
+            char *dst = reinterpret_cast<char*>(&long_t);
+            char *end = dst + totalSize;
+
+            for(; dst < end; dst += sizeof(*long_t))
+            {
+                dst[3] = *m_cdrBuffer.m_currentPosition++;
+                dst[2] = *m_cdrBuffer.m_currentPosition++;
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+            }
+        }
+        else
+        {
+            memcpy(long_t, m_cdrBuffer.m_currentPosition, totalSize);
+            m_cdrBuffer.m_currentPosition += totalSize;
+        }
+
+        m_cdrBuffer.m_bufferRemainLength -= totalSize;
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+}
+
+CDR& CDR::deserializeArrayFast(int32_t *long_t, size_t numElements, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+
+    try
+    {
+        deserializeArrayFast(long_t, numElements);
         m_cdrBuffer.m_swapBytes = auxSwap;
     }
     catch(Exception &ex)
@@ -1373,6 +2355,65 @@ CDR& CDR::deserializeArray(int64_t *longlong_t, size_t numElements, CDRBuffer::E
     return *this;
 }
 
+CDR& CDR::deserializeArrayFast(int64_t *longlong_t, size_t numElements)
+{
+    size_t totalSize = sizeof(*longlong_t) * numElements;
+
+    if(m_cdrBuffer.checkSpace(totalSize))
+    {
+        // Save last datasize.
+        m_cdrBuffer.m_lastDataSize = sizeof(longlong_t);
+
+        if(m_cdrBuffer.m_swapBytes)
+        {
+            char *dst = reinterpret_cast<char*>(&longlong_t);
+            char *end = dst + totalSize;
+
+            for(; dst < end; dst += sizeof(*longlong_t))
+            {
+                dst[7] = *m_cdrBuffer.m_currentPosition++;
+                dst[6] = *m_cdrBuffer.m_currentPosition++;
+                dst[5] = *m_cdrBuffer.m_currentPosition++;
+                dst[4] = *m_cdrBuffer.m_currentPosition++;
+                dst[3] = *m_cdrBuffer.m_currentPosition++;
+                dst[2] = *m_cdrBuffer.m_currentPosition++;
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+            }
+        }
+        else
+        {
+            memcpy(longlong_t, m_cdrBuffer.m_currentPosition, totalSize);
+            m_cdrBuffer.m_currentPosition += totalSize;
+        }
+
+        m_cdrBuffer.m_bufferRemainLength -= totalSize;
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+}
+
+CDR& CDR::deserializeArrayFast(int64_t *longlong_t, size_t numElements, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+
+    try
+    {
+        deserializeArrayFast(longlong_t, numElements);
+        m_cdrBuffer.m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_cdrBuffer.m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
 CDR& CDR::deserializeArray(float *float_t, size_t numElements)
 {
     size_t align = m_cdrBuffer.align(sizeof(float_t));
@@ -1423,6 +2464,61 @@ CDR& CDR::deserializeArray(float *float_t, size_t numElements, CDRBuffer::Endian
     try
     {
         deserializeArray(float_t, numElements);
+        m_cdrBuffer.m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_cdrBuffer.m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+CDR& CDR::deserializeArrayFast(float *float_t, size_t numElements)
+{
+    size_t totalSize = sizeof(*float_t) * numElements;
+
+    if(m_cdrBuffer.checkSpace(totalSize))
+    {
+        // Save last datasize.
+        m_cdrBuffer.m_lastDataSize = sizeof(float_t);
+
+        if(m_cdrBuffer.m_swapBytes)
+        {
+            char *dst = reinterpret_cast<char*>(&float_t);
+            char *end = dst + totalSize;
+
+            for(; dst < end; dst += sizeof(*float_t))
+            {
+                dst[3] = *m_cdrBuffer.m_currentPosition++;
+                dst[2] = *m_cdrBuffer.m_currentPosition++;
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+            }
+        }
+        else
+        {
+            memcpy(float_t, m_cdrBuffer.m_currentPosition, totalSize);
+            m_cdrBuffer.m_currentPosition += totalSize;
+        }
+
+        m_cdrBuffer.m_bufferRemainLength -= totalSize;
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+}
+
+CDR& CDR::deserializeArrayFast(float *float_t, size_t numElements, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+
+    try
+    {
+        deserializeArrayFast(float_t, numElements);
         m_cdrBuffer.m_swapBytes = auxSwap;
     }
     catch(Exception &ex)
@@ -1488,6 +2584,65 @@ CDR& CDR::deserializeArray(double *double_t, size_t numElements, CDRBuffer::Endi
     try
     {
         deserializeArray(double_t, numElements);
+        m_cdrBuffer.m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_cdrBuffer.m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+CDR& CDR::deserializeArrayFast(double *double_t, size_t numElements)
+{
+    size_t totalSize = sizeof(*double_t) * numElements;
+
+    if(m_cdrBuffer.checkSpace(totalSize))
+    {
+        // Save last datasize.
+        m_cdrBuffer.m_lastDataSize = sizeof(double_t);
+
+        if(m_cdrBuffer.m_swapBytes)
+        {
+            char *dst = reinterpret_cast<char*>(&double_t);
+            char *end = dst + totalSize;
+
+            for(; dst < end; dst += sizeof(*double_t))
+            {
+                dst[7] = *m_cdrBuffer.m_currentPosition++;
+                dst[6] = *m_cdrBuffer.m_currentPosition++;
+                dst[5] = *m_cdrBuffer.m_currentPosition++;
+                dst[4] = *m_cdrBuffer.m_currentPosition++;
+                dst[3] = *m_cdrBuffer.m_currentPosition++;
+                dst[2] = *m_cdrBuffer.m_currentPosition++;
+                dst[1] = *m_cdrBuffer.m_currentPosition++;
+                dst[0] = *m_cdrBuffer.m_currentPosition++;
+            }
+        }
+        else
+        {
+            memcpy(double_t, m_cdrBuffer.m_currentPosition, totalSize);
+            m_cdrBuffer.m_currentPosition += totalSize;
+        }
+
+        m_cdrBuffer.m_bufferRemainLength -= totalSize;
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+}
+
+CDR& CDR::deserializeArrayFast(double *double_t, size_t numElements, CDRBuffer::Endianness endianness)
+{
+    bool auxSwap = m_cdrBuffer.m_swapBytes;
+    m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+
+    try
+    {
+        deserializeArrayFast(double_t, numElements);
         m_cdrBuffer.m_swapBytes = auxSwap;
     }
     catch(Exception &ex)

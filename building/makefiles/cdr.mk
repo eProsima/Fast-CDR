@@ -13,8 +13,7 @@ CDR_TARGET_Z= $(BASEDIR)/lib/$(EPROSIMA_TARGET)/libcdrz.a
 CDR_CFLAGS += $(CFLAGS) -std=c++0x
 CDR_CFLAGS_DEBUG += $(CFLAGS_DEBUG) -std=c++0x
 
-CDR_INCLUDE_DIRS= $(INCLUDE_DIRS) -I$(BASEDIR)/include \
-		  -I$(EPROSIMADIR)/code
+CDR_INCLUDE_DIRS= $(INCLUDE_DIRS) -I$(BASEDIR)/include
 
 CDR_SRC_CPPFILES= $(BASEDIR)/src/cpp/Cdr.cpp \
 		  $(BASEDIR)/src/cpp/CdrBuffer.cpp \
@@ -48,7 +47,7 @@ checkCDRDirectories:
 	@mkdir -p $(CDR_OUTDIR_RELEASE)
 
 $(CDR_TARGET_DEBUG): $(CDR_OBJS_DEBUG)
-	$(LN) -shared -o $(CDR_TARGET_DEBUG) $(LIBRARY_PATH) $(LIBS_DEBUG) $(CDR_OBJS_DEBUG)
+	$(LN) $(LDFLAGS) -shared -o $(CDR_TARGET_DEBUG) $(LIBRARY_PATH) $(LIBS_DEBUG) $(CDR_OBJS_DEBUG)
 	$(CP) $(CDR_TARGET_DEBUG) $(EPROSIMA_LIBRARY_PATH)/proyectos/$(EPROSIMA_TARGET)
 
 $(CDR_TARGET_DEBUG_Z): $(CDR_OBJS_DEBUG)
@@ -56,7 +55,7 @@ $(CDR_TARGET_DEBUG_Z): $(CDR_OBJS_DEBUG)
 	$(CP) $(CDR_TARGET_DEBUG_Z) $(EPROSIMA_LIBRARY_PATH)/proyectos/$(EPROSIMA_TARGET)
 
 $(CDR_TARGET): $(CDR_OBJS_RELEASE)
-	$(LN) -shared -o $(CDR_TARGET) $(LIBRARY_PATH) $(LIBS) $(CDR_OBJS_RELEASE)
+	$(LN) $(LDFLAGS) -shared -o $(CDR_TARGET) $(LIBRARY_PATH) $(LIBS) $(CDR_OBJS_RELEASE)
 	$(CP) $(CDR_TARGET) $(EPROSIMA_LIBRARY_PATH)/proyectos/$(EPROSIMA_TARGET)
 
 $(CDR_TARGET_Z): $(CDR_OBJS_RELEASE)
@@ -69,11 +68,11 @@ $(CDR_OUTDIR_DEBUG)/%.o:%.cpp
 	@echo Calculating dependencies \(DEBUG mode\) $<
 	@$(CPP) $(CDR_CFLAGS_DEBUG) -MM $(CDR_INCLUDE_DIRS) $< | sed "s/^.*:/$(CDR_SED_OUTPUT_DIR_DEBUG)\/&/g" > $(@:%.o=%.d)
 	@echo Compiling \(DEBUG mode\) $<  
-	@$(CPP) $(CDR_CFLAGS_DEBUG) $(CDR_INCLUDE_DIRS) $< -o $@
+	$(CPP) $(CDR_CFLAGS_DEBUG) $(CDR_INCLUDE_DIRS) $< -o $@
 
 $(CDR_OUTDIR_RELEASE)/%.o:%.cpp
 	@echo Calculating dependencies \(RELEASE mode\) $<
 	@$(CPP) $(CDR_CFLAGS) -MM $(CDR_INCLUDE_DIRS) $< | sed "s/^.*:/$(CDR_SED_OUTPUT_DIR_RELEASE)\/&/g" > $(@:%.o=%.d)
 	@echo Compiling \(RELEASE mode\) $<
-	@$(CPP) $(CDR_CFLAGS) $(CDR_INCLUDE_DIRS) $< -o $@
+	$(CPP) $(CDR_CFLAGS) $(CDR_INCLUDE_DIRS) $< -o $@
 

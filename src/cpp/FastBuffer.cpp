@@ -7,24 +7,16 @@
 
 namespace eProsima
 {
-#if defined(__LITTLE_ENDIAN__)
-    const FastBuffer::Endianness FastBuffer::DEFAULT_ENDIAN = LITTLE_ENDIANNESS;
-#elif defined (__BIG_ENDIAN__)
-    const FastBuffer::Endianness FastBuffer::DEFAULT_ENDIAN = BIG_ENDIANNESS;
-#endif
-
     FastBuffer::State::State(FastBuffer &FastBuffer) : m_bufferRemainLength(FastBuffer.m_bufferRemainLength), m_currentPosition(FastBuffer.m_currentPosition),
-                 m_alignPosition(FastBuffer.m_alignPosition), m_swapBytes(FastBuffer.m_swapBytes), m_lastDataSize(FastBuffer.m_lastDataSize) {}
+                 m_alignPosition(FastBuffer.m_alignPosition) {}
 
-    FastBuffer::FastBuffer(const Endianness endianness) : m_buffer(NULL),
-        m_bufferSize(0), m_bufferRemainLength(0), m_currentPosition(NULL), m_alignPosition(NULL), m_endianness(endianness),
-        m_swapBytes(endianness == DEFAULT_ENDIAN ? false : true), m_lastDataSize(0), m_internalBuffer(true)
+    FastBuffer::FastBuffer() : m_buffer(NULL),
+        m_bufferSize(0), m_bufferRemainLength(0), m_currentPosition(NULL), m_alignPosition(NULL), m_internalBuffer(true)
     {
     }
 
-    FastBuffer::FastBuffer(char* const buffer, const size_t bufferSize, const Endianness endianness) : m_buffer(buffer),
-        m_bufferSize(bufferSize), m_bufferRemainLength(bufferSize), m_currentPosition(buffer), m_alignPosition(buffer), m_endianness(endianness),
-        m_swapBytes(endianness == DEFAULT_ENDIAN ? false : true), m_lastDataSize(0), m_internalBuffer(false)
+    FastBuffer::FastBuffer(char* const buffer, const size_t bufferSize) : m_buffer(buffer),
+        m_bufferSize(bufferSize), m_bufferRemainLength(bufferSize), m_currentPosition(buffer), m_alignPosition(buffer), m_internalBuffer(false)
     {
     }
 
@@ -33,8 +25,6 @@ namespace eProsima
         m_bufferRemainLength = m_bufferSize;
         m_currentPosition = m_buffer;
         m_alignPosition = m_buffer;
-        m_swapBytes = m_endianness == DEFAULT_ENDIAN ? false : true;
-        m_lastDataSize = 0;
     }
 
     bool FastBuffer::resize(size_t minSizeInc)

@@ -1,4 +1,5 @@
-#include "cpp/Cdr.h"
+
+#include "cpp/FastCdr.h"
 #include "cpp/exceptions/NotEnoughMemoryException.h"
 #include "cpp/exceptions/BadParamException.h"
 #include <string.h>
@@ -6,26 +7,19 @@
 using namespace eProsima;
 
 const std::string NOT_ENOUGH_MEMORY_MESSAGE("Not enough memory in the buffer stream");
-const std::string BAD_PARAM_MESSAGE("Bad parameter"); 
+const std::string BAD_PARAM_MESSAGE("Bad parameter");
 
-Cdr::Cdr(FastBuffer &FastBuffer, const CdrType cdrType) : m_cdrBuffer(FastBuffer),
-    m_cdrType(cdrType), m_plFlag(DDS_CDR_WITHOUT_PL), m_options(0)
+FastCdr::FastCdr(FastBuffer &FastBuffer) : m_cdrBuffer(FastBuffer)
 {
 }
 
-Cdr& Cdr::read_encapsulation()
+FastCdr& FastCdr::read_encapsulation()
 {
-    uint8_t dummy, encapsulationKind;
+    uint8_t encapsulationKind;
     FastBuffer::State state(m_cdrBuffer);
 
     try
     {
-        // If it is DDS_CDR, the first step is to get the dummy byte.
-        if(m_cdrType == DDS_CDR)
-        {
-            (*this) >> dummy;
-        }
-
         // Get the ecampsulation byte.
         (*this) >> encapsulationKind;
 
@@ -43,44 +37,10 @@ Cdr& Cdr::read_encapsulation()
         ex.raise();
     }
 
-    // If it is DDS_CDR type, view if contains a parameter list.
-    if(encapsulationKind & DDS_CDR_WITH_PL)
-    {
-        if(m_cdrType == DDS_CDR)
-        {
-            m_plFlag = DDS_CDR_WITH_PL;
-        }
-        else
-        {
-            throw BadParamException(BAD_PARAM_MESSAGE);
-        }
-    }
-
-    try
-    {
-        if(m_cdrType == DDS_CDR)
-            (*this) >> m_options;
-    }
-    catch(Exception &ex)
-    {
-        setState(state);
-        ex.raise();
-    }
-
     return *this;
 }
 
-Cdr::DDSCdrPlFlag Cdr::getDDSCdrPlFlag() const
-{
-    return m_plFlag;
-}
-
-uint16_t Cdr::getDDSCdrOptions() const
-{
-    return m_options;
-}
-
-bool Cdr::jump(uint32_t numBytes)
+bool FastCdr::jump(uint32_t numBytes)
 {
     bool returnedValue = false;
 
@@ -93,22 +53,17 @@ bool Cdr::jump(uint32_t numBytes)
     return returnedValue;
 }
 
-void Cdr::resetAlignment()
-{
-	m_cdrBuffer.resetAlign();
-}
-
-char* Cdr::getCurrentPosition()
+char* FastCdr::getCurrentPosition()
 {
     return m_cdrBuffer.m_currentPosition;
 }
 
-FastBuffer::State Cdr::getState() const
+FastBuffer::State FastCdr::getState() const
 {
     return FastBuffer::State(m_cdrBuffer);
 }
 
-void Cdr::setState(FastBuffer::State &state)
+void FastCdr::setState(FastBuffer::State &state)
 {
     m_cdrBuffer.m_currentPosition = state.m_currentPosition;
     m_cdrBuffer.m_bufferRemainLength = state.m_bufferRemainLength;
@@ -117,7 +72,7 @@ void Cdr::setState(FastBuffer::State &state)
     m_cdrBuffer.m_lastDataSize = state.m_lastDataSize;
 }
 
-Cdr& Cdr::serialize(const char char_t)
+FastCdr& FastCdr::serialize(const char char_t)
 {
     if(m_cdrBuffer.checkSpace(sizeof(char_t)) || m_cdrBuffer.resize(sizeof(char_t)))
     {
@@ -132,18 +87,13 @@ Cdr& Cdr::serialize(const char char_t)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::serialize(const int16_t short_t)
+FastCdr& FastCdr::serialize(const int16_t short_t)
 {
-    size_t align = m_cdrBuffer.align(sizeof(short_t));
-    size_t sizeAligned = sizeof(short_t) + align;
-
-    if(m_cdrBuffer.checkSpace(sizeAligned) || m_cdrBuffer.resize(sizeAligned))
+    if(m_cdrBuffer.checkSpace(sizeof(short_t)) || m_cdrBuffer.resize(sizeof(short_t)))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(short_t);
-    
-        // Align.
-        m_cdrBuffer.makeAlign(align);
+
         const char *dst = reinterpret_cast<const char*>(&short_t);
 
         if(m_cdrBuffer.m_swapBytes)
@@ -157,7 +107,7 @@ Cdr& Cdr::serialize(const int16_t short_t)
             m_cdrBuffer.m_currentPosition += sizeof(short_t);
         }
 
-        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(short_t);
 
         return *this;
     }
@@ -165,7 +115,7 @@ Cdr& Cdr::serialize(const int16_t short_t)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::serialize(const int16_t short_t, FastBuffer::Endianness endianness)
+FastCdr& FastCdr::serialize(const int16_t short_t, FastBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
@@ -184,18 +134,13 @@ Cdr& Cdr::serialize(const int16_t short_t, FastBuffer::Endianness endianness)
     return *this;
 }
 
-Cdr& Cdr::serialize(const int32_t long_t)
+FastCdr& FastCdr::serialize(const int32_t long_t)
 {
-    size_t align = m_cdrBuffer.align(sizeof(long_t));
-    size_t sizeAligned = sizeof(long_t) + align;
-
-    if(m_cdrBuffer.checkSpace(sizeAligned) || m_cdrBuffer.resize(sizeAligned))
+    if(m_cdrBuffer.checkSpace(sizeof(long_t)) || m_cdrBuffer.resize(sizeof(long_t)))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(long_t);
     
-        // Align.
-        m_cdrBuffer.makeAlign(align);
         const char *dst = reinterpret_cast<const char*>(&long_t);
 
         if(m_cdrBuffer.m_swapBytes)
@@ -211,7 +156,7 @@ Cdr& Cdr::serialize(const int32_t long_t)
             m_cdrBuffer.m_currentPosition += sizeof(long_t);
         }
 
-        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(long_t);
 
         return *this;
     }
@@ -219,7 +164,7 @@ Cdr& Cdr::serialize(const int32_t long_t)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::serialize(const int32_t long_t, FastBuffer::Endianness endianness)
+FastCdr& FastCdr::serialize(const int32_t long_t, FastBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
@@ -238,18 +183,13 @@ Cdr& Cdr::serialize(const int32_t long_t, FastBuffer::Endianness endianness)
     return *this;
 }
 
-Cdr& Cdr::serialize(const int64_t longlong_t)
+FastCdr& FastCdr::serialize(const int64_t longlong_t)
 {
-    size_t align = m_cdrBuffer.align(sizeof(longlong_t));
-    size_t sizeAligned = sizeof(longlong_t) + align;
-
-    if(m_cdrBuffer.checkSpace(sizeAligned) || m_cdrBuffer.resize(sizeAligned))
+    if(m_cdrBuffer.checkSpace(sizeof(longlong_t)) || m_cdrBuffer.resize(sizeof(longlong_t)))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(longlong_t);
     
-        // Align.
-        m_cdrBuffer.makeAlign(align);
         const char *dst = reinterpret_cast<const char*>(&longlong_t);
 
         if(m_cdrBuffer.m_swapBytes)
@@ -269,7 +209,7 @@ Cdr& Cdr::serialize(const int64_t longlong_t)
             m_cdrBuffer.m_currentPosition += sizeof(longlong_t);
         }
 
-        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(longlong_t);
 
         return *this;
     }
@@ -277,7 +217,7 @@ Cdr& Cdr::serialize(const int64_t longlong_t)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::serialize(const int64_t longlong_t, FastBuffer::Endianness endianness)
+FastCdr& FastCdr::serialize(const int64_t longlong_t, FastBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
@@ -296,18 +236,13 @@ Cdr& Cdr::serialize(const int64_t longlong_t, FastBuffer::Endianness endianness)
     return *this;
 }
 
-Cdr& Cdr::serialize(const float float_t)
+FastCdr& FastCdr::serialize(const float float_t)
 {
-    size_t align = m_cdrBuffer.align(sizeof(float_t));
-    size_t sizeAligned = sizeof(float_t) + align;
-
-    if(m_cdrBuffer.checkSpace(sizeAligned) || m_cdrBuffer.resize(sizeAligned))
+    if(m_cdrBuffer.checkSpace(sizeof(float_t)) || m_cdrBuffer.resize(sizeof(float_t)))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(float_t);
     
-        // Align.
-        m_cdrBuffer.makeAlign(align);
         const char *dst = reinterpret_cast<const char*>(&float_t);
 
         if(m_cdrBuffer.m_swapBytes)
@@ -323,7 +258,7 @@ Cdr& Cdr::serialize(const float float_t)
             m_cdrBuffer.m_currentPosition += sizeof(float_t);
         }
 
-        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(float_t);
 
         return *this;
     }
@@ -331,7 +266,7 @@ Cdr& Cdr::serialize(const float float_t)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::serialize(const float float_t, FastBuffer::Endianness endianness)
+FastCdr& FastCdr::serialize(const float float_t, FastBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
@@ -350,18 +285,13 @@ Cdr& Cdr::serialize(const float float_t, FastBuffer::Endianness endianness)
     return *this;
 }
 
-Cdr& Cdr::serialize(const double double_t)
+FastCdr& FastCdr::serialize(const double double_t)
 {
-    size_t align = m_cdrBuffer.align(sizeof(double_t));
-    size_t sizeAligned = sizeof(double_t) + align;
-
-    if(m_cdrBuffer.checkSpace(sizeAligned) || m_cdrBuffer.resize(sizeAligned))
+    if(m_cdrBuffer.checkSpace(sizeof(double_t)) || m_cdrBuffer.resize(sizeof(double_t)))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(double_t);
     
-        // Align.
-        m_cdrBuffer.makeAlign(align);
         const char *dst = reinterpret_cast<const char*>(&double_t);
 
         if(m_cdrBuffer.m_swapBytes)
@@ -381,7 +311,7 @@ Cdr& Cdr::serialize(const double double_t)
             m_cdrBuffer.m_currentPosition += sizeof(double_t);
         }
 
-        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(double_t);
 
         return *this;
     }
@@ -389,7 +319,7 @@ Cdr& Cdr::serialize(const double double_t)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::serialize(const double double_t, FastBuffer::Endianness endianness)
+FastCdr& FastCdr::serialize(const double double_t, FastBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
@@ -408,7 +338,7 @@ Cdr& Cdr::serialize(const double double_t, FastBuffer::Endianness endianness)
     return *this;
 }
 
-Cdr& Cdr::serialize(const bool bool_t)
+FastCdr& FastCdr::serialize(const bool bool_t)
 {
     uint8_t value = 0;
 
@@ -428,12 +358,12 @@ Cdr& Cdr::serialize(const bool bool_t)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::serialize(const std::string &string_t)
+FastCdr& FastCdr::serialize(const std::string &string_t)
 {
     uint32_t length = (uint32_t)string_t.length();
     FastBuffer::State state(m_cdrBuffer);
 
-    *this << length;
+    serialize(length);
 
     if(length > 0)
     {
@@ -456,7 +386,7 @@ Cdr& Cdr::serialize(const std::string &string_t)
     return *this;
 }
 
-Cdr& Cdr::serialize(const std::string &string_t, FastBuffer::Endianness endianness)
+FastCdr& FastCdr::serialize(const std::string &string_t, FastBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
@@ -475,7 +405,7 @@ Cdr& Cdr::serialize(const std::string &string_t, FastBuffer::Endianness endianne
     return *this;
 }
 
-Cdr& Cdr::serializeArray(const char *char_t, size_t numElements)
+FastCdr& FastCdr::serializeArray(const char *char_t, size_t numElements)
 {
     size_t totalSize = sizeof(*char_t)*numElements;
 
@@ -493,20 +423,14 @@ Cdr& Cdr::serializeArray(const char *char_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::serializeArray(const int16_t *short_t, size_t numElements)
+FastCdr& FastCdr::serializeArray(const int16_t *short_t, size_t numElements)
 {
-    size_t align = m_cdrBuffer.align(sizeof(short_t));
     size_t totalSize = sizeof(*short_t) * numElements;
-    size_t sizeAligned = totalSize + align;
 
-    if(m_cdrBuffer.checkSpace(sizeAligned) || m_cdrBuffer.resize(sizeAligned))
+    if(m_cdrBuffer.checkSpace(totalSize) || m_cdrBuffer.resize(totalSize))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(short_t);
-
-        // Align
-        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
-        m_cdrBuffer.makeAlign(align);
 
         if(m_cdrBuffer.m_swapBytes)
         {
@@ -525,7 +449,7 @@ Cdr& Cdr::serializeArray(const int16_t *short_t, size_t numElements)
             m_cdrBuffer.m_currentPosition += totalSize;
         }
 
-        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= totalSize;
 
         return *this;
     }
@@ -533,7 +457,7 @@ Cdr& Cdr::serializeArray(const int16_t *short_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::serializeArray(const int16_t *short_t, size_t numElements, FastBuffer::Endianness endianness)
+FastCdr& FastCdr::serializeArray(const int16_t *short_t, size_t numElements, FastBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
@@ -552,20 +476,14 @@ Cdr& Cdr::serializeArray(const int16_t *short_t, size_t numElements, FastBuffer:
     return *this;
 }
 
-Cdr& Cdr::serializeArray(const int32_t *long_t, size_t numElements)
+FastCdr& FastCdr::serializeArray(const int32_t *long_t, size_t numElements)
 {
-    size_t align = m_cdrBuffer.align(sizeof(long_t));
     size_t totalSize = sizeof(*long_t) * numElements;
-    size_t sizeAligned = totalSize + align;
 
-    if(m_cdrBuffer.checkSpace(sizeAligned) || m_cdrBuffer.resize(sizeAligned))
+    if(m_cdrBuffer.checkSpace(totalSize) || m_cdrBuffer.resize(totalSize))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(long_t);
-
-        // Align
-        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
-        m_cdrBuffer.makeAlign(align);
 
         if(m_cdrBuffer.m_swapBytes)
         {
@@ -586,7 +504,7 @@ Cdr& Cdr::serializeArray(const int32_t *long_t, size_t numElements)
             m_cdrBuffer.m_currentPosition += totalSize;
         }
 
-        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= totalSize;
 
         return *this;
     }
@@ -594,7 +512,7 @@ Cdr& Cdr::serializeArray(const int32_t *long_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::serializeArray(const int32_t *long_t, size_t numElements, FastBuffer::Endianness endianness)
+FastCdr& FastCdr::serializeArray(const int32_t *long_t, size_t numElements, FastBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
@@ -613,20 +531,14 @@ Cdr& Cdr::serializeArray(const int32_t *long_t, size_t numElements, FastBuffer::
     return *this;
 }
 
-Cdr& Cdr::serializeArray(const int64_t *longlong_t, size_t numElements)
+FastCdr& FastCdr::serializeArray(const int64_t *longlong_t, size_t numElements)
 {
-    size_t align = m_cdrBuffer.align(sizeof(longlong_t));
     size_t totalSize = sizeof(*longlong_t) * numElements;
-    size_t sizeAligned = totalSize + align;
 
-    if(m_cdrBuffer.checkSpace(sizeAligned) || m_cdrBuffer.resize(sizeAligned))
+    if(m_cdrBuffer.checkSpace(totalSize) || m_cdrBuffer.resize(totalSize))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(longlong_t);
-
-        // Align
-        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
-        m_cdrBuffer.makeAlign(align);
 
         if(m_cdrBuffer.m_swapBytes)
         {
@@ -651,7 +563,7 @@ Cdr& Cdr::serializeArray(const int64_t *longlong_t, size_t numElements)
             m_cdrBuffer.m_currentPosition += totalSize;
         }
 
-        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= totalSize;
 
         return *this;
     }
@@ -659,7 +571,7 @@ Cdr& Cdr::serializeArray(const int64_t *longlong_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::serializeArray(const int64_t *longlong_t, size_t numElements, FastBuffer::Endianness endianness)
+FastCdr& FastCdr::serializeArray(const int64_t *longlong_t, size_t numElements, FastBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
@@ -678,20 +590,14 @@ Cdr& Cdr::serializeArray(const int64_t *longlong_t, size_t numElements, FastBuff
     return *this;
 }
 
-Cdr& Cdr::serializeArray(const float *float_t, size_t numElements)
+FastCdr& FastCdr::serializeArray(const float *float_t, size_t numElements)
 {
-    size_t align = m_cdrBuffer.align(sizeof(float_t));
     size_t totalSize = sizeof(*float_t) * numElements;
-    size_t sizeAligned = totalSize + align;
 
-    if(m_cdrBuffer.checkSpace(sizeAligned) || m_cdrBuffer.resize(sizeAligned))
+    if(m_cdrBuffer.checkSpace(totalSize) || m_cdrBuffer.resize(totalSize))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(float_t);
-
-        // Align
-        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
-        m_cdrBuffer.makeAlign(align);
 
         if(m_cdrBuffer.m_swapBytes)
         {
@@ -712,7 +618,7 @@ Cdr& Cdr::serializeArray(const float *float_t, size_t numElements)
             m_cdrBuffer.m_currentPosition += totalSize;
         }
 
-        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= totalSize;
 
         return *this;
     }
@@ -720,7 +626,7 @@ Cdr& Cdr::serializeArray(const float *float_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::serializeArray(const float *float_t, size_t numElements, FastBuffer::Endianness endianness)
+FastCdr& FastCdr::serializeArray(const float *float_t, size_t numElements, FastBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
@@ -739,20 +645,14 @@ Cdr& Cdr::serializeArray(const float *float_t, size_t numElements, FastBuffer::E
     return *this;
 }
 
-Cdr& Cdr::serializeArray(const double *double_t, size_t numElements)
+FastCdr& FastCdr::serializeArray(const double *double_t, size_t numElements)
 {
-    size_t align = m_cdrBuffer.align(sizeof(double_t));
     size_t totalSize = sizeof(*double_t) * numElements;
-    size_t sizeAligned = totalSize + align;
 
-    if(m_cdrBuffer.checkSpace(sizeAligned) || m_cdrBuffer.resize(sizeAligned))
+    if(m_cdrBuffer.checkSpace(totalSize) || m_cdrBuffer.resize(totalSize))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(double_t);
-
-        // Align
-        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
-        m_cdrBuffer.makeAlign(align);
 
         if(m_cdrBuffer.m_swapBytes)
         {
@@ -777,7 +677,7 @@ Cdr& Cdr::serializeArray(const double *double_t, size_t numElements)
             m_cdrBuffer.m_currentPosition += totalSize;
         }
 
-        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= totalSize;
 
         return *this;
     }
@@ -785,7 +685,7 @@ Cdr& Cdr::serializeArray(const double *double_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::serializeArray(const double *double_t, size_t numElements, FastBuffer::Endianness endianness)
+FastCdr& FastCdr::serializeArray(const double *double_t, size_t numElements, FastBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
@@ -804,7 +704,7 @@ Cdr& Cdr::serializeArray(const double *double_t, size_t numElements, FastBuffer:
     return *this;
 }
 
-Cdr& Cdr::deserialize(char &char_t)
+FastCdr& FastCdr::deserialize(char &char_t)
 {
     if(m_cdrBuffer.checkSpace(sizeof(char_t)))
     {
@@ -819,18 +719,13 @@ Cdr& Cdr::deserialize(char &char_t)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::deserialize(int16_t &short_t)
+FastCdr& FastCdr::deserialize(int16_t &short_t)
 {
-    size_t align = m_cdrBuffer.align(sizeof(short_t));
-    size_t sizeAligned = sizeof(short_t) + align;
-
-    if(m_cdrBuffer.checkSpace(sizeAligned))
+    if(m_cdrBuffer.checkSpace(sizeof(short_t)))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(short_t);
 
-        // Align
-        m_cdrBuffer.makeAlign(align);
         char *dst = reinterpret_cast<char*>(&short_t);
 
         if(m_cdrBuffer.m_swapBytes)
@@ -844,7 +739,7 @@ Cdr& Cdr::deserialize(int16_t &short_t)
             m_cdrBuffer.m_currentPosition += sizeof(short_t);
         }
 
-        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(short_t);
 
         return *this;
     }
@@ -852,7 +747,7 @@ Cdr& Cdr::deserialize(int16_t &short_t)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::deserialize(int16_t &short_t, FastBuffer::Endianness endianness)
+FastCdr& FastCdr::deserialize(int16_t &short_t, FastBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
@@ -871,12 +766,9 @@ Cdr& Cdr::deserialize(int16_t &short_t, FastBuffer::Endianness endianness)
     return *this;
 }
 
-Cdr& Cdr::deserialize(int32_t &long_t)
+FastCdr& FastCdr::deserialize(int32_t &long_t)
 {
-    size_t align = m_cdrBuffer.align(sizeof(long_t));
-    size_t sizeAligned = sizeof(long_t) + align;
-
-    if(m_cdrBuffer.checkSpace(sizeAligned))
+    if(m_cdrBuffer.checkSpace(sizeof(long_t)))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(long_t);
@@ -896,7 +788,7 @@ Cdr& Cdr::deserialize(int32_t &long_t)
             m_cdrBuffer.m_currentPosition += sizeof(long_t);
         }
 
-        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(long_t);
 
         return *this;
     }
@@ -904,7 +796,7 @@ Cdr& Cdr::deserialize(int32_t &long_t)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::deserialize(int32_t &long_t, FastBuffer::Endianness endianness)
+FastCdr& FastCdr::deserialize(int32_t &long_t, FastBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
@@ -923,18 +815,13 @@ Cdr& Cdr::deserialize(int32_t &long_t, FastBuffer::Endianness endianness)
     return *this;
 }
 
-Cdr& Cdr::deserialize(int64_t &longlong_t)
+FastCdr& FastCdr::deserialize(int64_t &longlong_t)
 {
-    size_t align = m_cdrBuffer.align(sizeof(longlong_t));
-    size_t sizeAligned = sizeof(longlong_t) + align;
-
-    if(m_cdrBuffer.checkSpace(sizeAligned))
+    if(m_cdrBuffer.checkSpace(sizeof(longlong_t)))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(longlong_t);
 
-        // Align.
-        m_cdrBuffer.makeAlign(align);
         char *dst = reinterpret_cast<char*>(&longlong_t);
 
         if(m_cdrBuffer.m_swapBytes)
@@ -954,7 +841,7 @@ Cdr& Cdr::deserialize(int64_t &longlong_t)
             m_cdrBuffer.m_currentPosition += sizeof(longlong_t);
         }
 
-        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(longlong_t);
 
         return *this;
     }
@@ -962,7 +849,7 @@ Cdr& Cdr::deserialize(int64_t &longlong_t)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::deserialize(int64_t &longlong_t, FastBuffer::Endianness endianness)
+FastCdr& FastCdr::deserialize(int64_t &longlong_t, FastBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
@@ -981,18 +868,13 @@ Cdr& Cdr::deserialize(int64_t &longlong_t, FastBuffer::Endianness endianness)
     return *this;
 }
 
-Cdr& Cdr::deserialize(float &float_t)
+FastCdr& FastCdr::deserialize(float &float_t)
 {
-    size_t align = m_cdrBuffer.align(sizeof(float_t));
-    size_t sizeAligned = sizeof(float_t) + align;
-
-    if(m_cdrBuffer.checkSpace(sizeAligned))
+    if(m_cdrBuffer.checkSpace(sizeof(float_t)))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(float_t);
 
-        // Align.
-        m_cdrBuffer.makeAlign(align);
         char *dst = reinterpret_cast<char*>(&float_t);
 
         if(m_cdrBuffer.m_swapBytes)
@@ -1008,7 +890,7 @@ Cdr& Cdr::deserialize(float &float_t)
             m_cdrBuffer.m_currentPosition += sizeof(float_t);
         }
 
-        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(float_t);
 
         return *this;
     }
@@ -1016,7 +898,7 @@ Cdr& Cdr::deserialize(float &float_t)
    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::deserialize(float &float_t, FastBuffer::Endianness endianness)
+FastCdr& FastCdr::deserialize(float &float_t, FastBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
@@ -1035,18 +917,13 @@ Cdr& Cdr::deserialize(float &float_t, FastBuffer::Endianness endianness)
     return *this;
 }
 
-Cdr& Cdr::deserialize(double &double_t)
+FastCdr& FastCdr::deserialize(double &double_t)
 {
-    size_t align = m_cdrBuffer.align(sizeof(double_t));
-    size_t sizeAligned = sizeof(double_t) + align;
-
-    if(m_cdrBuffer.checkSpace(sizeAligned))
+    if(m_cdrBuffer.checkSpace(sizeof(double_t)))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(double_t);
 
-        // Align.
-        m_cdrBuffer.makeAlign(align);
         char *dst = reinterpret_cast<char*>(&double_t);
 
         if(m_cdrBuffer.m_swapBytes)
@@ -1066,7 +943,7 @@ Cdr& Cdr::deserialize(double &double_t)
             m_cdrBuffer.m_currentPosition += sizeof(double_t);
         }
 
-        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= sizeof(double_t);
 
         return *this;
     }
@@ -1074,7 +951,7 @@ Cdr& Cdr::deserialize(double &double_t)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::deserialize(double &double_t, FastBuffer::Endianness endianness)
+FastCdr& FastCdr::deserialize(double &double_t, FastBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
@@ -1093,7 +970,7 @@ Cdr& Cdr::deserialize(double &double_t, FastBuffer::Endianness endianness)
     return *this;
 }
 
-Cdr& Cdr::deserialize(bool &bool_t)
+FastCdr& FastCdr::deserialize(bool &bool_t)
 {
     uint8_t value = 0;
 
@@ -1122,12 +999,12 @@ Cdr& Cdr::deserialize(bool &bool_t)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::deserialize(std::string &string_t)
+FastCdr& FastCdr::deserialize(std::string &string_t)
 {
     uint32_t length = 0;
     FastBuffer::State state(m_cdrBuffer);
 
-    *this >> length;
+    deserialize(length);
 
     if(length == 0)
     {
@@ -1149,7 +1026,7 @@ Cdr& Cdr::deserialize(std::string &string_t)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::deserialize(std::string &string_t, FastBuffer::Endianness endianness)
+FastCdr& FastCdr::deserialize(std::string &string_t, FastBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
@@ -1168,7 +1045,7 @@ Cdr& Cdr::deserialize(std::string &string_t, FastBuffer::Endianness endianness)
     return *this;
 }
 
-Cdr& Cdr::deserializeArray(char *char_t, size_t numElements)
+FastCdr& FastCdr::deserializeArray(char *char_t, size_t numElements)
 {
     size_t totalSize = sizeof(*char_t)*numElements;
 
@@ -1186,20 +1063,14 @@ Cdr& Cdr::deserializeArray(char *char_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::deserializeArray(int16_t *short_t, size_t numElements)
+FastCdr& FastCdr::deserializeArray(int16_t *short_t, size_t numElements)
 {
-    size_t align = m_cdrBuffer.align(sizeof(short_t));
     size_t totalSize = sizeof(*short_t) * numElements;
-    size_t sizeAligned = totalSize + align;
 
-    if(m_cdrBuffer.checkSpace(sizeAligned))
+    if(m_cdrBuffer.checkSpace(totalSize))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(short_t);
-
-        // Align
-        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
-        m_cdrBuffer.makeAlign(align);
 
         if(m_cdrBuffer.m_swapBytes)
         {
@@ -1218,7 +1089,7 @@ Cdr& Cdr::deserializeArray(int16_t *short_t, size_t numElements)
             m_cdrBuffer.m_currentPosition += totalSize;
         }
 
-        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= totalSize;
 
         return *this;
     }
@@ -1226,7 +1097,7 @@ Cdr& Cdr::deserializeArray(int16_t *short_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::deserializeArray(int16_t *short_t, size_t numElements, FastBuffer::Endianness endianness)
+FastCdr& FastCdr::deserializeArray(int16_t *short_t, size_t numElements, FastBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
@@ -1245,20 +1116,14 @@ Cdr& Cdr::deserializeArray(int16_t *short_t, size_t numElements, FastBuffer::End
     return *this;
 }
 
-Cdr& Cdr::deserializeArray(int32_t *long_t, size_t numElements)
+FastCdr& FastCdr::deserializeArray(int32_t *long_t, size_t numElements)
 {
-    size_t align = m_cdrBuffer.align(sizeof(long_t));
     size_t totalSize = sizeof(*long_t) * numElements;
-    size_t sizeAligned = totalSize + align;
 
-    if(m_cdrBuffer.checkSpace(sizeAligned))
+    if(m_cdrBuffer.checkSpace(totalSize))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(long_t);
-
-        // Align
-        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
-        m_cdrBuffer.makeAlign(align);
 
         if(m_cdrBuffer.m_swapBytes)
         {
@@ -1279,7 +1144,7 @@ Cdr& Cdr::deserializeArray(int32_t *long_t, size_t numElements)
             m_cdrBuffer.m_currentPosition += totalSize;
         }
 
-        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= totalSize;
 
         return *this;
     }
@@ -1287,7 +1152,7 @@ Cdr& Cdr::deserializeArray(int32_t *long_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::deserializeArray(int32_t *long_t, size_t numElements, FastBuffer::Endianness endianness)
+FastCdr& FastCdr::deserializeArray(int32_t *long_t, size_t numElements, FastBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
@@ -1306,20 +1171,14 @@ Cdr& Cdr::deserializeArray(int32_t *long_t, size_t numElements, FastBuffer::Endi
     return *this;
 }
 
-Cdr& Cdr::deserializeArray(int64_t *longlong_t, size_t numElements)
+FastCdr& FastCdr::deserializeArray(int64_t *longlong_t, size_t numElements)
 {
-    size_t align = m_cdrBuffer.align(sizeof(longlong_t));
     size_t totalSize = sizeof(*longlong_t) * numElements;
-    size_t sizeAligned = totalSize + align;
 
-    if(m_cdrBuffer.checkSpace(sizeAligned))
+    if(m_cdrBuffer.checkSpace(totalSize))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(longlong_t);
-
-        // Align
-        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
-        m_cdrBuffer.makeAlign(align);
 
         if(m_cdrBuffer.m_swapBytes)
         {
@@ -1344,7 +1203,7 @@ Cdr& Cdr::deserializeArray(int64_t *longlong_t, size_t numElements)
             m_cdrBuffer.m_currentPosition += totalSize;
         }
 
-        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= totalSize;
 
         return *this;
     }
@@ -1352,7 +1211,7 @@ Cdr& Cdr::deserializeArray(int64_t *longlong_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::deserializeArray(int64_t *longlong_t, size_t numElements, FastBuffer::Endianness endianness)
+FastCdr& FastCdr::deserializeArray(int64_t *longlong_t, size_t numElements, FastBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
@@ -1371,20 +1230,14 @@ Cdr& Cdr::deserializeArray(int64_t *longlong_t, size_t numElements, FastBuffer::
     return *this;
 }
 
-Cdr& Cdr::deserializeArray(float *float_t, size_t numElements)
+FastCdr& FastCdr::deserializeArray(float *float_t, size_t numElements)
 {
-    size_t align = m_cdrBuffer.align(sizeof(float_t));
     size_t totalSize = sizeof(*float_t) * numElements;
-    size_t sizeAligned = totalSize + align;
 
-    if(m_cdrBuffer.checkSpace(sizeAligned))
+    if(m_cdrBuffer.checkSpace(totalSize))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(float_t);
-
-        // Align
-        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
-        m_cdrBuffer.makeAlign(align);
 
         if(m_cdrBuffer.m_swapBytes)
         {
@@ -1405,7 +1258,7 @@ Cdr& Cdr::deserializeArray(float *float_t, size_t numElements)
             m_cdrBuffer.m_currentPosition += totalSize;
         }
 
-        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= totalSize;
 
         return *this;
     }
@@ -1413,7 +1266,7 @@ Cdr& Cdr::deserializeArray(float *float_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::deserializeArray(float *float_t, size_t numElements, FastBuffer::Endianness endianness)
+FastCdr& FastCdr::deserializeArray(float *float_t, size_t numElements, FastBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
@@ -1432,20 +1285,14 @@ Cdr& Cdr::deserializeArray(float *float_t, size_t numElements, FastBuffer::Endia
     return *this;
 }
 
-Cdr& Cdr::deserializeArray(double *double_t, size_t numElements)
+FastCdr& FastCdr::deserializeArray(double *double_t, size_t numElements)
 {
-    size_t align = m_cdrBuffer.align(sizeof(double_t));
     size_t totalSize = sizeof(*double_t) * numElements;
-    size_t sizeAligned = totalSize + align;
 
-    if(m_cdrBuffer.checkSpace(sizeAligned))
+    if(m_cdrBuffer.checkSpace(totalSize))
     {
         // Save last datasize.
         m_cdrBuffer.m_lastDataSize = sizeof(double_t);
-
-        // Align
-        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
-        m_cdrBuffer.makeAlign(align);
 
         if(m_cdrBuffer.m_swapBytes)
         {
@@ -1470,7 +1317,7 @@ Cdr& Cdr::deserializeArray(double *double_t, size_t numElements)
             m_cdrBuffer.m_currentPosition += totalSize;
         }
 
-        m_cdrBuffer.m_bufferRemainLength -= sizeAligned;
+        m_cdrBuffer.m_bufferRemainLength -= totalSize;
 
         return *this;
     }
@@ -1478,7 +1325,7 @@ Cdr& Cdr::deserializeArray(double *double_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
 }
 
-Cdr& Cdr::deserializeArray(double *double_t, size_t numElements, FastBuffer::Endianness endianness)
+FastCdr& FastCdr::deserializeArray(double *double_t, size_t numElements, FastBuffer::Endianness endianness)
 {
     bool auxSwap = m_cdrBuffer.m_swapBytes;
     m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));

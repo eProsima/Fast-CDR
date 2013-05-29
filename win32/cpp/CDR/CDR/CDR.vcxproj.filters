@@ -27,9 +27,6 @@
     <ClCompile Include="..\..\..\..\src\cpp\Cdr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\cpp\CdrBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\src\cpp\exceptions\Exception.cpp">
       <Filter>Source Files\exceptions</Filter>
     </ClCompile>
@@ -39,12 +36,15 @@
     <ClCompile Include="..\..\..\..\src\cpp\exceptions\BadParamException.cpp">
       <Filter>Source Files\exceptions</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\cpp\FastBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\cpp\FastCdr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\include\cpp\Cdr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\cpp\CdrBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\include\exceptions\Exception.h">
@@ -55,6 +55,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\include\cpp\exceptions\BadParamException.h">
       <Filter>Header Files\exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\cpp\FastCdr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\cpp\FastBuffer.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

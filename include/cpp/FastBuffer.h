@@ -13,9 +13,10 @@ namespace eProsima
     * or deserialize a CDR representation.
     * @ingroup CDRAPIREFERENCE
     */
-    class eProsima_cpp_DllVariable CDRBuffer
+    class eProsima_cpp_DllVariable FastBuffer
     {
-        friend class CDR;
+        friend class Cdr;
+        friend class FastCdr;
     public:
         /*!
          * @brief This enumeration represents endianness types.
@@ -32,20 +33,21 @@ namespace eProsima
         static const Endianness DEFAULT_ENDIAN;
 
         /*!
-         * @brief This class stores a state of a eProsima::CDRBuffer. Its usage is dangerours when the eProsima::CDRBuffer can use
+         * @brief This class stores a state of a eProsima::FastBuffer. Its usage is dangerours when the eProsima::FastBuffer can use
          * a user's function to allocate dynamically memory.
          * @ingroup CDRAPIREFERENCE
          */
         class eProsima_cpp_DllVariable State
         {
-            friend class CDR;
+            friend class Cdr;
+            friend class FastCdr;
         private:
 
             /*!
              * @brief Default constructor.
-             * @param cdrBuffer The buffer that will be used to create the new state.
+             * @param FastBuffer The buffer that will be used to create the new state.
              */
-            State(CDRBuffer &cdrBuffer);
+            State(FastBuffer &FastBuffer);
 
              //! @brief The remaining bytes in the stream when the state was created.
             size_t m_bufferRemainLength;
@@ -64,33 +66,33 @@ namespace eProsima
         };
 
         /*!
-         * @brief This constructor creates an internal stream and assigns it to the eProsima::CDRBuffer object.
-         * The user can obtain this internal stream using the function eProsima::CDRBuffer::getBuffer(). Be careful because this internal stream
-         * is deleted in the destruction of the eProsima::CDRBuffer object.
+         * @brief This constructor creates an internal stream and assigns it to the eProsima::FastBuffer object.
+         * The user can obtain this internal stream using the function eProsima::FastBuffer::getBuffer(). Be careful because this internal stream
+         * is deleted in the destruction of the eProsima::FastBuffer object.
          *
          * @param endianness The initial endianness that will be used. By default is the endianness of the system.
          */
-        CDRBuffer(const Endianness endianness = DEFAULT_ENDIAN);
+        FastBuffer(const Endianness endianness = DEFAULT_ENDIAN);
 
         /*!
-         * @brief This constructor assigns the user's stream of bytes to the eProsima::CDRBuffer object.
+         * @brief This constructor assigns the user's stream of bytes to the eProsima::FastBuffer object.
          * The user's stream will be used to serialize.
          *
          * @param buffer The user's buffer that will be used. This buffer is not deallocated in the object's destruction. Cannot be NULL.
          * @param bufferSize The length of user's buffer.
          * @param endianness The initial endianness that will be used. By default is the endianness of the system.
          */
-        CDRBuffer(char* const buffer, const size_t bufferSize, const Endianness endianness = DEFAULT_ENDIAN);
+        FastBuffer(char* const buffer, const size_t bufferSize, const Endianness endianness = DEFAULT_ENDIAN);
 
         /*!
-         * @brief This function returns the stream that the eProsima::CDRBuffer uses to serialize data.
-         * @return The stream used by eProsima::CDRBuffer to serialize data.
+         * @brief This function returns the stream that the eProsima::FastBuffer uses to serialize data.
+         * @return The stream used by eProsima::FastBuffer to serialize data.
          */
         inline char* getBuffer() const { return m_buffer;}
 
         /*!
-         * @brief This function returns the size of the allocated memory of the stream that the eProsima::CDRBuffer uses to serialize data.
-         * @return The size of the allocated memory of the stream used by the eProsima::CDRBuffer to serialize data.
+         * @brief This function returns the size of the allocated memory of the stream that the eProsima::FastBuffer uses to serialize data.
+         * @return The size of the allocated memory of the stream used by the eProsima::FastBuffer to serialize data.
          */
         inline size_t getBufferSize() const { return m_bufferSize;}
 
@@ -101,7 +103,7 @@ namespace eProsima
         inline size_t getSerializedDataLength() const { return m_currentPosition - m_buffer;}
 
         /*!
-		 * @brief This function resets the eProsima::CDRBuffer object. The serialization process starts at the beginning.
+		 * @brief This function resets the eProsima::FastBuffer object. The serialization process starts at the beginning.
 		 */
         void reset();
 
@@ -122,7 +124,7 @@ namespace eProsima
         inline size_t align(size_t dataSize){return dataSize > m_lastDataSize ? (dataSize - ((m_currentPosition - m_alignPosition) % dataSize)) & (dataSize-1) : 0;}
 
         /*!
-         * @brief This function jumps the number of bytes of the alignment. These bytes should be calculated with the function eProsima::CDRBuffer::align.
+         * @brief This function jumps the number of bytes of the alignment. These bytes should be calculated with the function eProsima::FastBuffer::align.
          * @param align The number of bytes to be skipped.
          */
         inline void makeAlign(size_t align){m_currentPosition += align;}

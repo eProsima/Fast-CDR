@@ -26,7 +26,7 @@ namespace eProsima
          * a user's function to allocate dynamically memory.
          * @ingroup CDRAPIREFERENCE
          */
-        class state
+        class eProsima_cpp_DllExport state
         {
             friend class FastCdr;
         public:
@@ -66,6 +66,12 @@ namespace eProsima
          * @return Pointer to the current position in the buffer.
          */
         char* getCurrentPosition();
+
+        /*!
+         * @brief This function returns the length of the serialized data inside the stream.
+         * @return The length of the serialized data.
+         */
+        inline size_t getSerializedDataLength() const { return m_currentPosition - m_cdrBuffer.begin();}
 
         /*!
          * @brief This function returns the current state of the CDR stream.
@@ -847,11 +853,16 @@ namespace eProsima
             return deserializeArray(array_t->data(), numElements * array_t->size());
         }
 
+        bool resize(size_t minSizeInc);
+
         //! @brief Reference to the buffer that will be serialized/deserialized.
         FastBuffer &m_cdrBuffer;
 
         //! @brief The current position in the serialization/deserialization process.
         FastBuffer::iterator m_currentPosition;
+
+        //! @brief The last position in the buffer;
+        FastBuffer::iterator m_lastPosition;
     };
 };
 

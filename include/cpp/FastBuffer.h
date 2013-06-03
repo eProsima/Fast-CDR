@@ -18,8 +18,22 @@ namespace eProsima
 
         _FastBuffer_iterator() : m_buffer(NULL), m_currentPosition(NULL) {}
 
-        explicit _FastBuffer_iterator(char *buffer, size_t index, size_t totalSize) : m_buffer(buffer), m_currentPosition(&m_buffer[index]),
-        m_lastPosition(&m_buffer[totalSize]){}
+        explicit _FastBuffer_iterator(char *buffer, size_t index) : m_buffer(buffer), m_currentPosition(&m_buffer[index]){}
+
+        inline
+        void operator<<(const _FastBuffer_iterator &iterator)
+        {
+            ptrdiff_t diff = m_currentPosition - m_buffer;
+            m_buffer = iterator.m_buffer;
+            m_currentPosition = m_buffer + diff;
+        }
+
+        inline
+        void operator>>(const _FastBuffer_iterator &iterator)
+        {
+            ptrdiff_t diff = iterator.m_currentPosition - iterator.m_buffer;
+            m_currentPosition = m_buffer + diff;
+        }
 
         template<typename _T>
         inline
@@ -74,12 +88,6 @@ namespace eProsima
             return tmp;
         }
 
-        inline
-        size_t operator*()
-        {
-            return m_lastPosition - m_currentPosition;
-        }
-
         inline 
         char* operator&()
         {
@@ -91,8 +99,6 @@ namespace eProsima
         char *m_buffer;
 
         char *m_currentPosition;
-
-        char *m_lastPosition;
     };
 
     /*!
@@ -103,10 +109,8 @@ namespace eProsima
     */
     class eProsima_cpp_DllVariable FastBuffer
     {
-        friend class Cdr;
-        friend class FastCdr;
-        typedef _FastBuffer_iterator iterator;
     public:
+        typedef _FastBuffer_iterator iterator;
 
         /*!
          * @brief This constructor creates an internal stream and assigns it to the eProsima::FastBuffer object.
@@ -136,27 +140,17 @@ namespace eProsima
          */
         inline size_t getBufferSize() const { return m_bufferSize;}
 
-        /*!
-         * @brief This function returns the length of the serialized data inside the stream.
-         * @return The length of the serialized data.
-         */
-        // TODO
-        //inline size_t getSerializedDataLength() const { return m_currentPosition - m_buffer;}
-
         inline
         iterator begin()
         {
-            return (iterator(m_buffer, 0, m_bufferSize));
+            return (iterator(m_buffer, 0));
         }
 
-    private:
-
-        /*!
-         * @brief This function checks the remaining space in the buffer.
-         * @param dataSize The spected size to be available.
-         * @return True value if the space is available. In other case false value is returned.
-         */
-        inline bool checkSpace(iterator &it, size_t dataSize){return *it >= dataSize;}
+        inline
+        iterator end()
+        {
+            return (iterator(m_buffer, m_bufferSize));
+        }
 
         /*!
          * @brief This function resizes the raw buffer. It will call the user's defined function to make this job.
@@ -164,6 +158,8 @@ namespace eProsima
          * @return True value has to be returned if the operation works successful. In other case false value has to be returned.
          */
         bool resize(size_t minSizeInc);
+
+    private:
 
         //! @brief Pointer to the stream of bytes that contains the CDR representation.
         char *m_buffer;

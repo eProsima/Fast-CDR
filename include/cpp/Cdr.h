@@ -15,7 +15,7 @@ namespace eProsima
      * @brief This class offers an interface to serialize/deserialize some basic types using CDR protocol inside a eProsima::FastBuffer.
      * @ingroup CDRAPIREFERENCE
      */
-    class eProsima_cpp_DllExport Cdr
+    class eProsima_cpp_DllVariable Cdr
     {
     public:
 
@@ -57,7 +57,7 @@ namespace eProsima
          * a user's function to allocate dynamically memory.
          * @ingroup CDRAPIREFERENCE
          */
-        class state
+        class eProsima_cpp_DllExport state
         {
             friend class Cdr;
         public:
@@ -130,6 +130,12 @@ namespace eProsima
          * @return Pointer to the current position in the buffer.
          */
         char* getCurrentPosition();
+
+        /*!
+         * @brief This function returns the length of the serialized data inside the stream.
+         * @return The length of the serialized data.
+         */
+        inline size_t getSerializedDataLength() const { return m_currentPosition - m_cdrBuffer.begin();}
 
         /*!
          * @brief This function returns the current state of the CDR serialization process.
@@ -1538,6 +1544,8 @@ namespace eProsima
          */
         inline void makeAlign(size_t align){m_currentPosition += align;}
 
+        bool resize(size_t minSizeInc);
+
         //! @brief Reference to the buffer that will be serialized/deserialized.
         FastBuffer &m_cdrBuffer;
 
@@ -1564,6 +1572,9 @@ namespace eProsima
 
 		//! @brief The position from the aligment is calculated.
         FastBuffer::iterator m_alignPosition;
+
+        //! @brief The last position in the buffer;
+        FastBuffer::iterator m_lastPosition;
     };
 };
 

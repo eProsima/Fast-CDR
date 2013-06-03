@@ -56,8 +56,8 @@ int main()
     bool returnedValue = true;
 
     // Serialization.
-    CDRBuffer cdrbuffer_ser;
-    CDR cdr_ser(cdrbuffer_ser);
+    FastBuffer cdrbuffer;
+    Cdr cdr_ser(cdrbuffer);
 
     try
     {
@@ -74,8 +74,7 @@ int main()
         return -1;
     }
         // Deseriazliation.
-    CDRBuffer cdrbuffer_des(cdrbuffer_ser.getBuffer(), cdrbuffer_ser.getBufferSize());
-    CDR cdr_des(cdrbuffer_des);
+    Cdr cdr_des(cdrbuffer);
 
     uint8_t octet_value = 0;
     char char_value = 0;

@@ -9,6 +9,8 @@ using namespace eProsima;
 const std::string NOT_ENOUGH_MEMORY_MESSAGE("Not enough memory in the buffer stream");
 const std::string BAD_PARAM_MESSAGE("Bad parameter");
 
+FastCdr::state::state(FastCdr &fastcdr) : m_currentPosition(fastcdr.m_currentPosition) {}
+
 FastCdr::FastCdr(FastBuffer &cdrBuffer) : m_cdrBuffer(cdrBuffer), m_currentPosition(cdrBuffer.begin())
 {
 }
@@ -17,9 +19,9 @@ bool FastCdr::jump(uint32_t numBytes)
 {
     bool returnedValue = false;
 
-    if(m_cdrBuffer.checkSpace(sizeof(numBytes)))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, sizeof(numBytes)))
     {
-        m_cdrBuffer.m_currentPosition += numBytes;
+        m_currentPosition += numBytes;
         returnedValue = true;
     }
 
@@ -28,27 +30,30 @@ bool FastCdr::jump(uint32_t numBytes)
 
 char* FastCdr::getCurrentPosition()
 {
-    return m_cdrBuffer.m_currentPosition;
+    // TODO
+    return NULL; //m_cdrBuffer.m_currentPosition;
 }
 
-FastBuffer::State FastCdr::getState() const
+FastCdr::state FastCdr::getState()
 {
-    return FastBuffer::State(m_cdrBuffer);
+    return FastCdr::state(*this);
 }
 
-void FastCdr::setState(FastBuffer::State &state)
+void FastCdr::setState(FastCdr::state &state)
 {
-    m_cdrBuffer.m_currentPosition = state.m_currentPosition;
-    m_cdrBuffer.m_bufferRemainLength = state.m_bufferRemainLength;
-    m_cdrBuffer.m_alignPosition = state.m_alignPosition;
+    m_currentPosition = state.m_currentPosition;
+}
+
+void FastCdr::reset()
+{
+    m_currentPosition = m_cdrBuffer.begin();
 }
 
 FastCdr& FastCdr::serialize(const char char_t)
 {
-    if(m_cdrBuffer.checkSpace(sizeof(char_t)) || m_cdrBuffer.resize(sizeof(char_t)))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, sizeof(char_t)) || m_cdrBuffer.resize(sizeof(char_t)))
     {
-        *m_cdrBuffer.m_currentPosition++ = char_t;
-        m_cdrBuffer.m_bufferRemainLength -= sizeof(char_t);
+        m_currentPosition++ << char_t;
         return *this;
     }
 
@@ -57,12 +62,10 @@ FastCdr& FastCdr::serialize(const char char_t)
 
 FastCdr& FastCdr::serialize(const int16_t short_t)
 {
-    if(m_cdrBuffer.checkSpace(sizeof(short_t)) || m_cdrBuffer.resize(sizeof(short_t)))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, sizeof(short_t)) || m_cdrBuffer.resize(sizeof(short_t)))
     {
-        const char *dst = reinterpret_cast<const char*>(&short_t);
-        memcpy(m_cdrBuffer.m_currentPosition, dst, sizeof(short_t));
-        m_cdrBuffer.m_currentPosition += sizeof(short_t);
-        m_cdrBuffer.m_bufferRemainLength -= sizeof(short_t);
+        m_currentPosition << short_t;
+        m_currentPosition += sizeof(short_t);
 
         return *this;
     }
@@ -72,12 +75,10 @@ FastCdr& FastCdr::serialize(const int16_t short_t)
 
 FastCdr& FastCdr::serialize(const int32_t long_t)
 {
-    if(m_cdrBuffer.checkSpace(sizeof(long_t)) || m_cdrBuffer.resize(sizeof(long_t)))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, sizeof(long_t)) || m_cdrBuffer.resize(sizeof(long_t)))
     {
-        const char *dst = reinterpret_cast<const char*>(&long_t);
-        memcpy(m_cdrBuffer.m_currentPosition, dst, sizeof(long_t));
-        m_cdrBuffer.m_currentPosition += sizeof(long_t);
-        m_cdrBuffer.m_bufferRemainLength -= sizeof(long_t);
+        m_currentPosition << long_t;
+        m_currentPosition += sizeof(long_t);
 
         return *this;
     }
@@ -87,12 +88,10 @@ FastCdr& FastCdr::serialize(const int32_t long_t)
 
 FastCdr& FastCdr::serialize(const int64_t longlong_t)
 {
-    if(m_cdrBuffer.checkSpace(sizeof(longlong_t)) || m_cdrBuffer.resize(sizeof(longlong_t)))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, sizeof(longlong_t)) || m_cdrBuffer.resize(sizeof(longlong_t)))
     {
-        const char *dst = reinterpret_cast<const char*>(&longlong_t);
-        memcpy(m_cdrBuffer.m_currentPosition, dst, sizeof(longlong_t));
-        m_cdrBuffer.m_currentPosition += sizeof(longlong_t);
-        m_cdrBuffer.m_bufferRemainLength -= sizeof(longlong_t);
+        m_currentPosition << longlong_t;
+        m_currentPosition += sizeof(longlong_t);
 
         return *this;
     }
@@ -102,12 +101,10 @@ FastCdr& FastCdr::serialize(const int64_t longlong_t)
 
 FastCdr& FastCdr::serialize(const float float_t)
 {
-    if(m_cdrBuffer.checkSpace(sizeof(float_t)) || m_cdrBuffer.resize(sizeof(float_t)))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, sizeof(float_t)) || m_cdrBuffer.resize(sizeof(float_t)))
     {
-        const char *dst = reinterpret_cast<const char*>(&float_t);
-        memcpy(m_cdrBuffer.m_currentPosition, dst, sizeof(float_t));
-        m_cdrBuffer.m_currentPosition += sizeof(float_t);
-        m_cdrBuffer.m_bufferRemainLength -= sizeof(float_t);
+        m_currentPosition << float_t;
+        m_currentPosition += sizeof(float_t);
 
         return *this;
     }
@@ -117,12 +114,10 @@ FastCdr& FastCdr::serialize(const float float_t)
 
 FastCdr& FastCdr::serialize(const double double_t)
 {
-    if(m_cdrBuffer.checkSpace(sizeof(double_t)) || m_cdrBuffer.resize(sizeof(double_t)))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, sizeof(double_t)) || m_cdrBuffer.resize(sizeof(double_t)))
     {
-        const char *dst = reinterpret_cast<const char*>(&double_t);
-        memcpy(m_cdrBuffer.m_currentPosition, dst, sizeof(double_t));
-        m_cdrBuffer.m_currentPosition += sizeof(double_t);
-        m_cdrBuffer.m_bufferRemainLength -= sizeof(double_t);
+        m_currentPosition << double_t;
+        m_currentPosition += sizeof(double_t);
 
         return *this;
     }
@@ -134,12 +129,11 @@ FastCdr& FastCdr::serialize(const bool bool_t)
 {
     uint8_t value = 0;
 
-    if(m_cdrBuffer.checkSpace(sizeof(uint8_t)) || m_cdrBuffer.resize(sizeof(uint8_t)))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, sizeof(uint8_t)) || m_cdrBuffer.resize(sizeof(uint8_t)))
     {
         if(bool_t)
             value = 1;
-        *m_cdrBuffer.m_currentPosition++ = value;
-        m_cdrBuffer.m_bufferRemainLength -= sizeof(uint8_t);
+        m_currentPosition++ << value;
 
         return *this;
     }
@@ -150,17 +144,16 @@ FastCdr& FastCdr::serialize(const bool bool_t)
 FastCdr& FastCdr::serialize(const std::string &string_t)
 {
     uint32_t length = (uint32_t)string_t.length();
-    FastBuffer::State state(m_cdrBuffer);
+    FastCdr::state state(*this);
 
     serialize(length);
 
     if(length > 0)
     {
-        if(m_cdrBuffer.checkSpace(length) || m_cdrBuffer.resize(length))
+        if(m_cdrBuffer.checkSpace(m_currentPosition, length) || m_cdrBuffer.resize(length))
         {
-            memcpy(m_cdrBuffer.m_currentPosition, string_t.c_str(), length);
-            m_cdrBuffer.m_currentPosition += length;
-            m_cdrBuffer.m_bufferRemainLength -= length;
+            m_currentPosition.memcopy(string_t.c_str(), length);
+            m_currentPosition += length;
         }
         else
         {
@@ -176,11 +169,10 @@ FastCdr& FastCdr::serializeArray(const char *char_t, size_t numElements)
 {
     size_t totalSize = sizeof(*char_t)*numElements;
 
-    if(m_cdrBuffer.checkSpace(totalSize) || m_cdrBuffer.resize(totalSize))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, totalSize) || m_cdrBuffer.resize(totalSize))
     {
-        memcpy(m_cdrBuffer.m_currentPosition, char_t, totalSize);
-        m_cdrBuffer.m_currentPosition += totalSize;
-        m_cdrBuffer.m_bufferRemainLength -= totalSize;
+        m_currentPosition.memcopy(char_t, totalSize);
+        m_currentPosition += totalSize;
         return *this;
     }
 
@@ -191,11 +183,10 @@ FastCdr& FastCdr::serializeArray(const int16_t *short_t, size_t numElements)
 {
     size_t totalSize = sizeof(*short_t) * numElements;
 
-    if(m_cdrBuffer.checkSpace(totalSize) || m_cdrBuffer.resize(totalSize))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, totalSize) || m_cdrBuffer.resize(totalSize))
     {
-        memcpy(m_cdrBuffer.m_currentPosition, short_t, totalSize);
-        m_cdrBuffer.m_currentPosition += totalSize;
-        m_cdrBuffer.m_bufferRemainLength -= totalSize;
+        m_currentPosition.memcopy(short_t, totalSize);
+        m_currentPosition += totalSize;
 
         return *this;
     }
@@ -207,11 +198,10 @@ FastCdr& FastCdr::serializeArray(const int32_t *long_t, size_t numElements)
 {
     size_t totalSize = sizeof(*long_t) * numElements;
 
-    if(m_cdrBuffer.checkSpace(totalSize) || m_cdrBuffer.resize(totalSize))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, totalSize) || m_cdrBuffer.resize(totalSize))
     {
-        memcpy(m_cdrBuffer.m_currentPosition, long_t, totalSize);
-        m_cdrBuffer.m_currentPosition += totalSize;
-        m_cdrBuffer.m_bufferRemainLength -= totalSize;
+        m_currentPosition.memcopy(long_t, totalSize);
+        m_currentPosition += totalSize;
 
         return *this;
     }
@@ -223,11 +213,10 @@ FastCdr& FastCdr::serializeArray(const int64_t *longlong_t, size_t numElements)
 {
     size_t totalSize = sizeof(*longlong_t) * numElements;
 
-    if(m_cdrBuffer.checkSpace(totalSize) || m_cdrBuffer.resize(totalSize))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, totalSize) || m_cdrBuffer.resize(totalSize))
     {
-        memcpy(m_cdrBuffer.m_currentPosition, longlong_t, totalSize);
-        m_cdrBuffer.m_currentPosition += totalSize;
-        m_cdrBuffer.m_bufferRemainLength -= totalSize;
+        m_currentPosition.memcopy(longlong_t, totalSize);
+        m_currentPosition += totalSize;
 
         return *this;
     }
@@ -239,11 +228,10 @@ FastCdr& FastCdr::serializeArray(const float *float_t, size_t numElements)
 {
     size_t totalSize = sizeof(*float_t) * numElements;
 
-    if(m_cdrBuffer.checkSpace(totalSize) || m_cdrBuffer.resize(totalSize))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, totalSize) || m_cdrBuffer.resize(totalSize))
     {
-        memcpy(m_cdrBuffer.m_currentPosition, float_t, totalSize);
-        m_cdrBuffer.m_currentPosition += totalSize;
-        m_cdrBuffer.m_bufferRemainLength -= totalSize;
+        m_currentPosition.memcopy(float_t, totalSize);
+        m_currentPosition += totalSize;
 
         return *this;
     }
@@ -255,11 +243,10 @@ FastCdr& FastCdr::serializeArray(const double *double_t, size_t numElements)
 {
     size_t totalSize = sizeof(*double_t) * numElements;
 
-    if(m_cdrBuffer.checkSpace(totalSize) || m_cdrBuffer.resize(totalSize))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, totalSize) || m_cdrBuffer.resize(totalSize))
     {
-        memcpy(m_cdrBuffer.m_currentPosition, double_t, totalSize);
-        m_cdrBuffer.m_currentPosition += totalSize;
-        m_cdrBuffer.m_bufferRemainLength -= totalSize;
+        m_currentPosition.memcopy(double_t, totalSize);
+        m_currentPosition += totalSize;
 
         return *this;
     }
@@ -269,10 +256,9 @@ FastCdr& FastCdr::serializeArray(const double *double_t, size_t numElements)
 
 FastCdr& FastCdr::deserialize(char &char_t)
 {
-    if(m_cdrBuffer.checkSpace(sizeof(char_t)))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, sizeof(char_t)))
     {
-        char_t = *m_cdrBuffer.m_currentPosition++;
-        m_cdrBuffer.m_bufferRemainLength -= sizeof(char_t);
+        m_currentPosition++ >> char_t;
         return *this;
     }
 
@@ -281,12 +267,10 @@ FastCdr& FastCdr::deserialize(char &char_t)
 
 FastCdr& FastCdr::deserialize(int16_t &short_t)
 {
-    if(m_cdrBuffer.checkSpace(sizeof(short_t)))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, sizeof(short_t)))
     {
-        char *dst = reinterpret_cast<char*>(&short_t);
-        memcpy(dst, m_cdrBuffer.m_currentPosition, sizeof(short_t));
-        m_cdrBuffer.m_currentPosition += sizeof(short_t);
-        m_cdrBuffer.m_bufferRemainLength -= sizeof(short_t);
+        m_currentPosition >> short_t;
+        m_currentPosition += sizeof(short_t);
 
         return *this;
     }
@@ -296,12 +280,10 @@ FastCdr& FastCdr::deserialize(int16_t &short_t)
 
 FastCdr& FastCdr::deserialize(int32_t &long_t)
 {
-    if(m_cdrBuffer.checkSpace(sizeof(long_t)))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, sizeof(long_t)))
     {
-        char *dst = reinterpret_cast<char*>(&long_t);
-        memcpy(dst, m_cdrBuffer.m_currentPosition, sizeof(long_t));
-        m_cdrBuffer.m_currentPosition += sizeof(long_t);
-        m_cdrBuffer.m_bufferRemainLength -= sizeof(long_t);
+        m_currentPosition >> long_t;
+        m_currentPosition += sizeof(long_t);
 
         return *this;
     }
@@ -311,12 +293,10 @@ FastCdr& FastCdr::deserialize(int32_t &long_t)
 
 FastCdr& FastCdr::deserialize(int64_t &longlong_t)
 {
-    if(m_cdrBuffer.checkSpace(sizeof(longlong_t)))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, sizeof(longlong_t)))
     {
-        char *dst = reinterpret_cast<char*>(&longlong_t);
-        memcpy(dst, m_cdrBuffer.m_currentPosition, sizeof(longlong_t));
-        m_cdrBuffer.m_currentPosition += sizeof(longlong_t);
-        m_cdrBuffer.m_bufferRemainLength -= sizeof(longlong_t);
+        m_currentPosition >> longlong_t;
+        m_currentPosition += sizeof(longlong_t);
 
         return *this;
     }
@@ -326,12 +306,10 @@ FastCdr& FastCdr::deserialize(int64_t &longlong_t)
 
 FastCdr& FastCdr::deserialize(float &float_t)
 {
-    if(m_cdrBuffer.checkSpace(sizeof(float_t)))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, sizeof(float_t)))
     {
-        char *dst = reinterpret_cast<char*>(&float_t);
-        memcpy(dst, m_cdrBuffer.m_currentPosition, sizeof(float_t));
-        m_cdrBuffer.m_currentPosition += sizeof(float_t);
-        m_cdrBuffer.m_bufferRemainLength -= sizeof(float_t);
+        m_currentPosition >> float_t;
+        m_currentPosition += sizeof(float_t);
 
         return *this;
     }
@@ -341,12 +319,10 @@ FastCdr& FastCdr::deserialize(float &float_t)
 
 FastCdr& FastCdr::deserialize(double &double_t)
 {
-    if(m_cdrBuffer.checkSpace(sizeof(double_t)))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, sizeof(double_t)))
     {
-        char *dst = reinterpret_cast<char*>(&double_t);
-        memcpy(dst, m_cdrBuffer.m_currentPosition, sizeof(double_t));
-        m_cdrBuffer.m_currentPosition += sizeof(double_t);
-        m_cdrBuffer.m_bufferRemainLength -= sizeof(double_t);
+        m_currentPosition >> double_t;
+        m_currentPosition += sizeof(double_t);
 
         return *this;
     }
@@ -358,10 +334,9 @@ FastCdr& FastCdr::deserialize(bool &bool_t)
 {
     uint8_t value = 0;
 
-    if(m_cdrBuffer.checkSpace(sizeof(uint8_t)))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, sizeof(uint8_t)))
     {
-        value = *m_cdrBuffer.m_currentPosition++;
-        m_cdrBuffer.m_bufferRemainLength -= sizeof(uint8_t);
+        m_currentPosition++ >> value;
 
         if(value == 1)
         {
@@ -383,7 +358,7 @@ FastCdr& FastCdr::deserialize(bool &bool_t)
 FastCdr& FastCdr::deserialize(std::string &string_t)
 {
     uint32_t length = 0;
-    FastBuffer::State state(m_cdrBuffer);
+    FastCdr::state state(*this);
 
     deserialize(length);
 
@@ -392,11 +367,10 @@ FastCdr& FastCdr::deserialize(std::string &string_t)
         string_t = "";
         return *this;
     }
-    else if(m_cdrBuffer.checkSpace(length))
+    else if(m_cdrBuffer.checkSpace(m_currentPosition, length))
     {
-        string_t = std::string(m_cdrBuffer.m_currentPosition, length - (m_cdrBuffer.m_currentPosition[length-1] == '\0' ? 1 : 0));
-        m_cdrBuffer.m_currentPosition += length;
-        m_cdrBuffer.m_bufferRemainLength -= length;
+        string_t = std::string(&m_currentPosition, length - ((&m_currentPosition)[length-1] == '\0' ? 1 : 0));
+        m_currentPosition += length;
         return *this;
     }
 
@@ -408,11 +382,10 @@ FastCdr& FastCdr::deserializeArray(char *char_t, size_t numElements)
 {
     size_t totalSize = sizeof(*char_t)*numElements;
 
-    if(m_cdrBuffer.checkSpace(totalSize))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, totalSize))
     {
-        memcpy(char_t, m_cdrBuffer.m_currentPosition, totalSize);
-        m_cdrBuffer.m_currentPosition += totalSize;
-        m_cdrBuffer.m_bufferRemainLength -= totalSize;
+        m_currentPosition.rmemcopy(char_t, totalSize);
+        m_currentPosition += totalSize;
         return *this;
     }
 
@@ -423,11 +396,10 @@ FastCdr& FastCdr::deserializeArray(int16_t *short_t, size_t numElements)
 {
     size_t totalSize = sizeof(*short_t) * numElements;
 
-    if(m_cdrBuffer.checkSpace(totalSize))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, totalSize))
     {
-        memcpy(short_t, m_cdrBuffer.m_currentPosition, totalSize);
-        m_cdrBuffer.m_currentPosition += totalSize;
-        m_cdrBuffer.m_bufferRemainLength -= totalSize;
+        m_currentPosition.rmemcopy(short_t, totalSize);
+        m_currentPosition += totalSize;
 
         return *this;
     }
@@ -439,11 +411,10 @@ FastCdr& FastCdr::deserializeArray(int32_t *long_t, size_t numElements)
 {
     size_t totalSize = sizeof(*long_t) * numElements;
 
-    if(m_cdrBuffer.checkSpace(totalSize))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, totalSize))
     {
-        memcpy(long_t, m_cdrBuffer.m_currentPosition, totalSize);
-        m_cdrBuffer.m_currentPosition += totalSize;
-        m_cdrBuffer.m_bufferRemainLength -= totalSize;
+        m_currentPosition.rmemcopy(long_t, totalSize);
+        m_currentPosition += totalSize;
 
         return *this;
     }
@@ -455,11 +426,10 @@ FastCdr& FastCdr::deserializeArray(int64_t *longlong_t, size_t numElements)
 {
     size_t totalSize = sizeof(*longlong_t) * numElements;
 
-    if(m_cdrBuffer.checkSpace(totalSize))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, totalSize))
     {
-        memcpy(longlong_t, m_cdrBuffer.m_currentPosition, totalSize);
-        m_cdrBuffer.m_currentPosition += totalSize;
-        m_cdrBuffer.m_bufferRemainLength -= totalSize;
+        m_currentPosition.rmemcopy(longlong_t, totalSize);
+        m_currentPosition += totalSize;
 
         return *this;
     }
@@ -471,11 +441,10 @@ FastCdr& FastCdr::deserializeArray(float *float_t, size_t numElements)
 {
     size_t totalSize = sizeof(*float_t) * numElements;
 
-    if(m_cdrBuffer.checkSpace(totalSize))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, totalSize))
     {
-        memcpy(float_t, m_cdrBuffer.m_currentPosition, totalSize);
-        m_cdrBuffer.m_currentPosition += totalSize;
-        m_cdrBuffer.m_bufferRemainLength -= totalSize;
+        m_currentPosition.rmemcopy(float_t, totalSize);
+        m_currentPosition += totalSize;
 
         return *this;
     }
@@ -487,11 +456,10 @@ FastCdr& FastCdr::deserializeArray(double *double_t, size_t numElements)
 {
     size_t totalSize = sizeof(*double_t) * numElements;
 
-    if(m_cdrBuffer.checkSpace(totalSize))
+    if(m_cdrBuffer.checkSpace(m_currentPosition, totalSize))
     {
-        memcpy(double_t, m_cdrBuffer.m_currentPosition, totalSize);
-        m_cdrBuffer.m_currentPosition += totalSize;
-        m_cdrBuffer.m_bufferRemainLength -= totalSize;
+        m_currentPosition.rmemcopy(double_t, totalSize);
+        m_currentPosition += totalSize;
 
         return *this;
     }

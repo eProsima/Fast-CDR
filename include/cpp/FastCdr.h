@@ -19,6 +19,28 @@ namespace eProsima
     class eProsima_cpp_DllExport FastCdr
     {
     public:
+
+        // TODO Ver si hay que quitar la afirmación de que es peligroso.
+        /*!
+         * @brief This class stores the current state of a CDR serialization. Its usage is dangerours when the eProsima::FastBuffer can use
+         * a user's function to allocate dynamically memory.
+         * @ingroup CDRAPIREFERENCE
+         */
+        class state
+        {
+            friend class FastCdr;
+        public:
+
+            /*!
+             * @brief Default constructor.
+             */
+            state(FastCdr &fastcdr);
+
+        private:
+
+            //! @brief The position in the buffer when the state was created.
+            FastBuffer::iterator m_currentPosition;
+        };
         /*!
          * @brief This constructor creates a eProsima::FastCdr object that could serialize/deserialize
          * the assigned buffer.
@@ -49,13 +71,13 @@ namespace eProsima
          * @brief This function returns the current state of the CDR stream.
          * @return The current state of the buffer.
          */
-        FastBuffer::State getState() const;
+        FastCdr::state getState();
 
         /*!
          * @brief This function sets a previous state of the CDR stream;
          * @param state Previous state that will be set again.
          */
-        void setState(FastBuffer::State &state);
+        void setState(FastCdr::state &state);
 
         /*!
          * @brief This operator serializes an octet.
@@ -417,7 +439,7 @@ namespace eProsima
         template<class _T>
         FastCdr& serialize(const std::vector<_T> &vector_t)
         {
-            FastBuffer::State state(m_cdrBuffer);
+            FastCdr::state state(*this);
 
             serialize((int32_t)vector_t.size());
 
@@ -673,7 +695,7 @@ namespace eProsima
         FastCdr& deserialize(std::vector<_T> &vector_t)
         {
             uint32_t seqLength = 0;
-            FastBuffer::State state(m_cdrBuffer);
+            FastCdr::state state(*this);
 
             serialize(seqLength);
 

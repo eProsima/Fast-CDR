@@ -4,6 +4,7 @@
 #include "eProsima_cpp/eProsima_cpp_dll.h"
 #include <stdint.h>
 #include <cstdio>
+#include <string.h>
 
 namespace eProsima
 {
@@ -15,13 +16,83 @@ namespace eProsima
     {
     public:
 
-        _FastBuffer_iterator() : m_index(0) {}
+        _FastBuffer_iterator() : m_buffer(NULL), m_currentPosition(NULL) {}
 
-        explicit _FastBuffer_iterator(size_t index) : m_index(index) {}
+        explicit _FastBuffer_iterator(char *buffer, size_t index, size_t totalSize) : m_buffer(buffer), m_currentPosition(&m_buffer[index]),
+        m_lastPosition(&m_buffer[totalSize]){}
+
+        template<typename _T>
+        inline
+        void operator<<(const _T &data)
+        {
+            *((_T*)m_currentPosition) = data;
+        }
+
+        template<typename _T>
+        inline
+        void operator>>(_T &data)
+        {
+            data = *((_T*)m_currentPosition);
+        }
+
+        inline
+        void memcopy(const void* src, const size_t size)
+        {
+            memcpy(m_currentPosition, src, size);
+        }
+
+        inline
+        void rmemcopy(void* dst, const size_t size)
+        {
+            memcpy(dst, m_currentPosition, size);
+        }
+
+        inline
+        void operator+=(size_t numBytes)
+        {
+            m_currentPosition += numBytes;
+        }
+
+        inline
+        size_t operator-(const _FastBuffer_iterator &it) const
+        {
+            return m_currentPosition - it.m_currentPosition;
+        }
+
+        inline
+        _FastBuffer_iterator operator++()
+        {
+            ++m_currentPosition;
+            return *this;
+        }
+
+        inline
+        _FastBuffer_iterator operator++(int)
+        {
+            _FastBuffer_iterator tmp = *this;
+            ++*this;
+            return tmp;
+        }
+
+        inline
+        size_t operator*()
+        {
+            return m_lastPosition - m_currentPosition;
+        }
+
+        inline 
+        char* operator&()
+        {
+            return m_currentPosition;
+        }
 
     private:
 
-        size_t m_index;
+        char *m_buffer;
+
+        char *m_currentPosition;
+
+        char *m_lastPosition;
     };
 
     /*!
@@ -36,33 +107,6 @@ namespace eProsima
         friend class FastCdr;
         typedef _FastBuffer_iterator iterator;
     public:
-
-        /*!
-         * @brief This class stores a state of a eProsima::FastBuffer. Its usage is dangerours when the eProsima::FastBuffer can use
-         * a user's function to allocate dynamically memory.
-         * @ingroup CDRAPIREFERENCE
-         */
-        class eProsima_cpp_DllVariable State
-        {
-            friend class Cdr;
-            friend class FastCdr;
-        private:
-
-            /*!
-             * @brief Default constructor.
-             * @param FastBuffer The buffer that will be used to create the new state.
-             */
-            State(FastBuffer &FastBuffer);
-
-             //! @brief The remaining bytes in the stream when the state was created.
-            size_t m_bufferRemainLength;
-
-            //! @brief The position in the buffer when the state was created.
-            char *m_currentPosition;
-
-		    //! @brief The position from the aligment is calculated,  when the state was created..
-		    char *m_alignPosition;
-        };
 
         /*!
          * @brief This constructor creates an internal stream and assigns it to the eProsima::FastBuffer object.
@@ -96,17 +140,13 @@ namespace eProsima
          * @brief This function returns the length of the serialized data inside the stream.
          * @return The length of the serialized data.
          */
-        inline size_t getSerializedDataLength() const { return m_currentPosition - m_buffer;}
-
-        /*!
-		 * @brief This function resets the eProsima::FastBuffer object. The serialization process starts at the beginning.
-		 */
-        void reset();
+        // TODO
+        //inline size_t getSerializedDataLength() const { return m_currentPosition - m_buffer;}
 
         inline
         iterator begin()
         {
-            return (iterator(0));
+            return (iterator(m_buffer, 0, m_bufferSize));
         }
 
     private:
@@ -116,18 +156,7 @@ namespace eProsima
          * @param dataSize The spected size to be available.
          * @return True value if the space is available. In other case false value is returned.
          */
-        inline bool checkSpace(size_t dataSize){return m_bufferRemainLength >= dataSize;}
-
-        /*!
-         * @brief This function jumps the number of bytes of the alignment. These bytes should be calculated with the function eProsima::FastBuffer::align.
-         * @param align The number of bytes to be skipped.
-         */
-        inline void makeAlign(size_t align){m_currentPosition += align;}
-
-		/*!
-		 * @brief This function resets the align position for calculations to current position.
-		 */
-		inline void resetAlign(){m_alignPosition = m_currentPosition;}
+        inline bool checkSpace(iterator &it, size_t dataSize){return *it >= dataSize;}
 
         /*!
          * @brief This function resizes the raw buffer. It will call the user's defined function to make this job.
@@ -141,15 +170,6 @@ namespace eProsima
 
         //! @brief The total size of the user's buffer.
         size_t m_bufferSize;
-
-        //! @brief The remaining bytes in the stream.
-        size_t m_bufferRemainLength;
-
-        //! @brief The current position in the serialization/deserialization process.
-        char *m_currentPosition;
-
-		//! @brief The position from the aligment is calculated.
-		char *m_alignPosition;
 
         //! @brief This variable indicates if the managed buffer is internal or is from the user.
         bool m_internalBuffer;

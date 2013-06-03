@@ -10,13 +10,14 @@ CDR_TARGET_DEBUG_Z= $(BASEDIR)/lib/$(EPROSIMA_TARGET)/libcdrzd.a
 CDR_TARGET= $(BASEDIR)/lib/$(EPROSIMA_TARGET)/libcdr.so
 CDR_TARGET_Z= $(BASEDIR)/lib/$(EPROSIMA_TARGET)/libcdrz.a
 
-CDR_CFLAGS += $(CFLAGS) -std=c++0x
-CDR_CFLAGS_DEBUG += $(CFLAGS_DEBUG) -std=c++0x
+CDR_CFLAGS += $(CFLAGS) -std=c++11
+CDR_CFLAGS_DEBUG += $(CFLAGS_DEBUG) -std=c++11
 
 CDR_INCLUDE_DIRS= $(INCLUDE_DIRS) -I$(BASEDIR)/include
 
 CDR_SRC_CPPFILES= $(BASEDIR)/src/cpp/Cdr.cpp \
-		  $(BASEDIR)/src/cpp/CdrBuffer.cpp \
+		  $(BASEDIR)/src/cpp/FastCdr.cpp \
+		  $(BASEDIR)/src/cpp/FastBuffer.cpp \
 		  $(BASEDIR)/src/cpp/exceptions/Exception.cpp \
 		  $(BASEDIR)/src/cpp/exceptions/NotEnoughMemoryException.cpp \
 		  $(BASEDIR)/src/cpp/exceptions/BadParamException.cpp

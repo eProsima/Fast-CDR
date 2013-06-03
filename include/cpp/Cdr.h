@@ -69,15 +69,11 @@ namespace eProsima
 
         private:
 
-            /*
-            //! @brief The remaining bytes in the stream when the state was created.
-            size_t m_bufferRemainLength;
-
             //! @brief The position in the buffer when the state was created.
-            char *m_currentPosition;
+            FastBuffer::iterator m_currentPosition;
 
 		    //! @brief The position from the aligment is calculated,  when the state was created..
-		    char *m_alignPosition;*/
+            FastBuffer::iterator m_alignPosition;
 
             //! @brief This attribute specified if it is needed to swap the bytes when the state was created..
             bool m_swapBytes;
@@ -124,11 +120,6 @@ namespace eProsima
          */
         bool jump(uint32_t numBytes);
 
-		/*!
-		 * @brief This function resets the alignment to current position in the buffer.
-		 */
-		void resetAlignment();
-
         /*!
 		 * @brief This function resets the current position in the buffer to the begining.
 		 */
@@ -152,12 +143,10 @@ namespace eProsima
          */
         void setState(state &state);
 
-        /*!
-         * @brief This function returns the extra bytes regarding the allign.
-         * @param dataSize The size of the data that will be serialized.
-         * @return The size needed for the aligment.
-         */
-        inline size_t alignment(size_t dataSize) const {return dataSize > m_lastDataSize ? (dataSize - ((m_cdrBuffer.m_currentPosition - m_cdrBuffer.m_alignPosition) % dataSize)) & (dataSize-1) : 0;}
+		/*!
+		 * @brief This function resets the alignment to current position in the buffer.
+		 */
+		inline void resetAlignment(){m_alignPosition = m_currentPosition;}
 
         /*!
          * @brief This operator serializes an octet.
@@ -662,7 +651,7 @@ namespace eProsima
         template<class _T>
         Cdr& serialize(const std::vector<_T> &vector_t)
         {
-            FastBuffer::State state(m_cdrBuffer);
+            state state(*this);
 
             *this << (int32_t)vector_t.size();
 
@@ -689,17 +678,17 @@ namespace eProsima
         template<class _T>
         Cdr& serialize(const std::vector<_T> &vector_t, Endianness endianness)
         {
-            bool auxSwap = m_cdrBuffer.m_swapBytes;
-            m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+            bool auxSwap = m_swapBytes;
+            m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
 
             try
             {
                 serialize(vector_t);
-                m_cdrBuffer.m_swapBytes = auxSwap;
+                m_swapBytes = auxSwap;
             }
             catch(Exception &ex)
             {
-                m_cdrBuffer.m_swapBytes = auxSwap;
+                m_swapBytes = auxSwap;
                 ex.raise();
             }
 
@@ -1209,7 +1198,7 @@ namespace eProsima
         Cdr& deserialize(std::vector<_T> &vector_t)
         {
             uint32_t seqLength = 0;
-            FastBuffer::State state(m_cdrBuffer);
+            state state(*this);
 
             *this >> seqLength;
 
@@ -1237,17 +1226,17 @@ namespace eProsima
         template<class _T>
         Cdr& deserialize(std::vector<_T> &vector_t, Endianness endianness)
         {
-            bool auxSwap = m_cdrBuffer.m_swapBytes;
-            m_cdrBuffer.m_swapBytes = (m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness == endianness)) || (!m_cdrBuffer.m_swapBytes && (m_cdrBuffer.m_endianness != endianness));
+            bool auxSwap = m_swapBytes;
+            m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
 
             try
             {
                 deserialize(vector_t);
-                m_cdrBuffer.m_swapBytes = auxSwap;
+                m_swapBytes = auxSwap;
             }
             catch(Exception &ex)
             {
-                m_cdrBuffer.m_swapBytes = auxSwap;
+                m_swapBytes = auxSwap;
                 ex.raise();
             }
 
@@ -1536,6 +1525,19 @@ namespace eProsima
             return deserializeArray(array_t->data(), numElements * array_t->size(), endianness);
         }
 
+        /*!
+         * @brief This function returns the extra bytes regarding the allign.
+         * @param dataSize The size of the data that will be serialized.
+         * @return The size needed for the aligment.
+         */
+        inline size_t alignment(size_t dataSize) const {return dataSize > m_lastDataSize ? (dataSize - ((m_currentPosition - m_alignPosition) % dataSize)) & (dataSize-1) : 0;}
+
+        /*!
+         * @brief This function jumps the number of bytes of the alignment. These bytes should be calculated with the function eProsima::Cdr::alignment.
+         * @param align The number of bytes to be skipped.
+         */
+        inline void makeAlign(size_t align){m_currentPosition += align;}
+
         //! @brief Reference to the buffer that will be serialized/deserialized.
         FastBuffer &m_cdrBuffer;
 
@@ -1556,6 +1558,12 @@ namespace eProsima
 
         //! @brief Stores the last datasize serialized/deserialized. It's used to optimize.
         size_t m_lastDataSize;
+
+        //! @brief The current position in the serialization/deserialization process.
+        FastBuffer::iterator m_currentPosition;
+
+		//! @brief The position from the aligment is calculated.
+        FastBuffer::iterator m_alignPosition;
     };
 };
 

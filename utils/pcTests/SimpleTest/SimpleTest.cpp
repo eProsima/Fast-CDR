@@ -59,8 +59,8 @@ int main()
     char buffer[BUFFER_LENGTH];
 
     // Serialization.
-    CDRBuffer cdrbuffer_ser(buffer, BUFFER_LENGTH);
-    CDR cdr_ser(cdrbuffer_ser);
+    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+    Cdr cdr_ser(cdrbuffer);
 
     try
     {
@@ -76,9 +76,9 @@ int main()
         std::cout << "Serialization error: " << ex.what() << std::endl << "TEST FAILED" << std::endl;
         return -1;
     }
-        // Deseriazliation.
-    CDRBuffer cdrbuffer_des(buffer, BUFFER_LENGTH);
-    CDR cdr_des(cdrbuffer_des);
+
+    // Deseriazliation.
+    Cdr cdr_des(cdrbuffer);
 
     uint8_t octet_value = 0;
     char char_value = 0;

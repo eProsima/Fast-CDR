@@ -1,7 +1,6 @@
 #include "cpp/FastBuffer.h"
 
 #include <malloc.h>
-#include <cstddef>
 
 #define BUFFER_START_LENGTH 200
 

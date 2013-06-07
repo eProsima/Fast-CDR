@@ -703,7 +703,7 @@ namespace eProsima
             uint32_t seqLength = 0;
             FastCdr::state state(*this);
 
-            serialize(seqLength);
+            deserialize(seqLength);
 
             try
             {

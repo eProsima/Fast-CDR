@@ -115,8 +115,8 @@ Cdr::state Cdr::getState()
 
 void Cdr::setState(state &state)
 {
-    m_currentPosition >> state.m_currentPosition;
-    m_alignPosition >> state.m_alignPosition;
+    m_currentPosition = state.m_currentPosition;
+    m_alignPosition = state.m_alignPosition;
     m_swapBytes = state.m_swapBytes;
     m_lastDataSize = state.m_lastDataSize;
 }

@@ -499,7 +499,7 @@ Cdr& Cdr::serializeArray(const char *char_t, size_t numElements)
     if(((m_lastPosition - m_currentPosition) >= totalSize) || resize(totalSize))
     {
         // Save last datasize.
-        m_lastDataSize = sizeof(char_t);
+        m_lastDataSize = sizeof(*char_t);
 
         m_currentPosition.memcopy(char_t, totalSize);
         m_currentPosition += totalSize;
@@ -1175,7 +1175,7 @@ Cdr& Cdr::deserializeArray(char *char_t, size_t numElements)
     if((m_lastPosition - m_currentPosition) >= totalSize)
     {
         // Save last datasize.
-        m_lastDataSize = sizeof(char_t);
+        m_lastDataSize = sizeof(*char_t);
 
         m_currentPosition.rmemcopy(char_t, totalSize);
         m_currentPosition += totalSize;

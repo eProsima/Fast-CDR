@@ -376,6 +376,12 @@
     <ClInclude Include="..\..\..\..\include\cpp\FastCdr.h" />
     <ClInclude Include="..\..\..\..\include\exceptions\Exception.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\..\src\cpp\CDR.rc">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|x64'">EPROSIMA_C_DLL_EXPORT;EPROSIMA_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='DebugDLL|x64'">EPROSIMA_C_DLL_EXPORT;EPROSIMA_WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

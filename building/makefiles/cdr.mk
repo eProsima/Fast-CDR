@@ -13,7 +13,8 @@ CDR_TARGET_Z= $(BASEDIR)/lib/$(EPROSIMA_TARGET)/libcdrz.a
 CDR_CFLAGS += $(CFLAGS) -std=c++11
 CDR_CFLAGS_DEBUG += $(CFLAGS_DEBUG) -std=c++11
 
-CDR_INCLUDE_DIRS= $(INCLUDE_DIRS) -I$(BASEDIR)/include
+CDR_INCLUDE_DIRS= $(INCLUDE_DIRS) -I$(BASEDIR)/include \
+		  -I$(EPROSIMADIR)/code
 
 CDR_SRC_CPPFILES= $(BASEDIR)/src/cpp/Cdr.cpp \
 		  $(BASEDIR)/src/cpp/FastCdr.cpp \

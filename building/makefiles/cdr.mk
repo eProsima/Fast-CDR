@@ -47,6 +47,9 @@ checkCDRDirectories:
 	@mkdir -p $(CDR_OUTDIR)
 	@mkdir -p $(CDR_OUTDIR_DEBUG)
 	@mkdir -p $(CDR_OUTDIR_RELEASE)
+	@mkdir -p lib
+	@mkdir -p lib/$(EPROSIMA_TARGET)
+	@mkdir -p $(EPROSIMA_LIBRARY_PATH)/proyectos/$(EPROSIMA_TARGET)
 
 $(CDR_TARGET_DEBUG): $(CDR_OBJS_DEBUG)
 	$(LN) $(LDFLAGS) -shared -o $(CDR_TARGET_DEBUG) $(LIBRARY_PATH) $(LIBS_DEBUG) $(CDR_OBJS_DEBUG)

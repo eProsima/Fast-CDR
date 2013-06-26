@@ -13,18 +13,15 @@ namespace eProsima
 {
     /*!
      * @brief This class offers an interface to serialize/deserialize some basic types using a modified CDR protocol inside a eProsima::FastBuffer.
-     * This modified CDR protocol provides a serialization mechanim more faster than common CDR protocol, because it doesn't use aligment.
+     * This modified CDR protocol provides a serialization mechanism more faster than common CDR protocol, because it doesn't use aligment.
      * @ingroup CDRAPIREFERENCE
      */
     class eProsima_cpp_DllExport FastCdr
     {
     public:
 
-        // TODO Ver si hay que quitar la afirmación de que es peligroso.
         /*!
-         * @brief This class stores the current state of a CDR serialization. Its usage is dangerours when the eProsima::FastBuffer can use
-         * a user's function to allocate dynamically memory.
-         * @ingroup CDRAPIREFERENCE
+         * @brief This class stores the current state of a CDR serialization.
          */
         class eProsima_cpp_DllExport state
         {

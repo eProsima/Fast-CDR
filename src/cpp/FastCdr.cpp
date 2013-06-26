@@ -40,12 +40,12 @@ FastCdr::state FastCdr::getState()
 
 void FastCdr::setState(FastCdr::state &state)
 {
-    m_currentPosition = state.m_currentPosition;
+    m_currentPosition >> state.m_currentPosition;
 }
 
 void FastCdr::reset()
 {
-    m_currentPosition >> m_cdrBuffer.begin();
+    m_currentPosition = m_cdrBuffer.begin();
 }
 
 bool FastCdr::resize(size_t minSizeInc)

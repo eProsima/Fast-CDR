@@ -51,11 +51,9 @@ namespace eProsima
         //! @brief Default endiness in the system.
         static const Endianness DEFAULT_ENDIAN;
 
-        // TODO Ver si hay que quitar la afirmación de que es peligroso.
         /*!
          * @brief This class stores the current state of a CDR serialization. Its usage is dangerours when the eProsima::FastBuffer can use
          * a user's function to allocate dynamically memory.
-         * @ingroup CDRAPIREFERENCE
          */
         class eProsima_cpp_DllExport state
         {

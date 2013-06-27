@@ -373,10 +373,10 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\include\cpp\Cdr.h" />
     <ClInclude Include="..\..\..\..\include\cpp\exceptions\BadParamException.h" />
+    <ClInclude Include="..\..\..\..\include\cpp\exceptions\Exception.h" />
     <ClInclude Include="..\..\..\..\include\cpp\exceptions\NotEnoughMemoryException.h" />
     <ClInclude Include="..\..\..\..\include\cpp\FastBuffer.h" />
     <ClInclude Include="..\..\..\..\include\cpp\FastCdr.h" />
-    <ClInclude Include="..\..\..\..\include\exceptions\Exception.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\..\src\cpp\CDR.rc">

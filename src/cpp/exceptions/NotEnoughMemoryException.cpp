@@ -10,6 +10,8 @@
 
 namespace eProsima
 {
+    const std::string NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT("Not enough memory in the buffer stream");
+
 	NotEnoughMemoryException::NotEnoughMemoryException(const std::string &message) : Exception(message)
 	{
 	}

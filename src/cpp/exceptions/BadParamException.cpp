@@ -10,6 +10,8 @@
 
 namespace eProsima
 {
+    const std::string BadParamException::BAD_PARAM_MESSAGE_DEFAULT("Bad parameter");
+
 	BadParamException::BadParamException(const std::string &message) : Exception(message)
 	{
 	}

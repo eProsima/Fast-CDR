@@ -1,11 +1,3 @@
-/*************************************************************************
- * Copyright (c) 2012 eProsima. All rights reserved.
- *
- * This copy of RPCDDS is licensed to you under the terms described in the
- * RPCDDS_LICENSE file included in this distribution.
- *
- *************************************************************************/
-
 #include "cpp/exceptions/Exception.h"
 
 namespace eProsima

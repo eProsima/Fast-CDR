@@ -4,6 +4,7 @@
 #include "eProsima_cpp/eProsima_cpp_dll.h"
 #include "cpp/FastBuffer.h"
 #include "cpp/exceptions/Exception.h"
+#include "cpp/exceptions/NotEnoughMemoryException.h"
 #include <stdint.h>
 #include <string>
 #include <array>
@@ -329,7 +330,17 @@ namespace eProsima
          * @return Reference to the eProsima::FastCdr object.
          * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
          */
-        FastCdr& serialize(const char char_t);
+        inline
+        FastCdr& serialize(const char char_t)
+        {
+            if(((m_lastPosition - m_currentPosition) >= sizeof(char_t)) || resize(sizeof(char_t)))
+            {
+                m_currentPosition++ << char_t;
+                return *this;
+            }
+
+            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        }
 
         /*!
          * @brief This function serializes a unsigned short.
@@ -349,7 +360,19 @@ namespace eProsima
          * @return Reference to the eProsima::FastCdr object.
          * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
          */
-        FastCdr& serialize(const int16_t short_t);
+        inline
+        FastCdr& serialize(const int16_t short_t)
+        {
+            if(((m_lastPosition - m_currentPosition) >= sizeof(short_t)) || resize(sizeof(short_t)))
+            {
+                m_currentPosition << short_t;
+                m_currentPosition += sizeof(short_t);
+
+                return *this;
+            }
+
+            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        }
 
         /*!
          * @brief This function serializes a unsigned long.
@@ -369,7 +392,19 @@ namespace eProsima
          * @return Reference to the eProsima::FastCdr object.
          * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
          */
-        FastCdr& serialize(const int32_t long_t);
+        inline
+        FastCdr& serialize(const int32_t long_t)
+        {
+            if(((m_lastPosition - m_currentPosition) >= sizeof(long_t)) || resize(sizeof(long_t)))
+            {
+                m_currentPosition << long_t;
+                m_currentPosition += sizeof(long_t);
+
+                return *this;
+            }
+
+            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        }
 
         /*!
          * @brief This function serializes a unsigned long long.
@@ -389,7 +424,19 @@ namespace eProsima
          * @return Reference to the eProsima::FastCdr object.
          * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
          */
-        FastCdr& serialize(const int64_t longlong_t);
+        inline
+        FastCdr& serialize(const int64_t longlong_t)
+        {
+            if(((m_lastPosition - m_currentPosition) >= sizeof(longlong_t)) || resize(sizeof(longlong_t)))
+            {
+                m_currentPosition << longlong_t;
+                m_currentPosition += sizeof(longlong_t);
+
+                return *this;
+            }
+
+            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        }
 
         /*!
          * @brief This function serializes a float.
@@ -397,7 +444,19 @@ namespace eProsima
          * @return Reference to the eProsima::FastCdr object.
          * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
          */
-        FastCdr& serialize(const float float_t);
+        inline
+        FastCdr& serialize(const float float_t)
+        {
+            if(((m_lastPosition - m_currentPosition) >= sizeof(float_t)) || resize(sizeof(float_t)))
+            {
+                m_currentPosition << float_t;
+                m_currentPosition += sizeof(float_t);
+
+                return *this;
+            }
+
+            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        }
 
         /*!
          * @brief This function serializes a double.
@@ -405,7 +464,19 @@ namespace eProsima
          * @return Reference to the eProsima::FastCdr object.
          * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
          */
-        FastCdr& serialize(const double double_t);
+        inline
+        FastCdr& serialize(const double double_t)
+        {
+            if(((m_lastPosition - m_currentPosition) >= sizeof(double_t)) || resize(sizeof(double_t)))
+            {
+                m_currentPosition << double_t;
+                m_currentPosition += sizeof(double_t);
+
+                return *this;
+            }
+
+            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        }
 
         /*!
          * @brief This function serializes a boolean.
@@ -583,7 +654,17 @@ namespace eProsima
          * @return Reference to the eProsima::FastCdr object.
          * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
          */
-        FastCdr& deserialize(char &char_t);
+        inline
+        FastCdr& deserialize(char &char_t)
+        {
+            if((m_lastPosition - m_currentPosition) >= sizeof(char_t))
+            {
+                m_currentPosition++ >> char_t;
+                return *this;
+            }
+
+            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        }
 
         /*!
          * @brief This function deserializes a unsigned short.
@@ -603,7 +684,19 @@ namespace eProsima
          * @return Reference to the eProsima::FastCdr object.
          * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
          */
-        FastCdr& deserialize(int16_t &short_t);
+        inline
+        FastCdr& deserialize(int16_t &short_t)
+        {
+            if((m_lastPosition - m_currentPosition) >= sizeof(short_t))
+            {
+                m_currentPosition >> short_t;
+                m_currentPosition += sizeof(short_t);
+
+                return *this;
+            }
+
+            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        }
 
         /*!
          * @brief This function deserializes a unsigned long.
@@ -623,7 +716,19 @@ namespace eProsima
          * @return Reference to the eProsima::FastCdr object.
          * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
          */
-        FastCdr& deserialize(int32_t &long_t);
+        inline
+        FastCdr& deserialize(int32_t &long_t)
+        {
+            if((m_lastPosition - m_currentPosition) >= sizeof(long_t))
+            {
+                m_currentPosition >> long_t;
+                m_currentPosition += sizeof(long_t);
+
+                return *this;
+            }
+
+            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        }
 
         /*!
          * @brief This function deserializes a unsigned long long.
@@ -643,7 +748,19 @@ namespace eProsima
          * @return Reference to the eProsima::FastCdr object.
          * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
          */
-        FastCdr& deserialize(int64_t &longlong_t);
+        inline
+        FastCdr& deserialize(int64_t &longlong_t)
+        {
+            if((m_lastPosition - m_currentPosition) >= sizeof(longlong_t))
+            {
+                m_currentPosition >> longlong_t;
+                m_currentPosition += sizeof(longlong_t);
+
+                return *this;
+            }
+
+            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        }
 
         /*!
          * @brief This function deserializes a float.
@@ -651,7 +768,19 @@ namespace eProsima
          * @return Reference to the eProsima::FastCdr object.
          * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
          */
-        FastCdr& deserialize(float &float_t);
+        inline
+        FastCdr& deserialize(float &float_t)
+        {
+            if((m_lastPosition - m_currentPosition) >= sizeof(float_t))
+            {
+                m_currentPosition >> float_t;
+                m_currentPosition += sizeof(float_t);
+
+                return *this;
+            }
+
+           throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        }
 
         /*!
          * @brief This function deserializes a double.
@@ -659,7 +788,19 @@ namespace eProsima
          * @return Reference to the eProsima::FastCdr object.
          * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
          */
-        FastCdr& deserialize(double &double_t);
+        inline
+        FastCdr& deserialize(double &double_t)
+        {
+            if((m_lastPosition - m_currentPosition) >= sizeof(double_t))
+            {
+                m_currentPosition >> double_t;
+                m_currentPosition += sizeof(double_t);
+
+                return *this;
+            }
+
+            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        }
 
         /*!
          * @brief This function deserializes a boolean.

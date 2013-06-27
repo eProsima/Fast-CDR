@@ -47,9 +47,6 @@
     <ClInclude Include="..\..\..\..\include\cpp\Cdr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\include\exceptions\Exception.h">
-      <Filter>Header Files\exceptions</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\include\cpp\exceptions\NotEnoughMemoryException.h">
       <Filter>Header Files\exceptions</Filter>
     </ClInclude>
@@ -61,6 +58,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\include\cpp\FastBuffer.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\cpp\exceptions\Exception.h">
+      <Filter>Header Files\exceptions</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,13 +1,9 @@
 
 #include "cpp/FastCdr.h"
-#include "cpp/exceptions/NotEnoughMemoryException.h"
 #include "cpp/exceptions/BadParamException.h"
 #include <string.h>
 
 using namespace eProsima;
-
-const std::string NOT_ENOUGH_MEMORY_MESSAGE("Not enough memory in the buffer stream");
-const std::string BAD_PARAM_MESSAGE("Bad parameter");
 
 FastCdr::state::state(FastCdr &fastcdr) : m_currentPosition(fastcdr.m_currentPosition) {}
 
@@ -60,82 +56,6 @@ bool FastCdr::resize(size_t minSizeInc)
     return false;
 }
 
-FastCdr& FastCdr::serialize(const char char_t)
-{
-    if(((m_lastPosition - m_currentPosition) >= sizeof(char_t)) || resize(sizeof(char_t)))
-    {
-        m_currentPosition++ << char_t;
-        return *this;
-    }
-
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
-}
-
-FastCdr& FastCdr::serialize(const int16_t short_t)
-{
-    if(((m_lastPosition - m_currentPosition) >= sizeof(short_t)) || resize(sizeof(short_t)))
-    {
-        m_currentPosition << short_t;
-        m_currentPosition += sizeof(short_t);
-
-        return *this;
-    }
-
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
-}
-
-FastCdr& FastCdr::serialize(const int32_t long_t)
-{
-    if(((m_lastPosition - m_currentPosition) >= sizeof(long_t)) || resize(sizeof(long_t)))
-    {
-        m_currentPosition << long_t;
-        m_currentPosition += sizeof(long_t);
-
-        return *this;
-    }
-
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
-}
-
-FastCdr& FastCdr::serialize(const int64_t longlong_t)
-{
-    if(((m_lastPosition - m_currentPosition) >= sizeof(longlong_t)) || resize(sizeof(longlong_t)))
-    {
-        m_currentPosition << longlong_t;
-        m_currentPosition += sizeof(longlong_t);
-
-        return *this;
-    }
-
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
-}
-
-FastCdr& FastCdr::serialize(const float float_t)
-{
-    if(((m_lastPosition - m_currentPosition) >= sizeof(float_t)) || resize(sizeof(float_t)))
-    {
-        m_currentPosition << float_t;
-        m_currentPosition += sizeof(float_t);
-
-        return *this;
-    }
-
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
-}
-
-FastCdr& FastCdr::serialize(const double double_t)
-{
-    if(((m_lastPosition - m_currentPosition) >= sizeof(double_t)) || resize(sizeof(double_t)))
-    {
-        m_currentPosition << double_t;
-        m_currentPosition += sizeof(double_t);
-
-        return *this;
-    }
-
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
-}
-
 FastCdr& FastCdr::serialize(const bool bool_t)
 {
     uint8_t value = 0;
@@ -149,7 +69,7 @@ FastCdr& FastCdr::serialize(const bool bool_t)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::serialize(const std::string &string_t)
@@ -169,7 +89,7 @@ FastCdr& FastCdr::serialize(const std::string &string_t)
         else
         {
             setState(state);
-            throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
     }
 
@@ -187,7 +107,7 @@ FastCdr& FastCdr::serializeArray(const char *char_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::serializeArray(const int16_t *short_t, size_t numElements)
@@ -202,7 +122,7 @@ FastCdr& FastCdr::serializeArray(const int16_t *short_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::serializeArray(const int32_t *long_t, size_t numElements)
@@ -217,7 +137,7 @@ FastCdr& FastCdr::serializeArray(const int32_t *long_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::serializeArray(const int64_t *longlong_t, size_t numElements)
@@ -232,7 +152,7 @@ FastCdr& FastCdr::serializeArray(const int64_t *longlong_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::serializeArray(const float *float_t, size_t numElements)
@@ -247,7 +167,7 @@ FastCdr& FastCdr::serializeArray(const float *float_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::serializeArray(const double *double_t, size_t numElements)
@@ -262,83 +182,7 @@ FastCdr& FastCdr::serializeArray(const double *double_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
-}
-
-FastCdr& FastCdr::deserialize(char &char_t)
-{
-    if((m_lastPosition - m_currentPosition) >= sizeof(char_t))
-    {
-        m_currentPosition++ >> char_t;
-        return *this;
-    }
-
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
-}
-
-FastCdr& FastCdr::deserialize(int16_t &short_t)
-{
-    if((m_lastPosition - m_currentPosition) >= sizeof(short_t))
-    {
-        m_currentPosition >> short_t;
-        m_currentPosition += sizeof(short_t);
-
-        return *this;
-    }
-
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
-}
-
-FastCdr& FastCdr::deserialize(int32_t &long_t)
-{
-    if((m_lastPosition - m_currentPosition) >= sizeof(long_t))
-    {
-        m_currentPosition >> long_t;
-        m_currentPosition += sizeof(long_t);
-
-        return *this;
-    }
-
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
-}
-
-FastCdr& FastCdr::deserialize(int64_t &longlong_t)
-{
-    if((m_lastPosition - m_currentPosition) >= sizeof(longlong_t))
-    {
-        m_currentPosition >> longlong_t;
-        m_currentPosition += sizeof(longlong_t);
-
-        return *this;
-    }
-
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
-}
-
-FastCdr& FastCdr::deserialize(float &float_t)
-{
-    if((m_lastPosition - m_currentPosition) >= sizeof(float_t))
-    {
-        m_currentPosition >> float_t;
-        m_currentPosition += sizeof(float_t);
-
-        return *this;
-    }
-
-   throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
-}
-
-FastCdr& FastCdr::deserialize(double &double_t)
-{
-    if((m_lastPosition - m_currentPosition) >= sizeof(double_t))
-    {
-        m_currentPosition >> double_t;
-        m_currentPosition += sizeof(double_t);
-
-        return *this;
-    }
-
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::deserialize(bool &bool_t)
@@ -360,10 +204,10 @@ FastCdr& FastCdr::deserialize(bool &bool_t)
             return *this;
         }
 
-        throw BadParamException(BAD_PARAM_MESSAGE);
+        throw BadParamException(BadParamException::BAD_PARAM_MESSAGE_DEFAULT);
     }
 
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::deserialize(std::string &string_t)
@@ -386,7 +230,7 @@ FastCdr& FastCdr::deserialize(std::string &string_t)
     }
 
     setState(state);
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::deserializeArray(char *char_t, size_t numElements)
@@ -400,7 +244,7 @@ FastCdr& FastCdr::deserializeArray(char *char_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::deserializeArray(int16_t *short_t, size_t numElements)
@@ -415,7 +259,7 @@ FastCdr& FastCdr::deserializeArray(int16_t *short_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::deserializeArray(int32_t *long_t, size_t numElements)
@@ -430,7 +274,7 @@ FastCdr& FastCdr::deserializeArray(int32_t *long_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::deserializeArray(int64_t *longlong_t, size_t numElements)
@@ -445,7 +289,7 @@ FastCdr& FastCdr::deserializeArray(int64_t *longlong_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::deserializeArray(float *float_t, size_t numElements)
@@ -460,7 +304,7 @@ FastCdr& FastCdr::deserializeArray(float *float_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::deserializeArray(double *double_t, size_t numElements)
@@ -475,5 +319,5 @@ FastCdr& FastCdr::deserializeArray(double *double_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE);
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }

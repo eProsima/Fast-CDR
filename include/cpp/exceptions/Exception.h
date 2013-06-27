@@ -1,7 +1,7 @@
 #ifndef _CPP_EXCEPTIONS_EXCEPTION_H_
 #define _CPP_EXCEPTIONS_EXCEPTION_H_
 
-#include "eProsima_cpp/eProsima_cpp_dll.h"
+#include "cpp/Cdr_dll.h"
 #include <string>
 #include <exception>
 
@@ -11,7 +11,7 @@ namespace eProsima
     * @brief This abstract class is used to create exceptions.
     * @ingroup EXCEPTIONMODULE
     */
-    class eProsima_cpp_DllVariable Exception : public std::exception
+    class Cdr_DllAPI Exception : public std::exception
     {
     public:
 

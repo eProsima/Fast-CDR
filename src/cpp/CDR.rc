@@ -69,8 +69,8 @@ END
 #define VER_LEGALCOPYRIGHT_STR "Copyright 2013 (c)"
 #define VER_PRODUCTNAME_STR "CDR"
 
-#ifdef EPROSIMA_WIN32
-#ifdef EPROSIMA_C_DLL_EXPORT
+#ifdef _WIN32
+#ifdef CDR_DLL_EXPORT
 
 #ifndef _DEBUG
 #define VER_DEBUG 0
@@ -105,8 +105,8 @@ BEGIN
     END
 END
 
-#endif // EPROSIMA_C_DLL_EXPORT
-#endif // EPROSIMA_WIN32
+#endif // CDR_DLL_EXPORT
+#endif // _WIN32
 
 #endif    // Spanish resources
 /////////////////////////////////////////////////////////////////////////////

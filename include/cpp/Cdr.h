@@ -1,7 +1,7 @@
 #ifndef _CPP_CDR_H_
 #define _CPP_CDR_H_
 
-#include "eProsima_cpp/eProsima_cpp_dll.h"
+#include "Cdr_dll.h"
 #include "cpp/FastBuffer.h"
 #include "cpp/exceptions/Exception.h"
 #include <stdint.h>
@@ -15,7 +15,7 @@ namespace eProsima
      * @brief This class offers an interface to serialize/deserialize some basic types using CDR protocol inside a eProsima::FastBuffer.
      * @ingroup CDRAPIREFERENCE
      */
-    class eProsima_cpp_DllVariable Cdr
+    class Cdr_DllAPI Cdr
     {
     public:
 
@@ -55,7 +55,7 @@ namespace eProsima
          * @brief This class stores the current state of a CDR serialization. Its usage is dangerours when the eProsima::FastBuffer can use
          * a user's function to allocate dynamically memory.
          */
-        class eProsima_cpp_DllExport state
+        class Cdr_DllAPI state
         {
             friend class Cdr;
         public:

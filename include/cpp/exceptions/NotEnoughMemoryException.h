@@ -17,7 +17,7 @@ namespace eProsima
      * @brief This class is thrown as an exception when the buffer's internal memory reachs its size limit.
      * @ingroup EXCEPTIONMODULE
      */
-    class eProsima_cpp_DllVariable NotEnoughMemoryException : public Exception
+    class Cdr_DllAPI NotEnoughMemoryException : public Exception
     {
     public:
 

@@ -17,7 +17,7 @@ namespace eProsima
      * @brief This class is thrown as an exception when a invalid parameter was being serialized.
      * @ingroup EXCEPTIONMODULE
      */
-    class eProsima_cpp_DllVariable BadParamException : public Exception
+    class Cdr_DllAPI BadParamException : public Exception
     {
     public:
 

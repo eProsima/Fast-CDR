@@ -1,7 +1,7 @@
 #ifndef _CPP_FASTCDR_H_
 #define _CPP_FASTCDR_H_
 
-#include "eProsima_cpp/eProsima_cpp_dll.h"
+#include "Cdr_dll.h"
 #include "cpp/FastBuffer.h"
 #include "cpp/exceptions/Exception.h"
 #include "cpp/exceptions/NotEnoughMemoryException.h"
@@ -17,14 +17,14 @@ namespace eProsima
      * This modified CDR protocol provides a serialization mechanism more faster than common CDR protocol, because it doesn't use aligment.
      * @ingroup CDRAPIREFERENCE
      */
-    class eProsima_cpp_DllExport FastCdr
+    class Cdr_DllAPI FastCdr
     {
     public:
 
         /*!
          * @brief This class stores the current state of a CDR serialization.
          */
-        class eProsima_cpp_DllExport state
+        class Cdr_DllAPI state
         {
             friend class FastCdr;
         public:

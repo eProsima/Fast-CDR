@@ -1,7 +1,7 @@
 #ifndef _CPP_CDRBUFFER_H_
 #define _CPP_CDRBUFFER_H_
 
-#include "eProsima_cpp/eProsima_cpp_dll.h"
+#include "Cdr_dll.h"
 #include <stdint.h>
 #include <cstdio>
 #include <string.h>
@@ -171,7 +171,7 @@ namespace eProsima
     * or deserialize using their representation.
     * @ingroup CDRAPIREFERENCE
     */
-    class eProsima_cpp_DllVariable FastBuffer
+    class Cdr_DllAPI FastBuffer
     {
     public:
         typedef _FastBuffer_iterator iterator;

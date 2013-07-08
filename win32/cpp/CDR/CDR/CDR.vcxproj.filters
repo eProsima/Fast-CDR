@@ -62,6 +62,12 @@
     <ClInclude Include="..\..\..\..\include\cpp\exceptions\Exception.h">
       <Filter>Header Files\exceptions</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\include\cpp\Cdr_dll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\cpp\Cdr_version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\..\src\cpp\CDR.rc">

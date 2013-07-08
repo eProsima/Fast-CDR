@@ -1,4 +1,4 @@
-#include "version.cpp"
+#include "cpp/Cdr_version.h"
 // Microsoft Visual C++ generated resource script.
 //
 #ifdef APSTUDIO_INVOKED
@@ -70,7 +70,7 @@ END
 #define VER_PRODUCTNAME_STR "CDR"
 
 #ifdef _WIN32
-#ifdef CDR_DLL_EXPORT
+#if defined(CDR_SOURCE) && defined(CDR_DYN_LINK)
 
 #ifndef _DEBUG
 #define VER_DEBUG 0
@@ -105,7 +105,7 @@ BEGIN
     END
 END
 
-#endif // CDR_DLL_EXPORT
+#endif
 #endif // _WIN32
 
 #endif    // Spanish resources

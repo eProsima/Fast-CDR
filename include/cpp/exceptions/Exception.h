@@ -2,6 +2,7 @@
 #define _CPP_EXCEPTIONS_EXCEPTION_H_
 
 #include "cpp/Cdr_dll.h"
+#include "eProsima_cpp/eProsimaMacros.h"
 #include <string>
 #include <exception>
 

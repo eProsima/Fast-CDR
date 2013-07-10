@@ -5,6 +5,7 @@ CPP=g++
 LN=g++
 AR=ar
 CP=cp
+LNK=ln
 
 -include $(EPROSIMADIR)/building/makefiles/eProsima.mk
 -include $(BASEDIR)/building/makefiles/cdr.mk

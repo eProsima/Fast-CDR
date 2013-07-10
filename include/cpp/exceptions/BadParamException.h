@@ -70,7 +70,7 @@ namespace eProsima
         virtual void raise() const;
 
         //! @brief Default message used in the library.
-        static const std::string BadParamException::BAD_PARAM_MESSAGE_DEFAULT;
+        static const std::string BAD_PARAM_MESSAGE_DEFAULT;
     };
 } // namespace eProsima
 #endif // _CPP_EXCEPTIONS_BADPARAMEXCEPTION_H_

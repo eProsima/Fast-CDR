@@ -1,9 +1,12 @@
 
-#include "cpp/FastCdr.h"
+#include "cpp/cdr/FastCdr.h"
 #include "cpp/exceptions/BadParamException.h"
 #include <string.h>
 
 using namespace eProsima;
+
+const std::string FastCdr::BAD_PARAM_MESSAGE_DEFAULT("Bad parameter");
+const std::string FastCdr::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT("Not enough memory in the buffer stream");
 
 FastCdr::state::state(FastCdr &fastcdr) : m_currentPosition(fastcdr.m_currentPosition) {}
 
@@ -69,7 +72,7 @@ FastCdr& FastCdr::serialize(const bool bool_t)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::serialize(const std::string &string_t)
@@ -89,7 +92,7 @@ FastCdr& FastCdr::serialize(const std::string &string_t)
         else
         {
             setState(state);
-            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
     }
 
@@ -107,7 +110,7 @@ FastCdr& FastCdr::serializeArray(const char *char_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::serializeArray(const int16_t *short_t, size_t numElements)
@@ -122,7 +125,7 @@ FastCdr& FastCdr::serializeArray(const int16_t *short_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::serializeArray(const int32_t *long_t, size_t numElements)
@@ -137,7 +140,7 @@ FastCdr& FastCdr::serializeArray(const int32_t *long_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::serializeArray(const int64_t *longlong_t, size_t numElements)
@@ -152,7 +155,7 @@ FastCdr& FastCdr::serializeArray(const int64_t *longlong_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::serializeArray(const float *float_t, size_t numElements)
@@ -167,7 +170,7 @@ FastCdr& FastCdr::serializeArray(const float *float_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::serializeArray(const double *double_t, size_t numElements)
@@ -182,7 +185,7 @@ FastCdr& FastCdr::serializeArray(const double *double_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::deserialize(bool &bool_t)
@@ -204,10 +207,10 @@ FastCdr& FastCdr::deserialize(bool &bool_t)
             return *this;
         }
 
-        throw BadParamException(BadParamException::BAD_PARAM_MESSAGE_DEFAULT);
+        throw BadParamException(BAD_PARAM_MESSAGE_DEFAULT);
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::deserialize(std::string &string_t)
@@ -230,7 +233,7 @@ FastCdr& FastCdr::deserialize(std::string &string_t)
     }
 
     setState(state);
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::deserializeArray(char *char_t, size_t numElements)
@@ -244,7 +247,7 @@ FastCdr& FastCdr::deserializeArray(char *char_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::deserializeArray(int16_t *short_t, size_t numElements)
@@ -259,7 +262,7 @@ FastCdr& FastCdr::deserializeArray(int16_t *short_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::deserializeArray(int32_t *long_t, size_t numElements)
@@ -274,7 +277,7 @@ FastCdr& FastCdr::deserializeArray(int32_t *long_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::deserializeArray(int64_t *longlong_t, size_t numElements)
@@ -289,7 +292,7 @@ FastCdr& FastCdr::deserializeArray(int64_t *longlong_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::deserializeArray(float *float_t, size_t numElements)
@@ -304,7 +307,7 @@ FastCdr& FastCdr::deserializeArray(float *float_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::deserializeArray(double *double_t, size_t numElements)
@@ -319,5 +322,5 @@ FastCdr& FastCdr::deserializeArray(double *double_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }

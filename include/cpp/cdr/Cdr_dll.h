@@ -40,7 +40,7 @@
 #if !defined(CDR_SOURCE) && !defined(EPROSIMA_ALL_NO_LIB) \
     && !defined(CDR_NO_LIB)
 
-#include "cpp/Cdr_version.h"
+#include "cpp/cdr/Cdr_version.h"
 
 // Set properties.
 #define EPROSIMA_LIB_NAME cdr

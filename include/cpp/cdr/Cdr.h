@@ -1,13 +1,10 @@
 #ifndef _CPP_CDR_H_
 #define _CPP_CDR_H_
 
-#include "Cdr_dll.h"
+#include "cpp/cdr/Cdr_dll.h"
+#include "cpp/Marshalling.h"
 #include "cpp/FastBuffer.h"
 #include "cpp/exceptions/Exception.h"
-#include <stdint.h>
-#include <string>
-#include <array>
-#include <vector>
 
 namespace eProsima
 {
@@ -15,7 +12,7 @@ namespace eProsima
      * @brief This class offers an interface to serialize/deserialize some basic types using CDR protocol inside a eProsima::FastBuffer.
      * @ingroup CDRAPIREFERENCE
      */
-    class Cdr_DllAPI Cdr
+    class Cdr_DllAPI Cdr : public Marshalling
     {
     public:
 
@@ -1573,6 +1570,12 @@ namespace eProsima
 
         //! @brief The last position in the buffer;
         FastBuffer::iterator m_lastPosition;
+
+        //! @brief Common message for BadParamException exceptions.
+        static const std::string BAD_PARAM_MESSAGE_DEFAULT;
+
+        //! @brief Common message for NotEnoughMemoryException exceptions.
+        static const std::string NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT;
     };
 };
 

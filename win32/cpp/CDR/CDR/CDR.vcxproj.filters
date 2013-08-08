@@ -13,64 +13,40 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\exceptions">
-      <UniqueIdentifier>{7fa81ac3-7a98-4014-b2c4-bd397ab3404e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\exceptions">
-      <UniqueIdentifier>{5bc466a0-1d82-45e4-89b3-c32742d46c2d}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\src\cpp\Cdr.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\cpp\exceptions\Exception.cpp">
-      <Filter>Source Files\exceptions</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\cpp\exceptions\NotEnoughMemoryException.cpp">
-      <Filter>Source Files\exceptions</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\cpp\exceptions\BadParamException.cpp">
-      <Filter>Source Files\exceptions</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\src\cpp\FastBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\cpp\FastCdr.cpp">
+    <ClCompile Include="..\..\..\..\src\cpp\cdr\Cdr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\cpp\cdr\FastCdr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\include\cpp\Cdr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\cpp\exceptions\NotEnoughMemoryException.h">
-      <Filter>Header Files\exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\cpp\exceptions\BadParamException.h">
-      <Filter>Header Files\exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\cpp\FastCdr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\include\cpp\FastBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\include\cpp\exceptions\Exception.h">
-      <Filter>Header Files\exceptions</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\include\cpp\Cdr_dll.h">
+    <ClInclude Include="..\..\..\..\include\cpp\cdr\Cdr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\include\cpp\Cdr_version.h">
+    <ClInclude Include="..\..\..\..\include\cpp\cdr\Cdr_dll.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\cpp\cdr\Cdr_version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\include\cpp\cdr\FastCdr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\..\..\..\src\cpp\CDR.rc">
+    <ResourceCompile Include="..\..\..\..\src\cpp\cdr\CDR.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

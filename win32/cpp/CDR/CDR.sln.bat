@@ -1,7 +1,7 @@
 :: This script execute Visual Studio getting first the version of the product.
 
 :: Get the current vesion of CDR
-call %EPROSIMADIR%\scripts\common_pack_functions.bat :getVersionFromCPP VERSIONCDR ..\..\..\include\cpp\Cdr_version.h
+call %EPROSIMADIR%\scripts\common_pack_functions.bat :getVersionFromCPP VERSIONCDR ..\..\..\include\cpp\cdr\Cdr_version.h
 if not %errorstatus%==0 goto :EOF
 
 set VERSION=-%VERSIONCDR%

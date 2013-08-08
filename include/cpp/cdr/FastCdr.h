@@ -1,14 +1,11 @@
 #ifndef _CPP_FASTCDR_H_
 #define _CPP_FASTCDR_H_
 
-#include "Cdr_dll.h"
+#include "cpp/cdr/Cdr_dll.h"
+#include "cpp/Marshalling.h"
 #include "cpp/FastBuffer.h"
 #include "cpp/exceptions/Exception.h"
 #include "cpp/exceptions/NotEnoughMemoryException.h"
-#include <stdint.h>
-#include <string>
-#include <array>
-#include <vector>
 
 namespace eProsima
 {
@@ -17,7 +14,7 @@ namespace eProsima
      * This modified CDR protocol provides a serialization mechanism more faster than common CDR protocol, because it doesn't use aligment.
      * @ingroup CDRAPIREFERENCE
      */
-    class Cdr_DllAPI FastCdr
+    class Cdr_DllAPI FastCdr : public Marshalling
     {
     public:
 
@@ -339,7 +336,7 @@ namespace eProsima
                 return *this;
             }
 
-            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
 
         /*!
@@ -371,7 +368,7 @@ namespace eProsima
                 return *this;
             }
 
-            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
 
         /*!
@@ -403,7 +400,7 @@ namespace eProsima
                 return *this;
             }
 
-            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
 
         /*!
@@ -435,7 +432,7 @@ namespace eProsima
                 return *this;
             }
 
-            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
 
         /*!
@@ -455,7 +452,7 @@ namespace eProsima
                 return *this;
             }
 
-            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
 
         /*!
@@ -475,7 +472,7 @@ namespace eProsima
                 return *this;
             }
 
-            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
 
         /*!
@@ -663,7 +660,7 @@ namespace eProsima
                 return *this;
             }
 
-            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
 
         /*!
@@ -695,7 +692,7 @@ namespace eProsima
                 return *this;
             }
 
-            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
 
         /*!
@@ -727,7 +724,7 @@ namespace eProsima
                 return *this;
             }
 
-            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
 
         /*!
@@ -759,7 +756,7 @@ namespace eProsima
                 return *this;
             }
 
-            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
 
         /*!
@@ -779,7 +776,7 @@ namespace eProsima
                 return *this;
             }
 
-           throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+           throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
 
         /*!
@@ -799,7 +796,7 @@ namespace eProsima
                 return *this;
             }
 
-            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
 
         /*!
@@ -1001,6 +998,12 @@ namespace eProsima
 
         //! @brief The last position in the buffer;
         FastBuffer::iterator m_lastPosition;
+
+        //! @brief Common message for BadParamException exceptions.
+        static const std::string BAD_PARAM_MESSAGE_DEFAULT;
+
+        //! @brief Common message for NotEnoughMemoryException exceptions.
+        static const std::string NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT;
     };
 };
 

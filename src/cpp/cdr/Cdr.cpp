@@ -1,4 +1,4 @@
-#include "cpp/Cdr.h"
+#include "cpp/cdr/Cdr.h"
 #include "cpp/exceptions/NotEnoughMemoryException.h"
 #include "cpp/exceptions/BadParamException.h"
 
@@ -9,6 +9,9 @@ using namespace eProsima;
 #elif defined (__BIG_ENDIAN__)
     const Cdr::Endianness Cdr::DEFAULT_ENDIAN = BIG_ENDIANNESS;
 #endif
+
+const std::string Cdr::BAD_PARAM_MESSAGE_DEFAULT("Bad parameter");
+const std::string Cdr::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT("Not enough memory in the buffer stream");
 
 Cdr::state::state(Cdr &cdr) : m_currentPosition(cdr.m_currentPosition), m_alignPosition(cdr.m_alignPosition),
     m_swapBytes(cdr.m_swapBytes), m_lastDataSize(cdr.m_lastDataSize) {}
@@ -59,7 +62,7 @@ Cdr& Cdr::read_encapsulation()
         }
         else
         {
-            throw BadParamException(BadParamException::BAD_PARAM_MESSAGE_DEFAULT);
+            throw BadParamException(BAD_PARAM_MESSAGE_DEFAULT);
         }
     }
 
@@ -150,7 +153,7 @@ Cdr& Cdr::serialize(const char char_t)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::serialize(const int16_t short_t)
@@ -182,7 +185,7 @@ Cdr& Cdr::serialize(const int16_t short_t)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::serialize(const int16_t short_t, Endianness endianness)
@@ -235,7 +238,7 @@ Cdr& Cdr::serialize(const int32_t long_t)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::serialize(const int32_t long_t, Endianness endianness)
@@ -292,7 +295,7 @@ Cdr& Cdr::serialize(const int64_t longlong_t)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::serialize(const int64_t longlong_t, Endianness endianness)
@@ -345,7 +348,7 @@ Cdr& Cdr::serialize(const float float_t)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::serialize(const float float_t, Endianness endianness)
@@ -402,7 +405,7 @@ Cdr& Cdr::serialize(const double double_t)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::serialize(const double double_t, Endianness endianness)
@@ -440,7 +443,7 @@ Cdr& Cdr::serialize(const bool bool_t)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::serialize(const std::string &string_t)
@@ -463,7 +466,7 @@ Cdr& Cdr::serialize(const std::string &string_t)
         else
         {
             setState(state);
-            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
     }
 
@@ -503,7 +506,7 @@ Cdr& Cdr::serializeArray(const char *char_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::serializeArray(const int16_t *short_t, size_t numElements)
@@ -541,7 +544,7 @@ Cdr& Cdr::serializeArray(const int16_t *short_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::serializeArray(const int16_t *short_t, size_t numElements, Endianness endianness)
@@ -600,7 +603,7 @@ Cdr& Cdr::serializeArray(const int32_t *long_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::serializeArray(const int32_t *long_t, size_t numElements, Endianness endianness)
@@ -663,7 +666,7 @@ Cdr& Cdr::serializeArray(const int64_t *longlong_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::serializeArray(const int64_t *longlong_t, size_t numElements, Endianness endianness)
@@ -722,7 +725,7 @@ Cdr& Cdr::serializeArray(const float *float_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::serializeArray(const float *float_t, size_t numElements, Endianness endianness)
@@ -785,7 +788,7 @@ Cdr& Cdr::serializeArray(const double *double_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::serializeArray(const double *double_t, size_t numElements, Endianness endianness)
@@ -818,7 +821,7 @@ Cdr& Cdr::deserialize(char &char_t)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::deserialize(int16_t &short_t)
@@ -850,7 +853,7 @@ Cdr& Cdr::deserialize(int16_t &short_t)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::deserialize(int16_t &short_t, Endianness endianness)
@@ -903,7 +906,7 @@ Cdr& Cdr::deserialize(int32_t &long_t)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::deserialize(int32_t &long_t, Endianness endianness)
@@ -960,7 +963,7 @@ Cdr& Cdr::deserialize(int64_t &longlong_t)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::deserialize(int64_t &longlong_t, Endianness endianness)
@@ -1013,7 +1016,7 @@ Cdr& Cdr::deserialize(float &float_t)
         return *this;
     }
 
-   throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+   throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::deserialize(float &float_t, Endianness endianness)
@@ -1070,7 +1073,7 @@ Cdr& Cdr::deserialize(double &double_t)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::deserialize(double &double_t, Endianness endianness)
@@ -1114,10 +1117,10 @@ Cdr& Cdr::deserialize(bool &bool_t)
             return *this;
         }
 
-        throw BadParamException(BadParamException::BAD_PARAM_MESSAGE_DEFAULT);
+        throw BadParamException(BAD_PARAM_MESSAGE_DEFAULT);
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::deserialize(std::string &string_t)
@@ -1143,7 +1146,7 @@ Cdr& Cdr::deserialize(std::string &string_t)
     }
 
     setState(state);
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::deserialize(std::string &string_t, Endianness endianness)
@@ -1179,7 +1182,7 @@ Cdr& Cdr::deserializeArray(char *char_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::deserializeArray(int16_t *short_t, size_t numElements)
@@ -1217,7 +1220,7 @@ Cdr& Cdr::deserializeArray(int16_t *short_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::deserializeArray(int16_t *short_t, size_t numElements, Endianness endianness)
@@ -1276,7 +1279,7 @@ Cdr& Cdr::deserializeArray(int32_t *long_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::deserializeArray(int32_t *long_t, size_t numElements, Endianness endianness)
@@ -1339,7 +1342,7 @@ Cdr& Cdr::deserializeArray(int64_t *longlong_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::deserializeArray(int64_t *longlong_t, size_t numElements, Endianness endianness)
@@ -1398,7 +1401,7 @@ Cdr& Cdr::deserializeArray(float *float_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::deserializeArray(float *float_t, size_t numElements, Endianness endianness)
@@ -1461,7 +1464,7 @@ Cdr& Cdr::deserializeArray(double *double_t, size_t numElements)
         return *this;
     }
 
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::deserializeArray(double *double_t, size_t numElements, Endianness endianness)

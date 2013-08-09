@@ -2,7 +2,8 @@
 #include "cpp/exceptions/NotEnoughMemoryException.h"
 #include "cpp/exceptions/BadParamException.h"
 
-using namespace eProsima;
+using namespace eProsima::marshalling;
+using namespace eProsima::storage;
 
 #if defined(__LITTLE_ENDIAN__)
     const Cdr::Endianness Cdr::DEFAULT_ENDIAN = LITTLE_ENDIANNESS;
@@ -13,14 +14,27 @@ using namespace eProsima;
 const std::string Cdr::BAD_PARAM_MESSAGE_DEFAULT("Bad parameter");
 const std::string Cdr::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT("Not enough memory in the buffer stream");
 
-Cdr::state::state(Cdr &cdr) : m_currentPosition(cdr.m_currentPosition), m_alignPosition(cdr.m_alignPosition),
+Cdr::state::state(Cdr &cdr) : m_currentPosition(cdr.m_storage.clone(cdr.m_currentPosition)), m_alignPosition(cdr.m_storage.clone(cdr.m_alignPosition)),
     m_swapBytes(cdr.m_swapBytes), m_lastDataSize(cdr.m_lastDataSize) {}
 
-Cdr::Cdr(FastBuffer &cdrBuffer, const Endianness endianness, const CdrType cdrType) : m_cdrBuffer(cdrBuffer),
-    m_cdrType(cdrType), m_plFlag(DDS_CDR_WITHOUT_PL), m_options(0), m_endianness(endianness),
-    m_swapBytes(endianness == DEFAULT_ENDIAN ? false : true), m_lastDataSize(0), m_currentPosition(cdrBuffer.begin()),
-    m_alignPosition(cdrBuffer.begin()), m_lastPosition(cdrBuffer.end())
+Cdr::state::~state()
 {
+    delete &m_currentPosition;
+    delete &m_alignPosition;
+}
+
+Cdr::Cdr(Storage &storage, const Endianness endianness, const CdrType cdrType) : m_storage(storage),
+    m_cdrType(cdrType), m_plFlag(DDS_CDR_WITHOUT_PL), m_options(0), m_endianness(endianness),
+    m_swapBytes(endianness == DEFAULT_ENDIAN ? false : true), m_lastDataSize(0), m_currentPosition(storage.begin()),
+    m_alignPosition(storage.begin()), m_lastPosition(storage.end())
+{
+}
+
+Cdr::~Cdr()
+{
+    delete &m_currentPosition;
+    delete &m_alignPosition;
+    delete &m_lastPosition;
 }
 
 Cdr& Cdr::read_encapsulation()
@@ -103,9 +117,18 @@ bool Cdr::jump(uint32_t numBytes)
     return returnedValue;
 }
 
-char* Cdr::getCurrentPosition()
+//TODO
+/*char* Cdr::getCurrentPosition()
 {
     return &m_currentPosition;
+}*/
+
+size_t Cdr::getSerializedDataLength() const
+{
+    Storage::iterator &tmp = m_storage.begin();
+    size_t returnedSize =  m_currentPosition - tmp;
+    delete &tmp;
+    return returnedSize;
 }
 
 Cdr::state Cdr::getState()
@@ -123,19 +146,26 @@ void Cdr::setState(state &state)
 
 void Cdr::reset()
 {
-    m_currentPosition = m_cdrBuffer.begin();
-    m_alignPosition = m_cdrBuffer.begin();
+    delete &m_currentPosition;
+    m_currentPosition = m_storage.begin();
+    delete &m_alignPosition;
+    m_alignPosition = m_storage.begin();
     m_swapBytes = m_endianness == DEFAULT_ENDIAN ? false : true;
     m_lastDataSize = 0;
 }
 
 bool Cdr::resize(size_t minSizeInc)
 {
-    if(m_cdrBuffer.resize(minSizeInc))
+    if(m_storage.resize(minSizeInc))
     {
-        m_currentPosition << m_cdrBuffer.begin();
-        m_alignPosition << m_cdrBuffer.begin();
-        m_lastPosition = m_cdrBuffer.end();
+        Storage::iterator &tmp = m_storage.begin();
+
+        m_currentPosition << tmp;
+        m_alignPosition << tmp;
+        delete &m_lastPosition;
+        m_lastPosition = m_storage.end();
+        
+        delete &tmp;
         return true;
     }
     
@@ -149,7 +179,7 @@ Cdr& Cdr::serialize(const char char_t)
         // Save last datasize.
         m_lastDataSize = sizeof(char_t);
 
-        m_currentPosition++ << char_t;
+        m_storage.insert(m_currentPosition, char_t);
         return *this;
     }
 
@@ -173,13 +203,12 @@ Cdr& Cdr::serialize(const int16_t short_t)
         {    
             const char *dst = reinterpret_cast<const char*>(&short_t);
 
-            m_currentPosition++ << dst[1];
-            m_currentPosition++ << dst[0];
+            m_storage.insert(m_currentPosition, dst[1]);
+            m_storage.insert(m_currentPosition, dst[0]);
         }
         else
         {
-            m_currentPosition << short_t;
-            m_currentPosition += sizeof(short_t);
+            m_storage.insert(m_currentPosition, short_t);
         }
 
         return *this;
@@ -224,15 +253,14 @@ Cdr& Cdr::serialize(const int32_t long_t)
         {
             const char *dst = reinterpret_cast<const char*>(&long_t);
 
-            m_currentPosition++ << dst[3];
-            m_currentPosition++ << dst[2];
-            m_currentPosition++ << dst[1];
-            m_currentPosition++ << dst[0];
+            m_storage.insert(m_currentPosition, dst[3]);
+            m_storage.insert(m_currentPosition, dst[2]);
+            m_storage.insert(m_currentPosition, dst[1]);
+            m_storage.insert(m_currentPosition, dst[0]);
         }
         else
         {
-            m_currentPosition << long_t;
-            m_currentPosition += sizeof(long_t);
+            m_storage.insert(m_currentPosition, long_t);
         }
 
         return *this;
@@ -277,19 +305,18 @@ Cdr& Cdr::serialize(const int64_t longlong_t)
         {
             const char *dst = reinterpret_cast<const char*>(&longlong_t);
 
-            m_currentPosition++ << dst[7];
-            m_currentPosition++ << dst[6];
-            m_currentPosition++ << dst[5];
-            m_currentPosition++ << dst[4];
-            m_currentPosition++ << dst[3];
-            m_currentPosition++ << dst[2];
-            m_currentPosition++ << dst[1];
-            m_currentPosition++ << dst[0];
+            m_storage.insert(m_currentPosition, dst[7]);
+            m_storage.insert(m_currentPosition, dst[6]);
+            m_storage.insert(m_currentPosition, dst[5]);
+            m_storage.insert(m_currentPosition, dst[4]);
+            m_storage.insert(m_currentPosition, dst[3]);
+            m_storage.insert(m_currentPosition, dst[2]);
+            m_storage.insert(m_currentPosition, dst[1]);
+            m_storage.insert(m_currentPosition, dst[0]);
         }
         else
         {
-            m_currentPosition << longlong_t;
-            m_currentPosition += sizeof(longlong_t);
+            m_storage.insert(m_currentPosition, longlong_t);
         }
 
         return *this;
@@ -334,15 +361,14 @@ Cdr& Cdr::serialize(const float float_t)
         {
             const char *dst = reinterpret_cast<const char*>(&float_t);
 
-            m_currentPosition++ << dst[3];
-            m_currentPosition++ << dst[2];
-            m_currentPosition++ << dst[1];
-            m_currentPosition++ << dst[0];
+            m_storage.insert(m_currentPosition, dst[3]);
+            m_storage.insert(m_currentPosition, dst[2]);
+            m_storage.insert(m_currentPosition, dst[1]);
+            m_storage.insert(m_currentPosition, dst[0]);
         }
         else
         {
-            m_currentPosition << float_t;
-            m_currentPosition += sizeof(float_t);
+            m_storage.insert(m_currentPosition, float_t);
         }
 
         return *this;
@@ -387,19 +413,18 @@ Cdr& Cdr::serialize(const double double_t)
         {
             const char *dst = reinterpret_cast<const char*>(&double_t);
 
-            m_currentPosition++ << dst[7];
-            m_currentPosition++ << dst[6];
-            m_currentPosition++ << dst[5];
-            m_currentPosition++ << dst[4];
-            m_currentPosition++ << dst[3];
-            m_currentPosition++ << dst[2];
-            m_currentPosition++ << dst[1];
-            m_currentPosition++ << dst[0];
+            m_storage.insert(m_currentPosition, dst[7]);
+            m_storage.insert(m_currentPosition, dst[6]);
+            m_storage.insert(m_currentPosition, dst[5]);
+            m_storage.insert(m_currentPosition, dst[4]);
+            m_storage.insert(m_currentPosition, dst[3]);
+            m_storage.insert(m_currentPosition, dst[2]);
+            m_storage.insert(m_currentPosition, dst[1]);
+            m_storage.insert(m_currentPosition, dst[0]);
         }
         else
         {
-            m_currentPosition << double_t;
-            m_currentPosition += sizeof(double_t);
+            m_storage.insert(m_currentPosition, double_t);
         }
 
         return *this;
@@ -438,7 +463,7 @@ Cdr& Cdr::serialize(const bool bool_t)
 
         if(bool_t)
             value = 1;
-        m_currentPosition++ << value;
+        m_storage.insert(m_currentPosition, value);
 
         return *this;
     }
@@ -460,8 +485,7 @@ Cdr& Cdr::serialize(const std::string &string_t)
             // Save last datasize.
             m_lastDataSize = sizeof(uint8_t);
 
-            m_currentPosition.memcopy(string_t.c_str(), length);
-            m_currentPosition += length;
+            m_storage.memcopy(m_currentPosition, string_t.c_str(), length);
         }
         else
         {
@@ -501,8 +525,7 @@ Cdr& Cdr::serializeArray(const char *char_t, size_t numElements)
         // Save last datasize.
         m_lastDataSize = sizeof(*char_t);
 
-        m_currentPosition.memcopy(char_t, totalSize);
-        m_currentPosition += totalSize;
+        m_storage.memcopy(m_currentPosition, char_t, totalSize);
         return *this;
     }
 
@@ -531,14 +554,13 @@ Cdr& Cdr::serializeArray(const int16_t *short_t, size_t numElements)
 
             for(; dst < end; dst += sizeof(*short_t))
             {
-                m_currentPosition++ << dst[1];
-                m_currentPosition++ << dst[0];
+                m_storage.insert(m_currentPosition, dst[1]);
+                m_storage.insert(m_currentPosition, dst[0]);
             }
         }
         else
         {
-            m_currentPosition.memcopy(short_t, totalSize);
-            m_currentPosition += totalSize;
+            m_storage.memcopy(m_currentPosition, short_t, totalSize);
         }
 
         return *this;
@@ -588,16 +610,15 @@ Cdr& Cdr::serializeArray(const int32_t *long_t, size_t numElements)
 
             for(; dst < end; dst += sizeof(*long_t))
             {
-                m_currentPosition++ << dst[3];
-                m_currentPosition++ << dst[2];
-                m_currentPosition++ << dst[1];
-                m_currentPosition++ << dst[0];
+                m_storage.insert(m_currentPosition, dst[3]);
+                m_storage.insert(m_currentPosition, dst[2]);
+                m_storage.insert(m_currentPosition, dst[1]);
+                m_storage.insert(m_currentPosition, dst[0]);
             }
         }
         else
         {
-            m_currentPosition.memcopy(long_t, totalSize);
-            m_currentPosition += totalSize;
+            m_storage.memcopy(m_currentPosition, long_t, totalSize);
         }
 
         return *this;
@@ -647,20 +668,19 @@ Cdr& Cdr::serializeArray(const int64_t *longlong_t, size_t numElements)
 
             for(; dst < end; dst += sizeof(*longlong_t))
             {
-                m_currentPosition++ << dst[7];
-                m_currentPosition++ << dst[6];
-                m_currentPosition++ << dst[5];
-                m_currentPosition++ << dst[4];
-                m_currentPosition++ << dst[3];
-                m_currentPosition++ << dst[2];
-                m_currentPosition++ << dst[1];
-                m_currentPosition++ << dst[0];
+                m_storage.insert(m_currentPosition, dst[7]);
+                m_storage.insert(m_currentPosition, dst[6]);
+                m_storage.insert(m_currentPosition, dst[5]);
+                m_storage.insert(m_currentPosition, dst[4]);
+                m_storage.insert(m_currentPosition, dst[3]);
+                m_storage.insert(m_currentPosition, dst[2]);
+                m_storage.insert(m_currentPosition, dst[1]);
+                m_storage.insert(m_currentPosition, dst[0]);
             }
         }
         else
         {
-            m_currentPosition.memcopy(longlong_t, totalSize);
-            m_currentPosition += totalSize;
+            m_storage.memcopy(m_currentPosition, longlong_t, totalSize);
         }
 
         return *this;
@@ -710,16 +730,15 @@ Cdr& Cdr::serializeArray(const float *float_t, size_t numElements)
 
             for(; dst < end; dst += sizeof(*float_t))
             {
-                m_currentPosition++ << dst[3];
-                m_currentPosition++ << dst[2];
-                m_currentPosition++ << dst[1];
-                m_currentPosition++ << dst[0];
+                m_storage.insert(m_currentPosition, dst[3]);
+                m_storage.insert(m_currentPosition, dst[2]);
+                m_storage.insert(m_currentPosition, dst[1]);
+                m_storage.insert(m_currentPosition, dst[0]);
             }
         }
         else
         {
-            m_currentPosition.memcopy(float_t, totalSize);
-            m_currentPosition += totalSize;
+            m_storage.memcopy(m_currentPosition, float_t, totalSize);
         }
 
         return *this;
@@ -769,20 +788,19 @@ Cdr& Cdr::serializeArray(const double *double_t, size_t numElements)
 
             for(; dst < end; dst += sizeof(*double_t))
             {
-                m_currentPosition++ << dst[7];
-                m_currentPosition++ << dst[6];
-                m_currentPosition++ << dst[5];
-                m_currentPosition++ << dst[4];
-                m_currentPosition++ << dst[3];
-                m_currentPosition++ << dst[2];
-                m_currentPosition++ << dst[1];
-                m_currentPosition++ << dst[0];
+                m_storage.insert(m_currentPosition, dst[7]);
+                m_storage.insert(m_currentPosition, dst[6]);
+                m_storage.insert(m_currentPosition, dst[5]);
+                m_storage.insert(m_currentPosition, dst[4]);
+                m_storage.insert(m_currentPosition, dst[3]);
+                m_storage.insert(m_currentPosition, dst[2]);
+                m_storage.insert(m_currentPosition, dst[1]);
+                m_storage.insert(m_currentPosition, dst[0]);
             }
         }
         else
         {
-            m_currentPosition.memcopy(double_t, totalSize);
-            m_currentPosition += totalSize;
+            m_storage.memcopy(m_currentPosition, double_t, totalSize);
         }
 
         return *this;
@@ -817,7 +835,7 @@ Cdr& Cdr::deserialize(char &char_t)
         // Save last datasize.
         m_lastDataSize = sizeof(char_t);
 
-        m_currentPosition++ >> char_t;
+        m_storage.get(m_currentPosition, char_t);
         return *this;
     }
 
@@ -841,13 +859,12 @@ Cdr& Cdr::deserialize(int16_t &short_t)
         {    
             char *dst = reinterpret_cast<char*>(&short_t);
 
-            m_currentPosition++ >> dst[1];
-            m_currentPosition++ >> dst[0];
+            m_storage.get(m_currentPosition, dst[1]);
+            m_storage.get(m_currentPosition, dst[0]);
         }
         else
         {
-            m_currentPosition >> short_t;
-            m_currentPosition += sizeof(short_t);
+            m_storage.get(m_currentPosition, short_t);
         }
 
         return *this;
@@ -892,15 +909,14 @@ Cdr& Cdr::deserialize(int32_t &long_t)
         {
             char *dst = reinterpret_cast<char*>(&long_t);
 
-            m_currentPosition++ >> dst[3];
-            m_currentPosition++ >> dst[2];
-            m_currentPosition++ >> dst[1];
-            m_currentPosition++ >> dst[0];
+            m_storage.get(m_currentPosition, dst[3]);
+            m_storage.get(m_currentPosition, dst[2]);
+            m_storage.get(m_currentPosition, dst[1]);
+            m_storage.get(m_currentPosition, dst[0]);
         }
         else
         {
-            m_currentPosition >> long_t;
-            m_currentPosition += sizeof(long_t);
+            m_storage.get(m_currentPosition, long_t);
         }
 
         return *this;
@@ -945,19 +961,18 @@ Cdr& Cdr::deserialize(int64_t &longlong_t)
         {
             char *dst = reinterpret_cast<char*>(&longlong_t);
 
-            m_currentPosition++ >> dst[7];
-            m_currentPosition++ >> dst[6];
-            m_currentPosition++ >> dst[5];
-            m_currentPosition++ >> dst[4];
-            m_currentPosition++ >> dst[3];
-            m_currentPosition++ >> dst[2];
-            m_currentPosition++ >> dst[1];
-            m_currentPosition++ >> dst[0];
+            m_storage.get(m_currentPosition, dst[7]);
+            m_storage.get(m_currentPosition, dst[6]);
+            m_storage.get(m_currentPosition, dst[5]);
+            m_storage.get(m_currentPosition, dst[4]);
+            m_storage.get(m_currentPosition, dst[3]);
+            m_storage.get(m_currentPosition, dst[2]);
+            m_storage.get(m_currentPosition, dst[1]);
+            m_storage.get(m_currentPosition, dst[0]);
         }
         else
         {
-            m_currentPosition >> longlong_t;
-            m_currentPosition += sizeof(longlong_t);
+            m_storage.get(m_currentPosition, longlong_t);
         }
 
         return *this;
@@ -1002,15 +1017,14 @@ Cdr& Cdr::deserialize(float &float_t)
         {
             char *dst = reinterpret_cast<char*>(&float_t);
 
-            m_currentPosition++ >> dst[3];
-            m_currentPosition++ >> dst[2];
-            m_currentPosition++ >> dst[1];
-            m_currentPosition++ >> dst[0];
+            m_storage.get(m_currentPosition, dst[3]);
+            m_storage.get(m_currentPosition, dst[2]);
+            m_storage.get(m_currentPosition, dst[1]);
+            m_storage.get(m_currentPosition, dst[0]);
         }
         else
         {
-            m_currentPosition >> float_t;
-            m_currentPosition += sizeof(float_t);
+            m_storage.get(m_currentPosition, float_t);
         }
 
         return *this;
@@ -1055,19 +1069,18 @@ Cdr& Cdr::deserialize(double &double_t)
         {
             char *dst = reinterpret_cast<char*>(&double_t);
 
-            m_currentPosition++ >> dst[7];
-            m_currentPosition++ >> dst[6];
-            m_currentPosition++ >> dst[5];
-            m_currentPosition++ >> dst[4];
-            m_currentPosition++ >> dst[3];
-            m_currentPosition++ >> dst[2];
-            m_currentPosition++ >> dst[1];
-            m_currentPosition++ >> dst[0];
+            m_storage.get(m_currentPosition, dst[7]);
+            m_storage.get(m_currentPosition, dst[6]);
+            m_storage.get(m_currentPosition, dst[5]);
+            m_storage.get(m_currentPosition, dst[4]);
+            m_storage.get(m_currentPosition, dst[3]);
+            m_storage.get(m_currentPosition, dst[2]);
+            m_storage.get(m_currentPosition, dst[1]);
+            m_storage.get(m_currentPosition, dst[0]);
         }
         else
         {
-            m_currentPosition >> double_t;
-            m_currentPosition += sizeof(double_t);
+            m_storage.get(m_currentPosition, double_t);
         }
 
         return *this;
@@ -1104,7 +1117,7 @@ Cdr& Cdr::deserialize(bool &bool_t)
         // Save last datasize.
         m_lastDataSize = sizeof(uint8_t);
 
-        m_currentPosition++ >> value;
+        m_storage.get(m_currentPosition, value);
 
         if(value == 1)
         {
@@ -1140,7 +1153,8 @@ Cdr& Cdr::deserialize(std::string &string_t)
         // Save last datasize.
         m_lastDataSize = sizeof(uint8_t);
 
-        string_t = std::string(&m_currentPosition, length - ((&m_currentPosition)[length-1] == '\0' ? 1 : 0));
+        //TODO
+        //string_t = std::string(&m_currentPosition, length - ((&m_currentPosition)[length-1] == '\0' ? 1 : 0));
         m_currentPosition += length;
         return *this;
     }
@@ -1177,8 +1191,7 @@ Cdr& Cdr::deserializeArray(char *char_t, size_t numElements)
         // Save last datasize.
         m_lastDataSize = sizeof(*char_t);
 
-        m_currentPosition.rmemcopy(char_t, totalSize);
-        m_currentPosition += totalSize;
+        m_storage.rmemcopy(m_currentPosition, char_t, totalSize);
         return *this;
     }
 
@@ -1207,14 +1220,13 @@ Cdr& Cdr::deserializeArray(int16_t *short_t, size_t numElements)
 
             for(; dst < end; dst += sizeof(*short_t))
             {
-                m_currentPosition++ >> dst[1];
-                m_currentPosition++ >> dst[0];
+                m_storage.get(m_currentPosition, dst[1]);
+                m_storage.get(m_currentPosition, dst[0]);
             }
         }
         else
         {
-            m_currentPosition.rmemcopy(short_t, totalSize);
-            m_currentPosition += totalSize;
+            m_storage.rmemcopy(m_currentPosition, short_t, totalSize);
         }
 
         return *this;
@@ -1264,16 +1276,15 @@ Cdr& Cdr::deserializeArray(int32_t *long_t, size_t numElements)
 
             for(; dst < end; dst += sizeof(*long_t))
             {
-                m_currentPosition++ >> dst[3];
-                m_currentPosition++ >> dst[2];
-                m_currentPosition++ >> dst[1];
-                m_currentPosition++ >> dst[0];
+                m_storage.get(m_currentPosition, dst[3]);
+                m_storage.get(m_currentPosition, dst[2]);
+                m_storage.get(m_currentPosition, dst[1]);
+                m_storage.get(m_currentPosition, dst[0]);
             }
         }
         else
         {
-            m_currentPosition.rmemcopy(long_t, totalSize);
-            m_currentPosition += totalSize;
+            m_storage.rmemcopy(m_currentPosition, long_t, totalSize);
         }
 
         return *this;
@@ -1323,20 +1334,19 @@ Cdr& Cdr::deserializeArray(int64_t *longlong_t, size_t numElements)
 
             for(; dst < end; dst += sizeof(*longlong_t))
             {
-                m_currentPosition++ >> dst[7];
-                m_currentPosition++ >> dst[6];
-                m_currentPosition++ >> dst[5];
-                m_currentPosition++ >> dst[4];
-                m_currentPosition++ >> dst[3];
-                m_currentPosition++ >> dst[2];
-                m_currentPosition++ >> dst[1];
-                m_currentPosition++ >> dst[0];
+                m_storage.get(m_currentPosition, dst[7]);
+                m_storage.get(m_currentPosition, dst[6]);
+                m_storage.get(m_currentPosition, dst[5]);
+                m_storage.get(m_currentPosition, dst[4]);
+                m_storage.get(m_currentPosition, dst[3]);
+                m_storage.get(m_currentPosition, dst[2]);
+                m_storage.get(m_currentPosition, dst[1]);
+                m_storage.get(m_currentPosition, dst[0]);
             }
         }
         else
         {
-            m_currentPosition.rmemcopy(longlong_t, totalSize);
-            m_currentPosition += totalSize;
+            m_storage.rmemcopy(m_currentPosition, longlong_t, totalSize);
         }
 
         return *this;
@@ -1386,16 +1396,15 @@ Cdr& Cdr::deserializeArray(float *float_t, size_t numElements)
 
             for(; dst < end; dst += sizeof(*float_t))
             {
-                m_currentPosition++ >> dst[3];
-                m_currentPosition++ >> dst[2];
-                m_currentPosition++ >> dst[1];
-                m_currentPosition++ >> dst[0];
+                m_storage.get(m_currentPosition, dst[3]);
+                m_storage.get(m_currentPosition, dst[2]);
+                m_storage.get(m_currentPosition, dst[1]);
+                m_storage.get(m_currentPosition, dst[0]);
             }
         }
         else
         {
-            m_currentPosition.rmemcopy(float_t, totalSize);
-            m_currentPosition += totalSize;
+            m_storage.rmemcopy(m_currentPosition, float_t, totalSize);
         }
 
         return *this;
@@ -1445,20 +1454,19 @@ Cdr& Cdr::deserializeArray(double *double_t, size_t numElements)
 
             for(; dst < end; dst += sizeof(*double_t))
             {
-                m_currentPosition++ >> dst[7];
-                m_currentPosition++ >> dst[6];
-                m_currentPosition++ >> dst[5];
-                m_currentPosition++ >> dst[4];
-                m_currentPosition++ >> dst[3];
-                m_currentPosition++ >> dst[2];
-                m_currentPosition++ >> dst[1];
-                m_currentPosition++ >> dst[0];
+                m_storage.get(m_currentPosition, dst[7]);
+                m_storage.get(m_currentPosition, dst[6]);
+                m_storage.get(m_currentPosition, dst[5]);
+                m_storage.get(m_currentPosition, dst[4]);
+                m_storage.get(m_currentPosition, dst[3]);
+                m_storage.get(m_currentPosition, dst[2]);
+                m_storage.get(m_currentPosition, dst[1]);
+                m_storage.get(m_currentPosition, dst[0]);
             }
         }
         else
         {
-            m_currentPosition.rmemcopy(double_t, totalSize);
-            m_currentPosition += totalSize;
+            m_storage.rmemcopy(m_currentPosition, double_t, totalSize);
         }
 
         return *this;

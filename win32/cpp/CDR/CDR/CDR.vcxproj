@@ -401,14 +401,12 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\cpp\cdr\Cdr.cpp" />
     <ClCompile Include="..\..\..\..\src\cpp\cdr\FastCdr.cpp" />
-    <ClCompile Include="..\..\..\..\src\cpp\FastBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\include\cpp\cdr\Cdr.h" />
     <ClInclude Include="..\..\..\..\include\cpp\cdr\Cdr_dll.h" />
     <ClInclude Include="..\..\..\..\include\cpp\cdr\Cdr_version.h" />
     <ClInclude Include="..\..\..\..\include\cpp\cdr\FastCdr.h" />
-    <ClInclude Include="..\..\..\..\include\cpp\FastBuffer.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\..\src\cpp\cdr\CDR.rc" />

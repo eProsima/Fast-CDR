@@ -3,14 +3,15 @@
 #include "cpp/exceptions/BadParamException.h"
 #include <string.h>
 
-using namespace eProsima;
+using namespace eProsima::marshalling;
+using namespace eProsima::storage;
 
 const std::string FastCdr::BAD_PARAM_MESSAGE_DEFAULT("Bad parameter");
 const std::string FastCdr::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT("Not enough memory in the buffer stream");
 
 FastCdr::state::state(FastCdr &fastcdr) : m_currentPosition(fastcdr.m_currentPosition) {}
 
-FastCdr::FastCdr(FastBuffer &cdrBuffer) : m_cdrBuffer(cdrBuffer), m_currentPosition(cdrBuffer.begin()), m_lastPosition(cdrBuffer.end())
+FastCdr::FastCdr(Storage &storage) : m_storage(storage), m_currentPosition(storage.begin()), m_lastPosition(storage.end())
 {
 }
 
@@ -27,9 +28,17 @@ bool FastCdr::jump(uint32_t numBytes)
     return returnedValue;
 }
 
-char* FastCdr::getCurrentPosition()
+/*char* FastCdr::getCurrentPosition()
 {
     return &m_currentPosition;
+}*/
+
+size_t FastCdr::getSerializedDataLength() const
+{
+    Storage::iterator &tmp = m_storage.begin();
+    size_t returnedSize =  m_currentPosition - tmp;
+    delete &tmp;
+    return returnedSize;
 }
 
 FastCdr::state FastCdr::getState()
@@ -44,15 +53,21 @@ void FastCdr::setState(FastCdr::state &state)
 
 void FastCdr::reset()
 {
-    m_currentPosition = m_cdrBuffer.begin();
+    delete &m_currentPosition;
+    m_currentPosition = m_storage.begin();
 }
 
 bool FastCdr::resize(size_t minSizeInc)
 {
-    if(m_cdrBuffer.resize(minSizeInc))
+    if(m_storage.resize(minSizeInc))
     {
-        m_currentPosition << m_cdrBuffer.begin();
-        m_lastPosition = m_cdrBuffer.end();
+        Storage::iterator &tmp = m_storage.begin();
+
+        m_currentPosition << tmp;
+        delete &m_lastPosition;
+        m_lastPosition = m_storage.end();
+
+        delete &tmp;
         return true;
     }
     
@@ -67,7 +82,7 @@ FastCdr& FastCdr::serialize(const bool bool_t)
     {
         if(bool_t)
             value = 1;
-        m_currentPosition++ << value;
+        m_storage.insert(m_currentPosition, value);
 
         return *this;
     }
@@ -86,8 +101,7 @@ FastCdr& FastCdr::serialize(const std::string &string_t)
     {
         if(((m_lastPosition - m_currentPosition) >= length) || resize(length))
         {
-            m_currentPosition.memcopy(string_t.c_str(), length);
-            m_currentPosition += length;
+            m_storage.memcopy(m_currentPosition, string_t.c_str(), length);
         }
         else
         {
@@ -105,8 +119,7 @@ FastCdr& FastCdr::serializeArray(const char *char_t, size_t numElements)
 
     if(((m_lastPosition - m_currentPosition) >= totalSize) || resize(totalSize))
     {
-        m_currentPosition.memcopy(char_t, totalSize);
-        m_currentPosition += totalSize;
+        m_storage.memcopy(m_currentPosition, char_t, totalSize);
         return *this;
     }
 
@@ -119,8 +132,7 @@ FastCdr& FastCdr::serializeArray(const int16_t *short_t, size_t numElements)
 
     if(((m_lastPosition - m_currentPosition) >= totalSize) || resize(totalSize))
     {
-        m_currentPosition.memcopy(short_t, totalSize);
-        m_currentPosition += totalSize;
+        m_storage.memcopy(m_currentPosition, short_t, totalSize);
 
         return *this;
     }
@@ -134,8 +146,7 @@ FastCdr& FastCdr::serializeArray(const int32_t *long_t, size_t numElements)
 
     if(((m_lastPosition - m_currentPosition) >= totalSize) || resize(totalSize))
     {
-        m_currentPosition.memcopy(long_t, totalSize);
-        m_currentPosition += totalSize;
+        m_storage.memcopy(m_currentPosition, long_t, totalSize);
 
         return *this;
     }
@@ -149,8 +160,7 @@ FastCdr& FastCdr::serializeArray(const int64_t *longlong_t, size_t numElements)
 
     if(((m_lastPosition - m_currentPosition) >= totalSize) || resize(totalSize))
     {
-        m_currentPosition.memcopy(longlong_t, totalSize);
-        m_currentPosition += totalSize;
+        m_storage.memcopy(m_currentPosition, longlong_t, totalSize);
 
         return *this;
     }
@@ -164,8 +174,7 @@ FastCdr& FastCdr::serializeArray(const float *float_t, size_t numElements)
 
     if(((m_lastPosition - m_currentPosition) >= totalSize) || resize(totalSize))
     {
-        m_currentPosition.memcopy(float_t, totalSize);
-        m_currentPosition += totalSize;
+        m_storage.memcopy(m_currentPosition, float_t, totalSize);
 
         return *this;
     }
@@ -179,8 +188,7 @@ FastCdr& FastCdr::serializeArray(const double *double_t, size_t numElements)
 
     if(((m_lastPosition - m_currentPosition) >= totalSize) || resize(totalSize))
     {
-        m_currentPosition.memcopy(double_t, totalSize);
-        m_currentPosition += totalSize;
+        m_storage.memcopy(m_currentPosition, double_t, totalSize);
 
         return *this;
     }
@@ -194,7 +202,7 @@ FastCdr& FastCdr::deserialize(bool &bool_t)
 
     if((m_lastPosition - m_currentPosition) >= sizeof(uint8_t))
     {
-        m_currentPosition++ >> value;
+        m_storage.get(m_currentPosition, value);
 
         if(value == 1)
         {
@@ -227,7 +235,8 @@ FastCdr& FastCdr::deserialize(std::string &string_t)
     }
     else if((m_lastPosition - m_currentPosition) >= length)
     {
-        string_t = std::string(&m_currentPosition, length - ((&m_currentPosition)[length-1] == '\0' ? 1 : 0));
+        //TODO
+        //string_t = std::string(&m_currentPosition, length - ((&m_currentPosition)[length-1] == '\0' ? 1 : 0));
         m_currentPosition += length;
         return *this;
     }
@@ -242,8 +251,7 @@ FastCdr& FastCdr::deserializeArray(char *char_t, size_t numElements)
 
     if((m_lastPosition - m_currentPosition) >= totalSize)
     {
-        m_currentPosition.rmemcopy(char_t, totalSize);
-        m_currentPosition += totalSize;
+        m_storage.rmemcopy(m_currentPosition, char_t, totalSize);
         return *this;
     }
 
@@ -256,8 +264,7 @@ FastCdr& FastCdr::deserializeArray(int16_t *short_t, size_t numElements)
 
     if((m_lastPosition - m_currentPosition) >= totalSize)
     {
-        m_currentPosition.rmemcopy(short_t, totalSize);
-        m_currentPosition += totalSize;
+        m_storage.rmemcopy(m_currentPosition, short_t, totalSize);
 
         return *this;
     }
@@ -271,8 +278,7 @@ FastCdr& FastCdr::deserializeArray(int32_t *long_t, size_t numElements)
 
     if((m_lastPosition - m_currentPosition) >= totalSize)
     {
-        m_currentPosition.rmemcopy(long_t, totalSize);
-        m_currentPosition += totalSize;
+        m_storage.rmemcopy(m_currentPosition, long_t, totalSize);
 
         return *this;
     }
@@ -286,8 +292,7 @@ FastCdr& FastCdr::deserializeArray(int64_t *longlong_t, size_t numElements)
 
     if((m_lastPosition - m_currentPosition) >= totalSize)
     {
-        m_currentPosition.rmemcopy(longlong_t, totalSize);
-        m_currentPosition += totalSize;
+        m_storage.rmemcopy(m_currentPosition, longlong_t, totalSize);
 
         return *this;
     }
@@ -301,8 +306,7 @@ FastCdr& FastCdr::deserializeArray(float *float_t, size_t numElements)
 
     if((m_lastPosition - m_currentPosition) >= totalSize)
     {
-        m_currentPosition.rmemcopy(float_t, totalSize);
-        m_currentPosition += totalSize;
+        m_storage.rmemcopy(m_currentPosition, float_t, totalSize);
 
         return *this;
     }
@@ -316,8 +320,7 @@ FastCdr& FastCdr::deserializeArray(double *double_t, size_t numElements)
 
     if((m_lastPosition - m_currentPosition) >= totalSize)
     {
-        m_currentPosition.rmemcopy(double_t, totalSize);
-        m_currentPosition += totalSize;
+        m_storage.rmemcopy(m_currentPosition, double_t, totalSize);
 
         return *this;
     }

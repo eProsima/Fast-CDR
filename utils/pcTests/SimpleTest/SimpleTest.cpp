@@ -1,4 +1,5 @@
-﻿#include "cpp/Cdr.h"
+﻿#include "cpp/storage/FastBuffer.h"
+#include "cpp/cdr/Cdr.h"
 #include "cpp/exceptions/Exception.h"
 
 #include <stdio.h>
@@ -6,6 +7,8 @@
 #include <iostream>
 
 using namespace eProsima;
+using namespace eProsima::marshalling;
+using namespace eProsima::storage;
 
 #define BUFFER_LENGTH 2000
 

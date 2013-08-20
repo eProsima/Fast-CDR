@@ -29,9 +29,9 @@ bool FastCdr::jump(uint32_t numBytes)
 }
 
 /*char* FastCdr::getCurrentPosition()
-{
-    return &m_currentPosition;
-}*/
+  {
+  return &m_currentPosition;
+  }*/
 
 size_t FastCdr::getSerializedDataLength() const
 {
@@ -70,11 +70,11 @@ bool FastCdr::resize(size_t minSizeInc)
         delete &tmp;
         return true;
     }
-    
+
     return false;
 }
 
-FastCdr& FastCdr::serialize(const bool bool_t)
+Marshalling& FastCdr::serialize(const bool bool_t)
 {
     uint8_t value = 0;
 
@@ -90,7 +90,7 @@ FastCdr& FastCdr::serialize(const bool bool_t)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-FastCdr& FastCdr::serialize(const std::string &string_t)
+Marshalling& FastCdr::serialize(const std::string &string_t)
 {
     uint32_t length = (uint32_t)string_t.length();
     FastCdr::state state(*this);
@@ -101,7 +101,7 @@ FastCdr& FastCdr::serialize(const std::string &string_t)
     {
         if(((m_lastPosition - m_currentPosition) >= length) || resize(length))
         {
-            m_storage.memcopy(m_currentPosition, string_t.c_str(), length);
+            m_storage.insert(m_currentPosition, string_t);
         }
         else
         {
@@ -113,7 +113,197 @@ FastCdr& FastCdr::serialize(const std::string &string_t)
     return *this;
 }
 
-FastCdr& FastCdr::serializeArray(const char *char_t, size_t numElements)
+Marshalling& FastCdr::serialize(const std::vector<uint8_t> &vector_t)
+{
+    FastCdr::state state(*this);
+
+    serialize((int32_t)vector_t.size());
+
+    try
+    {
+        return serializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& FastCdr::serialize(const std::vector<char> &vector_t)
+{
+    FastCdr::state state(*this);
+
+    serialize((int32_t)vector_t.size());
+
+    try
+    {
+        return serializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& FastCdr::serialize(const std::vector<uint16_t> &vector_t)
+{
+    FastCdr::state state(*this);
+
+    serialize((int32_t)vector_t.size());
+
+    try
+    {
+        return serializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& FastCdr::serialize(const std::vector<int16_t> &vector_t)
+{
+    FastCdr::state state(*this);
+
+    serialize((int32_t)vector_t.size());
+
+    try
+    {
+        return serializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& FastCdr::serialize(const std::vector<uint32_t> &vector_t)
+{
+    FastCdr::state state(*this);
+
+    serialize((int32_t)vector_t.size());
+
+    try
+    {
+        return serializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& FastCdr::serialize(const std::vector<int32_t> &vector_t)
+{
+    FastCdr::state state(*this);
+
+    serialize((int32_t)vector_t.size());
+
+    try
+    {
+        return serializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& FastCdr::serialize(const std::vector<uint64_t> &vector_t)
+{
+    FastCdr::state state(*this);
+
+    serialize((int32_t)vector_t.size());
+
+    try
+    {
+        return serializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& FastCdr::serialize(const std::vector<int64_t> &vector_t)
+{
+    FastCdr::state state(*this);
+
+    serialize((int32_t)vector_t.size());
+
+    try
+    {
+        return serializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& FastCdr::serialize(const std::vector<float> &vector_t)
+{
+    FastCdr::state state(*this);
+
+    serialize((int32_t)vector_t.size());
+
+    try
+    {
+        return serializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& FastCdr::serialize(const std::vector<double> &vector_t)
+{
+    FastCdr::state state(*this);
+
+    serialize((int32_t)vector_t.size());
+
+    try
+    {
+        return serializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& FastCdr::serializeArray(const char *char_t, size_t numElements)
 {
     size_t totalSize = sizeof(*char_t)*numElements;
 
@@ -126,7 +316,7 @@ FastCdr& FastCdr::serializeArray(const char *char_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-FastCdr& FastCdr::serializeArray(const int16_t *short_t, size_t numElements)
+Marshalling& FastCdr::serializeArray(const int16_t *short_t, size_t numElements)
 {
     size_t totalSize = sizeof(*short_t) * numElements;
 
@@ -140,7 +330,7 @@ FastCdr& FastCdr::serializeArray(const int16_t *short_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-FastCdr& FastCdr::serializeArray(const int32_t *long_t, size_t numElements)
+Marshalling& FastCdr::serializeArray(const int32_t *long_t, size_t numElements)
 {
     size_t totalSize = sizeof(*long_t) * numElements;
 
@@ -154,7 +344,7 @@ FastCdr& FastCdr::serializeArray(const int32_t *long_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-FastCdr& FastCdr::serializeArray(const int64_t *longlong_t, size_t numElements)
+Marshalling& FastCdr::serializeArray(const int64_t *longlong_t, size_t numElements)
 {
     size_t totalSize = sizeof(*longlong_t) * numElements;
 
@@ -168,7 +358,7 @@ FastCdr& FastCdr::serializeArray(const int64_t *longlong_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-FastCdr& FastCdr::serializeArray(const float *float_t, size_t numElements)
+Marshalling& FastCdr::serializeArray(const float *float_t, size_t numElements)
 {
     size_t totalSize = sizeof(*float_t) * numElements;
 
@@ -182,7 +372,7 @@ FastCdr& FastCdr::serializeArray(const float *float_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-FastCdr& FastCdr::serializeArray(const double *double_t, size_t numElements)
+Marshalling& FastCdr::serializeArray(const double *double_t, size_t numElements)
 {
     size_t totalSize = sizeof(*double_t) * numElements;
 
@@ -196,7 +386,7 @@ FastCdr& FastCdr::serializeArray(const double *double_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-FastCdr& FastCdr::deserialize(bool &bool_t)
+Marshalling& FastCdr::deserialize(bool &bool_t)
 {
     uint8_t value = 0;
 
@@ -221,7 +411,7 @@ FastCdr& FastCdr::deserialize(bool &bool_t)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-FastCdr& FastCdr::deserialize(std::string &string_t)
+Marshalling& FastCdr::deserialize(std::string &string_t)
 {
     uint32_t length = 0;
     FastCdr::state state(*this);
@@ -235,9 +425,8 @@ FastCdr& FastCdr::deserialize(std::string &string_t)
     }
     else if((m_lastPosition - m_currentPosition) >= length)
     {
-        //TODO
-        //string_t = std::string(&m_currentPosition, length - ((&m_currentPosition)[length-1] == '\0' ? 1 : 0));
-        m_currentPosition += length;
+        m_storage.get(m_currentPosition, string_t, length);
+
         return *this;
     }
 
@@ -245,7 +434,217 @@ FastCdr& FastCdr::deserialize(std::string &string_t)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-FastCdr& FastCdr::deserializeArray(char *char_t, size_t numElements)
+Marshalling& FastCdr::deserialize(std::vector<uint8_t> &vector_t)
+{
+    uint32_t seqLength = 0;
+    FastCdr::state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        vector_t.resize(seqLength);
+        return deserializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& FastCdr::deserialize(std::vector<char> &vector_t)
+{
+    uint32_t seqLength = 0;
+    FastCdr::state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        vector_t.resize(seqLength);
+        return deserializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& FastCdr::deserialize(std::vector<uint16_t> &vector_t)
+{
+    uint32_t seqLength = 0;
+    FastCdr::state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        vector_t.resize(seqLength);
+        return deserializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& FastCdr::deserialize(std::vector<int16_t> &vector_t)
+{
+    uint32_t seqLength = 0;
+    FastCdr::state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        vector_t.resize(seqLength);
+        return deserializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& FastCdr::deserialize(std::vector<uint32_t> &vector_t)
+{
+    uint32_t seqLength = 0;
+    FastCdr::state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        vector_t.resize(seqLength);
+        return deserializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& FastCdr::deserialize(std::vector<int32_t> &vector_t)
+{
+    uint32_t seqLength = 0;
+    FastCdr::state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        vector_t.resize(seqLength);
+        return deserializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& FastCdr::deserialize(std::vector<uint64_t> &vector_t)
+{
+    uint32_t seqLength = 0;
+    FastCdr::state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        vector_t.resize(seqLength);
+        return deserializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& FastCdr::deserialize(std::vector<int64_t> &vector_t)
+{
+    uint32_t seqLength = 0;
+    FastCdr::state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        vector_t.resize(seqLength);
+        return deserializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& FastCdr::deserialize(std::vector<float> &vector_t)
+{
+    uint32_t seqLength = 0;
+    FastCdr::state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        vector_t.resize(seqLength);
+        return deserializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& FastCdr::deserialize(std::vector<double> &vector_t)
+{
+    uint32_t seqLength = 0;
+    FastCdr::state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        vector_t.resize(seqLength);
+        return deserializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& FastCdr::deserializeArray(char *char_t, size_t numElements)
 {
     size_t totalSize = sizeof(*char_t)*numElements;
 
@@ -258,7 +657,7 @@ FastCdr& FastCdr::deserializeArray(char *char_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-FastCdr& FastCdr::deserializeArray(int16_t *short_t, size_t numElements)
+Marshalling& FastCdr::deserializeArray(int16_t *short_t, size_t numElements)
 {
     size_t totalSize = sizeof(*short_t) * numElements;
 
@@ -272,7 +671,7 @@ FastCdr& FastCdr::deserializeArray(int16_t *short_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-FastCdr& FastCdr::deserializeArray(int32_t *long_t, size_t numElements)
+Marshalling& FastCdr::deserializeArray(int32_t *long_t, size_t numElements)
 {
     size_t totalSize = sizeof(*long_t) * numElements;
 
@@ -286,7 +685,7 @@ FastCdr& FastCdr::deserializeArray(int32_t *long_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-FastCdr& FastCdr::deserializeArray(int64_t *longlong_t, size_t numElements)
+Marshalling& FastCdr::deserializeArray(int64_t *longlong_t, size_t numElements)
 {
     size_t totalSize = sizeof(*longlong_t) * numElements;
 
@@ -300,7 +699,7 @@ FastCdr& FastCdr::deserializeArray(int64_t *longlong_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-FastCdr& FastCdr::deserializeArray(float *float_t, size_t numElements)
+Marshalling& FastCdr::deserializeArray(float *float_t, size_t numElements)
 {
     size_t totalSize = sizeof(*float_t) * numElements;
 
@@ -314,7 +713,7 @@ FastCdr& FastCdr::deserializeArray(float *float_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-FastCdr& FastCdr::deserializeArray(double *double_t, size_t numElements)
+Marshalling& FastCdr::deserializeArray(double *double_t, size_t numElements)
 {
     size_t totalSize = sizeof(*double_t) * numElements;
 

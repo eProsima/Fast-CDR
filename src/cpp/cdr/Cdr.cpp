@@ -6,9 +6,11 @@ using namespace eProsima::marshalling;
 using namespace eProsima::storage;
 
 #if defined(__LITTLE_ENDIAN__)
-    const Cdr::Endianness Cdr::DEFAULT_ENDIAN = LITTLE_ENDIANNESS;
+const Cdr::Endianness Cdr::DEFAULT_ENDIAN = LITTLE_ENDIANNESS;
 #elif defined (__BIG_ENDIAN__)
-    const Cdr::Endianness Cdr::DEFAULT_ENDIAN = BIG_ENDIANNESS;
+const Cdr::Endianness Cdr::DEFAULT_ENDIAN = BIG_ENDIANNESS;
+#else
+#error "It's not defined the endianness."
 #endif
 
 const std::string Cdr::BAD_PARAM_MESSAGE_DEFAULT("Bad parameter");
@@ -119,9 +121,9 @@ bool Cdr::jump(uint32_t numBytes)
 
 //TODO
 /*char* Cdr::getCurrentPosition()
-{
-    return &m_currentPosition;
-}*/
+  {
+  return &m_currentPosition;
+  }*/
 
 size_t Cdr::getSerializedDataLength() const
 {
@@ -164,15 +166,15 @@ bool Cdr::resize(size_t minSizeInc)
         m_alignPosition << tmp;
         delete &m_lastPosition;
         m_lastPosition = m_storage.end();
-        
+
         delete &tmp;
         return true;
     }
-    
+
     return false;
 }
 
-Cdr& Cdr::serialize(const char char_t)
+Marshalling& Cdr::serialize(const char char_t)
 {
     if(((m_lastPosition - m_currentPosition) >= sizeof(char_t)) || resize(sizeof(char_t)))
     {
@@ -186,7 +188,7 @@ Cdr& Cdr::serialize(const char char_t)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-Cdr& Cdr::serialize(const int16_t short_t)
+Marshalling& Cdr::serialize(const int16_t short_t)
 {
     size_t align = alignment(sizeof(short_t));
     size_t sizeAligned = sizeof(short_t) + align;
@@ -195,7 +197,7 @@ Cdr& Cdr::serialize(const int16_t short_t)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(short_t);
-    
+
         // Align.
         makeAlign(align);
 
@@ -221,7 +223,7 @@ Cdr& Cdr::serialize(const int16_t short_t, Endianness endianness)
 {
     bool auxSwap = m_swapBytes;
     m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-    
+
     try
     {
         serialize(short_t);
@@ -232,11 +234,11 @@ Cdr& Cdr::serialize(const int16_t short_t, Endianness endianness)
         m_swapBytes = auxSwap;
         ex.raise();
     }
-    
+
     return *this;
 }
 
-Cdr& Cdr::serialize(const int32_t long_t)
+Marshalling& Cdr::serialize(const int32_t long_t)
 {
     size_t align = alignment(sizeof(long_t));
     size_t sizeAligned = sizeof(long_t) + align;
@@ -245,7 +247,7 @@ Cdr& Cdr::serialize(const int32_t long_t)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(long_t);
-    
+
         // Align.
         makeAlign(align);
 
@@ -284,11 +286,11 @@ Cdr& Cdr::serialize(const int32_t long_t, Endianness endianness)
         m_swapBytes = auxSwap;
         ex.raise();
     }
-    
+
     return *this;
 }
 
-Cdr& Cdr::serialize(const int64_t longlong_t)
+Marshalling& Cdr::serialize(const int64_t longlong_t)
 {
     size_t align = alignment(sizeof(longlong_t));
     size_t sizeAligned = sizeof(longlong_t) + align;
@@ -297,7 +299,7 @@ Cdr& Cdr::serialize(const int64_t longlong_t)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(longlong_t);
-    
+
         // Align.
         makeAlign(align);
 
@@ -340,11 +342,11 @@ Cdr& Cdr::serialize(const int64_t longlong_t, Endianness endianness)
         m_swapBytes = auxSwap;
         ex.raise();
     }
-    
+
     return *this;
 }
 
-Cdr& Cdr::serialize(const float float_t)
+Marshalling& Cdr::serialize(const float float_t)
 {
     size_t align = alignment(sizeof(float_t));
     size_t sizeAligned = sizeof(float_t) + align;
@@ -353,7 +355,7 @@ Cdr& Cdr::serialize(const float float_t)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(float_t);
-    
+
         // Align.
         makeAlign(align);
 
@@ -392,11 +394,11 @@ Cdr& Cdr::serialize(const float float_t, Endianness endianness)
         m_swapBytes = auxSwap;
         ex.raise();
     }
-    
+
     return *this;
 }
 
-Cdr& Cdr::serialize(const double double_t)
+Marshalling& Cdr::serialize(const double double_t)
 {
     size_t align = alignment(sizeof(double_t));
     size_t sizeAligned = sizeof(double_t) + align;
@@ -405,7 +407,7 @@ Cdr& Cdr::serialize(const double double_t)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(double_t);
-    
+
         // Align.
         makeAlign(align);
 
@@ -448,11 +450,11 @@ Cdr& Cdr::serialize(const double double_t, Endianness endianness)
         m_swapBytes = auxSwap;
         ex.raise();
     }
-    
+
     return *this;
 }
 
-Cdr& Cdr::serialize(const bool bool_t)
+Marshalling& Cdr::serialize(const bool bool_t)
 {
     uint8_t value = 0;
 
@@ -471,7 +473,7 @@ Cdr& Cdr::serialize(const bool bool_t)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-Cdr& Cdr::serialize(const std::string &string_t)
+Marshalling& Cdr::serialize(const std::string &string_t)
 {
     uint32_t length = (uint32_t)string_t.length();
     state state(*this);
@@ -485,7 +487,7 @@ Cdr& Cdr::serialize(const std::string &string_t)
             // Save last datasize.
             m_lastDataSize = sizeof(uint8_t);
 
-            m_storage.memcopy(m_currentPosition, string_t.c_str(), length);
+            m_storage.insert(m_currentPosition, string_t);
         }
         else
         {
@@ -512,11 +514,391 @@ Cdr& Cdr::serialize(const std::string &string_t, Endianness endianness)
         m_swapBytes = auxSwap;
         ex.raise();
     }
-    
+
     return *this;
 }
 
-Cdr& Cdr::serializeArray(const char *char_t, size_t numElements)
+Marshalling& Cdr::serialize(const std::vector<uint8_t> &vector_t)
+{
+    Cdr::state state(*this);
+
+    serialize((int32_t)vector_t.size());
+
+    try
+    {
+        return serializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::serialize(const std::vector<uint8_t> &vector_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        serialize(vector_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& Cdr::serialize(const std::vector<char> &vector_t)
+{
+    Cdr::state state(*this);
+
+    serialize((int32_t)vector_t.size());
+
+    try
+    {
+        return serializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::serialize(const std::vector<char> &vector_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        serialize(vector_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& Cdr::serialize(const std::vector<uint16_t> &vector_t)
+{
+    Cdr::state state(*this);
+
+    serialize((int32_t)vector_t.size());
+
+    try
+    {
+        return serializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::serialize(const std::vector<uint16_t> &vector_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        serialize(vector_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& Cdr::serialize(const std::vector<int16_t> &vector_t)
+{
+    Cdr::state state(*this);
+
+    serialize((int32_t)vector_t.size());
+
+    try
+    {
+        return serializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::serialize(const std::vector<int16_t> &vector_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        serialize(vector_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& Cdr::serialize(const std::vector<uint32_t> &vector_t)
+{
+    Cdr::state state(*this);
+
+    serialize((int32_t)vector_t.size());
+
+    try
+    {
+        return serializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::serialize(const std::vector<uint32_t> &vector_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        serialize(vector_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& Cdr::serialize(const std::vector<int32_t> &vector_t)
+{
+    Cdr::state state(*this);
+
+    serialize((int32_t)vector_t.size());
+
+    try
+    {
+        return serializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::serialize(const std::vector<int32_t> &vector_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        serialize(vector_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& Cdr::serialize(const std::vector<uint64_t> &vector_t)
+{
+    Cdr::state state(*this);
+
+    serialize((int32_t)vector_t.size());
+
+    try
+    {
+        return serializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::serialize(const std::vector<uint64_t> &vector_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        serialize(vector_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& Cdr::serialize(const std::vector<int64_t> &vector_t)
+{
+    Cdr::state state(*this);
+
+    serialize((int32_t)vector_t.size());
+
+    try
+    {
+        return serializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::serialize(const std::vector<int64_t> &vector_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        serialize(vector_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& Cdr::serialize(const std::vector<float> &vector_t)
+{
+    Cdr::state state(*this);
+
+    serialize((int32_t)vector_t.size());
+
+    try
+    {
+        return serializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::serialize(const std::vector<float> &vector_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        serialize(vector_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& Cdr::serialize(const std::vector<double> &vector_t)
+{
+    Cdr::state state(*this);
+
+    serialize((int32_t)vector_t.size());
+
+    try
+    {
+        return serializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::serialize(const std::vector<double> &vector_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        serialize(vector_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& Cdr::serializeArray(const char *char_t, size_t numElements)
 {
     size_t totalSize = sizeof(*char_t)*numElements;
 
@@ -532,7 +914,7 @@ Cdr& Cdr::serializeArray(const char *char_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-Cdr& Cdr::serializeArray(const int16_t *short_t, size_t numElements)
+Marshalling& Cdr::serializeArray(const int16_t *short_t, size_t numElements)
 {
     size_t align = alignment(sizeof(*short_t));
     size_t totalSize = sizeof(*short_t) * numElements;
@@ -584,11 +966,11 @@ Cdr& Cdr::serializeArray(const int16_t *short_t, size_t numElements, Endianness 
         m_swapBytes = auxSwap;
         ex.raise();
     }
-    
+
     return *this;
 }
 
-Cdr& Cdr::serializeArray(const int32_t *long_t, size_t numElements)
+Marshalling& Cdr::serializeArray(const int32_t *long_t, size_t numElements)
 {
     size_t align = alignment(sizeof(*long_t));
     size_t totalSize = sizeof(*long_t) * numElements;
@@ -642,11 +1024,11 @@ Cdr& Cdr::serializeArray(const int32_t *long_t, size_t numElements, Endianness e
         m_swapBytes = auxSwap;
         ex.raise();
     }
-    
+
     return *this;
 }
 
-Cdr& Cdr::serializeArray(const int64_t *longlong_t, size_t numElements)
+Marshalling& Cdr::serializeArray(const int64_t *longlong_t, size_t numElements)
 {
     size_t align = alignment(sizeof(*longlong_t));
     size_t totalSize = sizeof(*longlong_t) * numElements;
@@ -708,7 +1090,7 @@ Cdr& Cdr::serializeArray(const int64_t *longlong_t, size_t numElements, Endianne
     return *this;
 }
 
-Cdr& Cdr::serializeArray(const float *float_t, size_t numElements)
+Marshalling& Cdr::serializeArray(const float *float_t, size_t numElements)
 {
     size_t align = alignment(sizeof(*float_t));
     size_t totalSize = sizeof(*float_t) * numElements;
@@ -766,7 +1148,7 @@ Cdr& Cdr::serializeArray(const float *float_t, size_t numElements, Endianness en
     return *this;
 }
 
-Cdr& Cdr::serializeArray(const double *double_t, size_t numElements)
+Marshalling& Cdr::serializeArray(const double *double_t, size_t numElements)
 {
     size_t align = alignment(sizeof(*double_t));
     size_t totalSize = sizeof(*double_t) * numElements;
@@ -828,7 +1210,7 @@ Cdr& Cdr::serializeArray(const double *double_t, size_t numElements, Endianness 
     return *this;
 }
 
-Cdr& Cdr::deserialize(char &char_t)
+Marshalling& Cdr::deserialize(char &char_t)
 {
     if((m_lastPosition - m_currentPosition) >= sizeof(char_t))
     {
@@ -842,7 +1224,7 @@ Cdr& Cdr::deserialize(char &char_t)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-Cdr& Cdr::deserialize(int16_t &short_t)
+Marshalling& Cdr::deserialize(int16_t &short_t)
 {
     size_t align = alignment(sizeof(short_t));
     size_t sizeAligned = sizeof(short_t) + align;
@@ -892,7 +1274,7 @@ Cdr& Cdr::deserialize(int16_t &short_t, Endianness endianness)
     return *this;
 }
 
-Cdr& Cdr::deserialize(int32_t &long_t)
+Marshalling& Cdr::deserialize(int32_t &long_t)
 {
     size_t align = alignment(sizeof(long_t));
     size_t sizeAligned = sizeof(long_t) + align;
@@ -944,7 +1326,7 @@ Cdr& Cdr::deserialize(int32_t &long_t, Endianness endianness)
     return *this;
 }
 
-Cdr& Cdr::deserialize(int64_t &longlong_t)
+Marshalling& Cdr::deserialize(int64_t &longlong_t)
 {
     size_t align = alignment(sizeof(longlong_t));
     size_t sizeAligned = sizeof(longlong_t) + align;
@@ -1000,7 +1382,7 @@ Cdr& Cdr::deserialize(int64_t &longlong_t, Endianness endianness)
     return *this;
 }
 
-Cdr& Cdr::deserialize(float &float_t)
+Marshalling& Cdr::deserialize(float &float_t)
 {
     size_t align = alignment(sizeof(float_t));
     size_t sizeAligned = sizeof(float_t) + align;
@@ -1030,7 +1412,7 @@ Cdr& Cdr::deserialize(float &float_t)
         return *this;
     }
 
-   throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::deserialize(float &float_t, Endianness endianness)
@@ -1052,7 +1434,7 @@ Cdr& Cdr::deserialize(float &float_t, Endianness endianness)
     return *this;
 }
 
-Cdr& Cdr::deserialize(double &double_t)
+Marshalling& Cdr::deserialize(double &double_t)
 {
     size_t align = alignment(sizeof(double_t));
     size_t sizeAligned = sizeof(double_t) + align;
@@ -1108,7 +1490,7 @@ Cdr& Cdr::deserialize(double &double_t, Endianness endianness)
     return *this;
 }
 
-Cdr& Cdr::deserialize(bool &bool_t)
+Marshalling& Cdr::deserialize(bool &bool_t)
 {
     uint8_t value = 0;
 
@@ -1136,7 +1518,7 @@ Cdr& Cdr::deserialize(bool &bool_t)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-Cdr& Cdr::deserialize(std::string &string_t)
+Marshalling& Cdr::deserialize(std::string &string_t)
 {
     uint32_t length = 0;
     state state(*this);
@@ -1153,9 +1535,8 @@ Cdr& Cdr::deserialize(std::string &string_t)
         // Save last datasize.
         m_lastDataSize = sizeof(uint8_t);
 
-        //TODO
-        //string_t = std::string(&m_currentPosition, length - ((&m_currentPosition)[length-1] == '\0' ? 1 : 0));
-        m_currentPosition += length;
+        m_storage.get(m_currentPosition, string_t, length);
+
         return *this;
     }
 
@@ -1182,7 +1563,407 @@ Cdr& Cdr::deserialize(std::string &string_t, Endianness endianness)
     return *this;
 }
 
-Cdr& Cdr::deserializeArray(char *char_t, size_t numElements)
+Marshalling& Cdr::deserialize(std::vector<uint8_t> &vector_t)
+{
+    uint32_t seqLength = 0;
+    Cdr::state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        vector_t.resize(seqLength);
+        return deserializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::deserialize(std::vector<uint8_t> &vector_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        deserialize(vector_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& Cdr::deserialize(std::vector<char> &vector_t)
+{
+    uint32_t seqLength = 0;
+    Cdr::state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        vector_t.resize(seqLength);
+        return deserializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::deserialize(std::vector<char> &vector_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        deserialize(vector_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& Cdr::deserialize(std::vector<uint16_t> &vector_t)
+{
+    uint32_t seqLength = 0;
+    Cdr::state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        vector_t.resize(seqLength);
+        return deserializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::deserialize(std::vector<uint16_t> &vector_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        deserialize(vector_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& Cdr::deserialize(std::vector<int16_t> &vector_t)
+{
+    uint32_t seqLength = 0;
+    Cdr::state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        vector_t.resize(seqLength);
+        return deserializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::deserialize(std::vector<int16_t> &vector_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        deserialize(vector_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& Cdr::deserialize(std::vector<uint32_t> &vector_t)
+{
+    uint32_t seqLength = 0;
+    Cdr::state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        vector_t.resize(seqLength);
+        return deserializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::deserialize(std::vector<uint32_t> &vector_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        deserialize(vector_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& Cdr::deserialize(std::vector<int32_t> &vector_t)
+{
+    uint32_t seqLength = 0;
+    Cdr::state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        vector_t.resize(seqLength);
+        return deserializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::deserialize(std::vector<int32_t> &vector_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        deserialize(vector_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& Cdr::deserialize(std::vector<uint64_t> &vector_t)
+{
+    uint32_t seqLength = 0;
+    Cdr::state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        vector_t.resize(seqLength);
+        return deserializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::deserialize(std::vector<uint64_t> &vector_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        deserialize(vector_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& Cdr::deserialize(std::vector<int64_t> &vector_t)
+{
+    uint32_t seqLength = 0;
+    Cdr::state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        vector_t.resize(seqLength);
+        return deserializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::deserialize(std::vector<int64_t> &vector_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        deserialize(vector_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& Cdr::deserialize(std::vector<float> &vector_t)
+{
+    uint32_t seqLength = 0;
+    Cdr::state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        vector_t.resize(seqLength);
+        return deserializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::deserialize(std::vector<float> &vector_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        deserialize(vector_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& Cdr::deserialize(std::vector<double> &vector_t)
+{
+    uint32_t seqLength = 0;
+    Cdr::state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        vector_t.resize(seqLength);
+        return deserializeArray(vector_t.data(), vector_t.size());
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::deserialize(std::vector<double> &vector_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        deserialize(vector_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Marshalling& Cdr::deserializeArray(char *char_t, size_t numElements)
 {
     size_t totalSize = sizeof(*char_t)*numElements;
 
@@ -1198,7 +1979,7 @@ Cdr& Cdr::deserializeArray(char *char_t, size_t numElements)
     throw NotEnoughMemoryException(NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-Cdr& Cdr::deserializeArray(int16_t *short_t, size_t numElements)
+Marshalling& Cdr::deserializeArray(int16_t *short_t, size_t numElements)
 {
     size_t align = alignment(sizeof(*short_t));
     size_t totalSize = sizeof(*short_t) * numElements;
@@ -1254,7 +2035,7 @@ Cdr& Cdr::deserializeArray(int16_t *short_t, size_t numElements, Endianness endi
     return *this;
 }
 
-Cdr& Cdr::deserializeArray(int32_t *long_t, size_t numElements)
+Marshalling& Cdr::deserializeArray(int32_t *long_t, size_t numElements)
 {
     size_t align = alignment(sizeof(*long_t));
     size_t totalSize = sizeof(*long_t) * numElements;
@@ -1312,7 +2093,7 @@ Cdr& Cdr::deserializeArray(int32_t *long_t, size_t numElements, Endianness endia
     return *this;
 }
 
-Cdr& Cdr::deserializeArray(int64_t *longlong_t, size_t numElements)
+Marshalling& Cdr::deserializeArray(int64_t *longlong_t, size_t numElements)
 {
     size_t align = alignment(sizeof(*longlong_t));
     size_t totalSize = sizeof(*longlong_t) * numElements;
@@ -1374,7 +2155,7 @@ Cdr& Cdr::deserializeArray(int64_t *longlong_t, size_t numElements, Endianness e
     return *this;
 }
 
-Cdr& Cdr::deserializeArray(float *float_t, size_t numElements)
+Marshalling& Cdr::deserializeArray(float *float_t, size_t numElements)
 {
     size_t align = alignment(sizeof(*float_t));
     size_t totalSize = sizeof(*float_t) * numElements;
@@ -1432,7 +2213,7 @@ Cdr& Cdr::deserializeArray(float *float_t, size_t numElements, Endianness endian
     return *this;
 }
 
-Cdr& Cdr::deserializeArray(double *double_t, size_t numElements)
+Marshalling& Cdr::deserializeArray(double *double_t, size_t numElements)
 {
     size_t align = alignment(sizeof(*double_t));
     size_t totalSize = sizeof(*double_t) * numElements;

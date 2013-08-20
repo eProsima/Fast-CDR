@@ -1,5 +1,6 @@
 ﻿#include "cpp/storage/FastBuffer.h"
 #include "cpp/cdr/Cdr.h"
+#include "cpp/cdr/FastCdr.h"
 #include "cpp/exceptions/Exception.h"
 
 #include <stdio.h>
@@ -61,7 +62,7 @@ int main()
     bool returnedValue = true;
     char buffer[BUFFER_LENGTH];
 
-    // Serialization.
+    // CDR serialization.
     FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
     Cdr cdr_ser(cdrbuffer);
 
@@ -76,11 +77,11 @@ int main()
     }
     catch(Exception &ex)
     {
-        std::cout << "Serialization error: " << ex.what() << std::endl << "TEST FAILED" << std::endl;
+        std::cout << "CDR serialization error: " << ex.what() << std::endl << "TEST FAILED" << std::endl;
         return -1;
     }
 
-    // Deseriazliation.
+    // CDR deseriazliation.
     Cdr cdr_des(cdrbuffer);
 
     uint8_t octet_value = 0;
@@ -138,7 +139,7 @@ int main()
     }
     catch(Exception &ex)
     {
-        std::cout << "Deserialization error: " << ex.what() << std::endl << "TEST FAILED" << std::endl;
+        std::cout << "CDR deserialization error: " << ex.what() << std::endl << "TEST FAILED" << std::endl;
         return -1;
     }
 
@@ -229,6 +230,174 @@ int main()
     returnedValue &= double_vector_value == double_vector_t;
 
     returnedValue &= triple_ulong_array_t == triple_ulong_array_value;
+
+    // FastCDR serialization.
+    FastCdr fastcdr_ser(cdrbuffer);
+
+    try
+    {
+        fastcdr_ser << octet_t << char_t << ushort_t << short_t << ulong_t << long_t << ulonglong_t << longlong_t << float_t << double_t << bool_t << string_t;
+        fastcdr_ser << octet_array_t << char_array_t << ushort_array_t << short_array_t << ulong_array_t << long_array_t << ulonglong_array_t << longlong_array_t << float_array_t << double_array_t;
+        fastcdr_ser.serializeArray(octet_array_2_t, 5).serializeArray(char_array_2_t, 5).serializeArray(ushort_array_2_t, 5).serializeArray(short_array_2_t, 5).serializeArray(ulong_array_2_t, 5);
+        fastcdr_ser.serializeArray(long_array_2_t, 5).serializeArray(ulonglong_array_2_t, 5).serializeArray(longlong_array_2_t, 5).serializeArray(float_array_2_t, 5).serializeArray(double_array_2_t, 5);
+        fastcdr_ser << octet_vector_t << char_vector_t << ushort_vector_t << short_vector_t << ulong_vector_t << long_vector_t << ulonglong_vector_t << longlong_vector_t << float_vector_t << double_vector_t;
+        fastcdr_ser << triple_ulong_array_t;
+    }
+    catch(Exception &ex)
+    {
+        std::cout << "FastCDR serialization error: " << ex.what() << std::endl << "TEST FAILED" << std::endl;
+        return -1;
+    }
+
+    // FastCDR deseriazliation.
+    FastCdr fastcdr_des(cdrbuffer);
+
+    uint8_t octet_value_f = 0;
+    char char_value_f = 0;
+    uint16_t ushort_value_f =0;
+    int16_t short_value_f = 0;
+    uint32_t ulong_value_f = 0;
+    int32_t long_value_f = 0;
+    uint64_t ulonglong_value_f = 0;
+    int64_t longlong_value_f = 0;
+    float float_value_f = 0;
+    double double_value_f = 0;
+    bool bool_value_f = false;
+    std::string string_value_f = "";
+    std::array<uint8_t, 5> octet_array_value_f;
+    uint8_t octet_array_2_value_f[5];
+    std::array<char, 5> char_array_value_f;
+    char char_array_2_value_f[5];
+    std::array<uint16_t, 5> ushort_array_value_f;
+    uint16_t ushort_array_2_value_f[5];
+    std::array<int16_t, 5> short_array_value_f;
+    int16_t short_array_2_value_f[5];
+    std::array<uint32_t, 5> ulong_array_value_f;
+    uint32_t ulong_array_2_value_f[5];
+    std::array<int32_t, 5> long_array_value_f;
+    int32_t long_array_2_value_f[5];
+    std::array<uint64_t, 5> ulonglong_array_value_f;
+    uint64_t ulonglong_array_2_value_f[5];
+    std::array<int64_t, 5> longlong_array_value_f;
+    int64_t longlong_array_2_value_f[5];
+    std::array<float, 5> float_array_value_f;
+    float float_array_2_value_f[5];
+    std::array<double, 5> double_array_value_f;
+    double double_array_2_value_f[5];
+    std::vector<uint8_t> octet_vector_value_f;
+    std::vector<char> char_vector_value_f;
+    std::vector<uint16_t> ushort_vector_value_f;
+    std::vector<int16_t> short_vector_value_f;
+    std::vector<uint32_t> ulong_vector_value_f;
+    std::vector<int32_t> long_vector_value_f;
+    std::vector<uint64_t> ulonglong_vector_value_f;
+    std::vector<int64_t> longlong_vector_value_f;
+    std::vector<float> float_vector_value_f;
+    std::vector<double> double_vector_value_f;
+    std::array<std::array<std::array<uint32_t, 3>, 2>, 2> triple_ulong_array_value_f;
+
+    try
+    {
+        fastcdr_des >> octet_value_f >> char_value_f >> ushort_value_f >> short_value_f >> ulong_value_f >> long_value_f >> ulonglong_value_f >> longlong_value_f >> float_value_f >> double_value_f >> bool_value_f >> string_value_f;
+        fastcdr_des >> octet_array_value_f >> char_array_value_f >> ushort_array_value_f >> short_array_value_f >> ulong_array_value_f >> long_array_value_f >> ulonglong_array_value_f >> longlong_array_value_f >> float_array_value_f >> double_array_value_f;
+        fastcdr_des.deserializeArray(octet_array_2_value_f, 5).deserializeArray(char_array_2_value_f, 5).deserializeArray(ushort_array_2_value_f, 5).deserializeArray(short_array_2_value_f, 5).deserializeArray(ulong_array_2_value_f, 5);
+        fastcdr_des.deserializeArray(long_array_2_value_f, 5).deserializeArray(ulonglong_array_2_value_f, 5).deserializeArray(longlong_array_2_value_f, 5).deserializeArray(float_array_2_value_f, 5).deserializeArray(double_array_2_value_f, 5);
+        fastcdr_des >> octet_vector_value_f >> char_vector_value_f >> ushort_vector_value_f >> short_vector_value_f >> ulong_vector_value_f >> long_vector_value_f >> ulonglong_vector_value_f >> longlong_vector_value_f >> float_vector_value_f >> double_vector_value_f;
+        fastcdr_des >> triple_ulong_array_value_f;
+    }
+    catch(Exception &ex)
+    {
+        std::cout << "Deserialization error: " << ex.what() << std::endl << "TEST FAILED" << std::endl;
+        return -1;
+    }
+
+    returnedValue &= octet_value_f == octet_t;
+    returnedValue &= char_value_f == char_t;
+    returnedValue &= ushort_value_f == ushort_t;
+    returnedValue &= short_value_f == short_t;
+    returnedValue &= ulong_value_f == ulong_t;
+    returnedValue &= long_value_f == long_t;
+    returnedValue &= ulonglong_value_f == ulonglong_t;
+    returnedValue &= longlong_value_f == longlong_t;
+    returnedValue &= float_value_f == float_t;
+    returnedValue &= double_value_f == double_t;
+    returnedValue &= bool_value_f == bool_t;
+    returnedValue &= string_value_f == string_t;
+
+    returnedValue &= octet_array_value_f == octet_array_t;
+    returnedValue &= char_array_value_f == char_array_t;
+    returnedValue &= ushort_array_value_f == ushort_array_t;
+    returnedValue &= short_array_value_f == short_array_t;
+    returnedValue &= ulong_array_value_f == ulong_array_t;
+    returnedValue &= long_array_value_f == long_array_t;
+    returnedValue &= ulonglong_array_value_f == ulonglong_array_t;
+    returnedValue &= longlong_array_value_f == longlong_array_t;
+    returnedValue &= float_array_value_f == float_array_t;
+    returnedValue &= double_array_value_f == double_array_t;
+
+    returnedValue &= octet_array_2_value_f[0] == octet_array_2_t[0];
+    returnedValue &= octet_array_2_value_f[1] == octet_array_2_t[1];
+    returnedValue &= octet_array_2_value_f[2] == octet_array_2_t[2];
+    returnedValue &= octet_array_2_value_f[3] == octet_array_2_t[3];
+    returnedValue &= octet_array_2_value_f[4] == octet_array_2_t[4];
+    returnedValue &= char_array_2_value_f[0] == char_array_2_t[0];
+    returnedValue &= char_array_2_value_f[1] == char_array_2_t[1];
+    returnedValue &= char_array_2_value_f[2] == char_array_2_t[2];
+    returnedValue &= char_array_2_value_f[3] == char_array_2_t[3];
+    returnedValue &= char_array_2_value_f[4] == char_array_2_t[4];
+    returnedValue &= ushort_array_2_value_f[0] == ushort_array_2_t[0];
+    returnedValue &= ushort_array_2_value_f[1] == ushort_array_2_t[1];
+    returnedValue &= ushort_array_2_value_f[2] == ushort_array_2_t[2];
+    returnedValue &= ushort_array_2_value_f[3] == ushort_array_2_t[3];
+    returnedValue &= ushort_array_2_value_f[4] == ushort_array_2_t[4];
+    returnedValue &= short_array_2_value_f[0] == short_array_2_t[0];
+    returnedValue &= short_array_2_value_f[1] == short_array_2_t[1];
+    returnedValue &= short_array_2_value_f[2] == short_array_2_t[2];
+    returnedValue &= short_array_2_value_f[3] == short_array_2_t[3];
+    returnedValue &= short_array_2_value_f[4] == short_array_2_t[4];
+    returnedValue &= ulong_array_2_value_f[0] == ulong_array_2_t[0];
+    returnedValue &= ulong_array_2_value_f[1] == ulong_array_2_t[1];
+    returnedValue &= ulong_array_2_value_f[2] == ulong_array_2_t[2];
+    returnedValue &= ulong_array_2_value_f[3] == ulong_array_2_t[3];
+    returnedValue &= ulong_array_2_value_f[4] == ulong_array_2_t[4];
+    returnedValue &= long_array_2_value_f[0] == long_array_2_t[0];
+    returnedValue &= long_array_2_value_f[1] == long_array_2_t[1];
+    returnedValue &= long_array_2_value_f[2] == long_array_2_t[2];
+    returnedValue &= long_array_2_value_f[3] == long_array_2_t[3];
+    returnedValue &= long_array_2_value_f[4] == long_array_2_t[4];
+    returnedValue &= ulonglong_array_2_value_f[0] == ulonglong_array_2_t[0];
+    returnedValue &= ulonglong_array_2_value_f[1] == ulonglong_array_2_t[1];
+    returnedValue &= ulonglong_array_2_value_f[2] == ulonglong_array_2_t[2];
+    returnedValue &= ulonglong_array_2_value_f[3] == ulonglong_array_2_t[3];
+    returnedValue &= ulonglong_array_2_value_f[4] == ulonglong_array_2_t[4];
+    returnedValue &= longlong_array_2_value_f[0] == longlong_array_2_t[0];
+    returnedValue &= longlong_array_2_value_f[1] == longlong_array_2_t[1];
+    returnedValue &= longlong_array_2_value_f[2] == longlong_array_2_t[2];
+    returnedValue &= longlong_array_2_value_f[3] == longlong_array_2_t[3];
+    returnedValue &= longlong_array_2_value_f[4] == longlong_array_2_t[4];
+    returnedValue &= float_array_2_value_f[0] == float_array_2_t[0];
+    returnedValue &= float_array_2_value_f[1] == float_array_2_t[1];
+    returnedValue &= float_array_2_value_f[2] == float_array_2_t[2];
+    returnedValue &= float_array_2_value_f[3] == float_array_2_t[3];
+    returnedValue &= float_array_2_value_f[4] == float_array_2_t[4];
+    returnedValue &= double_array_2_value_f[0] == double_array_2_t[0];
+    returnedValue &= double_array_2_value_f[1] == double_array_2_t[1];
+    returnedValue &= double_array_2_value_f[2] == double_array_2_t[2];
+    returnedValue &= double_array_2_value_f[3] == double_array_2_t[3];
+    returnedValue &= double_array_2_value_f[4] == double_array_2_t[4];
+
+    returnedValue &= octet_vector_value_f == octet_vector_t;
+    returnedValue &= char_vector_value_f == char_vector_t;
+    returnedValue &= ushort_vector_value_f == ushort_vector_t;
+    returnedValue &= short_vector_value_f == short_vector_t;
+    returnedValue &= ulong_vector_value_f == ulong_vector_t;
+    returnedValue &= long_vector_value_f == long_vector_t;
+    returnedValue &= ulonglong_vector_value_f == ulonglong_vector_t;
+    returnedValue &= longlong_vector_value_f == longlong_vector_t;
+    returnedValue &= float_vector_value_f == float_vector_t;
+    returnedValue &= double_vector_value_f == double_vector_t;
+
+    returnedValue &= triple_ulong_array_t == triple_ulong_array_value_f;
 
     if(returnedValue)
     {

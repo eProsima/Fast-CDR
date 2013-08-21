@@ -72,10 +72,10 @@ namespace eProsima
                     private:
 
                     //! @brief The position in the buffer when the state was created.
-                    storage::Storage::iterator &m_currentPosition;
+                    storage::Storage::iterator *m_currentPosition;
 
                     //! @brief The position from the aligment is calculated,  when the state was created..
-                    storage::Storage::iterator &m_alignPosition;
+                    storage::Storage::iterator *m_alignPosition;
 
                     //! @brief This attribute specified if it is needed to swap the bytes when the state was created..
                     bool m_swapBytes;
@@ -133,12 +133,6 @@ namespace eProsima
                 void reset();
 
                 /*!
-                 * @brief This function returns the current position in the CDR stream.
-                 * @return Pointer to the current position in the buffer.
-                 */
-                char* getCurrentPosition();
-
-                /*!
                  * @brief This function returns the length of the serialized data inside the stream.
                  * @return The length of the serialized data.
                  */
@@ -159,7 +153,7 @@ namespace eProsima
                 /*!
                  * @brief This function resets the alignment to current position in the buffer.
                  */
-                inline void resetAlignment(){m_alignPosition = m_currentPosition;}
+                inline void resetAlignment(){m_alignPosition->clone(m_currentPosition);}
 
                 /*!
                  * @brief This operator serializes an octet.
@@ -1917,13 +1911,13 @@ namespace eProsima
                  * @param dataSize The size of the data that will be serialized.
                  * @return The size needed for the aligment.
                  */
-                inline size_t alignment(size_t dataSize) const {return dataSize > m_lastDataSize ? (dataSize - ((m_currentPosition - m_alignPosition) % dataSize)) & (dataSize-1) : 0;}
+                inline size_t alignment(size_t dataSize) const {return dataSize > m_lastDataSize ? (dataSize - ((m_currentPosition->substract(m_alignPosition)) % dataSize)) & (dataSize-1) : 0;}
 
                 /*!
                  * @brief This function jumps the number of bytes of the alignment. These bytes should be calculated with the function eProsima::marshalling::Cdr::alignment.
                  * @param align The number of bytes to be skipped.
                  */
-                inline void makeAlign(size_t align){m_currentPosition += align;}
+                inline void makeAlign(size_t align){m_currentPosition->increasePosition(align);}
 
                 bool resize(size_t minSizeInc);
 
@@ -1949,13 +1943,13 @@ namespace eProsima
                 size_t m_lastDataSize;
 
                 //! @brief The current position in the serialization/deserialization process.
-                storage::Storage::iterator &m_currentPosition;
+                storage::Storage::iterator *m_currentPosition;
 
                 //! @brief The position from the aligment is calculated.
-                storage::Storage::iterator &m_alignPosition;
+                storage::Storage::iterator *m_alignPosition;
 
                 //! @brief The last position in the buffer;
-                storage::Storage::iterator &m_lastPosition;
+                storage::Storage::iterator *m_lastPosition;
 
                 //! @brief Common message for BadParamException exceptions.
                 static const std::string BAD_PARAM_MESSAGE_DEFAULT;

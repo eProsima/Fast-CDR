@@ -36,7 +36,7 @@ namespace eProsima
                     private:
 
                     //! @brief The position in the storage when the state was created.
-                    storage::Storage::iterator &m_currentPosition;
+                    storage::Storage::iterator *m_currentPosition;
                 };
                 /*!
                  * @brief This constructor creates a eProsima::marshalling::FastCdr object that could serialize/deserialize
@@ -57,12 +57,6 @@ namespace eProsima
                  * @brief This function resets the current position in the CDR stream to the begining.
                  */
                 void reset();
-
-                /*!
-                 * @brief This function returns the current position in the CDR stream.
-                 * @return Pointer to the current position in the storage.
-                 */
-                char* getCurrentPosition();
 
                 /*!
                  * @brief This function returns the length of the serialized data inside the CDR stream.
@@ -473,7 +467,7 @@ namespace eProsima
                 inline
                     Marshalling& serialize(const char char_t)
                     {
-                        if(((m_lastPosition - m_currentPosition) >= sizeof(char_t)) || resize(sizeof(char_t)))
+                        if((m_lastPosition->substract(m_currentPosition) >= sizeof(char_t)) || resize(sizeof(char_t)))
                         {
                             m_storage.insert(m_currentPosition, char_t);
                             return *this;
@@ -503,7 +497,7 @@ namespace eProsima
                 inline
                     Marshalling& serialize(const int16_t short_t)
                     {
-                        if(((m_lastPosition - m_currentPosition) >= sizeof(short_t)) || resize(sizeof(short_t)))
+                        if((m_lastPosition->substract(m_currentPosition) >= sizeof(short_t)) || resize(sizeof(short_t)))
                         {
                             m_storage.insert(m_currentPosition, short_t);
 
@@ -534,7 +528,7 @@ namespace eProsima
                 inline
                     Marshalling& serialize(const int32_t long_t)
                     {
-                        if(((m_lastPosition - m_currentPosition) >= sizeof(long_t)) || resize(sizeof(long_t)))
+                        if((m_lastPosition->substract(m_currentPosition) >= sizeof(long_t)) || resize(sizeof(long_t)))
                         {
                             m_storage.insert(m_currentPosition, long_t);
 
@@ -565,7 +559,7 @@ namespace eProsima
                 inline
                     Marshalling& serialize(const int64_t longlong_t)
                     {
-                        if(((m_lastPosition - m_currentPosition) >= sizeof(longlong_t)) || resize(sizeof(longlong_t)))
+                        if((m_lastPosition->substract(m_currentPosition) >= sizeof(longlong_t)) || resize(sizeof(longlong_t)))
                         {
                             m_storage.insert(m_currentPosition, longlong_t);
 
@@ -584,7 +578,7 @@ namespace eProsima
                 inline
                     Marshalling& serialize(const float float_t)
                     {
-                        if(((m_lastPosition - m_currentPosition) >= sizeof(float_t)) || resize(sizeof(float_t)))
+                        if((m_lastPosition->substract(m_currentPosition) >= sizeof(float_t)) || resize(sizeof(float_t)))
                         {
                             m_storage.insert(m_currentPosition, float_t);
 
@@ -603,7 +597,7 @@ namespace eProsima
                 inline
                     Marshalling& serialize(const double double_t)
                     {
-                        if(((m_lastPosition - m_currentPosition) >= sizeof(double_t)) || resize(sizeof(double_t)))
+                        if((m_lastPosition->substract(m_currentPosition) >= sizeof(double_t)) || resize(sizeof(double_t)))
                         {
                             m_storage.insert(m_currentPosition, double_t);
 
@@ -846,7 +840,7 @@ namespace eProsima
                 inline
                     Marshalling& deserialize(char &char_t)
                     {
-                        if((m_lastPosition - m_currentPosition) >= sizeof(char_t))
+                        if(m_lastPosition->substract(m_currentPosition) >= sizeof(char_t))
                         {
                             m_storage.get(m_currentPosition, char_t);
                             return *this;
@@ -876,7 +870,7 @@ namespace eProsima
                 inline
                     Marshalling& deserialize(int16_t &short_t)
                     {
-                        if((m_lastPosition - m_currentPosition) >= sizeof(short_t))
+                        if(m_lastPosition->substract(m_currentPosition) >= sizeof(short_t))
                         {
                             m_storage.get(m_currentPosition, short_t);
 
@@ -907,7 +901,7 @@ namespace eProsima
                 inline
                     Marshalling& deserialize(int32_t &long_t)
                     {
-                        if((m_lastPosition - m_currentPosition) >= sizeof(long_t))
+                        if(m_lastPosition->substract(m_currentPosition) >= sizeof(long_t))
                         {
                             m_storage.get(m_currentPosition, long_t);
 
@@ -938,7 +932,7 @@ namespace eProsima
                 inline
                     Marshalling& deserialize(int64_t &longlong_t)
                     {
-                        if((m_lastPosition - m_currentPosition) >= sizeof(longlong_t))
+                        if(m_lastPosition->substract(m_currentPosition) >= sizeof(longlong_t))
                         {
                             m_storage.get(m_currentPosition, longlong_t);
 
@@ -957,7 +951,7 @@ namespace eProsima
                 inline
                     Marshalling& deserialize(float &float_t)
                     {
-                        if((m_lastPosition - m_currentPosition) >= sizeof(float_t))
+                        if(m_lastPosition->substract(m_currentPosition) >= sizeof(float_t))
                         {
                             m_storage.get(m_currentPosition, float_t);
 
@@ -976,7 +970,7 @@ namespace eProsima
                 inline
                     Marshalling& deserialize(double &double_t)
                     {
-                        if((m_lastPosition - m_currentPosition) >= sizeof(double_t))
+                        if(m_lastPosition->substract(m_currentPosition) >= sizeof(double_t))
                         {
                             m_storage.get(m_currentPosition, double_t);
 
@@ -1233,10 +1227,10 @@ namespace eProsima
                 storage::Storage &m_storage;
 
                 //! @brief The current position in the serialization/deserialization process.
-                storage::Storage::iterator &m_currentPosition;
+                storage::Storage::iterator *m_currentPosition;
 
                 //! @brief The last position in the storage;
-                storage::Storage::iterator &m_lastPosition;
+                storage::Storage::iterator *m_lastPosition;
 
                 //! @brief Common message for BadParamException exceptions.
                 static const std::string BAD_PARAM_MESSAGE_DEFAULT;

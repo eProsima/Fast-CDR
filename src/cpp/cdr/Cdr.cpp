@@ -16,27 +16,27 @@ const Cdr::Endianness Cdr::DEFAULT_ENDIAN = BIG_ENDIANNESS;
 const std::string Cdr::BAD_PARAM_MESSAGE_DEFAULT("Bad parameter");
 const std::string Cdr::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT("Not enough memory in the buffer stream");
 
-Cdr::state::state(Cdr &cdr) : m_currentPosition(*cdr.m_storage.clone(cdr.m_currentPosition)), m_alignPosition(*cdr.m_storage.clone(cdr.m_alignPosition)),
+Cdr::state::state(Cdr &cdr) : m_currentPosition(cdr.m_storage.clone(cdr.m_currentPosition)), m_alignPosition(cdr.m_storage.clone(cdr.m_alignPosition)),
     m_swapBytes(cdr.m_swapBytes), m_lastDataSize(cdr.m_lastDataSize) {}
 
 Cdr::state::~state()
 {
-    delete &m_currentPosition;
-    delete &m_alignPosition;
+    delete m_currentPosition;
+    delete m_alignPosition;
 }
 
 Cdr::Cdr(Storage &storage, const Endianness endianness, const CdrType cdrType) : m_storage(storage),
     m_cdrType(cdrType), m_plFlag(DDS_CDR_WITHOUT_PL), m_options(0), m_endianness(endianness),
-    m_swapBytes(endianness == DEFAULT_ENDIAN ? false : true), m_lastDataSize(0), m_currentPosition(*storage.begin()),
-    m_alignPosition(*storage.begin()), m_lastPosition(*storage.end())
+    m_swapBytes(endianness == DEFAULT_ENDIAN ? false : true), m_lastDataSize(0), m_currentPosition(storage.begin()),
+    m_alignPosition(storage.begin()), m_lastPosition(storage.end())
 {
 }
 
 Cdr::~Cdr()
 {
-    delete &m_currentPosition;
-    delete &m_alignPosition;
-    delete &m_lastPosition;
+    delete m_currentPosition;
+    delete m_alignPosition;
+    delete m_lastPosition;
 }
 
 Cdr& Cdr::read_encapsulation()
@@ -110,26 +110,20 @@ bool Cdr::jump(uint32_t numBytes)
 {
     bool returnedValue = false;
 
-    if((m_lastPosition - m_currentPosition) >= sizeof(numBytes))
+    if(m_lastPosition->substract(m_currentPosition) >= sizeof(numBytes))
     {
-        m_currentPosition += numBytes;
+        m_currentPosition->increasePosition(numBytes);
         returnedValue = true;
     }
 
     return returnedValue;
 }
 
-//TODO
-/*char* Cdr::getCurrentPosition()
-  {
-  return &m_currentPosition;
-  }*/
-
 size_t Cdr::getSerializedDataLength() const
 {
-    Storage::iterator &tmp = *m_storage.begin();
-    size_t returnedSize =  m_currentPosition - tmp;
-    delete &tmp;
+    Storage::iterator *tmp = m_storage.begin();
+    size_t returnedSize =  m_currentPosition->substract(tmp);
+    delete tmp;
     return returnedSize;
 }
 
@@ -140,18 +134,18 @@ Cdr::state Cdr::getState()
 
 void Cdr::setState(state &state)
 {
-    m_currentPosition >> state.m_currentPosition;
-    m_alignPosition >> state.m_alignPosition;
+    m_currentPosition->copyPosition(state.m_currentPosition);
+    m_alignPosition->copyPosition(state.m_alignPosition);
     m_swapBytes = state.m_swapBytes;
     m_lastDataSize = state.m_lastDataSize;
 }
 
 void Cdr::reset()
 {
-    delete &m_currentPosition;
-    m_currentPosition = *m_storage.begin();
-    delete &m_alignPosition;
-    m_alignPosition = *m_storage.begin();
+    delete m_currentPosition;
+    m_currentPosition = m_storage.begin();
+    delete m_alignPosition;
+    m_alignPosition = m_storage.begin();
     m_swapBytes = m_endianness == DEFAULT_ENDIAN ? false : true;
     m_lastDataSize = 0;
 }
@@ -160,14 +154,14 @@ bool Cdr::resize(size_t minSizeInc)
 {
     if(m_storage.resize(minSizeInc))
     {
-        Storage::iterator &tmp = *m_storage.begin();
+        Storage::iterator *tmp = m_storage.begin();
 
-        m_currentPosition << tmp;
-        m_alignPosition << tmp;
-        delete &m_lastPosition;
-        m_lastPosition = *m_storage.end();
+        m_currentPosition->copyStorage(tmp);
+        m_alignPosition->copyStorage(tmp);
+        delete m_lastPosition;
+        m_lastPosition = m_storage.end();
 
-        delete &tmp;
+        delete tmp;
         return true;
     }
 
@@ -176,7 +170,7 @@ bool Cdr::resize(size_t minSizeInc)
 
 Marshalling& Cdr::serialize(const char char_t)
 {
-    if(((m_lastPosition - m_currentPosition) >= sizeof(char_t)) || resize(sizeof(char_t)))
+    if((m_lastPosition->substract(m_currentPosition) >= sizeof(char_t)) || resize(sizeof(char_t)))
     {
         // Save last datasize.
         m_lastDataSize = sizeof(char_t);
@@ -193,7 +187,7 @@ Marshalling& Cdr::serialize(const int16_t short_t)
     size_t align = alignment(sizeof(short_t));
     size_t sizeAligned = sizeof(short_t) + align;
 
-    if(((m_lastPosition - m_currentPosition) >= sizeAligned) || resize(sizeAligned))
+    if((m_lastPosition->substract(m_currentPosition) >= sizeAligned) || resize(sizeAligned))
     {
         // Save last datasize.
         m_lastDataSize = sizeof(short_t);
@@ -243,7 +237,7 @@ Marshalling& Cdr::serialize(const int32_t long_t)
     size_t align = alignment(sizeof(long_t));
     size_t sizeAligned = sizeof(long_t) + align;
 
-    if(((m_lastPosition - m_currentPosition) >= sizeAligned) || resize(sizeAligned))
+    if((m_lastPosition->substract(m_currentPosition) >= sizeAligned) || resize(sizeAligned))
     {
         // Save last datasize.
         m_lastDataSize = sizeof(long_t);
@@ -295,7 +289,7 @@ Marshalling& Cdr::serialize(const int64_t longlong_t)
     size_t align = alignment(sizeof(longlong_t));
     size_t sizeAligned = sizeof(longlong_t) + align;
 
-    if(((m_lastPosition - m_currentPosition) >= sizeAligned) || resize(sizeAligned))
+    if((m_lastPosition->substract(m_currentPosition) >= sizeAligned) || resize(sizeAligned))
     {
         // Save last datasize.
         m_lastDataSize = sizeof(longlong_t);
@@ -351,7 +345,7 @@ Marshalling& Cdr::serialize(const float float_t)
     size_t align = alignment(sizeof(float_t));
     size_t sizeAligned = sizeof(float_t) + align;
 
-    if(((m_lastPosition - m_currentPosition) >= sizeAligned) || resize(sizeAligned))
+    if((m_lastPosition->substract(m_currentPosition) >= sizeAligned) || resize(sizeAligned))
     {
         // Save last datasize.
         m_lastDataSize = sizeof(float_t);
@@ -403,7 +397,7 @@ Marshalling& Cdr::serialize(const double double_t)
     size_t align = alignment(sizeof(double_t));
     size_t sizeAligned = sizeof(double_t) + align;
 
-    if(((m_lastPosition - m_currentPosition) >= sizeAligned) || resize(sizeAligned))
+    if((m_lastPosition->substract(m_currentPosition) >= sizeAligned) || resize(sizeAligned))
     {
         // Save last datasize.
         m_lastDataSize = sizeof(double_t);
@@ -458,7 +452,7 @@ Marshalling& Cdr::serialize(const bool bool_t)
 {
     uint8_t value = 0;
 
-    if(((m_lastPosition - m_currentPosition) >= sizeof(uint8_t)) || resize(sizeof(uint8_t)))
+    if((m_lastPosition->substract(m_currentPosition) >= sizeof(uint8_t)) || resize(sizeof(uint8_t)))
     {
         // Save last datasize.
         m_lastDataSize = sizeof(uint8_t);
@@ -482,7 +476,7 @@ Marshalling& Cdr::serialize(const std::string &string_t)
 
     if(length > 0)
     {
-        if(((m_lastPosition - m_currentPosition) >= length) || resize(length))
+        if((m_lastPosition->substract(m_currentPosition) >= length) || resize(length))
         {
             // Save last datasize.
             m_lastDataSize = sizeof(uint8_t);
@@ -902,7 +896,7 @@ Marshalling& Cdr::serializeArray(const char *char_t, size_t numElements)
 {
     size_t totalSize = sizeof(*char_t)*numElements;
 
-    if(((m_lastPosition - m_currentPosition) >= totalSize) || resize(totalSize))
+    if((m_lastPosition->substract(m_currentPosition) >= totalSize) || resize(totalSize))
     {
         // Save last datasize.
         m_lastDataSize = sizeof(*char_t);
@@ -920,7 +914,7 @@ Marshalling& Cdr::serializeArray(const int16_t *short_t, size_t numElements)
     size_t totalSize = sizeof(*short_t) * numElements;
     size_t sizeAligned = totalSize + align;
 
-    if(((m_lastPosition - m_currentPosition) >= sizeAligned) || resize(sizeAligned))
+    if((m_lastPosition->substract(m_currentPosition) >= sizeAligned) || resize(sizeAligned))
     {
         // Save last datasize.
         m_lastDataSize = sizeof(*short_t);
@@ -976,7 +970,7 @@ Marshalling& Cdr::serializeArray(const int32_t *long_t, size_t numElements)
     size_t totalSize = sizeof(*long_t) * numElements;
     size_t sizeAligned = totalSize + align;
 
-    if(((m_lastPosition - m_currentPosition) >= sizeAligned) || resize(sizeAligned))
+    if((m_lastPosition->substract(m_currentPosition) >= sizeAligned) || resize(sizeAligned))
     {
         // Save last datasize.
         m_lastDataSize = sizeof(*long_t);
@@ -1034,7 +1028,7 @@ Marshalling& Cdr::serializeArray(const int64_t *longlong_t, size_t numElements)
     size_t totalSize = sizeof(*longlong_t) * numElements;
     size_t sizeAligned = totalSize + align;
 
-    if(((m_lastPosition - m_currentPosition) >= sizeAligned) || resize(sizeAligned))
+    if((m_lastPosition->substract(m_currentPosition) >= sizeAligned) || resize(sizeAligned))
     {
         // Save last datasize.
         m_lastDataSize = sizeof(*longlong_t);
@@ -1096,7 +1090,7 @@ Marshalling& Cdr::serializeArray(const float *float_t, size_t numElements)
     size_t totalSize = sizeof(*float_t) * numElements;
     size_t sizeAligned = totalSize + align;
 
-    if(((m_lastPosition - m_currentPosition) >= sizeAligned) || resize(sizeAligned))
+    if((m_lastPosition->substract(m_currentPosition) >= sizeAligned) || resize(sizeAligned))
     {
         // Save last datasize.
         m_lastDataSize = sizeof(*float_t);
@@ -1154,7 +1148,7 @@ Marshalling& Cdr::serializeArray(const double *double_t, size_t numElements)
     size_t totalSize = sizeof(*double_t) * numElements;
     size_t sizeAligned = totalSize + align;
 
-    if(((m_lastPosition - m_currentPosition) >= sizeAligned) || resize(sizeAligned))
+    if((m_lastPosition->substract(m_currentPosition) >= sizeAligned) || resize(sizeAligned))
     {
         // Save last datasize.
         m_lastDataSize = sizeof(*double_t);
@@ -1212,7 +1206,7 @@ Cdr& Cdr::serializeArray(const double *double_t, size_t numElements, Endianness 
 
 Marshalling& Cdr::deserialize(char &char_t)
 {
-    if((m_lastPosition - m_currentPosition) >= sizeof(char_t))
+    if(m_lastPosition->substract(m_currentPosition) >= sizeof(char_t))
     {
         // Save last datasize.
         m_lastDataSize = sizeof(char_t);
@@ -1229,7 +1223,7 @@ Marshalling& Cdr::deserialize(int16_t &short_t)
     size_t align = alignment(sizeof(short_t));
     size_t sizeAligned = sizeof(short_t) + align;
 
-    if((m_lastPosition - m_currentPosition) >= sizeAligned)
+    if(m_lastPosition->substract(m_currentPosition) >= sizeAligned)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(short_t);
@@ -1279,7 +1273,7 @@ Marshalling& Cdr::deserialize(int32_t &long_t)
     size_t align = alignment(sizeof(long_t));
     size_t sizeAligned = sizeof(long_t) + align;
 
-    if((m_lastPosition - m_currentPosition) >= sizeAligned)
+    if(m_lastPosition->substract(m_currentPosition) >= sizeAligned)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(long_t);
@@ -1331,7 +1325,7 @@ Marshalling& Cdr::deserialize(int64_t &longlong_t)
     size_t align = alignment(sizeof(longlong_t));
     size_t sizeAligned = sizeof(longlong_t) + align;
 
-    if((m_lastPosition - m_currentPosition) >= sizeAligned)
+    if(m_lastPosition->substract(m_currentPosition) >= sizeAligned)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(longlong_t);
@@ -1387,7 +1381,7 @@ Marshalling& Cdr::deserialize(float &float_t)
     size_t align = alignment(sizeof(float_t));
     size_t sizeAligned = sizeof(float_t) + align;
 
-    if((m_lastPosition - m_currentPosition) >= sizeAligned)
+    if(m_lastPosition->substract(m_currentPosition) >= sizeAligned)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(float_t);
@@ -1439,7 +1433,7 @@ Marshalling& Cdr::deserialize(double &double_t)
     size_t align = alignment(sizeof(double_t));
     size_t sizeAligned = sizeof(double_t) + align;
 
-    if((m_lastPosition - m_currentPosition) >= sizeAligned)
+    if(m_lastPosition->substract(m_currentPosition) >= sizeAligned)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(double_t);
@@ -1494,7 +1488,7 @@ Marshalling& Cdr::deserialize(bool &bool_t)
 {
     uint8_t value = 0;
 
-    if((m_lastPosition - m_currentPosition) >= sizeof(uint8_t))
+    if(m_lastPosition->substract(m_currentPosition) >= sizeof(uint8_t))
     {
         // Save last datasize.
         m_lastDataSize = sizeof(uint8_t);
@@ -1530,7 +1524,7 @@ Marshalling& Cdr::deserialize(std::string &string_t)
         string_t = "";
         return *this;
     }
-    else if((m_lastPosition - m_currentPosition) >= length)
+    else if(m_lastPosition->substract(m_currentPosition) >= length)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(uint8_t);
@@ -1967,7 +1961,7 @@ Marshalling& Cdr::deserializeArray(char *char_t, size_t numElements)
 {
     size_t totalSize = sizeof(*char_t)*numElements;
 
-    if((m_lastPosition - m_currentPosition) >= totalSize)
+    if(m_lastPosition->substract(m_currentPosition) >= totalSize)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(*char_t);
@@ -1985,7 +1979,7 @@ Marshalling& Cdr::deserializeArray(int16_t *short_t, size_t numElements)
     size_t totalSize = sizeof(*short_t) * numElements;
     size_t sizeAligned = totalSize + align;
 
-    if((m_lastPosition - m_currentPosition) >= sizeAligned)
+    if(m_lastPosition->substract(m_currentPosition) >= sizeAligned)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(*short_t);
@@ -2041,7 +2035,7 @@ Marshalling& Cdr::deserializeArray(int32_t *long_t, size_t numElements)
     size_t totalSize = sizeof(*long_t) * numElements;
     size_t sizeAligned = totalSize + align;
 
-    if((m_lastPosition - m_currentPosition) >= sizeAligned)
+    if(m_lastPosition->substract(m_currentPosition) >= sizeAligned)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(*long_t);
@@ -2099,7 +2093,7 @@ Marshalling& Cdr::deserializeArray(int64_t *longlong_t, size_t numElements)
     size_t totalSize = sizeof(*longlong_t) * numElements;
     size_t sizeAligned = totalSize + align;
 
-    if((m_lastPosition - m_currentPosition) >= sizeAligned)
+    if(m_lastPosition->substract(m_currentPosition) >= sizeAligned)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(*longlong_t);
@@ -2161,7 +2155,7 @@ Marshalling& Cdr::deserializeArray(float *float_t, size_t numElements)
     size_t totalSize = sizeof(*float_t) * numElements;
     size_t sizeAligned = totalSize + align;
 
-    if((m_lastPosition - m_currentPosition) >= sizeAligned)
+    if(m_lastPosition->substract(m_currentPosition) >= sizeAligned)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(*float_t);
@@ -2219,7 +2213,7 @@ Marshalling& Cdr::deserializeArray(double *double_t, size_t numElements)
     size_t totalSize = sizeof(*double_t) * numElements;
     size_t sizeAligned = totalSize + align;
 
-    if((m_lastPosition - m_currentPosition) >= sizeAligned)
+    if(m_lastPosition->substract(m_currentPosition) >= sizeAligned)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(*double_t);

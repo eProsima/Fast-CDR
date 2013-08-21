@@ -16,7 +16,7 @@ const Cdr::Endianness Cdr::DEFAULT_ENDIAN = BIG_ENDIANNESS;
 const std::string Cdr::BAD_PARAM_MESSAGE_DEFAULT("Bad parameter");
 const std::string Cdr::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT("Not enough memory in the buffer stream");
 
-Cdr::state::state(Cdr &cdr) : m_currentPosition(cdr.m_storage.clone(cdr.m_currentPosition)), m_alignPosition(cdr.m_storage.clone(cdr.m_alignPosition)),
+Cdr::state::state(Cdr &cdr) : m_currentPosition(*cdr.m_storage.clone(cdr.m_currentPosition)), m_alignPosition(*cdr.m_storage.clone(cdr.m_alignPosition)),
     m_swapBytes(cdr.m_swapBytes), m_lastDataSize(cdr.m_lastDataSize) {}
 
 Cdr::state::~state()
@@ -27,8 +27,8 @@ Cdr::state::~state()
 
 Cdr::Cdr(Storage &storage, const Endianness endianness, const CdrType cdrType) : m_storage(storage),
     m_cdrType(cdrType), m_plFlag(DDS_CDR_WITHOUT_PL), m_options(0), m_endianness(endianness),
-    m_swapBytes(endianness == DEFAULT_ENDIAN ? false : true), m_lastDataSize(0), m_currentPosition(storage.begin()),
-    m_alignPosition(storage.begin()), m_lastPosition(storage.end())
+    m_swapBytes(endianness == DEFAULT_ENDIAN ? false : true), m_lastDataSize(0), m_currentPosition(*storage.begin()),
+    m_alignPosition(*storage.begin()), m_lastPosition(*storage.end())
 {
 }
 
@@ -127,7 +127,7 @@ bool Cdr::jump(uint32_t numBytes)
 
 size_t Cdr::getSerializedDataLength() const
 {
-    Storage::iterator &tmp = m_storage.begin();
+    Storage::iterator &tmp = *m_storage.begin();
     size_t returnedSize =  m_currentPosition - tmp;
     delete &tmp;
     return returnedSize;
@@ -149,9 +149,9 @@ void Cdr::setState(state &state)
 void Cdr::reset()
 {
     delete &m_currentPosition;
-    m_currentPosition = m_storage.begin();
+    m_currentPosition = *m_storage.begin();
     delete &m_alignPosition;
-    m_alignPosition = m_storage.begin();
+    m_alignPosition = *m_storage.begin();
     m_swapBytes = m_endianness == DEFAULT_ENDIAN ? false : true;
     m_lastDataSize = 0;
 }
@@ -160,12 +160,12 @@ bool Cdr::resize(size_t minSizeInc)
 {
     if(m_storage.resize(minSizeInc))
     {
-        Storage::iterator &tmp = m_storage.begin();
+        Storage::iterator &tmp = *m_storage.begin();
 
         m_currentPosition << tmp;
         m_alignPosition << tmp;
         delete &m_lastPosition;
-        m_lastPosition = m_storage.end();
+        m_lastPosition = *m_storage.end();
 
         delete &tmp;
         return true;

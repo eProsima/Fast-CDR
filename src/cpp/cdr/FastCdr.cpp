@@ -9,9 +9,9 @@ using namespace eProsima::storage;
 const std::string FastCdr::BAD_PARAM_MESSAGE_DEFAULT("Bad parameter");
 const std::string FastCdr::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT("Not enough memory in the buffer stream");
 
-FastCdr::state::state(FastCdr &fastcdr) : m_currentPosition(fastcdr.m_currentPosition) {}
+FastCdr::state::state(FastCdr &fastcdr) : m_currentPosition(*fastcdr.m_storage.clone(fastcdr.m_currentPosition)) {}
 
-FastCdr::FastCdr(Storage &storage) : m_storage(storage), m_currentPosition(storage.begin()), m_lastPosition(storage.end())
+FastCdr::FastCdr(Storage &storage) : m_storage(storage), m_currentPosition(*storage.begin()), m_lastPosition(*storage.end())
 {
 }
 
@@ -35,7 +35,7 @@ bool FastCdr::jump(uint32_t numBytes)
 
 size_t FastCdr::getSerializedDataLength() const
 {
-    Storage::iterator &tmp = m_storage.begin();
+    Storage::iterator &tmp = *m_storage.begin();
     size_t returnedSize =  m_currentPosition - tmp;
     delete &tmp;
     return returnedSize;
@@ -54,18 +54,18 @@ void FastCdr::setState(FastCdr::state &state)
 void FastCdr::reset()
 {
     delete &m_currentPosition;
-    m_currentPosition = m_storage.begin();
+    m_currentPosition = *m_storage.begin();
 }
 
 bool FastCdr::resize(size_t minSizeInc)
 {
     if(m_storage.resize(minSizeInc))
     {
-        Storage::iterator &tmp = m_storage.begin();
+        Storage::iterator &tmp = *m_storage.begin();
 
         m_currentPosition << tmp;
         delete &m_lastPosition;
-        m_lastPosition = m_storage.end();
+        m_lastPosition = *m_storage.end();
 
         delete &tmp;
         return true;

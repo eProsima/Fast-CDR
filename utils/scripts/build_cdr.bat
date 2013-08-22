@@ -6,7 +6,7 @@
 set errorstatus=0
 
 :: Get the current vesion of CDR
-call %EPROSIMADIR%\scripts\common_pack_functions.bat :getVersionFromCPP VERSIONCDR ..\..\include\cpp\cdr\Cdr_version.h
+call %EPROSIMADIR%\scripts\common_pack_functions.bat :getVersionFromCPP VERSIONCDR ..\..\include\cpp\Cdr_version.h
 if not %errorstatus%==0 goto :exit
 
 :: i86 Platform

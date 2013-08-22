@@ -1,5 +1,4 @@
-﻿#include "cpp/storage/FastBuffer.h"
-#include "cpp/cdr/Cdr.h"
+﻿#include "cpp/Cdr.h"
 #include "cpp/exceptions/Exception.h"
 
 #include <stdio.h>
@@ -7,8 +6,6 @@
 #include <iostream>
 
 using namespace eProsima;
-using namespace eProsima::marshalling;
-using namespace eProsima::storage;
 
 const uint8_t octet_t = 32;
 const char char_t =  'Z';

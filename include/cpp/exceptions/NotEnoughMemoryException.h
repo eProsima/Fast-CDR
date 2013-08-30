@@ -1,10 +1,10 @@
 /*************************************************************************
-* Copyright (c) 2012 eProsima. All rights reserved.
-*
-* This copy of RPCDDS is licensed to you under the terms described in the
-* RPCDDS_LICENSE file included in this distribution.
-*
-*************************************************************************/
+ * Copyright (c) 2013 eProsima. All rights reserved.
+ *
+ * This copy of Fast Buffers is licensed to you under the terms described in the
+ * FAST_BUFFERS_LICENSE file included in this distribution.
+ *
+ *************************************************************************/
 
 #ifndef _CPP_EXCEPTIONS_NOTENOUGHMEMORYEXCEPTION_H_
 #define _CPP_EXCEPTIONS_NOTENOUGHMEMORYEXCEPTION_H_

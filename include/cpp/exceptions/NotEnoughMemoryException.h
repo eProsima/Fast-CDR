@@ -64,7 +64,7 @@ namespace eProsima
         NotEnoughMemoryException& operator=(NotEnoughMemoryException&& ex);
 
         //! @brief Default constructor
-        virtual ~NotEnoughMemoryException() EPROSIMA_USE_NOEXCEPT;
+        virtual ~NotEnoughMemoryException() throw();
 
         //! @brief This function throws the object as exception.
         virtual void raise() const;

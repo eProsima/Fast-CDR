@@ -1,10 +1,10 @@
 /*************************************************************************
-* Copyright (c) 2012 eProsima. All rights reserved.
-*
-* This copy of RPCDDS is licensed to you under the terms described in the
-* RPCDDS_LICENSE file included in this distribution.
-*
-*************************************************************************/
+ * Copyright (c) 2013 eProsima. All rights reserved.
+ *
+ * This copy of FastBuffers is licensed to you under the terms described in the
+ * FAST_BUFFERS_LICENSE file included in this distribution.
+ *
+ *************************************************************************/
 
 #ifndef _CPP_EXCEPTIONS_BADPARAMEXCEPTION_H_
 #define _CPP_EXCEPTIONS_BADPARAMEXCEPTION_H_
@@ -64,7 +64,7 @@ namespace eProsima
         BadParamException& operator=(BadParamException&& ex);
 
         //! @brief Default constructor
-        virtual ~BadParamException() EPROSIMA_USE_NOEXCEPT;
+        virtual ~BadParamException() throw();
 
         //! @brief This function throws the object as exception.
         virtual void raise() const;

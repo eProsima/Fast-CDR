@@ -1,8 +1,15 @@
+/*************************************************************************
+ * Copyright (c) 2013 eProsima. All rights reserved.
+ *
+ * This copy of FastBuffers is licensed to you under the terms described in the
+ * FAST_BUFFERS_LICENSE file included in this distribution.
+ *
+ *************************************************************************/
+
 #ifndef _CPP_EXCEPTIONS_EXCEPTION_H_
 #define _CPP_EXCEPTIONS_EXCEPTION_H_
 
 #include "cpp/Cdr_dll.h"
-#include "eProsima_cpp/eProsimaMacros.h"
 #include <string>
 #include <exception>
 
@@ -17,7 +24,7 @@ namespace eProsima
     public:
 
         //! \brief Default destructor.
-        virtual ~Exception() EPROSIMA_USE_NOEXCEPT;
+        virtual ~Exception() throw();
 
         //! \brief This function throws the object as exception.
         virtual void raise() const = 0;
@@ -27,7 +34,7 @@ namespace eProsima
          *
          * @return The error message.
          */
-        virtual const char* what() const throw() override;
+        virtual const char* what() const throw() ;
 
     protected:
 

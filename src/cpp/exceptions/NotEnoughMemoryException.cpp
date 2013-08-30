@@ -48,7 +48,7 @@ namespace eProsima
 		return *this;
 	}
 
-	NotEnoughMemoryException::~NotEnoughMemoryException() EPROSIMA_USE_NOEXCEPT
+	NotEnoughMemoryException::~NotEnoughMemoryException() throw()
 	{
 	}
 

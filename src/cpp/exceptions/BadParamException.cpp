@@ -48,7 +48,7 @@ namespace eProsima
 		return *this;
 	}
 
-	BadParamException::~BadParamException() EPROSIMA_USE_NOEXCEPT
+	BadParamException::~BadParamException() throw()
 	{
 	}
 

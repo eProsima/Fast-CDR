@@ -30,7 +30,7 @@ namespace eProsima
 		return *this;
 	}
 
-	Exception::~Exception() EPROSIMA_USE_NOEXCEPT
+	Exception::~Exception() throw()
 	{
 	}
 

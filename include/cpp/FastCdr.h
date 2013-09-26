@@ -45,7 +45,7 @@ namespace eProsima
         private:
 
             //! @brief The position in the buffer when the state was created.
-            FastBuffer::iterator m_currentPosition;
+            const FastBuffer::iterator m_currentPosition;
         };
         /*!
          * @brief This constructor creates a eProsima::FastCdr object that could serialize/deserialize

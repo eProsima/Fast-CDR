@@ -76,10 +76,10 @@ namespace eProsima
         private:
 
             //! @brief The position in the buffer when the state was created.
-            FastBuffer::iterator m_currentPosition;
+            const FastBuffer::iterator m_currentPosition;
 
 		    //! @brief The position from the aligment is calculated,  when the state was created..
-            FastBuffer::iterator m_alignPosition;
+            const FastBuffer::iterator m_alignPosition;
 
             //! @brief This attribute specified if it is needed to swap the bytes when the state was created..
             bool m_swapBytes;

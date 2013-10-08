@@ -496,7 +496,15 @@ namespace eProsima
 
         /*!
          * @brief This function serializes a string.
-         * @param bool_t The string that will be serialized in the buffer.
+         * @param string_t The pointer to the string that will be serialized in the buffer.
+         * @return Reference to the eProsima::FastCdr object.
+         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         */
+        FastCdr& serialize(const char *&string_t);
+
+        /*!
+         * @brief This function serializes a std::string.
+         * @param string_t The string that will be serialized in the buffer.
          * @return Reference to the eProsima::FastCdr object.
          * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
          */
@@ -821,6 +829,17 @@ namespace eProsima
 
         /*!
          * @brief This function deserializes a string.
+         * This function allocates memory to store the string. The user pointer will be set to point this allocated memory.
+         * The user will have to free this allocated memory using free() function.
+         * @param string_t The pointer that will point to the string read from the buffer.
+         * The user will have to free the allocated memory using free() function.
+         * @return Reference to the eProsima::FastCdr object.
+         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         */
+        FastCdr& deserialize(char *&string_t);
+
+        /*!
+         * @brief This function deserializes a std::string.
          * @param string_t The variable that will store the string read from the buffer.
          * @return Reference to the eProsima::FastCdr object.
          * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.

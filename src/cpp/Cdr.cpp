@@ -443,6 +443,49 @@ Cdr& Cdr::serialize(const bool bool_t)
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
+Cdr& Cdr::serialize(const char *&string_t)
+{
+    uint32_t length = (uint32_t)strlen(string_t);
+    Cdr::state state(*this);
+
+    serialize(length);
+
+    if(length > 0)
+    {
+        if(((m_lastPosition - m_currentPosition) >= length) || resize(length))
+        {
+            m_currentPosition.memcopy(string_t, length);
+            m_currentPosition += length;
+        }
+        else
+        {
+            setState(state);
+            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        }
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::serialize(const char *&string_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        serialize(string_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+    
+    return *this;
+}
+
 Cdr& Cdr::serialize(const std::string &string_t)
 {
     uint32_t length = (uint32_t)string_t.length();
@@ -1118,6 +1161,50 @@ Cdr& Cdr::deserialize(bool &bool_t)
     }
 
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+}
+
+Cdr& Cdr::deserialize(char *&string_t)
+{
+    uint32_t length = 0;
+    Cdr::state state(*this);
+
+    deserialize(length);
+
+    if(length == 0)
+    {
+        string_t = NULL;
+        return *this;
+    }
+    else if((m_lastPosition - m_currentPosition) >= length)
+    {
+        // Allocate memory.
+        string_t = (char*)malloc(length + ((&m_currentPosition)[length-1] == '\0' ? 0 : 1));
+        memcpy(string_t, &m_currentPosition, length);
+        m_currentPosition += length;
+        return *this;
+    }
+
+    setState(state);
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+}
+
+Cdr& Cdr::deserialize(char *&string_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        deserialize(string_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
 }
 
 Cdr& Cdr::deserialize(std::string &string_t)

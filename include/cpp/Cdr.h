@@ -618,15 +618,32 @@ namespace eProsima
 
         /*!
          * @brief This function serializes a string.
-         * @param bool_t The string that will be serialized in the buffer.
+         * @param string_t The pointer to the string that will be serialized in the buffer.
+         * @return Reference to the eProsima::Cdr object.
+         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         */
+        Cdr& serialize(const char *&string_t);
+
+        /*!
+         * @brief This function serializes a string with a different endianness.
+         * @param string_t The pointer to the string that will be serialized in the buffer.
+         * @param endianness Endianness that will be used in the serialization of this value.
+         * @return Reference to the eProsima::Cdr object.
+         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         */
+        Cdr& serialize(const char *&string_t, Endianness endianness);
+
+        /*!
+         * @brief This function serializes a std::string.
+         * @param string_t The string that will be serialized in the buffer.
          * @return Reference to the eProsima::Cdr object.
          * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
          */
         Cdr& serialize(const std::string &string_t);
 
         /*!
-         * @brief This function serializes a string with a different endianness.
-         * @param bool_t The string that will be serialized in the buffer.
+         * @brief This function serializes a std::string with a different endianness.
+         * @param string_t The string that will be serialized in the buffer.
          * @param endianness Endianness that will be used in the serialization of this value.
          * @return Reference to the eProsima::Cdr object.
          * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
@@ -1164,6 +1181,28 @@ namespace eProsima
 
         /*!
          * @brief This function deserializes a string.
+         * This function allocates memory to store the string. The user pointer will be set to point this allocated memory.
+         * The user will have to free this allocated memory using free() function.
+         * @param string_t The pointer that will point to the string read from the buffer.
+         * The user will have to free the allocated memory using free() function.
+         * @return Reference to the eProsima::Cdr object.
+         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         */
+        Cdr& deserialize(char *&string_t);
+
+        /*!
+         * @brief This function deserializes a string with a different endianness.
+         * This function allocates memory to store the string. The user pointer will be set to point this allocated memory.
+         * The user will have to free this allocated memory using free() function.
+         * @param string_t The pointer that will point to the string read from the buffer.
+         * The user will have to free the allocated memory using free() function.
+         * @return Reference to the eProsima::Cdr object.
+         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         */
+        Cdr& deserialize(char *&string_t, Endianness endianness);
+
+        /*!
+         * @brief This function deserializes a std::string.
          * @param string_t The variable that will store the string read from the buffer.
          * @return Reference to the eProsima::Cdr object.
          * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.

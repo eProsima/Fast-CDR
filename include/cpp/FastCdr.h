@@ -500,7 +500,7 @@ namespace eProsima
          * @return Reference to the eProsima::FastCdr object.
          * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
          */
-        FastCdr& serialize(const char *&string_t);
+        FastCdr& serialize(const char *string_t);
 
         /*!
          * @brief This function serializes a std::string.

@@ -91,7 +91,7 @@ bool Cdr::jump(uint32_t numBytes)
 {
     bool returnedValue = false;
 
-    if((m_lastPosition - m_currentPosition) >= sizeof(numBytes))
+    if(((m_lastPosition - m_currentPosition) >= sizeof(numBytes)) || resize(numBytes))
     {
         m_currentPosition += numBytes;
         returnedValue = true;
@@ -443,7 +443,7 @@ Cdr& Cdr::serialize(const bool bool_t)
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-Cdr& Cdr::serialize(const char *&string_t)
+Cdr& Cdr::serialize(const char *string_t)
 {
     uint32_t length = (uint32_t)strlen(string_t);
     Cdr::state state(*this);
@@ -467,7 +467,7 @@ Cdr& Cdr::serialize(const char *&string_t)
     return *this;
 }
 
-Cdr& Cdr::serialize(const char *&string_t, Endianness endianness)
+Cdr& Cdr::serialize(const char *string_t, Endianness endianness)
 {
     bool auxSwap = m_swapBytes;
     m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));

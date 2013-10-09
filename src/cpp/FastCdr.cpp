@@ -15,7 +15,7 @@ bool FastCdr::jump(uint32_t numBytes)
 {
     bool returnedValue = false;
 
-    if(((m_lastPosition - m_currentPosition) >= sizeof(numBytes)))
+    if(((m_lastPosition - m_currentPosition) >= sizeof(numBytes)) || resize(numBytes))
     {
         m_currentPosition += numBytes;
         returnedValue = true;
@@ -72,7 +72,7 @@ FastCdr& FastCdr::serialize(const bool bool_t)
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-FastCdr& FastCdr::serialize(const char *&string_t)
+FastCdr& FastCdr::serialize(const char *string_t)
 {
     uint32_t length = (uint32_t)strlen(string_t);
     FastCdr::state state(*this);

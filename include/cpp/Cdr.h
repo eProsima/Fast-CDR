@@ -622,7 +622,7 @@ namespace eProsima
          * @return Reference to the eProsima::Cdr object.
          * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
          */
-        Cdr& serialize(const char *&string_t);
+        Cdr& serialize(const char *string_t);
 
         /*!
          * @brief This function serializes a string with a different endianness.
@@ -631,7 +631,7 @@ namespace eProsima
          * @return Reference to the eProsima::Cdr object.
          * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
          */
-        Cdr& serialize(const char *&string_t, Endianness endianness);
+        Cdr& serialize(const char *string_t, Endianness endianness);
 
         /*!
          * @brief This function serializes a std::string.

@@ -653,6 +653,33 @@ namespace eProsima
         FastCdr& serializeArray(const double *double_t, size_t numElements);
 
         /*!
+         * @brief This function template serializes a raw sequence.
+         * @param sequence_t Pointer to the sequence that will be serialized in the buffer.
+         * @param numElements The number of elements contained in the sequence.
+         * @return Reference to the eProsima::FastCdr object.
+         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         */
+        template<class _T>
+        FastCdr& serializeSequence(const _T *sequence_t, size_t numElements)
+        {
+            FastCdr::state state(*this);
+
+            serialize((int32_t)numElements);
+
+            try
+            {
+                return serializeArray(sequence_t, numElements);
+            }
+            catch(Exception &ex)
+            {
+                setState(state);
+                ex.raise();
+            }
+
+            return *this;
+        }
+
+        /*!
          * @brief This function deserializes an octet.
          * @param octet_t The variable that will store the octet read from the buffer.
          * @return Reference to the eProsima::FastCdr object.
@@ -989,6 +1016,38 @@ namespace eProsima
          * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
          */
         FastCdr& deserializeArray(double *double_t, size_t numElements);
+
+        /*!
+         * @brief This function template deserializes a raw sequence.
+         * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
+         * The user will have to free this allocated memory using free() function.
+         * @param sequence_t The pointer that will store the sequence read from the buffer.
+         * @param numElements This variable return the number of elements of the sequence.
+         * @return Reference to the eProsima::FastCdr object.
+         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         */
+        template<class _T>
+        FastCdr& deserializeSequence(_T *&sequence_t, size_t &numElements)
+        {
+            uint32_t seqLength = 0;
+            FastCdr::state state(*this);
+
+            deserialize(seqLength);
+
+            try
+            {
+                sequence_t = (_T*)calloc(seqLength, sizeof(_T));
+                return deserializeArray(sequence_t, seqLength);
+            }
+            catch(Exception &ex)
+            {
+                setState(state);
+                ex.raise();
+            }
+
+            numElements = seqLength;
+            return *this;
+        }
 
     private:
 

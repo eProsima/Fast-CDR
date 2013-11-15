@@ -185,14 +185,14 @@ namespace eprosima
         typedef _FastBuffer_iterator iterator;
 
         /*!
-         * @brief This constructor creates an internal stream and assigns it to the eProsima::FastBuffer object.
-         * The user can obtain this internal stream using the function eProsima::FastBuffer::getBuffer(). Be careful because this internal stream
-         * is deleted in the destruction of the eProsima::FastBuffer object.
+         * @brief This constructor creates an internal stream and assigns it to the eprosima::FastBuffer object.
+         * The user can obtain this internal stream using the function eprosima::FastBuffer::getBuffer(). Be careful because this internal stream
+         * is deleted in the destruction of the eprosima::FastBuffer object.
          */
         FastBuffer();
 
         /*!
-         * @brief This constructor assigns the user's stream of bytes to the eProsima::FastBuffer object.
+         * @brief This constructor assigns the user's stream of bytes to the eprosima::FastBuffer object.
          * The user's stream will be used to serialize.
          *
          * @param buffer The user's buffer that will be used. This buffer is not deallocated in the object's destruction. Cannot be NULL.
@@ -201,14 +201,14 @@ namespace eprosima
         FastBuffer(char* const buffer, const size_t bufferSize);
 
         /*!
-         * @brief This function returns the stream that the eProsima::FastBuffer uses to serialize data.
-         * @return The stream used by eProsima::FastBuffer to serialize data.
+         * @brief This function returns the stream that the eprosima::FastBuffer uses to serialize data.
+         * @return The stream used by eprosima::FastBuffer to serialize data.
          */
         inline char* getBuffer() const { return m_buffer;}
 
         /*!
-         * @brief This function returns the size of the allocated memory of the stream that the eProsima::FastBuffer uses to serialize data.
-         * @return The size of the allocated memory of the stream used by the eProsima::FastBuffer to serialize data.
+         * @brief This function returns the size of the allocated memory of the stream that the eprosima::FastBuffer uses to serialize data.
+         * @return The size of the allocated memory of the stream used by the eprosima::FastBuffer to serialize data.
          */
         inline size_t getBufferSize() const { return m_bufferSize;}
 

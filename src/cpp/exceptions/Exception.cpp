@@ -1,6 +1,6 @@
 #include "cpp/exceptions/Exception.h"
 
-namespace eProsima
+namespace eprosima
 {
 	Exception::Exception(const std::string &message) : m_message(message)
 	{
@@ -38,4 +38,4 @@ namespace eProsima
 	{
 		return m_message.c_str();
 	}
-} // namespace eProsima
+} // namespace eprosima

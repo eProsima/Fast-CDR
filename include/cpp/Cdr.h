@@ -17,7 +17,7 @@
 #include <array>
 #include <vector>
 
-namespace eProsima
+namespace eprosima
 {
     /*!
      * @brief This class offers an interface to serialize/deserialize some basic types using CDR protocol inside a eProsima::FastBuffer.

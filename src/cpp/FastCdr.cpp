@@ -3,7 +3,7 @@
 #include "cpp/exceptions/BadParamException.h"
 #include <string.h>
 
-using namespace eProsima;
+using namespace eprosima;
 
 FastCdr::state::state(FastCdr &fastcdr) : m_currentPosition(fastcdr.m_currentPosition) {}
 

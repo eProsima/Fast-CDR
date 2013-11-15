@@ -8,7 +8,7 @@
 
 #include <cpp/exceptions/NotEnoughMemoryException.h>
 
-namespace eProsima
+namespace eprosima
 {
     const std::string NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT("Not enough memory in the buffer stream");
 
@@ -56,4 +56,4 @@ namespace eProsima
 	{
 		throw *this;
 	}
-} // namespace eProsima
+} // namespace eprosima

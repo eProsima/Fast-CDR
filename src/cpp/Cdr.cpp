@@ -2,7 +2,7 @@
 #include "cpp/exceptions/NotEnoughMemoryException.h"
 #include "cpp/exceptions/BadParamException.h"
 
-using namespace eProsima;
+using namespace eprosima;
 
 #if defined(__LITTLE_ENDIAN__)
     const Cdr::Endianness Cdr::DEFAULT_ENDIAN = LITTLE_ENDIANNESS;

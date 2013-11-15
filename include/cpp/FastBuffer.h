@@ -15,7 +15,7 @@
 #include <string.h>
 #include <cstddef>
 
-namespace eProsima
+namespace eprosima
 {
     /*!
      * @brief This class implements the iterator used to go through a FastBuffer.
@@ -250,6 +250,6 @@ namespace eProsima
         //! @brief This variable indicates if the managed buffer is internal or is from the user.
         bool m_internalBuffer;
     };
-};
+}; // namespace eprosima
 
 #endif // _CPP_CDRBUFFER_H_

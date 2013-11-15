@@ -18,7 +18,7 @@
 #include <array>
 #include <vector>
 
-namespace eProsima
+namespace eprosima
 {
     /*!
      * @brief This class offers an interface to serialize/deserialize some basic types using a modified CDR protocol inside a eProsima::FastBuffer.
@@ -1088,6 +1088,6 @@ namespace eProsima
         //! @brief The last position in the buffer;
         FastBuffer::iterator m_lastPosition;
     };
-};
+}; // namespace eprosima
 
 #endif //_CPP_FASTCDR_H_

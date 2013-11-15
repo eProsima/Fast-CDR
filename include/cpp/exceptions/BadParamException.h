@@ -11,7 +11,7 @@
 
 #include <cpp/exceptions/Exception.h>
 
-namespace eProsima
+namespace eprosima
 {
     /*!
      * @brief This class is thrown as an exception when a invalid parameter was being serialized.
@@ -72,5 +72,5 @@ namespace eProsima
         //! @brief Default message used in the library.
         static const std::string BAD_PARAM_MESSAGE_DEFAULT;
     };
-} // namespace eProsima
+} // namespace eprosima
 #endif // _CPP_EXCEPTIONS_BADPARAMEXCEPTION_H_

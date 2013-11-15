@@ -4,7 +4,7 @@
 
 #define BUFFER_START_LENGTH 200
 
-namespace eProsima
+namespace eprosima
 {
     FastBuffer::FastBuffer() : m_buffer(NULL),
         m_bufferSize(0), m_internalBuffer(true)

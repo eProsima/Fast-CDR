@@ -13,7 +13,7 @@
 #include <string>
 #include <exception>
 
-namespace eProsima
+namespace eprosima
 {
     /*!
     * @brief This abstract class is used to create exceptions.
@@ -84,6 +84,6 @@ namespace eProsima
 
         std::string m_message;
     };
-} // namespace eProsima
+} // namespace eprosima
 
 #endif // _CPP_EXCEPTIONS_EXCEPTION_H_

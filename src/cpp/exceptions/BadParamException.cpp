@@ -8,7 +8,7 @@
 
 #include <cpp/exceptions/BadParamException.h>
 
-namespace eProsima
+namespace eprosima
 {
     const std::string BadParamException::BAD_PARAM_MESSAGE_DEFAULT("Bad parameter");
 
@@ -56,4 +56,4 @@ namespace eProsima
 	{
 		throw *this;
 	}
-} // namespace eProsima
+} // namespace eprosima

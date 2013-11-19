@@ -6,13 +6,13 @@
  *
  *************************************************************************/
 
-#ifndef _CPP_FASTCDR_H_
-#define _CPP_FASTCDR_H_
+#ifndef _CDR_FASTCDR_H_
+#define _CDR_FASTCDR_H_
 
-#include "Cdr_dll.h"
-#include "cpp/FastBuffer.h"
-#include "cpp/exceptions/Exception.h"
-#include "cpp/exceptions/NotEnoughMemoryException.h"
+#include "cdr/Cdr_dll.h"
+#include "cdr/FastBuffer.h"
+#include "cdr/exceptions/Exception.h"
+#include "cdr/exceptions/NotEnoughMemoryException.h"
 #include <stdint.h>
 #include <string>
 #include <array>
@@ -1090,4 +1090,4 @@ namespace eprosima
     };
 }; // namespace eprosima
 
-#endif //_CPP_FASTCDR_H_
+#endif //_CDR_FASTCDR_H_

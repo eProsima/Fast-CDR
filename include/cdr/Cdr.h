@@ -6,12 +6,12 @@
  *
  *************************************************************************/
 
-#ifndef _CPP_CDR_H_
-#define _CPP_CDR_H_
+#ifndef _CDR_CDR_H_
+#define _CDR_CDR_H_
 
-#include "Cdr_dll.h"
-#include "cpp/FastBuffer.h"
-#include "cpp/exceptions/Exception.h"
+#include "cdr/Cdr_dll.h"
+#include "cdr/FastBuffer.h"
+#include "cdr/exceptions/Exception.h"
 #include <stdint.h>
 #include <string>
 #include <array>
@@ -1738,4 +1738,4 @@ namespace eprosima
     };
 };
 
-#endif // _CPP_CDR_H_
+#endif // _CDR_CDR_H_

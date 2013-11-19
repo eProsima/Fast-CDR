@@ -6,8 +6,8 @@
  *
  *************************************************************************/
 
-#ifndef _CPP_CDR_DLL_H_
-#define _CPP_CDR_DLL_H_
+#ifndef _CDR_CDR_DLL_H_
+#define _CDR_CDR_DLL_H_
 
 // normalize macros
 #if !defined(CDR_DYN_LINK) && !defined(CDR_STATIC_LINK) \
@@ -48,7 +48,7 @@
 #if !defined(CDR_SOURCE) && !defined(EPROSIMA_ALL_NO_LIB) \
     && !defined(CDR_NO_LIB)
 
-#include "cpp/Cdr_version.h"
+#include "cdr/Cdr_version.h"
 
 // Set properties.
 #define EPROSIMA_LIB_NAME cdr
@@ -60,4 +60,4 @@
 #include "eProsima_cpp/eProsima_auto_link.h"
 #endif // auto-linking disabled
 
-#endif // _CPP_CDR_DLL_H_
+#endif // _CDR_CDR_DLL_H_

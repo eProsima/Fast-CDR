@@ -3,7 +3,7 @@ CDR_OUTDIR_DEBUG = $(CDR_OUTDIR)/debug
 CDR_OUTDIR_RELEASE = $(CDR_OUTDIR)/release
 
 # Get product version.
-CDRVERSION=-$(shell $(EPROSIMADIR)/scripts/common_pack_functions.sh printVersionFromCPP include/cpp/Cdr_version.h)
+CDRVERSION=-$(shell $(EPROSIMADIR)/scripts/common_pack_functions.sh printVersionFromCPP include/cdr/Cdr_version.h)
 
 CDR_SED_OUTPUT_DIR_DEBUG= $(subst /,\\/,$(CDR_OUTDIR_DEBUG))
 CDR_SED_OUTPUT_DIR_RELEASE= $(subst /,\\/,$(CDR_OUTDIR_RELEASE))

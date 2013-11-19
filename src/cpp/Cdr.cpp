@@ -1,6 +1,6 @@
-#include "cpp/Cdr.h"
-#include "cpp/exceptions/NotEnoughMemoryException.h"
-#include "cpp/exceptions/BadParamException.h"
+#include "cdr/Cdr.h"
+#include "cdr/exceptions/NotEnoughMemoryException.h"
+#include "cdr/exceptions/BadParamException.h"
 
 using namespace eprosima;
 

@@ -6,10 +6,10 @@
  *
  *************************************************************************/
 
-#ifndef _CPP_CDRBUFFER_H_
-#define _CPP_CDRBUFFER_H_
+#ifndef _CDR_CDRBUFFER_H_
+#define _CDR_CDRBUFFER_H_
 
-#include "Cdr_dll.h"
+#include "cdr/Cdr_dll.h"
 #include <stdint.h>
 #include <cstdio>
 #include <string.h>
@@ -252,4 +252,4 @@ namespace eprosima
     };
 }; // namespace eprosima
 
-#endif // _CPP_CDRBUFFER_H_
+#endif // _CDR_CDRBUFFER_H_

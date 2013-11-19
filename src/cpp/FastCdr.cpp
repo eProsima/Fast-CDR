@@ -1,6 +1,6 @@
 
-#include "cpp/FastCdr.h"
-#include "cpp/exceptions/BadParamException.h"
+#include "cdr/FastCdr.h"
+#include "cdr/exceptions/BadParamException.h"
 #include <string.h>
 
 using namespace eprosima;

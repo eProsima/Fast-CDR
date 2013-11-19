@@ -1,4 +1,4 @@
-#include "cpp/Cdr_version.h"
+#include "cdr/Cdr_version.h"
 // Microsoft Visual C++ generated resource script.
 //
 #ifdef APSTUDIO_INVOKED

@@ -387,7 +387,7 @@
     <ClCompile>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include\cpp;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include\cdr;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -407,14 +407,14 @@
     <ClCompile Include="..\..\..\..\src\cpp\FastCdr.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\include\cpp\Cdr.h" />
-    <ClInclude Include="..\..\..\..\include\cpp\Cdr_dll.h" />
-    <ClInclude Include="..\..\..\..\include\cpp\Cdr_version.h" />
-    <ClInclude Include="..\..\..\..\include\cpp\exceptions\BadParamException.h" />
-    <ClInclude Include="..\..\..\..\include\cpp\exceptions\Exception.h" />
-    <ClInclude Include="..\..\..\..\include\cpp\exceptions\NotEnoughMemoryException.h" />
-    <ClInclude Include="..\..\..\..\include\cpp\FastBuffer.h" />
-    <ClInclude Include="..\..\..\..\include\cpp\FastCdr.h" />
+    <ClInclude Include="..\..\..\..\include\cdr\Cdr.h" />
+    <ClInclude Include="..\..\..\..\include\cdr\Cdr_dll.h" />
+    <ClInclude Include="..\..\..\..\include\cdr\Cdr_version.h" />
+    <ClInclude Include="..\..\..\..\include\cdr\exceptions\BadParamException.h" />
+    <ClInclude Include="..\..\..\..\include\cdr\exceptions\Exception.h" />
+    <ClInclude Include="..\..\..\..\include\cdr\exceptions\NotEnoughMemoryException.h" />
+    <ClInclude Include="..\..\..\..\include\cdr\FastBuffer.h" />
+    <ClInclude Include="..\..\..\..\include\cdr\FastCdr.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\..\..\src\cpp\CDR.rc">

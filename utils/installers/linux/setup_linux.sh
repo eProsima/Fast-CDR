@@ -19,22 +19,22 @@ function installer
 	errorstatus=$?
 	if [ $errorstatus != 0 ]; then return; fi
 
-	# Copy CDR headers
+	# Copy FastCDR headers
 	mkdir -p tmp/$project/include
-	cp -r ../../../include/cdr tmp/$project/include
+	cp -r ../../../include/fastcdr tmp/$project/include
 	errorstatus=$?
 	if [ $errorstatus != 0 ]; then return; fi
-        if [ -d tmp/$project/include/cdr/.svn ]; then
-            find tmp/$project/include/cdr -iname .svn -exec rm -rf {} \;
+        if [ -d tmp/$project/include/fastcdr/.svn ]; then
+            find tmp/$project/include/fastcdr -iname .svn -exec rm -rf {} \;
         fi
 
 	# Copy eProsima header files
-	mkdir -p tmp/$project/include/cdr/eProsima_cpp
-	cp $EPROSIMADIR/code/eProsima_cpp/eProsima_auto_link.h tmp/$project/include/cdr/eProsima_cpp
+	mkdir -p tmp/$project/include/fastcdr/eProsima_cpp
+	cp $EPROSIMADIR/code/eProsima_cpp/eProsima_auto_link.h tmp/$project/include/fastcdr/eProsima_cpp
 	errorstatus=$?
 	if [ $errorstatus != 0 ]; then return; fi
 
-	# Copy CDR sources
+	# Copy FastCDR sources
 	mkdir -p tmp/$project/src
 	cp -r ../../../src/cpp tmp/$project/src
 	errorstatus=$?

@@ -70,7 +70,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\..\..\..\src\cpp\FastCDR.rc">
+    <ResourceCompile Include="..\..\..\..\src\cpp\FastCdr.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

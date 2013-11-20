@@ -1,0 +1,11 @@
+library_includedir = $(includedir)
+nobase_library_include_HEADERS = cdr/Cdr_dll.h \
+			  cdr/Cdr.h \
+			  cdr/Cdr_version.h \
+			  cdr/FastBuffer.h \
+			  cdr/FastCdr.h \
+			  cdr/exceptions/BadParamException.h \
+			  cdr/exceptions/Exception.h \
+			  cdr/exceptions/NotEnoughMemoryException.h \
+			  cdr/eProsima_cpp/eProsima_auto_link.h
+

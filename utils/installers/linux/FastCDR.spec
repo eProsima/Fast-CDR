@@ -1,7 +1,7 @@
 Name: FastCDR
 Version: VERSION
 Release: 1%{?dist}
-Summary: A library for serialize using CDR serialization
+Summary: C++ library for serialize using CDR serialization
 License: LGPLv3	
 URL: http://eprosima.com
 Source0: %{name}_%{version}.tar.gz

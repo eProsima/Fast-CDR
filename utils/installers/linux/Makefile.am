@@ -12,5 +12,5 @@ libfastcdr_la_LDFLAGS = -version-number VERSION_MAJOR:VERSION_MINOR:0
 
 AM_CPPFLAGS = -std=c++0x -Iinclude
 
-fastcdrdir = $(datadir)/fastcdr
-fastcdr_DATA = FASTCDR_LIBRARY_LICENSE.txt LGPLv3_LICENSE.txt
+fastcdr_licenciasdir = $(datadir)/doc/fastcdr
+fastcdr_licencias_DATA = FASTCDR_LIBRARY_LICENSE.txt LGPLv3_LICENSE.txt

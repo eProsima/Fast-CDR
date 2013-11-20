@@ -77,6 +77,32 @@ function installer
 	if [ $errorstatus != 0 ]; then return; fi
 }
 
+function rpminstaller
+{
+	# Copy SPEC file
+	sed "s/VERSION/${version}/g" FastCDR.spec > ~/rpmbuild/SPECS/FastCDR.spec
+	errorstatus=$?
+	if [ $errorstatus != 0 ]; then return; fi
+	# Copy source
+	cp "${project}_${version}.tar.gz" ~/rpmbuild/SOURCES
+	errorstatus=$?
+	if [ $errorstatus != 0 ]; then return; fi
+	# Go to directory to build.
+	cd ~/rpmbuild/SPECS
+	errorstatus=$?
+	if [ $errorstatus != 0 ]; then return; fi
+	# Build command for i686.
+	rpmbuild -bb --target i686 FastCDR.spec
+	errorstatus=$?
+	if [ $errorstatus != 0 ]; then cd -; return; fi
+	# Build command for x86_64.
+	rpmbuild -bb --target x86_64 FastCDR.spec
+	errorstatus=$?
+	# Return
+	cd -
+	if [ $errorstatus != 0 ]; then return; fi
+}
+
 if [ $# -lt 1 ]; then
 	echo "Needs as parameter the version of the product $project"
 	exit -1
@@ -92,6 +118,9 @@ mkdir tmp
 mkdir tmp/$project
 
 installer
+
+#TODO Check the distro to know if RMP is supported.
+[ $errorstatus == 0 ] && { rpminstaller; }
 
 # Remove temporaly directory
 rm -rf tmp

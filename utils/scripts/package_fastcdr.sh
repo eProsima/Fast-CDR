@@ -11,18 +11,10 @@
 
 errorstatus=0
 
-function setPlatform
-{
-    platforms=`cat src/platforms`
-    if [[ $platforms != *$1* ]]; then
-        echo $1 >> src/platforms
-    fi
-}
-
 function package
 {
-    # Get current version of GCC.
-    . $EPROSIMADIR/scripts/common_pack_functions.sh getGccVersion
+    # Get current version of GCC. (Not more needed)
+    #. $EPROSIMADIR/scripts/common_pack_functions.sh getGccVersion
 
     # Update and compile FastCDR library.
     # Update FastCDR library.
@@ -31,14 +23,14 @@ function package
     if [ $errorstatus != 0 ]; then return; fi
     # Compile FastCDR library for i86.
     rm -rf output
-    EPROSIMA_TARGET="i86Linux2.6gcc${gccversion}"
+    EPROSIMA_TARGET="i86Linux2.6gcc"
     rm -r lib/$EPROSIMA_TARGET
     make
     errorstatus=$?
     if [ $errorstatus != 0 ]; then return; fi
     # Compile FastCDR library for x64.
     rm -rf output
-    EPROSIMA_TARGET="x64Linux2.6gcc${gccversion}"
+    EPROSIMA_TARGET="x64Linux2.6gcc"
     rm -r lib/$EPROSIMA_TARGET
     make
     errorstatus=$?

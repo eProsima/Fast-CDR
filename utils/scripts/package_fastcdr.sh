@@ -24,19 +24,19 @@ function package
     # Get current version of GCC.
     . $EPROSIMADIR/scripts/common_pack_functions.sh getGccVersion
 
-    # Update and compile CDR library.
-    # Update CDR library.
+    # Update and compile FastCDR library.
+    # Update FastCDR library.
     svn update
     errorstatus=$?
     if [ $errorstatus != 0 ]; then return; fi
-    # Compile CDR library for i86.
+    # Compile FastCDR library for i86.
     rm -rf output
     EPROSIMA_TARGET="i86Linux2.6gcc${gccversion}"
     rm -r lib/$EPROSIMA_TARGET
     make
     errorstatus=$?
     if [ $errorstatus != 0 ]; then return; fi
-    # Compile CDR library for x64.
+    # Compile FastCDR library for x64.
     rm -rf output
     EPROSIMA_TARGET="x64Linux2.6gcc${gccversion}"
     rm -r lib/$EPROSIMA_TARGET
@@ -45,7 +45,7 @@ function package
     if [ $errorstatus != 0 ]; then return; fi
 
     # Get the current version of FastBuffers
-    . $EPROSIMADIR/scripts/common_pack_functions.sh getVersionFromCPP fastcdrversion include/cdr/Cdr_version.h
+    . $EPROSIMADIR/scripts/common_pack_functions.sh getVersionFromCPP fastcdrversion include/fastcdr/FastCdr_version.h
     errorstatus=$?
     if [ $errorstatus != 0 ]; then return; fi
 

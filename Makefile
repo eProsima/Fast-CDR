@@ -8,11 +8,11 @@ CP=cp
 LNK=ln
 
 -include $(EPROSIMADIR)/building/makefiles/eProsima.mk
--include $(BASEDIR)/building/makefiles/cdr.mk
+-include $(BASEDIR)/building/makefiles/fastcdr.mk
 
 .PHONY: all
 
-all: cdr
+all: fastcdr
 
 clean:
 	@rm -f $(OBJS)

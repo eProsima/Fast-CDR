@@ -6,12 +6,12 @@
  *
  *************************************************************************/
 
-#ifndef _CDR_CDR_H_
-#define _CDR_CDR_H_
+#ifndef _FASTCDR_CDR_H_
+#define _FASTCDR_CDR_H_
 
-#include "cdr/Cdr_dll.h"
-#include "cdr/FastBuffer.h"
-#include "cdr/exceptions/Exception.h"
+#include "fastcdr/FastCdr_dll.h"
+#include "fastcdr/FastBuffer.h"
+#include "fastcdr/exceptions/Exception.h"
 #include <stdint.h>
 #include <string>
 #include <array>
@@ -21,7 +21,7 @@ namespace eprosima
 {
     /*!
      * @brief This class offers an interface to serialize/deserialize some basic types using CDR protocol inside a eprosima::FastBuffer.
-     * @ingroup CDRAPIREFERENCE
+     * @ingroup FASTCDRAPIREFERENCE
      */
     class Cdr_DllAPI Cdr
     {

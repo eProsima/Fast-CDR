@@ -1,25 +1,25 @@
 /*!
- * @mainpage CDR Serializer
+ * @mainpage FastCDR Serializer
  *
- * <center><b>CDR Serializer Library</b></center><br/>
+ * <center><b>FastCDR Serializer library</b></center><br/>
  * <center>
  * @image html eProsimaLogo.png
  * @image latex eProsimaLogo.png "" width=5cm
  * <br/><a href="http://www.eprosima.com">eProsima</a></center>
  *
- * CDR Serializer is a little and fast library that serializes data using CDR format. Its API provides you an easy way
+ * FastCDR Serializer is a little and fast library that serializes data using CDR format. Its API provides you an easy way
  * to serialize common basic types of data. This first release of this library is implemented in C++11.
  *
  */
 
  /*!
- * @defgroup CDRAPIREFERENCE CDR Serializer API Reference
- * @brief CDR Serializer internal API groped in modules.
+ * @defgroup FASTCDRAPIREFERENCE FastCDR Serializer API Reference
+ * @brief FastCDR Serializer internal API groped in modules.
  */
 
  /*!
  * @defgroup EXCEPTIONMODULE Exceptions
- * @ingroup CDRAPIREFERENCE
- * @brief Exceptions used by the CDR API.
- * All exceptions defined in this module are thrown by the CDR library.
+ * @ingroup FASTCDRAPIREFERENCE
+ * @brief Exceptions used by the FastCDR API.
+ * All exceptions defined in this module are thrown by the FastCDR library.
  */

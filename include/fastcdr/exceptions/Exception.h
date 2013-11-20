@@ -6,10 +6,10 @@
  *
  *************************************************************************/
 
-#ifndef _CDR_EXCEPTIONS_EXCEPTION_H_
-#define _CDR_EXCEPTIONS_EXCEPTION_H_
+#ifndef _FASTCDR_EXCEPTIONS_EXCEPTION_H_
+#define _FASTCDR_EXCEPTIONS_EXCEPTION_H_
 
-#include "cdr/Cdr_dll.h"
+#include "fastcdr/FastCdr_dll.h"
 #include <string>
 #include <exception>
 
@@ -86,4 +86,4 @@ namespace eprosima
     };
 } // namespace eprosima
 
-#endif // _CDR_EXCEPTIONS_EXCEPTION_H_
+#endif // _FASTCDR_EXCEPTIONS_EXCEPTION_H_

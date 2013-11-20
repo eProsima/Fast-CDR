@@ -38,7 +38,7 @@
     <ProjectGuid>{D6523184-F3F2-44CD-ADE2-F5F98FE3016D}</ProjectGuid>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <Keyword>ManagedCProj</Keyword>
-    <RootNamespace>CDR</RootNamespace>
+    <RootNamespace>FastCDR</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -127,23 +127,23 @@
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <OutDir>$(ProjectDir)..\..\..\..\lib\i86Win32VS2010\</OutDir>
-    <TargetName>libcdrd$(VERSION)</TargetName>
+    <TargetName>libfastcdrd$(VERSION)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>libcdrd$(VERSION)</TargetName>
+    <TargetName>libfastcdrd$(VERSION)</TargetName>
     <OutDir>$(ProjectDir)..\..\..\..\lib\x64Win64VS2010\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDLL|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>cdrd$(VERSION)</TargetName>
+    <TargetName>fastcdrd$(VERSION)</TargetName>
     <OutDir>$(ProjectDir)..\..\..\..\lib\i86Win32VS2010\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDLL|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>cdrd$(VERSION)</TargetName>
+    <TargetName>fastcdrd$(VERSION)</TargetName>
     <OutDir>$(ProjectDir)..\..\..\..\lib\x64Win64VS2010\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -151,11 +151,11 @@
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <OutDir>$(ProjectDir)..\..\..\..\lib\i86Win32VS2010\</OutDir>
-    <TargetName>libcdr$(VERSION)</TargetName>
+    <TargetName>libfastcdr$(VERSION)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>libcdr$(VERSION)</TargetName>
+    <TargetName>libfastcdr$(VERSION)</TargetName>
     <OutDir>$(ProjectDir)..\..\..\..\lib\x64Win64VS2010\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
@@ -163,13 +163,13 @@
     <LinkIncremental>false</LinkIncremental>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
     <OutDir>$(ProjectDir)..\..\..\..\lib\i86Win32VS2010\</OutDir>
-    <TargetName>cdr$(VERSION)</TargetName>
+    <TargetName>fastcdr$(VERSION)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|x64'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(ProjectDir)..\..\..\..\lib\x64Win64VS2010\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <TargetName>cdr$(VERSION)</TargetName>
+    <TargetName>fastcdr$(VERSION)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug DLL|Win32'">
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
@@ -179,7 +179,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;__LITTLE_ENDIAN__;CDR_SOURCE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;__LITTLE_ENDIAN__;FASTCDR_SOURCE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
@@ -197,7 +197,7 @@
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
     <ResourceCompile>
-      <PreprocessorDefinitions>CDR_SOURCE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FASTCDR_SOURCE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
@@ -205,7 +205,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;__LITTLE_ENDIAN__;CDR_SOURCE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;__LITTLE_ENDIAN__;FASTCDR_SOURCE;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
@@ -224,7 +224,7 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Lib>
     <ResourceCompile>
-      <PreprocessorDefinitions>CDR_SOURCE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FASTCDR_SOURCE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
@@ -232,7 +232,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;__LITTLE_ENDIAN__;CDR_SOURCE;CDR_DYN_LINK;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;__LITTLE_ENDIAN__;FASTCDR_SOURCE;FASTCDR_DYN_LINK;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;$(EPROSIMADIR)\code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -247,7 +247,7 @@
       <Command>copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\i86Win32VS2010</Command>
     </PostBuildEvent>
     <ResourceCompile>
-      <PreprocessorDefinitions>CDR_SOURCE;CDR_DYN_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FASTCDR_SOURCE;FASTCDR_DYN_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
@@ -255,7 +255,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;__LITTLE_ENDIAN__;CDR_SOURCE;CDR_DYN_LINK;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;__LITTLE_ENDIAN__;FASTCDR_SOURCE;FASTCDR_DYN_LINK;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
@@ -272,14 +272,14 @@
       <Command>copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\x64Win64VS2010</Command>
     </PostBuildEvent>
     <ResourceCompile>
-      <PreprocessorDefinitions>CDR_SOURCE;CDR_DYN_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FASTCDR_SOURCE;FASTCDR_DYN_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;__LITTLE_ENDIAN__;CDR_SOURCE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;__LITTLE_ENDIAN__;FASTCDR_SOURCE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
@@ -297,14 +297,14 @@
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
     <ResourceCompile>
-      <PreprocessorDefinitions>CDR_SOURCE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FASTCDR_SOURCE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;__LITTLE_ENDIAN__;CDR_SOURCE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;__LITTLE_ENDIAN__;FASTCDR_SOURCE;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
@@ -323,14 +323,14 @@
       <TargetMachine>MachineX64</TargetMachine>
     </Lib>
     <ResourceCompile>
-      <PreprocessorDefinitions>CDR_SOURCE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FASTCDR_SOURCE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;__LITTLE_ENDIAN__;CDR_SOURCE;CDR_DYN_LINK;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;__LITTLE_ENDIAN__;FASTCDR_SOURCE;FASTCDR_DYN_LINK;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
@@ -347,14 +347,14 @@
       <Command>copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\i86Win32VS2010</Command>
     </PostBuildEvent>
     <ResourceCompile>
-      <PreprocessorDefinitions>CDR_SOURCE;CDR_DYN_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FASTCDR_SOURCE;FASTCDR_DYN_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;__LITTLE_ENDIAN__;CDR_SOURCE;CDR_DYN_LINK;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;__LITTLE_ENDIAN__;FASTCDR_SOURCE;FASTCDR_DYN_LINK;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
@@ -371,7 +371,7 @@
       <Command>copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\x64Win64VS2010</Command>
     </PostBuildEvent>
     <ResourceCompile>
-      <PreprocessorDefinitions>CDR_SOURCE;CDR_DYN_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>FASTCDR_SOURCE;FASTCDR_DYN_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <ResourceCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include</AdditionalIncludeDirectories>
@@ -387,7 +387,7 @@
     <ClCompile>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include\cdr;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include\fastcdr;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -407,17 +407,17 @@
     <ClCompile Include="..\..\..\..\src\cpp\FastCdr.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\include\cdr\Cdr.h" />
-    <ClInclude Include="..\..\..\..\include\cdr\Cdr_dll.h" />
-    <ClInclude Include="..\..\..\..\include\cdr\Cdr_version.h" />
-    <ClInclude Include="..\..\..\..\include\cdr\exceptions\BadParamException.h" />
-    <ClInclude Include="..\..\..\..\include\cdr\exceptions\Exception.h" />
-    <ClInclude Include="..\..\..\..\include\cdr\exceptions\NotEnoughMemoryException.h" />
-    <ClInclude Include="..\..\..\..\include\cdr\FastBuffer.h" />
-    <ClInclude Include="..\..\..\..\include\cdr\FastCdr.h" />
+    <ClInclude Include="..\..\..\..\include\fastcdr\Cdr.h" />
+    <ClInclude Include="..\..\..\..\include\fastcdr\FastCdr_dll.h" />
+    <ClInclude Include="..\..\..\..\include\fastcdr\FastCdr_version.h" />
+    <ClInclude Include="..\..\..\..\include\fastcdr\exceptions\BadParamException.h" />
+    <ClInclude Include="..\..\..\..\include\fastcdr\exceptions\Exception.h" />
+    <ClInclude Include="..\..\..\..\include\fastcdr\exceptions\NotEnoughMemoryException.h" />
+    <ClInclude Include="..\..\..\..\include\fastcdr\FastBuffer.h" />
+    <ClInclude Include="..\..\..\..\include\fastcdr\FastCdr.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\..\..\..\src\cpp\CDR.rc">
+    <ResourceCompile Include="..\..\..\..\src\cpp\FastCDR.rc">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|x64'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='DebugDLL|x64'">_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='ReleaseDLL|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>

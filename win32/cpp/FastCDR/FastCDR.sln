@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CDR", "CDR\CDR.vcxproj", "{D6523184-F3F2-44CD-ADE2-F5F98FE3016D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FastCDR", "FastCDR\FastCDR.vcxproj", "{D6523184-F3F2-44CD-ADE2-F5F98FE3016D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

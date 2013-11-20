@@ -6,18 +6,18 @@
  *
  *************************************************************************/
 
-#ifndef _CDR_EXCEPTIONS_BADPARAMEXCEPTION_H_
-#define _CDR_EXCEPTIONS_BADPARAMEXCEPTION_H_
+#ifndef _FASTCDR_EXCEPTIONS_NOTENOUGHMEMORYEXCEPTION_H_
+#define _FASTCDR_EXCEPTIONS_NOTENOUGHMEMORYEXCEPTION_H_
 
-#include <cdr/exceptions/Exception.h>
+#include <fastcdr/exceptions/Exception.h>
 
 namespace eprosima
 {
     /*!
-     * @brief This class is thrown as an exception when a invalid parameter was being serialized.
+     * @brief This class is thrown as an exception when the buffer's internal memory reachs its size limit.
      * @ingroup EXCEPTIONMODULE
      */
-    class Cdr_DllAPI BadParamException : public Exception
+    class Cdr_DllAPI NotEnoughMemoryException : public Exception
     {
     public:
 
@@ -26,51 +26,51 @@ namespace eprosima
          *
          * @param message A error message. This message is copied.
          */
-        BadParamException(const std::string &message);
+        NotEnoughMemoryException(const std::string &message);
 
         /*!
          * @brief Default constructor.
          *
          * @param message A error message. This message is moved.
          */
-        BadParamException(std::string&& message);
+        NotEnoughMemoryException(std::string&& message);
 
         /*!
          * @brief Default copy constructor.
          *
-         * @param ex BadParamException that will be copied.
+         * @param ex NotEnoughMemoryException that will be copied.
          */
-        BadParamException(const BadParamException &ex);
+        NotEnoughMemoryException(const NotEnoughMemoryException &ex);
 
         /*!
          * @brief Default move constructor.
          *
-         * @param ex BadParamException that will be moved.
+         * @param ex NotEnoughMemoryException that will be moved.
          */
-        BadParamException(BadParamException&& ex);
+        NotEnoughMemoryException(NotEnoughMemoryException&& ex);
 
         /*!
          * @brief Assigment operation.
          *
-         * @param ex BadParamException that will be copied.
+         * @param ex NotEnoughMemoryException that will be copied.
          */
-        BadParamException& operator=(const BadParamException &ex);
+        NotEnoughMemoryException& operator=(const NotEnoughMemoryException &ex);
 
         /*!
          * @brief Assigment operation.
          *
-         * @param ex BadParamException that will be moved.
+         * @param ex NotEnoughMemoryException that will be moved.
          */
-        BadParamException& operator=(BadParamException&& ex);
+        NotEnoughMemoryException& operator=(NotEnoughMemoryException&& ex);
 
         //! @brief Default constructor
-        virtual ~BadParamException() throw();
+        virtual ~NotEnoughMemoryException() throw();
 
         //! @brief This function throws the object as exception.
         virtual void raise() const;
 
         //! @brief Default message used in the library.
-        static const std::string BAD_PARAM_MESSAGE_DEFAULT;
+        static const std::string NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT;
     };
 } // namespace eprosima
-#endif // _CDR_EXCEPTIONS_BADPARAMEXCEPTION_H_
+#endif // _FASTCDR_EXCEPTIONS_NOTENOUGHMEMORYEXCEPTION_H_

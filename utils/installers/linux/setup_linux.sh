@@ -4,6 +4,9 @@
 # Also it creates a RPM package.
 # @param The version of the project
 
+# To create RPM in Fedora you have to follot this link:
+#   https://fedoraproject.org/wiki/How_to_create_an_RPM_package#Preparing_your_system
+
 project="FastCDR"
 
 function installer

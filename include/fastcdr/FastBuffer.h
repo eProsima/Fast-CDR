@@ -6,10 +6,10 @@
  *
  *************************************************************************/
 
-#ifndef _CDR_CDRBUFFER_H_
-#define _CDR_CDRBUFFER_H_
+#ifndef _FASTCDR_CDRBUFFER_H_
+#define _FASTCDR_CDRBUFFER_H_
 
-#include "cdr/Cdr_dll.h"
+#include "fastcdr/FastCdr_dll.h"
 #include <stdint.h>
 #include <cstdio>
 #include <string.h>
@@ -177,7 +177,7 @@ namespace eprosima
     * @brief This class represents a stream of bytes that contains or will contain
     * serialized data. This class is used by the serializers to serialize
     * or deserialize using their representation.
-    * @ingroup CDRAPIREFERENCE
+    * @ingroup FASTCDRAPIREFERENCE
     */
     class Cdr_DllAPI FastBuffer
     {
@@ -252,4 +252,4 @@ namespace eprosima
     };
 }; // namespace eprosima
 
-#endif // _CDR_CDRBUFFER_H_
+#endif // _FASTCDR_FASTCDRBUFFER_H_

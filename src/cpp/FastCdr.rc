@@ -1,4 +1,4 @@
-#include "cdr/Cdr_version.h"
+#include "fastcdr/FastCdr_version.h"
 // Microsoft Visual C++ generated resource script.
 //
 #ifdef APSTUDIO_INVOKED
@@ -67,10 +67,10 @@ END
 #define VER_COMPANYNAME_STR "eProsima"
 #define VER_FILEDESCRIPTION_STR "Library to serialize in CDR"
 #define VER_LEGALCOPYRIGHT_STR "Copyright 2013 (c)"
-#define VER_PRODUCTNAME_STR "CDR"
+#define VER_PRODUCTNAME_STR "FastCDR"
 
 #ifdef _WIN32
-#if defined(CDR_SOURCE) && defined(CDR_DYN_LINK)
+#if defined(FASTCDR_SOURCE) && defined(FASTCDR_DYN_LINK)
 
 #ifndef _DEBUG
 #define VER_DEBUG 0

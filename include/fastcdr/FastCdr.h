@@ -6,13 +6,13 @@
  *
  *************************************************************************/
 
-#ifndef _CDR_FASTCDR_H_
-#define _CDR_FASTCDR_H_
+#ifndef _FASTCDR_FASTCDR_H_
+#define _FASTCDR_FASTCDR_H_
 
-#include "cdr/Cdr_dll.h"
-#include "cdr/FastBuffer.h"
-#include "cdr/exceptions/Exception.h"
-#include "cdr/exceptions/NotEnoughMemoryException.h"
+#include "fastcdr/FastCdr_dll.h"
+#include "fastcdr/FastBuffer.h"
+#include "fastcdr/exceptions/Exception.h"
+#include "fastcdr/exceptions/NotEnoughMemoryException.h"
 #include <stdint.h>
 #include <string>
 #include <array>
@@ -23,7 +23,7 @@ namespace eprosima
     /*!
      * @brief This class offers an interface to serialize/deserialize some basic types using a modified CDR protocol inside a eprosima::FastBuffer.
      * This modified CDR protocol provides a serialization mechanism more faster than common CDR protocol, because it doesn't use aligment.
-     * @ingroup CDRAPIREFERENCE
+     * @ingroup FASTCDRAPIREFERENCE
      */
     class Cdr_DllAPI FastCdr
     {
@@ -1090,4 +1090,4 @@ namespace eprosima
     };
 }; // namespace eprosima
 
-#endif //_CDR_FASTCDR_H_
+#endif //_FASTCDR_FASTCDR_H_

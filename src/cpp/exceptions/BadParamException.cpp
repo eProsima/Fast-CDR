@@ -6,7 +6,7 @@
  *
  *************************************************************************/
 
-#include <cdr/exceptions/BadParamException.h>
+#include <fastcdr/exceptions/BadParamException.h>
 
 namespace eprosima
 {

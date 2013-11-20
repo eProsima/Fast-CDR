@@ -44,33 +44,33 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\include\cdr\Cdr.h">
+    <ClInclude Include="..\..\..\..\include\fastcdr\Cdr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\include\cdr\exceptions\NotEnoughMemoryException.h">
+    <ClInclude Include="..\..\..\..\include\fastcdr\exceptions\NotEnoughMemoryException.h">
       <Filter>Header Files\exceptions</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\include\cdr\exceptions\BadParamException.h">
+    <ClInclude Include="..\..\..\..\include\fastcdr\exceptions\BadParamException.h">
       <Filter>Header Files\exceptions</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\include\cdr\FastCdr.h">
+    <ClInclude Include="..\..\..\..\include\fastcdr\FastCdr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\include\cdr\FastBuffer.h">
+    <ClInclude Include="..\..\..\..\include\fastcdr\FastBuffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\include\cdr\exceptions\Exception.h">
+    <ClInclude Include="..\..\..\..\include\fastcdr\exceptions\Exception.h">
       <Filter>Header Files\exceptions</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\include\cdr\Cdr_dll.h">
+    <ClInclude Include="..\..\..\..\include\fastcdr\FastCdr_dll.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\include\cdr\Cdr_version.h">
+    <ClInclude Include="..\..\..\..\include\fastcdr\FastCdr_version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="..\..\..\..\src\cpp\CDR.rc">
+    <ResourceCompile Include="..\..\..\..\src\cpp\FastCDR.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

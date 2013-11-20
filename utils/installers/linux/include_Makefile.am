@@ -1,11 +1,11 @@
 library_includedir = $(includedir)
-nobase_library_include_HEADERS = cdr/Cdr_dll.h \
-			  cdr/Cdr.h \
-			  cdr/Cdr_version.h \
-			  cdr/FastBuffer.h \
-			  cdr/FastCdr.h \
-			  cdr/exceptions/BadParamException.h \
-			  cdr/exceptions/Exception.h \
-			  cdr/exceptions/NotEnoughMemoryException.h \
-			  cdr/eProsima_cpp/eProsima_auto_link.h
+nobase_library_include_HEADERS = fastcdr/FastCdr_dll.h \
+			  fastcdr/Cdr.h \
+			  fastcdr/FastCdr_version.h \
+			  fastcdr/FastBuffer.h \
+			  fastcdr/FastCdr.h \
+			  fastcdr/exceptions/BadParamException.h \
+			  fastcdr/exceptions/Exception.h \
+			  fastcdr/exceptions/NotEnoughMemoryException.h \
+			  fastcdr/eProsima_cpp/eProsima_auto_link.h
 

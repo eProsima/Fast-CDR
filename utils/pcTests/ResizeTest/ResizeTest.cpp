@@ -1,5 +1,5 @@
-﻿#include "cdr/Cdr.h"
-#include "cdr/exceptions/Exception.h"
+﻿#include "fastcdr/Cdr.h"
+#include "fastcdr/exceptions/Exception.h"
 
 #include <stdio.h>
 #include <limits>

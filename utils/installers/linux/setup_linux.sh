@@ -83,18 +83,22 @@ function rpminstaller
 	sed "s/VERSION/${version}/g" FastCDR.spec > ~/rpmbuild/SPECS/FastCDR.spec
 	errorstatus=$?
 	if [ $errorstatus != 0 ]; then return; fi
+
 	# Copy source
 	cp "${project}_${version}.tar.gz" ~/rpmbuild/SOURCES
 	errorstatus=$?
 	if [ $errorstatus != 0 ]; then return; fi
+
 	# Go to directory to build.
 	cd ~/rpmbuild/SPECS
 	errorstatus=$?
 	if [ $errorstatus != 0 ]; then return; fi
+
 	# Build command for i686.
 	rpmbuild -bb --target i686 FastCDR.spec
 	errorstatus=$?
 	if [ $errorstatus != 0 ]; then cd -; return; fi
+
 	# Build command for x86_64.
 	rpmbuild -bb --target x86_64 FastCDR.spec
 	errorstatus=$?

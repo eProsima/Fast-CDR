@@ -7,7 +7,7 @@
 # To create RPM in Fedora you have to follot this link:
 #   https://fedoraproject.org/wiki/How_to_create_an_RPM_package#Preparing_your_system
 
-project="FastCDR"
+project="fastcdr"
 
 function installer
 {

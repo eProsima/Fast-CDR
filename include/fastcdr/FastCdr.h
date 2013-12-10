@@ -57,7 +57,7 @@ namespace eprosima
 
          /*!
          * @brief This function skips a number of bytes in the CDR stream buffer.
-         * @numBytes The number of bytes that will be jumped.
+         * @param numBytes The number of bytes that will be jumped.
          * @return True is returned when the jump operation works successfully. Otherwise, false is returned.
          */
         bool jump(uint32_t numBytes);

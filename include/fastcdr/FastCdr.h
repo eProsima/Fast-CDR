@@ -22,7 +22,7 @@ namespace eprosima
 {
     /*!
      * @brief This class offers an interface to serialize/deserialize some basic types using a modified CDR protocol inside a eprosima::FastBuffer.
-     * This modified CDR protocol provides a serialization mechanism more faster than common CDR protocol, because it doesn't use aligment.
+     * This modified CDR protocol provides a serialization mechanism much faster than common CDR protocol, because it doesn't use alignment.
      * @ingroup FASTCDRAPIREFERENCE
      */
     class Cdr_DllAPI FastCdr
@@ -48,17 +48,17 @@ namespace eprosima
             const FastBuffer::iterator m_currentPosition;
         };
         /*!
-         * @brief This constructor creates a eprosima::FastCdr object that could serialize/deserialize
+         * @brief This constructor creates a eprosima::FastCdr object that can serialize/deserialize
          * the assigned buffer.
          *
-         * @param cdrBuffer A reference to the buffer that contains or will contain the CDR representation.
+         * @param cdrBuffer A reference to the buffer that contains (or will contain) the CDR representation.
          */
         FastCdr(FastBuffer &cdrBuffer);
 
          /*!
          * @brief This function skips a number of bytes in the CDR stream buffer.
          * @numBytes The number of bytes that will be jumped.
-         * @return True value is returned when the jump operation works successfully. In other case false value is returned.
+         * @return True is returned when the jump operation works successfully. Otherwise, false is returned.
          */
         bool jump(uint32_t numBytes);
 
@@ -95,23 +95,23 @@ namespace eprosima
          * @brief This operator serializes an octet.
          * @param octet_t The value of the octet that will be serialized in the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         inline FastCdr& operator<<(const uint8_t octet_t){return serialize(octet_t);}
 
         /*!
-         * @brief This operator serializes a char.
+         * @brief This operator serializes a character.
          * @param char_t The value of the character that will be serialized in the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         inline FastCdr& operator<<(const char char_t){return serialize(char_t);}
 
         /*!
-        * @brief This operator serializes a unsigned short.
+        * @brief This operator serializes an unsigned short.
         * @param ushort_t The value of the unsigned short that will be serialized in the buffer.
         * @return Reference to the eprosima::FastCdr object.
-        * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+        * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
         */
         inline FastCdr& operator<<(const uint16_t ushort_t){return serialize(ushort_t);}
 
@@ -119,31 +119,31 @@ namespace eprosima
         * @brief This operator serializes a short.
         * @param short_t The value of the short that will be serialized in the buffer.
         * @return Reference to the eprosima::FastCdr object.
-        * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+        * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
         */
         inline FastCdr& operator<<(const int16_t short_t){return serialize(short_t);}
 
         /*!
-        * @brief This operator serializes a unsigned long.
+        * @brief This operator serializes an unsigned long.
         * @param ulong_t The value of the unsigned long that will be serialized in the buffer.
         * @return Reference to the eprosima::FastCdr object.
-        * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+        * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
         */
         inline FastCdr& operator<<(const uint32_t ulong_t){return serialize(ulong_t);}
 
         /*!
         * @brief This operator serializes a long.
-        * @param ulong_t The value of the unsigned long that will be serialized in the buffer.
+        * @param ulong_t The value of the long that will be serialized in the buffer.
         * @return Reference to the eprosima::FastCdr object.
-        * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+        * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
         */
         inline FastCdr& operator<<(const int32_t long_t){return serialize(long_t);}
 
         /*!
-        * @brief This operator serializes a unsigned long long.
+        * @brief This operator serializes an unsigned long long.
         * @param ulonglong_t The value of the unsigned long long that will be serialized in the buffer.
         * @return Reference to the eprosima::FastCdr object.
-        * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+        * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
         */
         inline FastCdr& operator<<(const uint64_t ulonglong_t){return serialize(ulonglong_t);}
 
@@ -151,7 +151,7 @@ namespace eprosima
         * @brief This operator serializes a long long.
         * @param longlong_t The value of the long long that will be serialized in the buffer.
         * @return Reference to the eprosima::FastCdr object.
-        * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+        * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
         */
         inline FastCdr& operator<<(const int64_t longlong_t){return serialize(longlong_t);}
 
@@ -159,7 +159,7 @@ namespace eprosima
         * @brief This operator serializes a float.
         * @param float_t The value of the float that will be serialized in the buffer.
         * @return Reference to the eprosima::FastCdr object.
-        * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+        * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
         */
         inline FastCdr& operator<<(const float float_t){return serialize(float_t);}
 
@@ -167,7 +167,7 @@ namespace eprosima
         * @brief This operator serializes a double.
         * @param double_t The value of the double that will be serialized in the buffer.
         * @return Reference to the eprosima::FastCdr object.
-        * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+        * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
         */
         inline FastCdr& operator<<(const double double_t){return serialize(double_t);}
 
@@ -175,7 +175,7 @@ namespace eprosima
           * @brief This operator serializes a boolean.
           * @param bool_t The value of the boolean that will be serialized in the buffer.
           * @return Reference to the eprosima::FastCdr object.
-          * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+          * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
           */
         inline FastCdr& operator<<(const bool bool_t){return serialize(bool_t);}
 
@@ -183,7 +183,7 @@ namespace eprosima
           * @brief This operator serializes a string.
           * @param string_t The string that will be serialized in the buffer.
           * @return Reference to the eprosima::FastCdr object.
-          * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+          * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
           */
         inline FastCdr& operator<<(const std::string &string_t){return serialize(string_t);}
 
@@ -191,7 +191,7 @@ namespace eprosima
           * @brief This operator template is used to serialize arrays.
           * @param array_t The array that will be serialized in the buffer.
           * @return Reference to the eprosima::FastCdr object.
-          * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+          * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
           */
         template<class _T, size_t _Size>
         inline FastCdr& operator<<(const std::array<_T, _Size> &array_t){return serialize<_T, _Size>(array_t);}
@@ -200,32 +200,32 @@ namespace eprosima
           * @brief This operator template is used to serialize sequences.
           * @param vector_t The sequence that will be serialized in the buffer.
           * @return Reference to the eprosima::FastCdr object.
-          * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+          * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
           */
         template<class _T>
         inline FastCdr& operator<<(const std::vector<_T> &vector_t){return serialize<_T>(vector_t);}
 
-        /*!
+        /*! 
         * @brief This operator deserializes an octet.
         * @param octet_t The variable that will store the octet read from the buffer.
         * @return Reference to the eprosima::FastCdr object.
-        * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+        * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
         */
         inline FastCdr& operator>>(uint8_t &octet_t){return deserialize(octet_t);}
 
         /*!
-        * @brief This operator deserializes a char.
+        * @brief This operator deserializes a character.
         * @param char_t The variable that will store the character read from the buffer.
         * @return Reference to the eprosima::FastCdr object.
-        * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+        * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
         */
         inline FastCdr& operator>>(char &char_t){return deserialize(char_t);}
 
         /*!
-        * @brief This operator deserializes a unsigned short.
+        * @brief This operator deserializes an unsigned short.
         * @param ushort_t The variable that will store the unsigned short read from the buffer.
         * @return Reference to the eprosima::FastCdr object.
-        * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+        * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
         */
         inline FastCdr& operator>>(uint16_t &ushort_t){return deserialize(ushort_t);}
 
@@ -233,15 +233,15 @@ namespace eprosima
         * @brief This operator deserializes a short.
         * @param short_t The variable that will store the short read from the buffer.
         * @return Reference to the eprosima::FastCdr object.
-        * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+        * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
         */
         inline FastCdr& operator>>(int16_t &short_t){return deserialize(short_t);}
 
         /*!
-        * @brief This operator deserializes a unsigned long.
+        * @brief This operator deserializes an unsigned long.
         * @param ulong_t The variable that will store the unsigned long read from the buffer.
         * @return Reference to the eprosima::FastCdr object.
-        * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+        * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
         */
         inline FastCdr& operator>>(uint32_t &ulong_t){return deserialize(ulong_t);}
 
@@ -249,15 +249,15 @@ namespace eprosima
         * @brief This operator deserializes a long.
         * @param long_t The variable that will store the long read from the buffer.
         * @return Reference to the eprosima::FastCdr object.
-        * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+        * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
         */
         inline FastCdr& operator>>(int32_t &long_t){return deserialize(long_t);}
 
         /*!
-        * @brief This operator deserializes a unsigned long long.
+        * @brief This operator deserializes an unsigned long long.
         * @param ulonglong_t The variable that will store the unsigned long long read from the buffer.
         * @return Reference to the eprosima::FastCdr object.
-        * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+        * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
         */
         inline FastCdr& operator>>(uint64_t &ulonglong_t){return deserialize(ulonglong_t);}
 
@@ -265,7 +265,7 @@ namespace eprosima
         * @brief This operator deserializes a long long.
         * @param longlong_t The variable that will store the long long read from the buffer.
         * @return Reference to the eprosima::FastCdr object.
-        * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+        * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
         */
         inline FastCdr& operator>>(int64_t &longlong_t){return deserialize(longlong_t);}
 
@@ -273,7 +273,7 @@ namespace eprosima
         * @brief This operator deserializes a float.
         * @param float_t The variable that will store the float read from the buffer.
         * @return Reference to the eprosima::FastCdr object.
-        * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+        * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
         */
         inline FastCdr& operator>>(float &float_t){return deserialize(float_t);}
 
@@ -281,16 +281,16 @@ namespace eprosima
         * @brief This operator deserializes a double.
         * @param double_t The variable that will store the double read from the buffer.
         * @return Reference to the eprosima::FastCdr object.
-        * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+        * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
         */
         inline FastCdr& operator>>(double &double_t){return deserialize(double_t);}
 
-        /*!
+        /*! 
           * @brief This operator deserializes a boolean.
           * @param bool_t The variable that will store the boolean read from the buffer.
           * @return Reference to the eprosima::FastCdr object.
-          * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
-          * @exception BadParamException This exception is thrown trying to deserialize in an invalid value.
+          * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
+          * @exception BadParamException This exception is thrown when trying to deserialize in an invalid value.
           */
         inline FastCdr& operator>>(bool &bool_t){return deserialize(bool_t);}
 
@@ -298,7 +298,7 @@ namespace eprosima
           * @brief This operator deserializes a string.
           * @param string_t The variable that will store the string read from the buffer.
           * @return Reference to the eprosima::FastCdr object.
-          * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+          * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
           */
         inline FastCdr& operator>>(std::string &string_t){return deserialize(string_t);}
 
@@ -306,7 +306,7 @@ namespace eprosima
           * @brief This operator template is used to deserialize arrays.
           * @param array_t The variable that will store the array read from the buffer.
           * @return Reference to the eprosima::FastCdr object.
-          * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+          * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
           */
         template<class _T, size_t _Size>
         inline FastCdr& operator>>(std::array<_T, _Size> &array_t){return deserialize<_T, _Size>(array_t);}
@@ -315,7 +315,7 @@ namespace eprosima
           * @brief This operator template is used to deserialize sequences.
           * @param vector_t The variable that will store the sequence read from the buffer.
           * @return Reference to the eprosima::FastCdr object.
-          * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+          * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
           */
         template<class _T>
         inline FastCdr& operator>>(std::vector<_T> &vector_t){return deserialize<_T>(vector_t);}
@@ -324,7 +324,7 @@ namespace eprosima
          * @brief This function serializes an octet.
          * @param octet_t The value of the octet that will be serialized in the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& serialize(const uint8_t octet_t)
@@ -333,10 +333,10 @@ namespace eprosima
         }
 
         /*!
-         * @brief This function serializes a char.
+         * @brief This function serializes a character.
          * @param char_t The value of the character that will be serialized in the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& serialize(const char char_t)
@@ -351,10 +351,10 @@ namespace eprosima
         }
 
         /*!
-         * @brief This function serializes a unsigned short.
+         * @brief This function serializes an unsigned short.
          * @param ushort_t The value of the unsigned short that will be serialized in the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& serialize(const uint16_t ushort_t)
@@ -366,7 +366,7 @@ namespace eprosima
          * @brief This function serializes a short.
          * @param short_t The value of the short that will be serialized in the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& serialize(const int16_t short_t)
@@ -383,10 +383,10 @@ namespace eprosima
         }
 
         /*!
-         * @brief This function serializes a unsigned long.
+         * @brief This function serializes an unsigned long.
          * @param ulong_t The value of the unsigned long that will be serialized in the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& serialize(const uint32_t ulong_t)
@@ -398,7 +398,7 @@ namespace eprosima
          * @brief This function serializes a long.
          * @param long_t The value of the long that will be serialized in the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& serialize(const int32_t long_t)
@@ -415,10 +415,10 @@ namespace eprosima
         }
 
         /*!
-         * @brief This function serializes a unsigned long long.
+         * @brief This function serializes an unsigned long long.
          * @param ulonglong_t The value of the unsigned long long that will be serialized in the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& serialize(const uint64_t ulonglong_t)
@@ -430,7 +430,7 @@ namespace eprosima
          * @brief This function serializes a long long.
          * @param longlong_t The value of the long long that will be serialized in the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& serialize(const int64_t longlong_t)
@@ -450,7 +450,7 @@ namespace eprosima
          * @brief This function serializes a float.
          * @param float_t The value of the float that will be serialized in the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& serialize(const float float_t)
@@ -470,7 +470,7 @@ namespace eprosima
          * @brief This function serializes a double.
          * @param double_t The value of the double that will be serialized in the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& serialize(const double double_t)
@@ -490,7 +490,7 @@ namespace eprosima
          * @brief This function serializes a boolean.
          * @param bool_t The value of the boolean that will be serialized in the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         FastCdr& serialize(const bool bool_t);
 
@@ -498,7 +498,7 @@ namespace eprosima
          * @brief This function serializes a string.
          * @param string_t The pointer to the string that will be serialized in the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         FastCdr& serialize(const char *string_t);
 
@@ -506,7 +506,7 @@ namespace eprosima
          * @brief This function serializes a std::string.
          * @param string_t The string that will be serialized in the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         FastCdr& serialize(const std::string &string_t);
 
@@ -514,7 +514,7 @@ namespace eprosima
          * @brief This function template serializes an array.
          * @param array_t The array that will be serialized in the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         template<class _T, size_t _Size>
         inline FastCdr& serialize(const std::array<_T, _Size> &array_t)
@@ -524,7 +524,7 @@ namespace eprosima
          * @brief This function template serializes a sequence.
          * @param vector_t The sequence that will be serialized in the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         template<class _T>
         FastCdr& serialize(const std::vector<_T> &vector_t)
@@ -548,10 +548,10 @@ namespace eprosima
 
         /*!
          * @brief This function serializes an array of octets.
-         * @param octet_t The sequence of octets  that will be serialized in the buffer.
+         * @param octet_t The sequence of octets that will be serialized in the buffer.
          * @param numElements Number of the elements in the array.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& serializeArray(const uint8_t *octet_t, size_t numElements)
@@ -560,20 +560,20 @@ namespace eprosima
         }
 
         /*!
-         * @brief This function serializes an array of characteres.
-         * @param char_t The array of characteres  that will be serialized in the buffer.
+         * @brief This function serializes an array of characters.
+         * @param char_t The array of characters that will be serialized in the buffer.
          * @param numElements Number of the elements in the array.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         FastCdr& serializeArray(const char *char_t, size_t numElements);
 
         /*!
          * @brief This function serializes an array of unsigned shorts.
-         * @param ushort_t The array of unsigned shorts  that will be serialized in the buffer.
+         * @param ushort_t The array of unsigned shorts that will be serialized in the buffer.
          * @param numElements Number of the elements in the array.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& serializeArray(const uint16_t *ushort_t, size_t numElements)
@@ -583,19 +583,19 @@ namespace eprosima
 
         /*!
          * @brief This function serializes an array of shorts.
-         * @param short_t The array of shorts  that will be serialized in the buffer.
+         * @param short_t The array of shorts that will be serialized in the buffer.
          * @param numElements Number of the elements in the array.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         FastCdr& serializeArray(const int16_t *short_t, size_t numElements);
 
         /*!
          * @brief This function serializes an array of unsigned longs.
-         * @param ulong_t The array of unsigned longs  that will be serialized in the buffer.
+         * @param ulong_t The array of unsigned longs that will be serialized in the buffer.
          * @param numElements Number of the elements in the array.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& serializeArray(const uint32_t *ulong_t, size_t numElements)
@@ -605,19 +605,19 @@ namespace eprosima
 
         /*!
          * @brief This function serializes an array of longs.
-         * @param long_t The array of longs  that will be serialized in the buffer.
+         * @param long_t The array of longs that will be serialized in the buffer.
          * @param numElements Number of the elements in the array.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         FastCdr& serializeArray(const int32_t *long_t, size_t numElements);
 
         /*!
          * @brief This function serializes an array of unsigned long longs.
-         * @param ulonglong_t The array of unsigned long longs  that will be serialized in the buffer.
+         * @param ulonglong_t The array of unsigned long longs that will be serialized in the buffer.
          * @param numElements Number of the elements in the array.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& serializeArray(const uint64_t *ulonglong_t, size_t numElements)
@@ -627,10 +627,10 @@ namespace eprosima
 
         /*!
          * @brief This function serializes an array of long longs.
-         * @param longlong_t The array of  long longs  that will be serialized in the buffer.
+         * @param longlong_t The array of  long longs that will be serialized in the buffer.
          * @param numElements Number of the elements in the array.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         FastCdr& serializeArray(const int64_t *longlong_t, size_t numElements);
         
@@ -639,7 +639,7 @@ namespace eprosima
          * @param float_t The array of floats that will be serialized in the buffer.
          * @param numElements Number of the elements in the array.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         FastCdr& serializeArray(const float *float_t, size_t numElements);
 
@@ -648,7 +648,7 @@ namespace eprosima
          * @param double_t The array of doubles that will be serialized in the buffer.
          * @param numElements Number of the elements in the array.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         FastCdr& serializeArray(const double *double_t, size_t numElements);
 
@@ -657,7 +657,7 @@ namespace eprosima
          * @param sequence_t Pointer to the sequence that will be serialized in the buffer.
          * @param numElements The number of elements contained in the sequence.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to serialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         template<class _T>
         FastCdr& serializeSequence(const _T *sequence_t, size_t numElements)
@@ -683,7 +683,7 @@ namespace eprosima
          * @brief This function deserializes an octet.
          * @param octet_t The variable that will store the octet read from the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& deserialize(uint8_t &octet_t)
@@ -692,10 +692,10 @@ namespace eprosima
         }
 
         /*!
-         * @brief This function deserializes a characteres.
+         * @brief This function deserializes a character.
          * @param char_t The variable that will store the character read from the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& deserialize(char &char_t)
@@ -710,10 +710,10 @@ namespace eprosima
         }
 
         /*!
-         * @brief This function deserializes a unsigned short.
+         * @brief This function deserializes an unsigned short.
          * @param ushort_t The variable that will store the unsigned short read from the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& deserialize(uint16_t &ushort_t)
@@ -725,7 +725,7 @@ namespace eprosima
          * @brief This function deserializes a short.
          * @param short_t The variable that will store the short read from the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& deserialize(int16_t &short_t)
@@ -742,10 +742,10 @@ namespace eprosima
         }
 
         /*!
-         * @brief This function deserializes a unsigned long.
+         * @brief This function deserializes an unsigned long.
          * @param ulong_t The variable that will store the unsigned long read from the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& deserialize(uint32_t &ulong_t)
@@ -757,7 +757,7 @@ namespace eprosima
          * @brief This function deserializes a long.
          * @param long_t The variable that will store the long read from the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& deserialize(int32_t &long_t)
@@ -774,10 +774,10 @@ namespace eprosima
         }
 
         /*!
-         * @brief This function deserializes a unsigned long long.
+         * @brief This function deserializes an unsigned long long.
          * @param ulonglong_t The variable that will store the unsigned long long read from the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& deserialize(uint64_t &ulonglong_t)
@@ -789,7 +789,7 @@ namespace eprosima
          * @brief This function deserializes a long long.
          * @param longlong_t The variable that will store the long long read from the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& deserialize(int64_t &longlong_t)
@@ -809,7 +809,7 @@ namespace eprosima
          * @brief This function deserializes a float.
          * @param float_t The variable that will store the float read from the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& deserialize(float &float_t)
@@ -829,7 +829,7 @@ namespace eprosima
          * @brief This function deserializes a double.
          * @param double_t The variable that will store the double read from the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& deserialize(double &double_t)
@@ -849,19 +849,19 @@ namespace eprosima
          * @brief This function deserializes a boolean.
          * @param bool_t The variable that will store the boolean read from the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
-         * @exception BadParamException This exception is thrown trying to deserialize in an invalid value.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
+         * @exception BadParamException This exception is thrown when trying to deserialize in an invalid value.
          */
         FastCdr& deserialize(bool &bool_t);
 
-        /*!
+        /*! 
          * @brief This function deserializes a string.
          * This function allocates memory to store the string. The user pointer will be set to point this allocated memory.
-         * The user will have to free this allocated memory using free() function.
+         * The user will have to free this allocated memory using free()
          * @param string_t The pointer that will point to the string read from the buffer.
-         * The user will have to free the allocated memory using free() function.
+         * The user will have to free the allocated memory using free()
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         FastCdr& deserialize(char *&string_t);
 
@@ -869,7 +869,7 @@ namespace eprosima
          * @brief This function deserializes a std::string.
          * @param string_t The variable that will store the string read from the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         FastCdr& deserialize(std::string &string_t);
 
@@ -877,7 +877,7 @@ namespace eprosima
          * @brief This function template deserializes an array.
          * @param array_t The variable that will store the array read from the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         template<class _T, size_t _Size>
         inline FastCdr& deserialize(std::array<_T, _Size> &array_t)
@@ -887,7 +887,7 @@ namespace eprosima
          * @brief This function template deserializes a sequence.
          * @param vector_t The variable that will store the sequence read from the buffer.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         template<class _T>
         FastCdr& deserialize(std::vector<_T> &vector_t)
@@ -916,7 +916,7 @@ namespace eprosima
          * @param octet_t The variable that will store the array of octets read from the buffer.
          * @param numElements Number of the elements in the array.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& deserializeArray(uint8_t *octet_t, size_t numElements)
@@ -925,20 +925,20 @@ namespace eprosima
         }
 
         /*!
-         * @brief This function deserializes an array of characteres.
-         * @param char_t The variable that will store the array of characteres read from the buffer.
+         * @brief This function deserializes an array of characters.
+         * @param char_t The variable that will store the array of characters read from the buffer.
          * @param numElements Number of the elements in the array.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         FastCdr& deserializeArray(char *char_t, size_t numElements);
 
         /*!
-         * @brief This function deserializes an array of unsigned short.
-         * @param ushort_t The variable that will store the array of unsigned short read from the buffer.
+         * @brief This function deserializes an array of unsigned shorts.
+         * @param ushort_t The variable that will store the array of unsigned shorts read from the buffer.
          * @param numElements Number of the elements in the array.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& deserializeArray(uint16_t *ushort_t, size_t numElements)
@@ -947,20 +947,20 @@ namespace eprosima
         }
 
         /*!
-         * @brief This function deserializes an array of short.
-         * @param short_t The variable that will store the array of short read from the buffer.
+         * @brief This function deserializes an array of shorts.
+         * @param short_t The variable that will store the array of shorts read from the buffer.
          * @param numElements Number of the elements in the array.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         FastCdr& deserializeArray(int16_t *short_t, size_t numElements);
 
         /*!
-         * @brief This function deserializes an array of unsigned longt.
-         * @param ulong_t The variable that will store the array of unsigned long read from the buffer.
+         * @brief This function deserializes an array of unsigned longs.
+         * @param ulong_t The variable that will store the array of unsigned longs read from the buffer.
          * @param numElements Number of the elements in the array.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& deserializeArray(uint32_t *ulong_t, size_t numElements)
@@ -969,20 +969,20 @@ namespace eprosima
         }
 
         /*!
-         * @brief This function deserializes an array of long.
-         * @param long_t The variable that will store the array of long read from the buffer.
+         * @brief This function deserializes an array of longs.
+         * @param long_t The variable that will store the array of longs read from the buffer.
          * @param numElements Number of the elements in the array.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         FastCdr& deserializeArray(int32_t *long_t, size_t numElements);
 
         /*!
-         * @brief This function deserializes an array of unsigned long long.
-         * @param ulonglong_t The variable that will store the array of unsigned long long read from the buffer.
+         * @brief This function deserializes an array of unsigned long longs.
+         * @param ulonglong_t The variable that will store the array of unsigned long longs read from the buffer.
          * @param numElements Number of the elements in the array.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         inline
         FastCdr& deserializeArray(uint64_t *ulonglong_t, size_t numElements)
@@ -991,40 +991,40 @@ namespace eprosima
         }
 
         /*!
-         * @brief This function deserializes an array of long long.
-         * @param longlong_t The variable that will store the array of long long read from the buffer.
+         * @brief This function deserializes an array of long longs.
+         * @param longlong_t The variable that will store the array of long longs read from the buffer.
          * @param numElements Number of the elements in the array.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         FastCdr& deserializeArray(int64_t *longlong_t, size_t numElements);
 
         /*!
-         * @brief This function deserializes an array of float.
-         * @param float_t The variable that will store the array of float read from the buffer.
+         * @brief This function deserializes an array of floats.
+         * @param float_t The variable that will store the array of floats read from the buffer.
          * @param numElements Number of the elements in the array.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         FastCdr& deserializeArray(float *float_t, size_t numElements);
 
         /*!
-         * @brief This function deserializes an array of double.
-         * @param double_t The variable that will store the array of double read from the buffer.
+         * @brief This function deserializes an array of doubles.
+         * @param double_t The variable that will store the array of doubles read from the buffer.
          * @param numElements Number of the elements in the array.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         FastCdr& deserializeArray(double *double_t, size_t numElements);
 
         /*!
          * @brief This function template deserializes a raw sequence.
          * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
-         * The user will have to free this allocated memory using free() function.
+         * The user will have to free this allocated memory using free() 
          * @param sequence_t The pointer that will store the sequence read from the buffer.
          * @param numElements This variable return the number of elements of the sequence.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         template<class _T>
         FastCdr& deserializeSequence(_T *&sequence_t, size_t &numElements)
@@ -1056,7 +1056,7 @@ namespace eprosima
          * @param array_t The array that will be serialized in the buffer.
          * @param numElements Number of the elements in the array.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
          */
         template<class _T, size_t _Size>
         FastCdr& serializeArray(const std::array<_T, _Size> *array_t, size_t numElements)
@@ -1069,7 +1069,7 @@ namespace eprosima
          * @param array_t The variable that will store the array read from the buffer.
          * @param numElements Number of the elements in the array.
          * @return Reference to the eprosima::FastCdr object.
-         * @exception NotEnoughMemoryException This exception is thrown trying to deserialize in a position that exceed the internal memory size.
+         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
          */
         template<class _T, size_t _Size>
         FastCdr& deserializeArray(std::array<_T, _Size> *array_t, size_t numElements)

@@ -40,7 +40,7 @@ namespace eprosima
 
         /*!
          * @brief This operator changes the iterator's raw buffer.
-         * This operator makes the iterator points to the same position but in other raw buffer.
+         * This operator makes the iterator point to the same position but in another raw buffer.
          * The new raw buffer is the same than the source iterator's.
          * @param iterator The source iterator. The iterator will use the source iterator's raw buffer after this operation.
          */
@@ -54,7 +54,7 @@ namespace eprosima
 
         /*!
          * @brief This operator changes the position where the iterator points.
-         * This operator takes the index of the source iterator, but the iterator continue using its raw buffer.
+         * This operator takes the index of the source iterator, but the iterator continues using its raw buffer.
          * @param The source iterator. The iterator will use the source's iterator index to point to its own raw buffer.
          */
         inline
@@ -66,7 +66,7 @@ namespace eprosima
 
         /*!
          * @brief This operator copies a data in the raw buffer.
-         * The copy uses the size of the data's type.
+         * The copy uses the size of the data type.
          * @param data Data to be copied. Cannot be NULL.
          */
         template<typename _T>
@@ -78,7 +78,7 @@ namespace eprosima
 
         /*!
          * @brief This operator copies data from the raw buffer to a variable.
-         * The copy uses the size of the data's type.
+         * The copy uses the size of the data type.
          * @param data Data to be filled.
          */
         template<typename _T>
@@ -91,7 +91,7 @@ namespace eprosima
         /*!
          * @brief This function copies a buffer into the raw buffer.
          * @param src The source buffer.
-         * @param size The size of bytes to be copied.
+         * @param size The number of bytes to be copied.
          */
         inline
         void memcopy(const void* src, const size_t size)
@@ -102,7 +102,7 @@ namespace eprosima
         /*!
          * @brief This function copies from the raw buffer to a external buffer.
          * @param dst The destination buffer.
-         * @param size The size of bytes to be copies.
+         * @param size The size of bytes to be copied.
          */
         inline
         void rmemcopy(void* dst, const size_t size)
@@ -111,8 +111,8 @@ namespace eprosima
         }
 
         /*!
-         * @brief This function increment the position where the iterator points.
-         * @param numBytes Number of bytes the iterator move forward the position.
+         * @brief This function increments the position where the iterator points.
+         * @param numBytes Number of bytes the iterator moves the position.
          */
         inline
         void operator+=(size_t numBytes)
@@ -132,7 +132,7 @@ namespace eprosima
         }
 
         /*!
-         * @brief This function increments in one the position of the iterator.
+         * @brief This function increments the iterator in one the position.
          * @return The current iterator.
          */
         inline
@@ -143,7 +143,7 @@ namespace eprosima
         }
 
         /*!
-         * @brief This function increments in one the position of the iterator.
+         * @brief This function increments the iterator in one the position.
          * @return The current iterator.
          */
         inline
@@ -155,7 +155,7 @@ namespace eprosima
         }
 
         /*!
-         * @brief This function returns the currento position in the raw buffer.
+         * @brief This function returns the current position in the raw buffer.
          * @return The current position in the raw buffer.
          */
         inline 
@@ -174,7 +174,7 @@ namespace eprosima
     };
 
     /*!
-    * @brief This class represents a stream of bytes that contains or will contain
+    * @brief This class represents a stream of bytes that contains (or will contain)
     * serialized data. This class is used by the serializers to serialize
     * or deserialize using their representation.
     * @ingroup FASTCDRAPIREFERENCE
@@ -233,9 +233,9 @@ namespace eprosima
         }
 
         /*!
-         * @brief This function resizes the raw buffer. It will call the user's defined function to make this job.
+         * @brief This function resizes the raw buffer. It will call the user's defined function for this purpose.
          * @param minSizeInc The minimun growth expected of the current raw buffer.
-         * @return True value has to be returned if the operation works successful. In other case false value has to be returned.
+         * @return True if the operation works. False if it does not.
          */
         bool resize(size_t minSizeInc);
 

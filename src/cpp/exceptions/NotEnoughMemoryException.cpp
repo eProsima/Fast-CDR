@@ -1,8 +1,8 @@
 /*************************************************************************
- * Copyright (c) 2012 eProsima. All rights reserved.
+ * Copyright (c) 2013 eProsima. All rights reserved.
  *
- * This copy of RPCDDS is licensed to you under the terms described in the
- * RPCDDS_LICENSE file included in this distribution.
+ * This copy of FastCdr is licensed to you under the terms described in the
+ * FASTCDR_LIBRARY_LICENSE file included in this distribution.
  *
  *************************************************************************/
 

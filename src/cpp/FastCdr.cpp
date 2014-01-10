@@ -1,3 +1,11 @@
+/*************************************************************************
+ * Copyright (c) 2013 eProsima. All rights reserved.
+ *
+ * This copy of FastCdr is licensed to you under the terms described in the
+ * FASTCDR_LIBRARY_LICENSE file included in this distribution.
+ *
+ *************************************************************************/
+
 #include "fastcdr/FastCdr.h"
 #include "fastcdr/exceptions/BadParamException.h"
 #include <string.h>

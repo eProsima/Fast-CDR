@@ -1,8 +1,8 @@
 /*************************************************************************
  * Copyright (c) 2013 eProsima. All rights reserved.
  *
- * This copy of Fast Buffers is licensed to you under the terms described in the
- * FAST_BUFFERS_LICENSE file included in this distribution.
+ * This copy of FastCdr is licensed to you under the terms described in the
+ * FASTCDR_LIBRARY_LICENSE file included in this distribution.
  *
  *************************************************************************/
 

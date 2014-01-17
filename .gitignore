@@ -1,2 +1,15 @@
+# Backup GVim files.
 *~
+# Temporaly GVim files.
 *.swp
+# Visual Studio user configuration files.
+*.vcxproj.user
+*.sdf
+*.suo
+# Visual Studio build directories.
+Debug*/
+Release*/
+ipch/
+objs/
+# Lib directory
+lib/

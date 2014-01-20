@@ -11,5 +11,6 @@ Debug*/
 Release*/
 ipch/
 objs/
+output/
 # Lib directory
 lib/

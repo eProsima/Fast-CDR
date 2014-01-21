@@ -201,6 +201,11 @@ namespace eprosima
         FastBuffer(char* const buffer, const size_t bufferSize);
 
         /*!
+         * @brief Default destructor.
+         */
+        virtual ~FastBuffer();
+
+        /*!
          * @brief This function returns the stream that the eprosima::FastBuffer uses to serialize data.
          * @return The stream used by eprosima::FastBuffer to serialize data.
          */

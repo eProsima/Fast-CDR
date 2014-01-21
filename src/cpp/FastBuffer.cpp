@@ -24,6 +24,14 @@ namespace eprosima
     {
     }
 
+    FastBuffer::~FastBuffer()
+    {
+        if(m_internalBuffer && m_buffer != NULL)
+        {
+            free(m_buffer);
+        }
+    }
+
     bool FastBuffer::resize(size_t minSizeInc)
     {
         size_t incBufferSize = BUFFER_START_LENGTH;

@@ -89,7 +89,7 @@ bool CDRTests()
     catch(Exception &ex)
     {
         std::cout << "Serialization error: " << ex.what() << std::endl << "TEST FAILED" << std::endl;
-        return -1;
+        return false;
     }
 
     // Deseriazliation.
@@ -165,7 +165,7 @@ bool CDRTests()
     catch(Exception &ex)
     {
         std::cout << "Deserialization error: " << ex.what() << std::endl << "TEST FAILED" << std::endl;
-        return -1;
+        return false;
     }
 
     returnedValue &= octet_value == octet_t;
@@ -394,7 +394,7 @@ bool FastCDRTests()
     catch(Exception &ex)
     {
         std::cout << "Serialization error: " << ex.what() << std::endl << "TEST FAILED" << std::endl;
-        return -1;
+        return false;
     }
 
     // Deseriazliation.
@@ -470,7 +470,7 @@ bool FastCDRTests()
     catch(Exception &ex)
     {
         std::cout << "Deserialization error: " << ex.what() << std::endl << "TEST FAILED" << std::endl;
-        return -1;
+        return false;
     }
 
     returnedValue &= octet_value == octet_t;

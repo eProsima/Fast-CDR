@@ -1593,7 +1593,7 @@ namespace eprosima
             try
             {
                 sequence_t = (_T*)calloc(seqLength, sizeof(_T));
-                return deserializeArray(sequence_t, seqLength);
+                deserializeArray(sequence_t, seqLength);
             }
             catch(Exception &ex)
             {

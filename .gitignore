@@ -5,6 +5,7 @@
 # Visual Studio user configuration files.
 *.vcxproj.user
 *.sdf
+*.opensdf
 *.suo
 # Visual Studio build directories.
 Debug*/
@@ -12,5 +13,9 @@ Release*/
 ipch/
 objs/
 output/
+bin/
 # Lib directory
 lib/
+# Tags info
+tags
+cscope.out

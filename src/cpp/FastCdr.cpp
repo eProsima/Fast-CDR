@@ -256,7 +256,7 @@ FastCdr& FastCdr::deserialize(char *&string_t)
     else if((m_lastPosition - m_currentPosition) >= length)
     {
         // Allocate memory.
-        string_t = (char*)malloc(length + ((&m_currentPosition)[length-1] == '\0' ? 0 : 1));
+        string_t = (char*)calloc(length + ((&m_currentPosition)[length-1] == '\0' ? 0 : 1), sizeof(char));
         memcpy(string_t, &m_currentPosition, length);
         m_currentPosition += length;
         return *this;

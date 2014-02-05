@@ -62,6 +62,8 @@ const uint64_t ulonglong_seq_t[5] = {18446744073709551604u, 18446744073709551603
 const int64_t longlong_seq_t[5] = {-9223372036804, -9223372036803, -9223372036802, -9223372036801, -9223372036800};
 const float float_seq_t[5] = {float_t + 4, float_t + 3, float_t + 2, float_t + 1, float_t};
 const double double_seq_t[5] = {double_t + 4, double_t + 3, double_t + 2, double_t + 1, double_t};
+// Added because error 337
+const char *c_string_t = "HOLA";
 
 bool CDRTests()
 {
@@ -82,6 +84,7 @@ bool CDRTests()
         cdr_ser.serializeSequence(octet_seq_t, 5).serializeSequence(char_seq_t, 5).serializeSequence(ushort_seq_t, 5).serializeSequence(short_seq_t, 5);
         cdr_ser.serializeSequence(ulong_seq_t, 5).serializeSequence(long_seq_t, 5).serializeSequence(ulonglong_seq_t, 5).serializeSequence(longlong_seq_t, 5);
         cdr_ser.serializeSequence(float_seq_t, 5).serializeSequence(double_seq_t, 5);
+        cdr_ser.serialize(c_string_t);
     }
     catch(Exception &ex)
     {
@@ -144,6 +147,7 @@ bool CDRTests()
     int64_t *longlong_seq_value = NULL; size_t longlong_seq_len;
     float *float_seq_value = NULL; size_t float_seq_len;
     double *double_seq_value = NULL; size_t double_seq_len;
+    char *c_string_value = NULL;
 
     try
     {
@@ -157,6 +161,7 @@ bool CDRTests()
         cdr_des.deserializeSequence(short_seq_value, short_seq_len).deserializeSequence(ulong_seq_value, ulong_seq_len).deserializeSequence(long_seq_value, long_seq_len); 
         cdr_des.deserializeSequence(ulonglong_seq_value, ulonglong_seq_len).deserializeSequence(longlong_seq_value, longlong_seq_len).deserializeSequence(float_seq_value, float_seq_len); 
         cdr_des.deserializeSequence(double_seq_value, double_seq_len);
+        cdr_des.deserialize(c_string_value);
     }
     catch(Exception &ex)
     {
@@ -363,6 +368,8 @@ bool CDRTests()
     else
         returnedValue = false;
 
+    returnedValue &= (strcmp(c_string_t, c_string_value) == 0);
+
     return returnedValue;
 }
 
@@ -385,6 +392,7 @@ bool FastCDRTests()
         cdr_ser.serializeSequence(octet_seq_t, 5).serializeSequence(char_seq_t, 5).serializeSequence(ushort_seq_t, 5).serializeSequence(short_seq_t, 5);
         cdr_ser.serializeSequence(ulong_seq_t, 5).serializeSequence(long_seq_t, 5).serializeSequence(ulonglong_seq_t, 5).serializeSequence(longlong_seq_t, 5);
         cdr_ser.serializeSequence(float_seq_t, 5).serializeSequence(double_seq_t, 5);
+        cdr_ser.serialize(c_string_t);
     }
     catch(Exception &ex)
     {
@@ -447,6 +455,7 @@ bool FastCDRTests()
     int64_t *longlong_seq_value = NULL; size_t longlong_seq_len;
     float *float_seq_value = NULL; size_t float_seq_len;
     double *double_seq_value = NULL; size_t double_seq_len;
+    char *c_string_value = NULL;
 
     try
     {
@@ -460,6 +469,7 @@ bool FastCDRTests()
         cdr_des.deserializeSequence(short_seq_value, short_seq_len).deserializeSequence(ulong_seq_value, ulong_seq_len).deserializeSequence(long_seq_value, long_seq_len); 
         cdr_des.deserializeSequence(ulonglong_seq_value, ulonglong_seq_len).deserializeSequence(longlong_seq_value, longlong_seq_len).deserializeSequence(float_seq_value, float_seq_len); 
         cdr_des.deserializeSequence(double_seq_value, double_seq_len);
+        cdr_des.deserialize(c_string_value);
     }
     catch(Exception &ex)
     {
@@ -665,6 +675,8 @@ bool FastCDRTests()
     }
     else
         returnedValue = false;
+
+    returnedValue &= (strcmp(c_string_t, c_string_value) == 0);
 
     return returnedValue;
 }

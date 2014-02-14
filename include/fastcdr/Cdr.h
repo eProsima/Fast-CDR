@@ -142,6 +142,9 @@ namespace eprosima
          */
         inline size_t getSerializedDataLength() const { return m_currentPosition - m_cdrBuffer.begin();}
 
+        /*! TODO */
+        inline static size_t alignment(size_t current_alignment, size_t dataSize) { return (dataSize - (current_alignment % dataSize)) & (dataSize-1);}
+
         /*!
          * @brief This function returns the current state of the CDR serialization process.
          * @return The current state of the CDR serialization process.

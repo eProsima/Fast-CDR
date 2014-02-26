@@ -18,11 +18,11 @@ FastCdr::FastCdr(FastBuffer &cdrBuffer) : m_cdrBuffer(cdrBuffer), m_currentPosit
 {
 }
 
-bool FastCdr::jump(uint32_t numBytes)
+bool FastCdr::jump(size_t numBytes)
 {
     bool returnedValue = false;
 
-    if(((m_lastPosition - m_currentPosition) >= sizeof(numBytes)) || resize(numBytes))
+    if(((m_lastPosition - m_currentPosition) >= numBytes) || resize(numBytes))
     {
         m_currentPosition += numBytes;
         returnedValue = true;

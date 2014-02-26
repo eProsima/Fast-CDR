@@ -106,11 +106,16 @@ namespace eprosima
          */
          Cdr& read_encapsulation();
 
+         Cdr& serialize_encapsulation();
+
         /*!
          * @brief This function returns the parameter list flag when the CDR type is eprosima::DDS_CDR.
          * @return The flag that specifies if the content is a parameter list.
          */
         DDSCdrPlFlag getDDSCdrPlFlag() const;
+
+        // TODO
+        void setDDSCdrPlFlag(DDSCdrPlFlag plFlag);
 
         /*!
          * @brief This function returns the option flags when the CDR type is eprosima::DDS_CDR.
@@ -118,12 +123,18 @@ namespace eprosima
          */
         uint16_t getDDSCdrOptions() const;
 
+        // TODO
+        void setDDSCdrOptions(uint16_t options);
+
+        // TODO
+        void changeEndianness(Endianness endianness); 
+
         /*!
          * @brief This function skips a number of bytes in the CDR stream buffer.
          * @param numBytes The number of bytes that will be jumped.
          * @return True is returned when it works successfully. Otherwise, false is returned.
          */
-        bool jump(uint32_t numBytes);
+        bool jump(size_t numBytes);
 
         /*!
 		 * @brief This function resets the current position in the buffer to the beginning.
@@ -156,6 +167,8 @@ namespace eprosima
          * @param state Previous state that will be set.
          */
         void setState(state &state);
+
+        bool moveAlignmentForward(size_t numBytes);
 
 		/*!
 		 * @brief This function resets the alignment to the current position in the buffer.
@@ -210,6 +223,9 @@ namespace eprosima
         */
         inline Cdr& operator<<(const int32_t long_t){return serialize(long_t);}
 
+        // TODO in FastCdr
+        inline Cdr& operator<<(const wchar_t wchar){return serialize(wchar);}
+
         /*!
         * @brief This operator serializes an unsigned long long.
         * @param ulonglong_t The value of the unsigned long long that will be serialized in the buffer.
@@ -257,6 +273,14 @@ namespace eprosima
           * @exception NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
           */
         inline Cdr& operator<<(const std::string &string_t){return serialize(string_t);}
+
+        // TODO
+        template<class _T>
+        inline Cdr& operator<<(const _T &type_t)
+        {
+            type_t.serialize(*this);
+            return *this;
+        }
 
         /*!
           * @brief This operator template is used to serialize arrays.
@@ -324,6 +348,9 @@ namespace eprosima
         */
         inline Cdr& operator>>(int32_t &long_t){return deserialize(long_t);}
 
+        // TODO in FastCdr
+        inline Cdr& operator>>(wchar_t &wchar){return deserialize(wchar);}
+
         /*!
         * @brief This operator deserializes a unsigned long long.
         * @param ulonglong_t The variable that will store the unsigned long long read from the buffer.
@@ -372,6 +399,14 @@ namespace eprosima
           * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
           */
         inline Cdr& operator>>(std::string &string_t){return deserialize(string_t);}
+
+        // TODO
+        template<class _T>
+        inline Cdr& operator>>(_T &type_t)
+        {
+            type_t.deserialize(*this);
+            return *this;
+        }
 
         /*!
           * @brief This operator template is used to deserialize arrays.
@@ -520,6 +555,20 @@ namespace eprosima
          * @exception NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
          */
         Cdr& serialize(const int32_t long_t, Endianness endianness);
+
+        // TODO in FastCdr
+        inline
+        Cdr& serialize(const wchar_t wchar)
+        {
+            return serialize((int32_t)wchar);
+        }
+
+        // TODO
+        inline
+        Cdr& serialize(const wchar_t wchar, Endianness endianness)
+        {
+            return serialize((int32_t)wchar, endianness);
+        }
 
         /*!
          * @brief This function serializes an unsigned long long.
@@ -868,6 +917,20 @@ namespace eprosima
          */
         Cdr& serializeArray(const int32_t *long_t, size_t numElements, Endianness endianness);
 
+        // TODO in FastCdr
+        inline
+        Cdr& serializeArray(const wchar_t *wchar, size_t numElements)
+        {
+            return serializeArray((const int32_t*)wchar, numElements);
+        }
+
+        // TODO
+        inline
+        Cdr& serializeArray(const wchar_t *wchar, size_t numElements, Endianness endianness)
+        {
+            return serializeArray((const int32_t*)wchar, numElements, endianness);
+        }
+
         /*!
          * @brief This function serializes an array of unsigned long longs.
          * @param ulonglong_t The array of unsigned long longs that will be serialized in the buffer.
@@ -1135,6 +1198,20 @@ namespace eprosima
          * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
          */
         Cdr& deserialize(int32_t &long_t, Endianness endianness);
+
+        // TODO in FastCdr
+        inline
+        Cdr& deserialize(wchar_t &wchar)
+        {
+            return deserialize((int32_t&)wchar);
+        }
+
+        // TODO
+        inline
+        Cdr& deserialize(wchar_t &wchar, Endianness endianness)
+        {
+            return deserialize((int32_t&)wchar, endianness);
+        }
 
         /*!
          * @brief This function deserializes an unsigned long long.
@@ -1491,6 +1568,20 @@ namespace eprosima
          * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
          */
         Cdr& deserializeArray(int32_t *long_t, size_t numElements, Endianness endianness);
+
+        // TODO in FastCdr
+        inline
+        Cdr& deserializeArray(wchar_t *wchar, size_t numElements)
+        {
+            return deserializeArray((int32_t*)wchar, numElements);
+        }
+
+        // TODO
+        inline
+        Cdr& deserializeArray(wchar_t *wchar, size_t numElements, Endianness endianness)
+        {
+            return deserializeArray((int32_t*)wchar, numElements, endianness);
+        }
 
         /*!
          * @brief This function deserializes an array of unsigned long longs.

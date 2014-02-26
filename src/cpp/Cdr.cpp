@@ -49,7 +49,7 @@ Cdr& Cdr::read_encapsulation()
         if(m_endianness != (encapsulationKind & 0x1))
         {
             m_swapBytes = !m_swapBytes;
-            m_endianness = encapsulationKind;
+            m_endianness = (encapsulationKind & 0x1);
         }
     }
     catch(Exception &ex)
@@ -85,9 +85,53 @@ Cdr& Cdr::read_encapsulation()
     return *this;
 }
 
+Cdr& Cdr::serialize_encapsulation()
+{
+    uint8_t dummy = 0, encapsulationKind = 0;
+    state state(*this);
+
+    try
+    {
+        // If it is DDS_CDR, the first step is to serialize the dummy byte.
+        if(m_cdrType == DDS_CDR)
+        {
+            (*this) << dummy;
+        }
+
+        // Construct encapsulation byte.
+        encapsulationKind = (m_plFlag | m_endianness);
+
+        // Serialize the encapsulation byte.
+        (*this) << encapsulationKind;
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    try
+    {
+        if(m_cdrType == DDS_CDR)
+            (*this) << m_options;
+    }
+    catch(Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    return *this;
+}
+
 Cdr::DDSCdrPlFlag Cdr::getDDSCdrPlFlag() const
 {
     return m_plFlag;
+}
+
+void Cdr::setDDSCdrPlFlag(DDSCdrPlFlag plFlag)
+{
+    m_plFlag = plFlag;
 }
 
 uint16_t Cdr::getDDSCdrOptions() const
@@ -95,11 +139,25 @@ uint16_t Cdr::getDDSCdrOptions() const
     return m_options;
 }
 
-bool Cdr::jump(uint32_t numBytes)
+void Cdr::setDDSCdrOptions(uint16_t options)
+{
+    m_options = options;
+}
+
+void Cdr::changeEndianness(Endianness endianness)
+{
+    if(m_endianness != endianness)
+    {
+        m_swapBytes = !m_swapBytes;
+        m_endianness = endianness;
+    }
+}
+
+bool Cdr::jump(size_t numBytes)
 {
     bool returnedValue = false;
 
-    if(((m_lastPosition - m_currentPosition) >= sizeof(numBytes)) || resize(numBytes))
+    if(((m_lastPosition - m_currentPosition) >= numBytes) || resize(numBytes))
     {
         m_currentPosition += numBytes;
         returnedValue = true;
@@ -132,6 +190,19 @@ void Cdr::reset()
     m_alignPosition = m_cdrBuffer.begin();
     m_swapBytes = m_endianness == DEFAULT_ENDIAN ? false : true;
     m_lastDataSize = 0;
+}
+
+bool Cdr::moveAlignmentForward(size_t numBytes)
+{
+    bool returnedValue = false;
+
+    if(((m_lastPosition - m_alignPosition) >= numBytes) || resize(numBytes))
+    {
+        m_alignPosition += numBytes;
+        returnedValue = true;
+    }
+
+    return returnedValue;
 }
 
 bool Cdr::resize(size_t minSizeInc)

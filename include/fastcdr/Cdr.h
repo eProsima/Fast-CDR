@@ -274,14 +274,6 @@ namespace eprosima
           */
         inline Cdr& operator<<(const std::string &string_t){return serialize(string_t);}
 
-        // TODO
-        template<class _T>
-        inline Cdr& operator<<(const _T &type_t)
-        {
-            type_t.serialize(*this);
-            return *this;
-        }
-
         /*!
           * @brief This operator template is used to serialize arrays.
           * @param array_t The array that will be serialized in the buffer.
@@ -299,6 +291,14 @@ namespace eprosima
           */
         template<class _T>
         inline Cdr& operator<<(const std::vector<_T> &vector_t){return serialize<_T>(vector_t);}
+
+        // TODO
+        template<class _T>
+        inline Cdr& operator<<(const _T &type_t)
+        {
+            type_t.serialize(*this);
+            return *this;
+        }
 
         /*!
         * @brief This operator deserializes an octet.
@@ -400,14 +400,6 @@ namespace eprosima
           */
         inline Cdr& operator>>(std::string &string_t){return deserialize(string_t);}
 
-        // TODO
-        template<class _T>
-        inline Cdr& operator>>(_T &type_t)
-        {
-            type_t.deserialize(*this);
-            return *this;
-        }
-
         /*!
           * @brief This operator template is used to deserialize arrays.
           * @param array_t The variable that will store the array read from the buffer.
@@ -425,6 +417,14 @@ namespace eprosima
           */
         template<class _T>
         inline Cdr& operator>>(std::vector<_T> &vector_t){return deserialize<_T>(vector_t);}
+
+        // TODO
+        template<class _T>
+        inline Cdr& operator>>(_T &type_t)
+        {
+            type_t.deserialize(*this);
+            return *this;
+        }
 
         /*!
          * @brief This function serializes an octet.
@@ -775,6 +775,14 @@ namespace eprosima
             return *this;
         }
 
+        // TODO
+        template<class _T>
+        inline Cdr& serialize(const _T &type_t)
+        {
+            type_t.serialize(*this);
+            return *this;
+        }
+
         /*!
          * @brief This function serializes an array of octets.
          * @param octet_t The sequence of octets that will be serialized in the buffer.
@@ -1014,6 +1022,48 @@ namespace eprosima
          * @exception NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
          */
         Cdr& serializeArray(const double *double_t, size_t numElements, Endianness endianness);
+
+        // TODO
+        Cdr& serializeArray(const std::string *string_t, size_t numElements);
+        Cdr& serializeArray(const std::string *string_t, size_t numElements, Endianness endianness);
+
+        // TODO
+        template<class _T>
+        Cdr& serializeArray(const std::vector<_T> *vector_t, size_t numElements)
+        {
+           for(size_t count = 0; count < numElements; ++count)
+               serialize(vector_t[count]);
+           return *this;
+        }
+
+        // TODO
+        template<class _T>
+        Cdr& serializeArray(const _T *type_t, size_t numElements)
+        {
+           for(size_t count = 0; count < numElements; ++count)
+              type_t[count].serialize(*this);
+           return *this;
+        }
+
+        template<class _T>
+        Cdr& serializeArray(const _T *type_t, size_t numElements, Endianness endianness)
+        {
+            bool auxSwap = m_swapBytes;
+            m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+            try
+            {
+                serializeArray(type_t, numElements);
+                m_swapBytes = auxSwap;
+            }
+            catch(Exception &ex)
+            {
+                m_swapBytes = auxSwap;
+                ex.raise();
+            }
+
+            return *this;
+        }
 
         /*!
          * @brief This function template serializes a raw sequence.
@@ -1427,6 +1477,14 @@ namespace eprosima
             return *this;
         }
 
+        // TODO
+        template<class _T>
+        inline Cdr& deserialize(_T &type_t)
+        {
+            type_t.deserialize(*this);
+            return *this;
+        }
+
         /*!
          * @brief This function deserializes an array of octets.
          * @param octet_t The variable that will store the array of octets read from the buffer.
@@ -1666,6 +1724,48 @@ namespace eprosima
          * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
          */
         Cdr& deserializeArray(double *double_t, size_t numElements, Endianness endianness);
+
+        // TODO
+        Cdr& deserializeArray(std::string *string_t, size_t numElements);
+        Cdr& deserializeArray(std::string *string_t, size_t numElements, Endianness endianness);
+
+        // TODO
+        template<class _T>
+        Cdr& deserializeArray(std::vector<_T> *vector_t, size_t numElements)
+        {
+           for(size_t count = 0; count < numElements; ++count)
+               deserialize(vector_t[count]);
+           return *this;
+        }
+
+        // TODO
+        template<class _T>
+        Cdr& deserializeArray(_T *type_t, size_t numElements)
+        {
+           for(size_t count = 0; count < numElements; ++count)
+              type_t[count].deserialize(*this);
+           return *this;
+        }
+
+        template<class _T>
+        Cdr& deserializeArray(_T *type_t, size_t numElements, Endianness endianness)
+        {
+            bool auxSwap = m_swapBytes;
+            m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+            try
+            {
+                deserializeArray(type_t, numElements);
+                m_swapBytes = auxSwap;
+            }
+            catch(Exception &ex)
+            {
+                m_swapBytes = auxSwap;
+                ex.raise();
+            }
+
+            return *this;
+        }
 
         /*!
          * @brief This function template deserializes a raw sequence.

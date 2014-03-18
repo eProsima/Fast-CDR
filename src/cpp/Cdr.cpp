@@ -929,6 +929,32 @@ Cdr& Cdr::serializeArray(const double *double_t, size_t numElements, Endianness 
     return *this;
 }
 
+Cdr& Cdr::serializeArray(const std::string *string_t, size_t numElements)
+{
+    for(size_t count = 0; count < numElements; ++count)
+        serialize(string_t[count]);
+    return *this;
+}
+
+Cdr& Cdr::serializeArray(const std::string *string_t, size_t numElements, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        serializeArray(string_t, numElements);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
 Cdr& Cdr::deserialize(char &char_t)
 {
     if((m_lastPosition - m_currentPosition) >= sizeof(char_t))
@@ -1638,6 +1664,32 @@ Cdr& Cdr::deserializeArray(double *double_t, size_t numElements, Endianness endi
     try
     {
         deserializeArray(double_t, numElements);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::deserializeArray(std::string *string_t, size_t numElements)
+{
+    for(size_t count = 0; count < numElements; ++count)
+        deserialize(string_t[count]);
+    return *this;
+}
+
+Cdr& Cdr::deserializeArray(std::string *string_t, size_t numElements, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        deserializeArray(string_t, numElements);
         m_swapBytes = auxSwap;
     }
     catch(Exception &ex)

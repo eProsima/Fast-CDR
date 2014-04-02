@@ -139,6 +139,9 @@ namespace eprosima
         */
         inline FastCdr& operator<<(const int32_t long_t){return serialize(long_t);}
 
+        // TODO in FastCdr
+        inline FastCdr& operator<<(const wchar_t wchar){return serialize(wchar);}
+
         /*!
         * @brief This operator serializes an unsigned long long.
         * @param ulonglong_t The value of the unsigned long long that will be serialized in the buffer.
@@ -205,6 +208,14 @@ namespace eprosima
         template<class _T>
         inline FastCdr& operator<<(const std::vector<_T> &vector_t){return serialize<_T>(vector_t);}
 
+        // TODO
+        template<class _T>
+        inline FastCdr& operator<<(const _T &type_t)
+        {
+            type_t.serialize(*this);
+            return *this;
+        }
+
         /*! 
         * @brief This operator deserializes an octet.
         * @param octet_t The variable that will store the octet read from the buffer.
@@ -252,6 +263,9 @@ namespace eprosima
         * @exception NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
         */
         inline FastCdr& operator>>(int32_t &long_t){return deserialize(long_t);}
+
+        // TODO in FastCdr
+        inline FastCdr& operator>>(wchar_t &wchar){return deserialize(wchar);}
 
         /*!
         * @brief This operator deserializes an unsigned long long.
@@ -319,6 +333,14 @@ namespace eprosima
           */
         template<class _T>
         inline FastCdr& operator>>(std::vector<_T> &vector_t){return deserialize<_T>(vector_t);}
+
+        // TODO
+        template<class _T>
+        inline FastCdr& operator>>(_T &type_t)
+        {
+            type_t.deserialize(*this);
+            return *this;
+        }
 
         /*!
          * @brief This function serializes an octet.
@@ -412,6 +434,14 @@ namespace eprosima
             }
 
             throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        }
+
+
+        // TODO in FastCdr
+        inline
+        FastCdr& serialize(const wchar_t wchar)
+        {
+            return serialize((int32_t)wchar);
         }
 
         /*!
@@ -529,9 +559,9 @@ namespace eprosima
         template<class _T>
         FastCdr& serialize(const std::vector<_T> &vector_t)
         {
-            FastCdr::state state(*this);
+            state state(*this);
 
-            serialize((int32_t)vector_t.size());
+            *this << (int32_t)vector_t.size();
 
             try
             {
@@ -612,6 +642,13 @@ namespace eprosima
          */
         FastCdr& serializeArray(const int32_t *long_t, size_t numElements);
 
+        // TODO in FastCdr
+        inline
+        FastCdr& serializeArray(const wchar_t *wchar, size_t numElements)
+        {
+            return serializeArray((const int32_t*)wchar, numElements);
+        }
+
         /*!
          * @brief This function serializes an array of unsigned long longs.
          * @param ulonglong_t The array of unsigned long longs that will be serialized in the buffer.
@@ -652,6 +689,27 @@ namespace eprosima
          */
         FastCdr& serializeArray(const double *double_t, size_t numElements);
 
+        // TODO
+        FastCdr& serializeArray(const std::string *string_t, size_t numElements);
+
+        // TODO
+        template<class _T>
+        FastCdr& serializeArray(const std::vector<_T> *vector_t, size_t numElements)
+        {
+           for(size_t count = 0; count < numElements; ++count)
+               serialize(vector_t[count]);
+           return *this;
+        }
+
+        // TODO
+        template<class _T>
+        FastCdr& serializeArray(const _T *type_t, size_t numElements)
+        {
+           for(size_t count = 0; count < numElements; ++count)
+              type_t[count].serialize(*this);
+           return *this;
+        }
+
         /*!
          * @brief This function template serializes a raw sequence.
          * @param sequence_t Pointer to the sequence that will be serialized in the buffer.
@@ -662,7 +720,7 @@ namespace eprosima
         template<class _T>
         FastCdr& serializeSequence(const _T *sequence_t, size_t numElements)
         {
-            FastCdr::state state(*this);
+            state state(*this);
 
             serialize((int32_t)numElements);
 
@@ -771,6 +829,13 @@ namespace eprosima
             }
 
             throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        }
+
+        // TODO in FastCdr
+        inline
+        FastCdr& deserialize(wchar_t &wchar)
+        {
+            return deserialize((int32_t&)wchar);
         }
 
         /*!
@@ -893,9 +958,9 @@ namespace eprosima
         FastCdr& deserialize(std::vector<_T> &vector_t)
         {
             uint32_t seqLength = 0;
-            FastCdr::state state(*this);
+            state state(*this);
 
-            deserialize(seqLength);
+            *this >> seqLength;
 
             try
             {
@@ -908,6 +973,14 @@ namespace eprosima
                 ex.raise();
             }
 
+            return *this;
+        }
+
+        // TODO
+        template<class _T>
+        inline FastCdr& deserialize(_T &type_t)
+        {
+            type_t.deserialize(*this);
             return *this;
         }
 
@@ -977,6 +1050,13 @@ namespace eprosima
          */
         FastCdr& deserializeArray(int32_t *long_t, size_t numElements);
 
+        // TODO in FastCdr
+        inline
+        FastCdr& deserializeArray(wchar_t *wchar, size_t numElements)
+        {
+            return deserializeArray((int32_t*)wchar, numElements);
+        }
+
         /*!
          * @brief This function deserializes an array of unsigned long longs.
          * @param ulonglong_t The variable that will store the array of unsigned long longs read from the buffer.
@@ -1017,6 +1097,27 @@ namespace eprosima
          */
         FastCdr& deserializeArray(double *double_t, size_t numElements);
 
+        // TODO
+        FastCdr& deserializeArray(std::string *string_t, size_t numElements);
+
+        // TODO
+        template<class _T>
+        FastCdr& deserializeArray(std::vector<_T> *vector_t, size_t numElements)
+        {
+           for(size_t count = 0; count < numElements; ++count)
+               deserialize(vector_t[count]);
+           return *this;
+        }
+
+        // TODO
+        template<class _T>
+        FastCdr& deserializeArray(_T *type_t, size_t numElements)
+        {
+           for(size_t count = 0; count < numElements; ++count)
+              type_t[count].deserialize(*this);
+           return *this;
+        }
+
         /*!
          * @brief This function template deserializes a raw sequence.
          * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
@@ -1030,7 +1131,7 @@ namespace eprosima
         FastCdr& deserializeSequence(_T *&sequence_t, size_t &numElements)
         {
             uint32_t seqLength = 0;
-            FastCdr::state state(*this);
+            state state(*this);
 
             deserialize(seqLength);
 

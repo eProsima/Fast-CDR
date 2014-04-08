@@ -6,7 +6,8 @@
 #include <limits>
 #include <iostream>
 
-using namespace eprosima;
+using namespace eprosima::fastcdr;
+using namespace ::exception;
 
 const uint8_t octet_t = 32;
 const char char_t =  'Z';

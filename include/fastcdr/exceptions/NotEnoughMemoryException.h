@@ -13,64 +13,70 @@
 
 namespace eprosima
 {
-    /*!
-     * @brief This class is thrown as an exception when the buffer's internal memory reachs its size limit.
-     * @ingroup EXCEPTIONMODULE
-     */
-    class Cdr_DllAPI NotEnoughMemoryException : public Exception
+    namespace fastcdr
     {
-    public:
+        namespace exception
+        {
+            /*!
+             * @brief This class is thrown as an exception when the buffer's internal memory reachs its size limit.
+             * @ingroup EXCEPTIONMODULE
+             */
+            class Cdr_DllAPI NotEnoughMemoryException : public Exception
+            {
+                public:
 
-        /*!
-         * @brief Default constructor.
-         *
-         * @param message A error message. This message is copied.
-         */
-        NotEnoughMemoryException(const std::string &message);
+                    /*!
+                     * @brief Default constructor.
+                     *
+                     * @param message A error message. This message is copied.
+                     */
+                    NotEnoughMemoryException(const std::string &message);
 
-        /*!
-         * @brief Default constructor.
-         *
-         * @param message A error message. This message is moved.
-         */
-        NotEnoughMemoryException(std::string&& message);
+                    /*!
+                     * @brief Default constructor.
+                     *
+                     * @param message A error message. This message is moved.
+                     */
+                    NotEnoughMemoryException(std::string&& message);
 
-        /*!
-         * @brief Default copy constructor.
-         *
-         * @param ex NotEnoughMemoryException that will be copied.
-         */
-        NotEnoughMemoryException(const NotEnoughMemoryException &ex);
+                    /*!
+                     * @brief Default copy constructor.
+                     *
+                     * @param ex NotEnoughMemoryException that will be copied.
+                     */
+                    NotEnoughMemoryException(const NotEnoughMemoryException &ex);
 
-        /*!
-         * @brief Default move constructor.
-         *
-         * @param ex NotEnoughMemoryException that will be moved.
-         */
-        NotEnoughMemoryException(NotEnoughMemoryException&& ex);
+                    /*!
+                     * @brief Default move constructor.
+                     *
+                     * @param ex NotEnoughMemoryException that will be moved.
+                     */
+                    NotEnoughMemoryException(NotEnoughMemoryException&& ex);
 
-        /*!
-         * @brief Assigment operation.
-         *
-         * @param ex NotEnoughMemoryException that will be copied.
-         */
-        NotEnoughMemoryException& operator=(const NotEnoughMemoryException &ex);
+                    /*!
+                     * @brief Assigment operation.
+                     *
+                     * @param ex NotEnoughMemoryException that will be copied.
+                     */
+                    NotEnoughMemoryException& operator=(const NotEnoughMemoryException &ex);
 
-        /*!
-         * @brief Assigment operation.
-         *
-         * @param ex NotEnoughMemoryException that will be moved.
-         */
-        NotEnoughMemoryException& operator=(NotEnoughMemoryException&& ex);
+                    /*!
+                     * @brief Assigment operation.
+                     *
+                     * @param ex NotEnoughMemoryException that will be moved.
+                     */
+                    NotEnoughMemoryException& operator=(NotEnoughMemoryException&& ex);
 
-        //! @brief Default constructor
-        virtual ~NotEnoughMemoryException() throw();
+                    //! @brief Default constructor
+                    virtual ~NotEnoughMemoryException() throw();
 
-        //! @brief This function throws the object as exception.
-        virtual void raise() const;
+                    //! @brief This function throws the object as exception.
+                    virtual void raise() const;
 
-        //! @brief Default message used in the library.
-        static const std::string NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT;
-    };
-} // namespace eprosima
+                    //! @brief Default message used in the library.
+                    static const std::string NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT;
+            };
+        } //namespace exception
+    } //namespace fastcdr
+} //namespace eprosima
 #endif // _FASTCDR_EXCEPTIONS_NOTENOUGHMEMORYEXCEPTION_H_

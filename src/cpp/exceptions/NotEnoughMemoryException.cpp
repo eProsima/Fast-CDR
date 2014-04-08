@@ -8,52 +8,51 @@
 
 #include <fastcdr/exceptions/NotEnoughMemoryException.h>
 
-namespace eprosima
+using namespace eprosima::fastcdr::exception;
+
+const std::string NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT("Not enough memory in the buffer stream");
+
+NotEnoughMemoryException::NotEnoughMemoryException(const std::string &message) : Exception(message)
 {
-    const std::string NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT("Not enough memory in the buffer stream");
+}
 
-	NotEnoughMemoryException::NotEnoughMemoryException(const std::string &message) : Exception(message)
-	{
-	}
+NotEnoughMemoryException::NotEnoughMemoryException(std::string&& message) : Exception(std::move(message))
+{
+}
 
-	NotEnoughMemoryException::NotEnoughMemoryException(std::string&& message) : Exception(std::move(message))
-	{
-	}
+NotEnoughMemoryException::NotEnoughMemoryException(const NotEnoughMemoryException &ex) : Exception(ex)
+{
+}
 
-	NotEnoughMemoryException::NotEnoughMemoryException(const NotEnoughMemoryException &ex) : Exception(ex)
-	{
-	}
+NotEnoughMemoryException::NotEnoughMemoryException(NotEnoughMemoryException&& ex) : Exception(std::move(ex))
+{
+}
 
-	NotEnoughMemoryException::NotEnoughMemoryException(NotEnoughMemoryException&& ex) : Exception(std::move(ex))
-	{
-	}
+NotEnoughMemoryException& NotEnoughMemoryException::operator=(const NotEnoughMemoryException &ex)
+{
+    if(this != &ex)
+    {
+        Exception::operator=(ex);
+    }
 
-	NotEnoughMemoryException& NotEnoughMemoryException::operator=(const NotEnoughMemoryException &ex)
-	{
-		if(this != &ex)
-		{
-			Exception::operator=(ex);
-		}
+    return *this;
+}
 
-		return *this;
-	}
+NotEnoughMemoryException& NotEnoughMemoryException::operator=(NotEnoughMemoryException&& ex)
+{
+    if(this != &ex)
+    {
+        Exception::operator=(std::move(ex));
+    }
 
-	NotEnoughMemoryException& NotEnoughMemoryException::operator=(NotEnoughMemoryException&& ex)
-	{
-		if(this != &ex)
-		{
-			Exception::operator=(std::move(ex));
-		}
+    return *this;
+}
 
-		return *this;
-	}
+NotEnoughMemoryException::~NotEnoughMemoryException() throw()
+{
+}
 
-	NotEnoughMemoryException::~NotEnoughMemoryException() throw()
-	{
-	}
-
-	void NotEnoughMemoryException::raise() const
-	{
-		throw *this;
-	}
-} // namespace eprosima
+void NotEnoughMemoryException::raise() const
+{
+    throw *this;
+}

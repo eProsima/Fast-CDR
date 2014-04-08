@@ -8,52 +8,51 @@
 
 #include <fastcdr/exceptions/BadParamException.h>
 
-namespace eprosima
+using namespace eprosima::fastcdr::exception;
+
+const std::string BadParamException::BAD_PARAM_MESSAGE_DEFAULT("Bad parameter");
+
+BadParamException::BadParamException(const std::string &message) : Exception(message)
 {
-    const std::string BadParamException::BAD_PARAM_MESSAGE_DEFAULT("Bad parameter");
+}
 
-	BadParamException::BadParamException(const std::string &message) : Exception(message)
-	{
-	}
+BadParamException::BadParamException(std::string&& message) : Exception(std::move(message))
+{
+}
 
-	BadParamException::BadParamException(std::string&& message) : Exception(std::move(message))
-	{
-	}
+BadParamException::BadParamException(const BadParamException &ex) : Exception(ex)
+{
+}
 
-	BadParamException::BadParamException(const BadParamException &ex) : Exception(ex)
-	{
-	}
+BadParamException::BadParamException(BadParamException&& ex) : Exception(std::move(ex))
+{
+}
 
-	BadParamException::BadParamException(BadParamException&& ex) : Exception(std::move(ex))
-	{
-	}
+BadParamException& BadParamException::operator=(const BadParamException &ex)
+{
+    if(this != &ex)
+    {
+        Exception::operator=(ex);
+    }
 
-	BadParamException& BadParamException::operator=(const BadParamException &ex)
-	{
-		if(this != &ex)
-		{
-			Exception::operator=(ex);
-		}
+    return *this;
+}
 
-		return *this;
-	}
+BadParamException& BadParamException::operator=(BadParamException&& ex)
+{
+    if(this != &ex)
+    {
+        Exception::operator=(std::move(ex));
+    }
 
-	BadParamException& BadParamException::operator=(BadParamException&& ex)
-	{
-		if(this != &ex)
-		{
-			Exception::operator=(std::move(ex));
-		}
+    return *this;
+}
 
-		return *this;
-	}
+BadParamException::~BadParamException() throw()
+{
+}
 
-	BadParamException::~BadParamException() throw()
-	{
-	}
-
-	void BadParamException::raise() const
-	{
-		throw *this;
-	}
-} // namespace eprosima
+void BadParamException::raise() const
+{
+    throw *this;
+}

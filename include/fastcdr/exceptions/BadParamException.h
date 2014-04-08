@@ -13,64 +13,70 @@
 
 namespace eprosima
 {
-    /*!
-     * @brief This class is thrown as an exception when a invalid parameter was being serialized.
-     * @ingroup EXCEPTIONMODULE
-     */
-    class Cdr_DllAPI BadParamException : public Exception
+    namespace fastcdr
     {
-    public:
+        namespace exception
+        {
+            /*!
+             * @brief This class is thrown as an exception when a invalid parameter was being serialized.
+             * @ingroup EXCEPTIONMODULE
+             */
+            class Cdr_DllAPI BadParamException : public Exception
+            {
+                public:
 
-        /*!
-         * @brief Default constructor.
-         *
-         * @param message A error message. This message is copied.
-         */
-        BadParamException(const std::string &message);
+                    /*!
+                     * @brief Default constructor.
+                     *
+                     * @param message A error message. This message is copied.
+                     */
+                    BadParamException(const std::string &message);
 
-        /*!
-         * @brief Default constructor.
-         *
-         * @param message A error message. This message is moved.
-         */
-        BadParamException(std::string&& message);
+                    /*!
+                     * @brief Default constructor.
+                     *
+                     * @param message A error message. This message is moved.
+                     */
+                    BadParamException(std::string&& message);
 
-        /*!
-         * @brief Default copy constructor.
-         *
-         * @param ex BadParamException that will be copied.
-         */
-        BadParamException(const BadParamException &ex);
+                    /*!
+                     * @brief Default copy constructor.
+                     *
+                     * @param ex BadParamException that will be copied.
+                     */
+                    BadParamException(const BadParamException &ex);
 
-        /*!
-         * @brief Default move constructor.
-         *
-         * @param ex BadParamException that will be moved.
-         */
-        BadParamException(BadParamException&& ex);
+                    /*!
+                     * @brief Default move constructor.
+                     *
+                     * @param ex BadParamException that will be moved.
+                     */
+                    BadParamException(BadParamException&& ex);
 
-        /*!
-         * @brief Assigment operation.
-         *
-         * @param ex BadParamException that will be copied.
-         */
-        BadParamException& operator=(const BadParamException &ex);
+                    /*!
+                     * @brief Assigment operation.
+                     *
+                     * @param ex BadParamException that will be copied.
+                     */
+                    BadParamException& operator=(const BadParamException &ex);
 
-        /*!
-         * @brief Assigment operation.
-         *
-         * @param ex BadParamException that will be moved.
-         */
-        BadParamException& operator=(BadParamException&& ex);
+                    /*!
+                     * @brief Assigment operation.
+                     *
+                     * @param ex BadParamException that will be moved.
+                     */
+                    BadParamException& operator=(BadParamException&& ex);
 
-        //! @brief Default constructor
-        virtual ~BadParamException() throw();
+                    //! @brief Default constructor
+                    virtual ~BadParamException() throw();
 
-        //! @brief This function throws the object as exception.
-        virtual void raise() const;
+                    //! @brief This function throws the object as exception.
+                    virtual void raise() const;
 
-        //! @brief Default message used in the library.
-        static const std::string BAD_PARAM_MESSAGE_DEFAULT;
-    };
-} // namespace eprosima
+                    //! @brief Default message used in the library.
+                    static const std::string BAD_PARAM_MESSAGE_DEFAULT;
+            };
+        } //namespace exception
+    } //namespace fastcdr
+} //namespace eprosima
 #endif // _FASTCDR_EXCEPTIONS_BADPARAMEXCEPTION_H_

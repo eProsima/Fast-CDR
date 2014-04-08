@@ -6,7 +6,8 @@
 #include <limits>
 #include <iostream>
 
-using namespace eprosima;
+using namespace eprosima::fastcdr;
+using namespace ::exception;
 
 #define BUFFER_LENGTH 2000
 

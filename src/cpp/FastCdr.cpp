@@ -10,7 +10,8 @@
 #include "fastcdr/exceptions/BadParamException.h"
 #include <string.h>
 
-using namespace eprosima;
+using namespace eprosima::fastcdr;
+using namespace ::exception;
 
 FastCdr::state::state(FastCdr &fastcdr) : m_currentPosition(fastcdr.m_currentPosition) {}
 

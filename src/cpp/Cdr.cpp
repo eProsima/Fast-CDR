@@ -10,7 +10,8 @@
 #include "fastcdr/exceptions/NotEnoughMemoryException.h"
 #include "fastcdr/exceptions/BadParamException.h"
 
-using namespace eprosima;
+using namespace eprosima::fastcdr;
+using namespace ::exception;
 
 #if defined(__LITTLE_ENDIAN__)
     const Cdr::Endianness Cdr::DEFAULT_ENDIAN = LITTLE_ENDIANNESS;

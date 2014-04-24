@@ -172,6 +172,13 @@ FastCdr& FastCdr::serializeArray(const int32_t *long_t, size_t numElements)
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
+FastCdr& FastCdr::serializeArray(const wchar_t *wchar, size_t numElements)
+{
+    for(size_t count = 0; count < numElements; ++count)
+        serialize(wchar[count]);
+    return *this;
+}
+
 FastCdr& FastCdr::serializeArray(const int64_t *longlong_t, size_t numElements)
 {
     size_t totalSize = sizeof(*longlong_t) * numElements;
@@ -339,6 +346,17 @@ FastCdr& FastCdr::deserializeArray(int32_t *long_t, size_t numElements)
     }
 
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+}
+
+FastCdr& FastCdr::deserializeArray(wchar_t *wchar, size_t numElements)
+{
+    uint32_t value;
+    for(size_t count = 0; count < numElements; ++count)
+    {
+        deserialize(value);
+        wchar[count] = (wchar_t)value;
+    }
+    return *this;
 }
 
 FastCdr& FastCdr::deserializeArray(int64_t *longlong_t, size_t numElements)

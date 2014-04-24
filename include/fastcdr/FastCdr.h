@@ -439,11 +439,10 @@ namespace eprosima
                     }
 
 
-                // TODO in FastCdr
                 inline
                     FastCdr& serialize(const wchar_t wchar)
                     {
-                        return serialize((int32_t)wchar);
+                        return serialize((uint32_t)wchar);
                     }
 
                 /*!
@@ -644,12 +643,7 @@ namespace eprosima
                  */
                 FastCdr& serializeArray(const int32_t *long_t, size_t numElements);
 
-                // TODO in FastCdr
-                inline
-                    FastCdr& serializeArray(const wchar_t *wchar, size_t numElements)
-                    {
-                        return serializeArray((const int32_t*)wchar, numElements);
-                    }
+                FastCdr& serializeArray(const wchar_t *wchar, size_t numElements);
 
                 /*!
                  * @brief This function serializes an array of unsigned long longs.
@@ -833,11 +827,13 @@ namespace eprosima
                         throw exception::NotEnoughMemoryException(exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
                     }
 
-                // TODO in FastCdr
                 inline
                     FastCdr& deserialize(wchar_t &wchar)
                     {
-                        return deserialize((int32_t&)wchar);
+                        uint32_t ret;
+                        deserialize(ret);
+                        wchar = (wchar_t)ret;
+                        return *this;
                     }
 
                 /*!
@@ -1052,12 +1048,7 @@ namespace eprosima
                  */
                 FastCdr& deserializeArray(int32_t *long_t, size_t numElements);
 
-                // TODO in FastCdr
-                inline
-                    FastCdr& deserializeArray(wchar_t *wchar, size_t numElements)
-                    {
-                        return deserializeArray((int32_t*)wchar, numElements);
-                    }
+                FastCdr& deserializeArray(wchar_t *wchar, size_t numElements);
 
                 /*!
                  * @brief This function deserializes an array of unsigned long longs.

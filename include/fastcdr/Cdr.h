@@ -558,18 +558,16 @@ namespace eprosima
                  */
                 Cdr& serialize(const int32_t long_t, Endianness endianness);
 
-                // TODO in FastCdr
                 inline
                     Cdr& serialize(const wchar_t wchar)
                     {
-                        return serialize((int32_t)wchar);
+                        return serialize((uint32_t)wchar);
                     }
 
-                // TODO
                 inline
                     Cdr& serialize(const wchar_t wchar, Endianness endianness)
                     {
-                        return serialize((int32_t)wchar, endianness);
+                        return serialize((uint32_t)wchar, endianness);
                     }
 
                 /*!
@@ -927,19 +925,9 @@ namespace eprosima
                  */
                 Cdr& serializeArray(const int32_t *long_t, size_t numElements, Endianness endianness);
 
-                // TODO in FastCdr
-                inline
-                    Cdr& serializeArray(const wchar_t *wchar, size_t numElements)
-                    {
-                        return serializeArray((const int32_t*)wchar, numElements);
-                    }
+                Cdr& serializeArray(const wchar_t *wchar, size_t numElements);
 
-                // TODO
-                inline
-                    Cdr& serializeArray(const wchar_t *wchar, size_t numElements, Endianness endianness)
-                    {
-                        return serializeArray((const int32_t*)wchar, numElements, endianness);
-                    }
+                Cdr& serializeArray(const wchar_t *wchar, size_t numElements, Endianness endianness);
 
                 /*!
                  * @brief This function serializes an array of unsigned long longs.
@@ -1251,18 +1239,22 @@ namespace eprosima
                  */
                 Cdr& deserialize(int32_t &long_t, Endianness endianness);
 
-                // TODO in FastCdr
                 inline
                     Cdr& deserialize(wchar_t &wchar)
                     {
-                        return deserialize((int32_t&)wchar);
+                        uint32_t ret;
+                        deserialize(ret);
+                        wchar = (wchar_t)ret;
+                        return *this;
                     }
 
-                // TODO
                 inline
                     Cdr& deserialize(wchar_t &wchar, Endianness endianness)
                     {
-                        return deserialize((int32_t&)wchar, endianness);
+                        uint32_t ret;
+                        deserialize(ret, endianness);
+                        wchar = (wchar_t)ret;
+                        return *this;
                     }
 
                 /*!
@@ -1629,19 +1621,9 @@ namespace eprosima
                  */
                 Cdr& deserializeArray(int32_t *long_t, size_t numElements, Endianness endianness);
 
-                // TODO in FastCdr
-                inline
-                    Cdr& deserializeArray(wchar_t *wchar, size_t numElements)
-                    {
-                        return deserializeArray((int32_t*)wchar, numElements);
-                    }
+                Cdr& deserializeArray(wchar_t *wchar, size_t numElements);
 
-                // TODO
-                inline
-                    Cdr& deserializeArray(wchar_t *wchar, size_t numElements, Endianness endianness)
-                    {
-                        return deserializeArray((int32_t*)wchar, numElements, endianness);
-                    }
+                Cdr& deserializeArray(wchar_t *wchar, size_t numElements, Endianness endianness);
 
                 /*!
                  * @brief This function deserializes an array of unsigned long longs.

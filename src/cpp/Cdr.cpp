@@ -745,6 +745,32 @@ Cdr& Cdr::serializeArray(const int32_t *long_t, size_t numElements, Endianness e
     return *this;
 }
 
+Cdr& Cdr::serializeArray(const wchar_t *wchar, size_t numElements)
+{
+    for(size_t count = 0; count < numElements; ++count)
+        serialize(wchar[count]);
+    return *this;
+}
+
+Cdr& Cdr::serializeArray(const wchar_t *wchar, size_t numElements, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        serializeArray(wchar, numElements);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+    
+    return *this;
+}
+
 Cdr& Cdr::serializeArray(const int64_t *longlong_t, size_t numElements)
 {
     size_t align = alignment(sizeof(*longlong_t));
@@ -1480,6 +1506,36 @@ Cdr& Cdr::deserializeArray(int32_t *long_t, size_t numElements, Endianness endia
     try
     {
         deserializeArray(long_t, numElements);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::deserializeArray(wchar_t *wchar, size_t numElements)
+{
+    uint32_t value;
+    for(size_t count = 0; count < numElements; ++count)
+    {
+        deserialize(value);
+        wchar[count] = (wchar_t)value;
+    }
+    return *this;
+}
+
+Cdr& Cdr::deserializeArray(wchar_t *wchar, size_t numElements, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        deserializeArray(wchar, numElements);
         m_swapBytes = auxSwap;
     }
     catch(Exception &ex)

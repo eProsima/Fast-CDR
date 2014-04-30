@@ -30,9 +30,9 @@ function installer
 	cp -r ../../../include/fastcdr tmp/$project/include
 	errorstatus=$?
 	if [ $errorstatus != 0 ]; then return; fi
-        if [ -d tmp/$project/include/fastcdr/.svn ]; then
-            find tmp/$project/include/fastcdr -iname .svn -exec rm -rf {} \;
-        fi
+    if [ -d tmp/$project/include/fastcdr/.svn ]; then
+        find tmp/$project/include/fastcdr -iname .svn -exec rm -rf {} \;
+    fi
 
 	# Copy eProsima header files
 	mkdir -p tmp/$project/include/fastcdr/eProsima_cpp
@@ -45,9 +45,9 @@ function installer
 	cp -r ../../../src/cpp tmp/$project/src
 	errorstatus=$?
 	if [ $errorstatus != 0 ]; then return; fi
-        if [ -d tmp/$project/src/cpp/.svn ]; then
-            find tmp/$project/src/cpp -iname .svn -exec rm -rf {} \;
-        fi
+    if [ -d tmp/$project/src/cpp/.svn ]; then
+        find tmp/$project/src/cpp -iname .svn -exec rm -rf {} \;
+    fi
 
 	# Copy autoconf configuration files.
 	cp configure.ac tmp/$project
@@ -69,6 +69,9 @@ function installer
 	errorstatus=$?
 	if [ $errorstatus != 0 ]; then return; fi
 	sed -i "s/VERSION_MINOR/`echo ${version} | cut -d. -f2`/g" Makefile.am
+	errorstatus=$?
+	if [ $errorstatus != 0 ]; then return; fi
+	sed -i "s/VERSION_RELEASE/`echo ${version} | cut -d. -f3`/g" Makefile.am
 	errorstatus=$?
 	if [ $errorstatus != 0 ]; then return; fi
 	autoreconf --force --install

@@ -268,6 +268,12 @@ namespace eprosima
                  */
                 inline Cdr& operator<<(const bool bool_t){return serialize(bool_t);}
 
+				//TODO
+				inline Cdr& operator<<(const char *string_t){return serialize(string_t);}
+
+				//TODO
+				inline Cdr& operator<<(char *string_t){return serialize(string_t);}
+
                 /*!
                  * @brief This operator serializes a string.
                  * @param string_t The string that will be serialized in the buffer.
@@ -393,6 +399,9 @@ namespace eprosima
                  * @exception exception::BadParamException This exception is thrown when trying to deserialize an invalid value.
                  */
                 inline Cdr& operator>>(bool &bool_t){return deserialize(bool_t);}
+
+				//TODO
+				inline Cdr& operator>>(char *&string_t){return deserialize(string_t);}
 
                 /*!
                  * @brief This operator deserializes a string.
@@ -683,6 +692,12 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
                 Cdr& serialize(const char *string_t, Endianness endianness);
+
+				//TODO
+				inline Cdr& serialize(char *string_t) {return serialize((const char*)string_t);}
+
+				//TODO
+				inline Cdr& serialize(char *string_t, Endianness endianness) {return serialize((const char*)string_t, endianness);}
 
                 /*!
                  * @brief This function serializes a std::string.

@@ -85,10 +85,10 @@ FastCdr& FastCdr::serialize(const char *string_t)
     uint32_t length = (uint32_t)strlen(string_t);
     FastCdr::state state(*this);
 
-    serialize(length);
-
     if(length > 0)
     {
+		serialize(++length);
+
         if(((m_lastPosition - m_currentPosition) >= length) || resize(length))
         {
             m_currentPosition.memcopy(string_t, length);
@@ -100,6 +100,8 @@ FastCdr& FastCdr::serialize(const char *string_t)
             throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
     }
+	else
+		serialize(length);
 
     return *this;
 }
@@ -109,10 +111,10 @@ FastCdr& FastCdr::serialize(const std::string &string_t)
     uint32_t length = (uint32_t)string_t.length();
     FastCdr::state state(*this);
 
-    serialize(length);
-
     if(length > 0)
     {
+		*this << ++length;
+
         if(((m_lastPosition - m_currentPosition) >= length) || resize(length))
         {
             m_currentPosition.memcopy(string_t.c_str(), length);
@@ -124,6 +126,8 @@ FastCdr& FastCdr::serialize(const std::string &string_t)
             throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
     }
+	else
+		*this << length;
 
     return *this;
 }

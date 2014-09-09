@@ -1,7 +1,7 @@
 :: This script execute Visual Studio getting first the version of the product.
 
 :: Get the current vesion of FastCDR
-call %EPROSIMADIR%\scripts\common_pack_functions.bat :getVersionFromCPP VERSIONFASTCDR ..\..\..\include\fastcdr\FastCdr_version.h
+call ..\..\..\thirdparty\eProsima\scripts\common_pack_functions.bat :getVersionFromCPP VERSIONFASTCDR ..\..\..\include\fastcdr\FastCdr_version.h
 if not %errorstatus%==0 goto :EOF
 
 set VERSION=-%VERSIONFASTCDR%

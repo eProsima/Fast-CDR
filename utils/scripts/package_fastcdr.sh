@@ -14,7 +14,7 @@ errorstatus=0
 function package
 {
     # Get current version of GCC. (Not more needed)
-    #. ../../thirdparty/eProsima/scripts/common_pack_functions.sh getGccVersion
+    #. ./thirdparty/eProsima/scripts/common_pack_functions.sh getGccVersion
 
     # Compile FastCDR library for i86.
     rm -rf output
@@ -32,7 +32,7 @@ function package
     if [ $errorstatus != 0 ]; then return; fi
 
     # Get the current version of FastBuffers
-    . ../../thirdparty/eProsima/scripts/common_pack_functions.sh getVersionFromCPP fastcdrversion include/fastcdr/FastCdr_version.h
+    . ./thirdparty/eProsima/scripts/common_pack_functions.sh getVersionFromCPP fastcdrversion include/fastcdr/FastCdr_version.h
     errorstatus=$?
     if [ $errorstatus != 0 ]; then return; fi
 
@@ -48,10 +48,10 @@ function package
 }
 
 # Check that the environment.sh script was run.
-#if [ "$EPROSIMADIR" == "" ]; then
-#    echo "environment.sh must to be run."
-#    exit -1
-#fi
+if [ "$EPROSIMA_LIBRARY_PATH" == "" ]; then
+    echo "environment.sh must to be run."
+    exit -1
+fi
 
 # Go to root
 cd ../..

@@ -5,6 +5,7 @@ CPP=g++
 LN=g++
 AR=ar
 CP=cp
+EPROSIMADIR=$(BASEDIR)/../../../thirdparty/eProsima
 
 -include $(BASEDIR)/../../../thirdparty/eProsima/building/makefiles/eProsima.mk
 

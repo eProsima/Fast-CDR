@@ -1,3 +1,3 @@
-[submodule "thirdparty/eProsima"]
-	path = thirdparty/eProsima
-	url = git@git.sambaserver.eprosima.com:eprosima-common/eprosima.git
+[submodule "thirdparty/dev-env"]
+	path = thirdparty/dev-env
+	url = git@git.sambaserver.eprosima.com:eprosima-common/dev-env.git

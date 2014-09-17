@@ -13,9 +13,6 @@ errorstatus=0
 
 function package
 {
-    # Get current version of GCC. (Not more needed)
-    #. ./thirdparty/eProsima/scripts/common_pack_functions.sh getGccVersion
-
     # Compile FastCDR library for i86.
     rm -rf output
     EPROSIMA_TARGET="i86Linux2.6gcc"
@@ -32,7 +29,7 @@ function package
     if [ $errorstatus != 0 ]; then return; fi
 
     # Get the current version of FastBuffers
-    . ./thirdparty/eProsima/scripts/common_pack_functions.sh getVersionFromCPP fastcdrversion include/fastcdr/FastCdr_version.h
+    . ./thirdparty/dev-env/scripts/common_pack_functions.sh getVersionFromCPP fastcdrversion include/fastcdr/FastCdr_version.h
     errorstatus=$?
     if [ $errorstatus != 0 ]; then return; fi
 

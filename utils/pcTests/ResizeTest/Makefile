@@ -5,9 +5,8 @@ CPP=g++
 LN=g++
 AR=ar
 CP=cp
-EPROSIMADIR=$(BASEDIR)/../../../thirdparty/eProsima
 
--include $(BASEDIR)/../../../thirdparty/eProsima/building/makefiles/eProsima.mk
+-include $(BASEDIR)/../../../thirdparty/dev-env/building/makefiles/eProsima.mk
 
 RESIZETEST_OUTDIR= $(OUTDIR)/ResizeTest
 RESIZETEST_OUTDIR_DEBUG = $(RESIZETEST_OUTDIR)/debug
@@ -23,7 +22,7 @@ RESIZETEST_TARGET_DEBUG= $(BASEDIR)/bin/$(EPROSIMA_TARGET)/ResizeTestd
 RESIZETEST_TARGET= $(BASEDIR)/bin/$(EPROSIMA_TARGET)/ResizeTest
 
 RESIZETEST_INCLUDE_DIRS= $(INCLUDE_DIRS) -I$(BASEDIR)/../../../include \
-                         -I$(BASEDIR)/../../../thirdparty/eProsima/code
+                         -I$(BASEDIR)/../../../thirdparty/eprosima-common-code
 
 RESIZETEST_LIBS_DEBUG= $(LIBS_DEBUG) -L$(BASEDIR)/../../../lib/$(EPROSIMA_TARGET) -lfastcdrd
 RESIZETEST_LIBS_RELEASE= $(LIBS) -L$(BASEDIR)/../../../lib/$(EPROSIMA_TARGET) -lfastcdr

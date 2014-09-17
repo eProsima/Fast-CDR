@@ -5,9 +5,8 @@ CPP=g++
 LN=g++
 AR=ar
 CP=cp
-EPROSIMADIR=$(BASEDIR)/../../../thirdparty/eProsima
 
--include ../../../thirdparty/eProsima/building/makefiles/eProsima.mk
+-include ../../../thirdparty/dev-env/building/makefiles/eProsima.mk
 
 SIMPLETEST_OUTDIR= $(OUTDIR)/SimpleTest
 SIMPLETEST_OUTDIR_DEBUG = $(SIMPLETEST_OUTDIR)/debug
@@ -23,7 +22,7 @@ SIMPLETEST_TARGET_DEBUG= $(BASEDIR)/bin/$(EPROSIMA_TARGET)/SimpleTestd
 SIMPLETEST_TARGET= $(BASEDIR)/bin/$(EPROSIMA_TARGET)/SimpleTest
 
 SIMPLETEST_INCLUDE_DIRS= $(INCLUDE_DIRS) -I$(BASEDIR)/../../../include \
-                         -I../../../thirdparty/eProsima/code
+                         -I../../../thirdparty/eprosima-common-code
 
 SIMPLETEST_LIBS_DEBUG= $(LIBS_DEBUG) -L$(BASEDIR)/../../../lib/$(EPROSIMA_TARGET) -lfastcdrd
 SIMPLETEST_LIBS_RELEASE= $(LIBS) -L$(BASEDIR)/../../../lib/$(EPROSIMA_TARGET) -lfastcdr

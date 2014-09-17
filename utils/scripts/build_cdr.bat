@@ -6,7 +6,7 @@
 set errorstatus=0
 
 :: Get the current vesion of FastCDR
-call ..\..\thirdparty\eProsima\scripts\common_pack_functions.bat :getVersionFromCPP VERSIONFASTCDR ..\..\include\fastcdr\FastCdr_version.h
+call ..\..\thirdparty\dev-env\scripts\common_pack_functions.bat :getVersionFromCPP VERSIONFASTCDR ..\..\include\fastcdr\FastCdr_version.h
 if not %errorstatus%==0 goto :exit
 
 :: i86 Platform

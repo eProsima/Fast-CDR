@@ -3,7 +3,7 @@ FASTCDR_OUTDIR_DEBUG = $(FASTCDR_OUTDIR)/debug
 FASTCDR_OUTDIR_RELEASE = $(FASTCDR_OUTDIR)/release
 
 # Get product version.
-FASTCDRVERSION=-$(shell $(BASEDIR)/thirdparty/eProsima/scripts/common_pack_functions.sh printVersionFromCPP include/fastcdr/FastCdr_version.h)
+FASTCDRVERSION=-$(shell $(BASEDIR)/thirdparty/dev-env/scripts/common_pack_functions.sh printVersionFromCPP include/fastcdr/FastCdr_version.h)
 
 FASTCDR_SED_OUTPUT_DIR_DEBUG= $(subst /,\\/,$(FASTCDR_OUTDIR_DEBUG))
 FASTCDR_SED_OUTPUT_DIR_RELEASE= $(subst /,\\/,$(FASTCDR_OUTDIR_RELEASE))
@@ -27,7 +27,7 @@ FASTCDR_CFLAGS += $(CFLAGS) -std=c++0x
 FASTCDR_CFLAGS_DEBUG += $(CFLAGS_DEBUG) -std=c++0x
 
 FASTCDR_INCLUDE_DIRS= $(INCLUDE_DIRS) -I$(BASEDIR)/include \
-		  -I$(BASEDIR)/thirdparty/eProsima/code
+		  -I$(BASEDIR)/thirdparty/eprosima-common-code
 
 FASTCDR_SRC_CPPFILES= $(BASEDIR)/src/cpp/Cdr.cpp \
 		  $(BASEDIR)/src/cpp/FastCdr.cpp \

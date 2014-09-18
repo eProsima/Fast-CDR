@@ -32,8 +32,8 @@ function installer
 	if [ $errorstatus != 0 ]; then return; fi
 
 	# Copy eProsima header files
-	mkdir -p tmp/$project/include/fastcdr/eProsima_cpp
-	cp ../../../thirdparty/eprosima-common-code/eProsima_cpp/eProsima_auto_link.h tmp/$project/include/fastcdr/eProsima_cpp
+	mkdir -p tmp/$project/include/fastcdr/eProsima_cpp/config
+	cp ../../../thirdparty/eprosima-common-code/eProsima_cpp/config/eProsima_auto_link.h tmp/$project/include/fastcdr/eProsima_cpp/config
 	errorstatus=$?
 	if [ $errorstatus != 0 ]; then return; fi
 

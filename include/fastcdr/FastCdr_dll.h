@@ -57,7 +57,7 @@
 #define EPROSIMA_DYN_LINK
 #endif
 
-#include "eProsima_cpp/eProsima_auto_link.h"
+#include "eProsima_cpp/config/eProsima_auto_link.h"
 #endif // auto-linking disabled
 
 #endif // _FASTCDR_FASTCDR_DLL_H_

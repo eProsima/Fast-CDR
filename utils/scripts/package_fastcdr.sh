@@ -44,12 +44,6 @@ function package
     rm -rf output
 }
 
-# Check that the environment.sh script was run.
-if [ "$EPROSIMA_LIBRARY_PATH" == "" ]; then
-    echo "environment.sh must to be run."
-    exit -1
-fi
-
 # Go to root
 cd ../..
 

@@ -10,7 +10,7 @@ libfastcdr_la_SOURCES = src/cpp/Cdr.cpp \
 
 libfastcdr_la_LDFLAGS = -version-number VERSION_MAJOR:VERSION_MINOR:VERSION_RELEASE
 
-AM_CPPFLAGS = -std=c++0x -Iinclude
+AM_CPPFLAGS = -std=c++0x -DFASTCDR_SOURCE -Iinclude
 
 fastcdr_licenciasdir = $(datadir)/doc/fastcdr
 fastcdr_licencias_DATA = FASTCDR_LIBRARY_LICENSE.txt LGPLv3_LICENSE.txt

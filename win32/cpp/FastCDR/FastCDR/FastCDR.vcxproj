@@ -183,7 +183,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code\code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -191,7 +191,9 @@
       </AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\i86Win32VS2010</Command>
+      <Command>if not "$(EPROSIMA_LIBRARY_PATH)" == "" (
+copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\i86Win32VS2010
+)</Command>
     </PostBuildEvent>
     <Lib>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
@@ -209,7 +211,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code\code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -217,7 +219,9 @@
       </AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\x64Win64VS2010</Command>
+      <Command>if not "$(EPROSIMA_LIBRARY_PATH)" == "" (
+copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\x64Win64VS2010
+)</Command>
     </PostBuildEvent>
     <Lib>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
@@ -234,7 +238,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;__LITTLE_ENDIAN__;FASTCDR_SOURCE;FASTCDR_DYN_LINK;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code\code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -244,7 +248,9 @@
       <ImportLibrary>$(TargetDir)$(TargetName).lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\i86Win32VS2010</Command>
+      <Command>if not "$(EPROSIMA_LIBRARY_PATH)" == "" (
+copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\i86Win32VS2010
+)</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <PreprocessorDefinitions>FASTCDR_SOURCE;FASTCDR_DYN_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -259,7 +265,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code\code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -269,7 +275,9 @@
       <ImportLibrary>$(TargetDir)$(TargetName).lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\x64Win64VS2010</Command>
+      <Command>if not "$(EPROSIMA_LIBRARY_PATH)" == "" (
+copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\x64Win64VS2010
+)</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <PreprocessorDefinitions>FASTCDR_SOURCE;FASTCDR_DYN_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -283,7 +291,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code\code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -291,7 +299,9 @@
       </AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\i86Win32VS2010</Command>
+      <Command>if not "$(EPROSIMA_LIBRARY_PATH)" == "" (
+copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\i86Win32VS2010
+)</Command>
     </PostBuildEvent>
     <Lib>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
@@ -308,7 +318,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code\code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -316,7 +326,9 @@
       </AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\x64Win64VS2010</Command>
+      <Command>if not "$(EPROSIMA_LIBRARY_PATH)" == "" (
+copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\x64Win64VS2010
+)</Command>
     </PostBuildEvent>
     <Lib>
       <OutputFile>$(TargetDir)$(TargetName)$(TargetExt)</OutputFile>
@@ -334,7 +346,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code\code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -344,7 +356,9 @@
       <ImportLibrary>$(TargetDir)$(TargetName).lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\i86Win32VS2010</Command>
+      <Command>if not "$(EPROSIMA_LIBRARY_PATH)" == "" (
+copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\i86Win32VS2010
+)</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <PreprocessorDefinitions>FASTCDR_SOURCE;FASTCDR_DYN_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -358,7 +372,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code\code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -368,7 +382,9 @@
       <ImportLibrary>$(TargetDir)$(TargetName).lib</ImportLibrary>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\x64Win64VS2010</Command>
+      <Command>if not "$(EPROSIMA_LIBRARY_PATH)" == "" (
+copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\x64Win64VS2010
+)</Command>
     </PostBuildEvent>
     <ResourceCompile>
       <PreprocessorDefinitions>FASTCDR_SOURCE;FASTCDR_DYN_LINK;%(PreprocessorDefinitions)</PreprocessorDefinitions>

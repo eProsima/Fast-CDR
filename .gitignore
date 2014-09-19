@@ -21,3 +21,5 @@ tags
 cscope.out
 # Compiled python objects
 *.pyc
+# Installers
+*.tar.gz

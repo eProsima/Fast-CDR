@@ -17,14 +17,14 @@ function package
     rm -rf output
     EPROSIMA_TARGET="i86Linux2.6gcc"
     rm -r lib/$EPROSIMA_TARGET
-    make
+    EPROSIMA_TARGET=${EPROSIMA_TARGET} make
     errorstatus=$?
     if [ $errorstatus != 0 ]; then return; fi
     # Compile FastCDR library for x64.
     rm -rf output
     EPROSIMA_TARGET="x64Linux2.6gcc"
     rm -r lib/$EPROSIMA_TARGET
-    make
+    EPROSIMA_TARGET=${EPROSIMA_TARGET} make
     errorstatus=$?
     if [ $errorstatus != 0 ]; then return; fi
 

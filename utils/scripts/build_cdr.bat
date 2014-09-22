@@ -7,6 +7,7 @@ set errorstatus=0
 
 :: Get the current vesion of FastCDR
 call ..\..\thirdparty\dev-env\scripts\common_pack_functions.bat :getVersionFromCPP VERSIONFASTCDR ..\..\include\fastcdr\FastCdr_version.h
+set errorstatus=%ERRORLEVEL%
 if not %errorstatus%==0 goto :exit
 
 :: i86 Platform

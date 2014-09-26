@@ -589,6 +589,14 @@ namespace eprosima
                         return *this;
                     }
 
+                // TODO
+                template<class _T>
+                    inline FastCdr& serialize(const _T &type_t)
+                    {
+                        type_t.serialize(*this);
+                        return *this;
+                    }
+
                 /*!
                  * @brief This function serializes an array of octets.
                  * @param octet_t The sequence of octets that will be serialized in the buffer.

@@ -89,11 +89,11 @@ void $exception.scopedname$::raise() const
 $if(ctx.anyCdr)$
 size_t $exception.scopedname$::getMaxCdrSerializedSize(size_t current_alignment)
 {
-    size_t current_align = current_alignment;
+    size_t initial_alignment = current_alignment;
             
-    $exception.members : { member |$max_serialized_size(ctx=ctx, typecode=member.typecode, var="current_align")$}; separator="\n"$
+    $exception.members : { member |$max_serialized_size(ctx=ctx, typecode=member.typecode, var="current_alignment")$}; separator="\n"$
 
-    return current_align;
+    return current_alignment - initial_alignment;
 }
 
 $endif$
@@ -171,11 +171,11 @@ $struct.scopedname$& $struct.scopedname$::operator=($struct.name$ &&x)
 $if(ctx.anyCdr)$
 size_t $struct.scopedname$::getMaxCdrSerializedSize(size_t current_alignment)
 {
-    size_t current_align = current_alignment;
+    size_t initial_alignment = current_alignment;
             
-    $struct.members : { member |$max_serialized_size(ctx=ctx, typecode=member.typecode, var="current_align")$}; separator="\n"$
+    $struct.members : { member |$max_serialized_size(ctx=ctx, typecode=member.typecode, var="current_alignment")$}; separator="\n"$
 
-    return current_align;
+    return current_alignment - initial_alignment;
 }
 
 $endif$
@@ -289,23 +289,23 @@ $union.members:{$public_unionmember_declaration(class=union.scopedname, member=i
 $if(ctx.anyCdr)$
 size_t $union.scopedname$::getMaxCdrSerializedSize(size_t current_alignment)
 {
-    size_t current_align = current_alignment;
-    size_t reset_align = 0;
+    size_t initial_alignment = current_alignment;
+    size_t reset_alignment = 0;
     size_t union_max_size_serialized = 0;
 
-    $max_serialized_size(ctx=ctx, typecode=union.discriminator, var="current_align")$
+    $max_serialized_size(ctx=ctx, typecode=union.discriminator, var="current_alignment")$
 
     $union.members : { member |
-    reset_align = current_align;
+    reset_alignment = current_alignment;
 
-    $max_serialized_size(ctx=ctx, typecode=member.typecode, var="reset_align")$
+    $max_serialized_size(ctx=ctx, typecode=member.typecode, var="reset_alignment")$
 
-    if(union_max_size_serialized < reset_align)
-        union_max_size_serialized = reset_align;
+    if(union_max_size_serialized < reset_alignment)
+        union_max_size_serialized = reset_alignment;
 
     }; separator="\n"$
 
-    return union_max_size_serialized;
+    return union_max_size_serialized - initial_alignment;
 }
 
 $endif$

@@ -16,7 +16,7 @@ $fileHeader(file=[ctx.filename, ".h"], description=["This header file contains t
 #define _$ctx.filename;format="toUpper"$_H_
 
 // TODO Poner en el contexto.
-$if(ctx.fastrpcProduct)$
+$if(ctx.printexception)$
 #include "$ctx.product$/exceptions/UserException.h"
 $endif$
 
@@ -90,7 +90,7 @@ $exports; separator="\n"$
 >>
 
 exception(ctx, exception) ::= <<
-$if(ctx.fastrpcProduct)$
+$if(ctx.printexception)$
 /*!
  * @brief This class implementes the user exception $exception.scopedname$
  * @ingroup $ctx.trimfilename$
@@ -145,7 +145,8 @@ private:
 $endif$
 >>
 
-operation(ctx, operation, param_list) ::= <<>>
+operation(ctx, operation, param_list) ::= <<
+>>
 
 param_list(parameters) ::= <<>>
 

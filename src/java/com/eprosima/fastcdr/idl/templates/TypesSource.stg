@@ -13,15 +13,8 @@ $elseif(ctx.fastcdr)$
 
 $endif$
 
-$if(ctx.fastrpcProduct)$
 #include "$ctx.product$/exceptions/BadParamException.h"
-using namespace eprosima::rpc::exception;
-
-$else$
-#include "fastcdr/exceptions/BadParamException.h"
-using namespace eprosima::fastcdr::exception;
-
-$endif$
+using namespace eprosima::$ctx.namespace$::exception;
 
 #include <utility>
 
@@ -47,6 +40,7 @@ $exports; separator="\n"$
 >>
 
 exception(ctx, exception) ::= <<
+$if(ctx.printexception)$
 $exception.scopedname$::$exception.name$() : UserException()
 {
     $exception.members : { member |$member_default_init(member=member)$}; separator="\n"$
@@ -122,6 +116,7 @@ void $exception.scopedname$::deserialize(eprosima::fastcdr::FastCdr &dcdr)
 
 $endif$
 
+$endif$
 >>
 
 operation(ctx, operation, param_list) ::= <<>>

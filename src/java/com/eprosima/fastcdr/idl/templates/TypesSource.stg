@@ -125,7 +125,18 @@ param_list(parameters) ::= <<>>
 
 param(parameter) ::= <<>>
 
-const_decl(ctx, const) ::= <<>>
+const_decl(ctx, const) ::= <<
+$if(const.parent)$
+$if(const.parent.isInterface)$
+$if(const.typeCode.isType_5)$
+const $const.typeCode.cppTypename$ $const.parent.scopedname$::$const.name$ = $const.value$;
+$elseif(const.typeCode.isType_6)$
+const $const.typeCode.cppTypename$ $const.parent.scopedname$::$const.name$ = $const.value$;
+$endif$
+$endif$
+$endif$
+$endif$
+>>
 
 typedef_decl(ctx, typedefs) ::= <<>>
 

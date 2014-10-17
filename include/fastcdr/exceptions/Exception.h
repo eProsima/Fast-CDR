@@ -12,7 +12,7 @@
 #include "fastcdr/FastCdr_dll.h"
 #include <string>
 #include <exception>
-#include "eProsima_cpp/macros/stlexport.hpp"
+#include "eProsima_cpp/macros/stl_string_export.hpp"
 
 STL_STRING_EXPORT(Cdr_DllAPI)
 

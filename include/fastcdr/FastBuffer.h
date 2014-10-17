@@ -22,7 +22,7 @@ namespace eprosima
         /*!
          * @brief This class implements the iterator used to go through a FastBuffer.
          */
-        class _FastBuffer_iterator
+        class Cdr_DllAPI _FastBuffer_iterator
         {
             public:
 

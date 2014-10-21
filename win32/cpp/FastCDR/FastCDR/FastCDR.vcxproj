@@ -184,6 +184,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -212,6 +213,7 @@ copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\i86Win32
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -239,6 +241,7 @@ copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\x64Win64
       <PreprocessorDefinitions>WIN32;__LITTLE_ENDIAN__;FASTCDR_SOURCE;FASTCDR_DYN_LINK;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -266,6 +269,7 @@ copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\i86Win32
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -292,6 +296,7 @@ copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\x64Win64
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -319,6 +324,7 @@ copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\i86Win32
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -347,6 +353,7 @@ copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\x64Win64
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -373,6 +380,7 @@ copy "$(TargetDir)$(TargetFileName)" $(EPROSIMA_LIBRARY_PATH)\proyectos\i86Win32
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include;..\..\..\..\thirdparty\eprosima-common-code;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ProgramDataBaseFileName>$(TargetDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

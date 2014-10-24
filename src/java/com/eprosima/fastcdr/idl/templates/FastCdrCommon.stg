@@ -1,5 +1,33 @@
 group FastCdrCommon;
 
+paramRetType(typecode) ::= <<
+$if(typecode)$
+$typecode.cppTypename$
+$else$
+void
+$endif$
+>>
+
+paramTypeByValue(typecode) ::= <<
+$if(typecode.primitive)$
+$if(typecode.isType_d)$
+const $typecode.cppTypename$&
+$else$
+$typecode.cppTypename$
+$endif$
+$else$
+const $typecode.cppTypename$&
+$endif$
+>>
+
+paramTypeByRef(typecode) ::= <<
+$typecode.cppTypename$&
+>>
+
+paramDeclarations(params, separatorInicial) ::= <<
+$if(params)$$separatorInicial$$endif$$params : {param | /*$param.comment$*/ $if(param.output)$$paramTypeByRef(typecode=param.typecode)$$else$$paramTypeByValue(typecode=param.typecode)$$endif$ $param.name$}; separator=", "$
+>>
+
 object_serialization(ctx, object, preffix) ::= <<
 $if(object.typecode.maxsize)$
 if($preffix$$object.name$.$sizeFunction.(object.typecode.stType)$ <= $object.typecode.maxsize$)

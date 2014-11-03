@@ -7,5 +7,6 @@ nobase_library_include_HEADERS = fastcdr/FastCdr_dll.h \
 			  fastcdr/exceptions/BadParamException.h \
 			  fastcdr/exceptions/Exception.h \
 			  fastcdr/exceptions/NotEnoughMemoryException.h \
+			  fastcdr/macros/stl_string_export.hpp \
 			  fastcdr/eProsima_cpp/config/eProsima_auto_link.h
 

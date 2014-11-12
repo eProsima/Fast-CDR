@@ -1274,6 +1274,30 @@ Cdr& Cdr::deserialize(char *&string_t, Endianness endianness)
     return *this;
 }
 
+const char* Cdr::readString(uint32_t &length)
+{
+	state state(*this);
+
+	*this >> length;
+
+	if(length == 0)
+	{
+		return "";
+	}
+	else if((m_lastPosition - m_currentPosition) >= length)
+	{
+		// Save last datasize.
+		m_lastDataSize = sizeof(uint8_t);
+
+		m_currentPosition += length;
+		if((&m_currentPosition)[length-1] == '\0') --length;
+		return &m_currentPosition;
+	}
+
+	setState(state);
+	throw eprosima::fastcdr::exception::NotEnoughMemoryException(eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+}
+
 Cdr& Cdr::deserializeArray(char *char_t, size_t numElements)
 {
     size_t totalSize = sizeof(*char_t)*numElements;

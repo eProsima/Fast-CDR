@@ -252,6 +252,27 @@ FastCdr& FastCdr::deserialize(char *&string_t)
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
+const char* FastCdr::readString(uint32_t &length)
+{
+	state state(*this);
+
+	*this >> length;
+
+	if(length == 0)
+	{
+		return "";
+	}
+	else if((m_lastPosition - m_currentPosition) >= length)
+	{
+		m_currentPosition += length;
+		if((&m_currentPosition)[length-1] == '\0') --length;
+		return &m_currentPosition;
+	}
+
+	setState(state);
+	throw eprosima::fastcdr::exception::NotEnoughMemoryException(eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+}
+
 FastCdr& FastCdr::deserializeArray(char *char_t, size_t numElements)
 {
     size_t totalSize = sizeof(*char_t)*numElements;

@@ -550,6 +550,7 @@ namespace eprosima
                  * @return Reference to the eprosima::fastcdr::FastCdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
                  */
+				inline
                 FastCdr& serialize(const std::string &string_t) {return serialize(string_t.c_str());}
 
                 /*!
@@ -705,6 +706,7 @@ namespace eprosima
                 FastCdr& serializeArray(const double *double_t, size_t numElements);
 
                 // TODO
+				inline
                 FastCdr& serializeArray(const std::string *string_t, size_t numElements)
 				{
 					for(size_t count = 0; count < numElements; ++count)
@@ -958,27 +960,12 @@ namespace eprosima
                  * @return Reference to the eprosima::fastcdr::FastCdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
                  */
+				inline
                 FastCdr& deserialize(std::string &string_t)
 				{
 					uint32_t length = 0;
-					FastCdr::state state(*this);
-
-					deserialize(length);
-
-					if(length == 0)
-					{
-						string_t = "";
-						return *this;
-					}
-					else if((m_lastPosition - m_currentPosition) >= length)
-					{
-						string_t = std::string(&m_currentPosition, length - ((&m_currentPosition)[length-1] == '\0' ? 1 : 0));
-						m_currentPosition += length;
-						return *this;
-					}
-
-					setState(state);
-					throw eprosima::fastcdr::exception::NotEnoughMemoryException(eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+					string_t = std::string(readString(length), length);
+					return *this;
 				}
 
                 /*!
@@ -1136,6 +1123,7 @@ namespace eprosima
                 FastCdr& deserializeArray(double *double_t, size_t numElements);
 
                 // TODO
+				inline
                 FastCdr& deserializeArray(std::string *string_t, size_t numElements)
 				{
 					for(size_t count = 0; count < numElements; ++count)
@@ -1222,6 +1210,8 @@ namespace eprosima
                     }
 
                 bool resize(size_t minSizeInc);
+
+				const char* readString(uint32_t &length);
 
                 //! @brief Reference to the buffer that will be serialized/deserialized.
                 FastBuffer &m_cdrBuffer;

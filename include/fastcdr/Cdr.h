@@ -715,6 +715,7 @@ namespace eprosima
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
+				inline
                 Cdr& serialize(const std::string &string_t, Endianness endianness)  {return serialize(string_t.c_str(), endianness);}
 
                 /*!
@@ -1030,6 +1031,7 @@ namespace eprosima
                 Cdr& serializeArray(const double *double_t, size_t numElements, Endianness endianness);
 
                 // TODO
+				inline
                 Cdr& serializeArray(const std::string *string_t, size_t numElements)
 				{
 					for(size_t count = 0; count < numElements; ++count)
@@ -1037,6 +1039,7 @@ namespace eprosima
 					return *this;
 				}
 
+				inline
                 Cdr& serializeArray(const std::string *string_t, size_t numElements, Endianness endianness)
 				{
 					bool auxSwap = m_swapBytes;
@@ -1423,30 +1426,12 @@ namespace eprosima
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
                  */
+				inline
                 Cdr& deserialize(std::string &string_t)
 				{
 					uint32_t length = 0;
-					state state(*this);
-
-					*this >> length;
-
-					if(length == 0)
-					{
-						string_t = "";
-						return *this;
-					}
-					else if((m_lastPosition - m_currentPosition) >= length)
-					{
-						// Save last datasize.
-						m_lastDataSize = sizeof(uint8_t);
-
-						string_t = std::string(&m_currentPosition, length - ((&m_currentPosition)[length-1] == '\0' ? 1 : 0));
-						m_currentPosition += length;
-						return *this;
-					}
-
-					setState(state);
-					throw eprosima::fastcdr::exception::NotEnoughMemoryException(eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+					string_t = std::string(readString(length), length);
+					return *this;
 				}
 
                 /*!
@@ -1456,6 +1441,7 @@ namespace eprosima
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
                  */
+				inline
                 Cdr& deserialize(std::string &string_t, Endianness endianness)
 				{
 					bool auxSwap = m_swapBytes;
@@ -1790,6 +1776,7 @@ namespace eprosima
                 Cdr& deserializeArray(double *double_t, size_t numElements, Endianness endianness);
 
                 // TODO
+				inline
                 Cdr& deserializeArray(std::string *string_t, size_t numElements)
 				{
 					for(size_t count = 0; count < numElements; ++count)
@@ -1797,6 +1784,7 @@ namespace eprosima
 					return *this;
 				}
 
+				inline
                 Cdr& deserializeArray(std::string *string_t, size_t numElements, Endianness endianness)
 				{
 					bool auxSwap = m_swapBytes;
@@ -1990,6 +1978,9 @@ namespace eprosima
                  * @return True if the resize was succesful, false if it was not
                  */
                 bool resize(size_t minSizeInc);
+
+				//TODO
+				const char* readString(uint32_t &length);
 
                 //! @brief Reference to the buffer that will be serialized/deserialized.
                 FastBuffer &m_cdrBuffer;

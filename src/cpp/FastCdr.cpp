@@ -254,19 +254,21 @@ FastCdr& FastCdr::deserialize(char *&string_t)
 
 const char* FastCdr::readString(uint32_t &length)
 {
+	const char* returnedValue = "";
 	state state(*this);
 
 	*this >> length;
 
 	if(length == 0)
 	{
-		return "";
+		return returnedValue;
 	}
 	else if((m_lastPosition - m_currentPosition) >= length)
 	{
+		returnedValue = &m_currentPosition;
 		m_currentPosition += length;
-		if((&m_currentPosition)[length-1] == '\0') --length;
-		return &m_currentPosition;
+		if(returnedValue[length-1] == '\0') --length;
+		return returnedValue;
 	}
 
 	setState(state);

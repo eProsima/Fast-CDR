@@ -1276,22 +1276,24 @@ Cdr& Cdr::deserialize(char *&string_t, Endianness endianness)
 
 const char* Cdr::readString(uint32_t &length)
 {
+	const char* returnedValue = "";
 	state state(*this);
 
 	*this >> length;
 
 	if(length == 0)
 	{
-		return "";
+		return returnedValue;
 	}
 	else if((m_lastPosition - m_currentPosition) >= length)
 	{
 		// Save last datasize.
 		m_lastDataSize = sizeof(uint8_t);
 
+		returnedValue = &m_currentPosition;
 		m_currentPosition += length;
-		if((&m_currentPosition)[length-1] == '\0') --length;
-		return &m_currentPosition;
+		if(returnedValue[length-1] == '\0') --length;
+		return returnedValue;
 	}
 
 	setState(state);

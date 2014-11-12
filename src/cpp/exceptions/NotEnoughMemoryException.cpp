@@ -10,13 +10,9 @@
 
 using namespace eprosima::fastcdr::exception;
 
-const std::string NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT("Not enough memory in the buffer stream");
+const char* const NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT = "Not enough memory in the buffer stream";
 
-NotEnoughMemoryException::NotEnoughMemoryException(const std::string &message) : Exception(message)
-{
-}
-
-NotEnoughMemoryException::NotEnoughMemoryException(std::string&& message) : Exception(std::move(message))
+NotEnoughMemoryException::NotEnoughMemoryException(const char* const &message) : Exception(message)
 {
 }
 

@@ -10,13 +10,9 @@
 
 using namespace eprosima::fastcdr::exception;
 
-const std::string BadParamException::BAD_PARAM_MESSAGE_DEFAULT("Bad parameter");
+const char* const BadParamException::BAD_PARAM_MESSAGE_DEFAULT ="Bad parameter";
 
-BadParamException::BadParamException(const std::string &message) : Exception(message)
-{
-}
-
-BadParamException::BadParamException(std::string&& message) : Exception(std::move(message))
+BadParamException::BadParamException(const char* const &message) : Exception(message)
 {
 }
 

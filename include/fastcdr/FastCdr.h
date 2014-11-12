@@ -11,7 +11,6 @@
 
 #include "fastcdr/FastCdr_dll.h"
 #include "fastcdr/FastBuffer.h"
-#include "fastcdr/exceptions/Exception.h"
 #include "fastcdr/exceptions/NotEnoughMemoryException.h"
 #include <stdint.h>
 #include <string>
@@ -551,7 +550,7 @@ namespace eprosima
                  * @return Reference to the eprosima::fastcdr::FastCdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
                  */
-                FastCdr& serialize(const std::string &string_t);
+                FastCdr& serialize(const std::string &string_t) {return serialize(string_t.c_str());}
 
                 /*!
                  * @brief This function template serializes an array.
@@ -580,7 +579,7 @@ namespace eprosima
                         {
                             return serializeArray(vector_t.data(), vector_t.size());
                         }
-                        catch(exception::Exception &ex)
+                        catch(eprosima::fastcdr::exception::Exception &ex)
                         {
                             setState(state);
                             ex.raise();
@@ -706,7 +705,12 @@ namespace eprosima
                 FastCdr& serializeArray(const double *double_t, size_t numElements);
 
                 // TODO
-                FastCdr& serializeArray(const std::string *string_t, size_t numElements);
+                FastCdr& serializeArray(const std::string *string_t, size_t numElements)
+				{
+					for(size_t count = 0; count < numElements; ++count)
+						serialize(string_t[count].c_str());
+					return *this;
+				}
 
                 // TODO
                 template<class _T>
@@ -744,7 +748,7 @@ namespace eprosima
                         {
                             return serializeArray(sequence_t, numElements);
                         }
-                        catch(exception::Exception &ex)
+                        catch(eprosima::fastcdr::exception::Exception &ex)
                         {
                             setState(state);
                             ex.raise();
@@ -954,7 +958,28 @@ namespace eprosima
                  * @return Reference to the eprosima::fastcdr::FastCdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
                  */
-                FastCdr& deserialize(std::string &string_t);
+                FastCdr& deserialize(std::string &string_t)
+				{
+					uint32_t length = 0;
+					FastCdr::state state(*this);
+
+					deserialize(length);
+
+					if(length == 0)
+					{
+						string_t = "";
+						return *this;
+					}
+					else if((m_lastPosition - m_currentPosition) >= length)
+					{
+						string_t = std::string(&m_currentPosition, length - ((&m_currentPosition)[length-1] == '\0' ? 1 : 0));
+						m_currentPosition += length;
+						return *this;
+					}
+
+					setState(state);
+					throw eprosima::fastcdr::exception::NotEnoughMemoryException(eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+				}
 
                 /*!
                  * @brief This function template deserializes an array.
@@ -985,7 +1010,7 @@ namespace eprosima
                             vector_t.resize(seqLength);
                             return deserializeArray(vector_t.data(), vector_t.size());
                         }
-                        catch(exception::Exception &ex)
+                        catch(eprosima::fastcdr::exception::Exception &ex)
                         {
                             setState(state);
                             ex.raise();
@@ -1111,7 +1136,12 @@ namespace eprosima
                 FastCdr& deserializeArray(double *double_t, size_t numElements);
 
                 // TODO
-                FastCdr& deserializeArray(std::string *string_t, size_t numElements);
+                FastCdr& deserializeArray(std::string *string_t, size_t numElements)
+				{
+					for(size_t count = 0; count < numElements; ++count)
+						deserialize(string_t[count]);
+					return *this;
+				}
 
                 // TODO
                 template<class _T>
@@ -1153,7 +1183,7 @@ namespace eprosima
                             sequence_t = (_T*)calloc(seqLength, sizeof(_T));
                             deserializeArray(sequence_t, seqLength);
                         }
-                        catch(exception::Exception &ex)
+                        catch(eprosima::fastcdr::exception::Exception &ex)
                         {
                             setState(state);
                             ex.raise();

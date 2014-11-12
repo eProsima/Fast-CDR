@@ -7,7 +7,6 @@
  *************************************************************************/
 
 #include "fastcdr/Cdr.h"
-#include "fastcdr/exceptions/NotEnoughMemoryException.h"
 #include "fastcdr/exceptions/BadParamException.h"
 
 using namespace eprosima::fastcdr;
@@ -571,54 +570,6 @@ Cdr& Cdr::serialize(const char *string_t, Endianness endianness)
     return *this;
 }
 
-Cdr& Cdr::serialize(const std::string &string_t)
-{
-    uint32_t length = (uint32_t)string_t.length();
-    state state(*this);
-
-    if(length > 0)
-    {
-		*this << ++length;
-
-        if(((m_lastPosition - m_currentPosition) >= length) || resize(length))
-        {
-            // Save last datasize.
-            m_lastDataSize = sizeof(uint8_t);
-
-            m_currentPosition.memcopy(string_t.c_str(), length);
-            m_currentPosition += length;
-        }
-        else
-        {
-            setState(state);
-            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
-        }
-    }
-	else
-		*this << length;
-
-    return *this;
-}
-
-Cdr& Cdr::serialize(const std::string &string_t, Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        serialize(string_t);
-        m_swapBytes = auxSwap;
-    }
-    catch(Exception &ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-    
-    return *this;
-}
-
 Cdr& Cdr::serializeArray(const char *char_t, size_t numElements)
 {
     size_t totalSize = sizeof(*char_t)*numElements;
@@ -952,32 +903,6 @@ Cdr& Cdr::serializeArray(const double *double_t, size_t numElements, Endianness 
     try
     {
         serializeArray(double_t, numElements);
-        m_swapBytes = auxSwap;
-    }
-    catch(Exception &ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
-}
-
-Cdr& Cdr::serializeArray(const std::string *string_t, size_t numElements)
-{
-    for(size_t count = 0; count < numElements; ++count)
-        serialize(string_t[count]);
-    return *this;
-}
-
-Cdr& Cdr::serializeArray(const std::string *string_t, size_t numElements, Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        serializeArray(string_t, numElements);
         m_swapBytes = auxSwap;
     }
     catch(Exception &ex)
@@ -1349,51 +1274,6 @@ Cdr& Cdr::deserialize(char *&string_t, Endianness endianness)
     return *this;
 }
 
-Cdr& Cdr::deserialize(std::string &string_t)
-{
-    uint32_t length = 0;
-    state state(*this);
-
-    *this >> length;
-
-    if(length == 0)
-    {
-        string_t = "";
-        return *this;
-    }
-    else if((m_lastPosition - m_currentPosition) >= length)
-    {
-        // Save last datasize.
-        m_lastDataSize = sizeof(uint8_t);
-
-        string_t = std::string(&m_currentPosition, length - ((&m_currentPosition)[length-1] == '\0' ? 1 : 0));
-        m_currentPosition += length;
-        return *this;
-    }
-
-    setState(state);
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
-}
-
-Cdr& Cdr::deserialize(std::string &string_t, Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        deserialize(string_t);
-        m_swapBytes = auxSwap;
-    }
-    catch(Exception &ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
-}
-
 Cdr& Cdr::deserializeArray(char *char_t, size_t numElements)
 {
     size_t totalSize = sizeof(*char_t)*numElements;
@@ -1731,32 +1611,6 @@ Cdr& Cdr::deserializeArray(double *double_t, size_t numElements, Endianness endi
     try
     {
         deserializeArray(double_t, numElements);
-        m_swapBytes = auxSwap;
-    }
-    catch(Exception &ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
-}
-
-Cdr& Cdr::deserializeArray(std::string *string_t, size_t numElements)
-{
-    for(size_t count = 0; count < numElements; ++count)
-        deserialize(string_t[count]);
-    return *this;
-}
-
-Cdr& Cdr::deserializeArray(std::string *string_t, size_t numElements, Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        deserializeArray(string_t, numElements);
         m_swapBytes = auxSwap;
     }
     catch(Exception &ex)

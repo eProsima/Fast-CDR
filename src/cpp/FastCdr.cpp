@@ -106,32 +106,6 @@ FastCdr& FastCdr::serialize(const char *string_t)
     return *this;
 }
 
-FastCdr& FastCdr::serialize(const std::string &string_t)
-{
-    uint32_t length = (uint32_t)string_t.length();
-    FastCdr::state state(*this);
-
-    if(length > 0)
-    {
-		*this << ++length;
-
-        if(((m_lastPosition - m_currentPosition) >= length) || resize(length))
-        {
-            m_currentPosition.memcopy(string_t.c_str(), length);
-            m_currentPosition += length;
-        }
-        else
-        {
-            setState(state);
-            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
-        }
-    }
-	else
-		*this << length;
-
-    return *this;
-}
-
 FastCdr& FastCdr::serializeArray(const char *char_t, size_t numElements)
 {
     size_t totalSize = sizeof(*char_t)*numElements;
@@ -228,13 +202,6 @@ FastCdr& FastCdr::serializeArray(const double *double_t, size_t numElements)
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-FastCdr& FastCdr::serializeArray(const std::string *string_t, size_t numElements)
-{
-    for(size_t count = 0; count < numElements; ++count)
-        serialize(string_t[count]);
-    return *this;
-}
-
 FastCdr& FastCdr::deserialize(bool &bool_t)
 {
     uint8_t value = 0;
@@ -277,29 +244,6 @@ FastCdr& FastCdr::deserialize(char *&string_t)
         // Allocate memory.
         string_t = (char*)calloc(length + ((&m_currentPosition)[length-1] == '\0' ? 0 : 1), sizeof(char));
         memcpy(string_t, &m_currentPosition, length);
-        m_currentPosition += length;
-        return *this;
-    }
-
-    setState(state);
-    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
-}
-
-FastCdr& FastCdr::deserialize(std::string &string_t)
-{
-    uint32_t length = 0;
-    FastCdr::state state(*this);
-
-    deserialize(length);
-
-    if(length == 0)
-    {
-        string_t = "";
-        return *this;
-    }
-    else if((m_lastPosition - m_currentPosition) >= length)
-    {
-        string_t = std::string(&m_currentPosition, length - ((&m_currentPosition)[length-1] == '\0' ? 1 : 0));
         m_currentPosition += length;
         return *this;
     }
@@ -406,11 +350,4 @@ FastCdr& FastCdr::deserializeArray(double *double_t, size_t numElements)
     }
 
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
-}
-
-FastCdr& FastCdr::deserializeArray(std::string *string_t, size_t numElements)
-{
-    for(size_t count = 0; count < numElements; ++count)
-        deserialize(string_t[count]);
-    return *this;
 }

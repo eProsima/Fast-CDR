@@ -964,7 +964,8 @@ namespace eprosima
                 FastCdr& deserialize(std::string &string_t)
 				{
 					uint32_t length = 0;
-					string_t = std::string(readString(length), length);
+					const char *str = readString(length);
+					string_t = std::string(str, length);
 					return *this;
 				}
 

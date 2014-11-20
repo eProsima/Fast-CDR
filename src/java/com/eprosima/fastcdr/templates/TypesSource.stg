@@ -418,7 +418,7 @@ m_$member.name$ = std::move(x.m_$member.name$);
 $endif$
 >>
 
-// TODO Mirar si el default: está delante de otros casos, el resto no se ejecuta.
+// TODO Mirar si el default: esta delante de otros casos, el resto no se ejecuta.
 unionmember_discriminator_case(member, totallabels) ::= <<
 $if(member.default)$
 default:

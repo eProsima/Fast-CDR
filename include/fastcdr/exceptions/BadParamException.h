@@ -21,7 +21,7 @@ namespace eprosima
              * @brief This class is thrown as an exception when a invalid parameter was being serialized.
              * @ingroup EXCEPTIONMODULE
              */
-            class Cdr_DllAPI BadParamException : public Exception
+            class BadParamException : public Exception
             {
                 public:
 
@@ -30,35 +30,28 @@ namespace eprosima
                      *
                      * @param message A error message. This message is copied.
                      */
-                    BadParamException(const std::string &message);
-
-                    /*!
-                     * @brief Default constructor.
-                     *
-                     * @param message A error message. This message is moved.
-                     */
-                    BadParamException(std::string&& message);
+                    Cdr_DllAPI BadParamException(const char* const &message);
 
                     /*!
                      * @brief Default copy constructor.
                      *
                      * @param ex BadParamException that will be copied.
                      */
-                    BadParamException(const BadParamException &ex);
+                    Cdr_DllAPI BadParamException(const BadParamException &ex);
 
                     /*!
                      * @brief Default move constructor.
                      *
                      * @param ex BadParamException that will be moved.
                      */
-                    BadParamException(BadParamException&& ex);
+                    Cdr_DllAPI BadParamException(BadParamException&& ex);
 
                     /*!
                      * @brief Assigment operation.
                      *
                      * @param ex BadParamException that will be copied.
                      */
-                    BadParamException& operator=(const BadParamException &ex);
+                    Cdr_DllAPI BadParamException& operator=(const BadParamException &ex);
 
                     /*!
                      * @brief Assigment operation.
@@ -68,13 +61,13 @@ namespace eprosima
                     BadParamException& operator=(BadParamException&& ex);
 
                     //! @brief Default constructor
-                    virtual ~BadParamException() throw();
+                    virtual Cdr_DllAPI ~BadParamException() throw();
 
                     //! @brief This function throws the object as exception.
-                    virtual void raise() const;
+                    virtual Cdr_DllAPI void raise() const;
 
                     //! @brief Default message used in the library.
-                    static const std::string BAD_PARAM_MESSAGE_DEFAULT;
+                    static Cdr_DllAPI const char* const BAD_PARAM_MESSAGE_DEFAULT;
             };
         } //namespace exception
     } //namespace fastcdr

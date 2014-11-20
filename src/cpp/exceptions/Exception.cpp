@@ -10,11 +10,7 @@
 
 using namespace eprosima::fastcdr::exception;
 
-Exception::Exception(const std::string &message) : m_message(message)
-{
-}
-
-Exception::Exception(std::string&& message) : m_message(std::move(message))
+Exception::Exception(const char* const &message) : m_message(message)
 {
 }
 

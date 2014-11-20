@@ -11,7 +11,7 @@
 
 #include "fastcdr/FastCdr_dll.h"
 #include "fastcdr/FastBuffer.h"
-#include "fastcdr/exceptions/Exception.h"
+#include "fastcdr/exceptions/NotEnoughMemoryException.h"
 #include <stdint.h>
 #include <string>
 #include <array>
@@ -705,7 +705,8 @@ namespace eprosima
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
-                Cdr& serialize(const std::string &string_t);
+				inline
+					Cdr& serialize(const std::string &string_t) {return serialize(string_t.c_str());}
 
                 /*!
                  * @brief This function serializes a std::string with a different endianness.
@@ -714,7 +715,8 @@ namespace eprosima
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
-                Cdr& serialize(const std::string &string_t, Endianness endianness);
+				inline
+                Cdr& serialize(const std::string &string_t, Endianness endianness)  {return serialize(string_t.c_str(), endianness);}
 
                 /*!
                  * @brief This function template serializes an array.
@@ -754,7 +756,7 @@ namespace eprosima
                         {
                             return serializeArray(vector_t.data(), vector_t.size());
                         }
-                        catch(exception::Exception &ex)
+                        catch(eprosima::fastcdr::exception::Exception &ex)
                         {
                             setState(state);
                             ex.raise();
@@ -781,7 +783,7 @@ namespace eprosima
                             serialize(vector_t);
                             m_swapBytes = auxSwap;
                         }
-                        catch(exception::Exception &ex)
+                        catch(eprosima::fastcdr::exception::Exception &ex)
                         {
                             m_swapBytes = auxSwap;
                             ex.raise();
@@ -1029,8 +1031,33 @@ namespace eprosima
                 Cdr& serializeArray(const double *double_t, size_t numElements, Endianness endianness);
 
                 // TODO
-                Cdr& serializeArray(const std::string *string_t, size_t numElements);
-                Cdr& serializeArray(const std::string *string_t, size_t numElements, Endianness endianness);
+				inline
+                Cdr& serializeArray(const std::string *string_t, size_t numElements)
+				{
+					for(size_t count = 0; count < numElements; ++count)
+						serialize(string_t[count].c_str());
+					return *this;
+				}
+
+				inline
+                Cdr& serializeArray(const std::string *string_t, size_t numElements, Endianness endianness)
+				{
+					bool auxSwap = m_swapBytes;
+					m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+					try
+					{
+						serializeArray(string_t, numElements);
+						m_swapBytes = auxSwap;
+					}
+					catch(eprosima::fastcdr::exception::Exception &ex)
+					{
+						m_swapBytes = auxSwap;
+						ex.raise();
+					}
+
+					return *this;
+				}
 
                 // TODO
                 template<class _T>
@@ -1061,7 +1088,7 @@ namespace eprosima
                             serializeArray(type_t, numElements);
                             m_swapBytes = auxSwap;
                         }
-                        catch(exception::Exception &ex)
+                        catch(eprosima::fastcdr::exception::Exception &ex)
                         {
                             m_swapBytes = auxSwap;
                             ex.raise();
@@ -1088,7 +1115,7 @@ namespace eprosima
                         {
                             return serializeArray(sequence_t, numElements);
                         }
-                        catch(exception::Exception &ex)
+                        catch(eprosima::fastcdr::exception::Exception &ex)
                         {
                             setState(state);
                             ex.raise();
@@ -1115,7 +1142,7 @@ namespace eprosima
                             serializeSequence(sequence_t, numElements);
                             m_swapBytes = auxSwap;
                         }
-                        catch(exception::Exception &ex)
+                        catch(eprosima::fastcdr::exception::Exception &ex)
                         {
                             m_swapBytes = auxSwap;
                             ex.raise();
@@ -1399,7 +1426,14 @@ namespace eprosima
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
                  */
-                Cdr& deserialize(std::string &string_t);
+				inline
+                Cdr& deserialize(std::string &string_t)
+				{
+					uint32_t length = 0;
+					const char *str = readString(length);
+					string_t = std::string(str, length);
+					return *this;
+				}
 
                 /*!
                  * @brief This function deserializes a string with a different endianness.
@@ -1408,7 +1442,25 @@ namespace eprosima
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
                  */
-                Cdr& deserialize(std::string &string_t, Endianness endianness);
+				inline
+                Cdr& deserialize(std::string &string_t, Endianness endianness)
+				{
+					bool auxSwap = m_swapBytes;
+					m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+					try
+					{
+						deserialize(string_t);
+						m_swapBytes = auxSwap;
+					}
+					catch(eprosima::fastcdr::exception::Exception &ex)
+					{
+						m_swapBytes = auxSwap;
+						ex.raise();
+					}
+
+					return *this;
+				}
 
                 /*!
                  * @brief This function template deserializes an array.
@@ -1450,7 +1502,7 @@ namespace eprosima
                             vector_t.resize(seqLength);
                             return deserializeArray(vector_t.data(), vector_t.size());
                         }
-                        catch(exception::Exception &ex)
+                        catch(eprosima::fastcdr::exception::Exception &ex)
                         {
                             setState(state);
                             ex.raise();
@@ -1725,8 +1777,33 @@ namespace eprosima
                 Cdr& deserializeArray(double *double_t, size_t numElements, Endianness endianness);
 
                 // TODO
-                Cdr& deserializeArray(std::string *string_t, size_t numElements);
-                Cdr& deserializeArray(std::string *string_t, size_t numElements, Endianness endianness);
+				inline
+                Cdr& deserializeArray(std::string *string_t, size_t numElements)
+				{
+					for(size_t count = 0; count < numElements; ++count)
+						deserialize(string_t[count]);
+					return *this;
+				}
+
+				inline
+                Cdr& deserializeArray(std::string *string_t, size_t numElements, Endianness endianness)
+				{
+					bool auxSwap = m_swapBytes;
+					m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+					try
+					{
+						deserializeArray(string_t, numElements);
+						m_swapBytes = auxSwap;
+					}
+					catch(eprosima::fastcdr::exception::Exception &ex)
+					{
+						m_swapBytes = auxSwap;
+						ex.raise();
+					}
+
+					return *this;
+				}
 
                 // TODO
                 template<class _T>
@@ -1757,7 +1834,7 @@ namespace eprosima
                             deserializeArray(type_t, numElements);
                             m_swapBytes = auxSwap;
                         }
-                        catch(exception::Exception &ex)
+                        catch(eprosima::fastcdr::exception::Exception &ex)
                         {
                             m_swapBytes = auxSwap;
                             ex.raise();
@@ -1788,7 +1865,7 @@ namespace eprosima
                             sequence_t = (_T*)calloc(seqLength, sizeof(_T));
                             deserializeArray(sequence_t, seqLength);
                         }
-                        catch(exception::Exception &ex)
+                        catch(eprosima::fastcdr::exception::Exception &ex)
                         {
                             setState(state);
                             ex.raise();
@@ -1818,7 +1895,7 @@ namespace eprosima
                             deserializeSequence(sequence_t, numElements);
                             m_swapBytes = auxSwap;
                         }
-                        catch(exception::Exception &ex)
+                        catch(eprosima::fastcdr::exception::Exception &ex)
                         {
                             m_swapBytes = auxSwap;
                             ex.raise();
@@ -1902,6 +1979,9 @@ namespace eprosima
                  * @return True if the resize was succesful, false if it was not
                  */
                 bool resize(size_t minSizeInc);
+
+				//TODO
+				const char* readString(uint32_t &length);
 
                 //! @brief Reference to the buffer that will be serialized/deserialized.
                 FastBuffer &m_cdrBuffer;

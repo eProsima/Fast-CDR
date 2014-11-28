@@ -3,6 +3,11 @@ group TypesSource;
 main(ctx, definitions) ::= <<
 $fileHeader(file=[ctx.filename, ".cpp"], description=["This source file contains the definition of the described types in the IDL file."])$
 
+#ifdef _WIN32
+#pragma warning( push )
+#pragma warning( disable : 4221 )
+#endif
+
 #include "$ctx.filename$.h"
 
 $if(ctx.cdr)$
@@ -19,6 +24,10 @@ using namespace eprosima::$ctx.namespace$::exception;
 #include <utility>
 
 $definitions; separator="\n"$
+
+#ifdef _WIN32
+#pragma warning( pop )
+#endif
 >>
 
 module(ctx, module, definition_list) ::= <<

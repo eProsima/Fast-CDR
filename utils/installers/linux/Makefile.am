@@ -1,5 +1,7 @@
 SUBDIRS = include
 
+ACLOCAL_AMFLAGS = -I m4 --install
+
 lib_LTLIBRARIES = libfastcdr.la
 libfastcdr_la_SOURCES = src/cpp/Cdr.cpp \
 			src/cpp/FastCdr.cpp \

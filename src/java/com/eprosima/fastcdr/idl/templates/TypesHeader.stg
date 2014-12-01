@@ -37,6 +37,20 @@ $ctx.directIncludeDependencies : {include | #include "$include$.h"}; separator="
 #define eProsima_user_DllExport
 #endif
 
+#if defined(_WIN32)
+#if defined(EPROSIMA_USER_DLL_EXPORT)
+#if defined($ctx.filename;format="toUpper"$_SOURCE)
+#define $ctx.filename;format="toUpper"$_DllAPI __declspec( dllexport )
+#else
+#define $ctx.filename;format="toUpper"$_DllAPI __declspec( dllimport )
+#endif // $ctx.filename;format="toUpper"$_SOURCE
+#else
+#define $ctx.filename;format="toUpper"$_DllAPI
+#endif
+#else
+#define $ctx.filename;format="toUpper"$_DllAPI
+#endif // _WIN32
+
 $if(ctx.cdr)$
 namespace eprosima
 {
@@ -79,7 +93,7 @@ interface(ctx, interface, export_list) ::= <<
  * @brief This class represents the interface $interface.name$ defined by the user in the IDL file.
  * @ingroup $ctx.trimfilename$
  */
-class FASTRPCUSERDllExport $interface.name$ $if(interface.bases)$: $interface.bases : {base |public $base.scopedname$}; separator=", "$$endif$
+class $ctx.filename;format="toUpper"$_DllAPI $interface.name$ $if(interface.bases)$: $interface.bases : {base |public $base.scopedname$}; separator=", "$$endif$
 {
     public:
 

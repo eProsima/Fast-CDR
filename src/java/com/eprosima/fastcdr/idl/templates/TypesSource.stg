@@ -4,8 +4,8 @@ main(ctx, definitions) ::= <<
 $fileHeader(file=[ctx.filename, ".cpp"], description=["This source file contains the definition of the described types in the IDL file."])$
 
 #ifdef _WIN32
-#pragma warning( push )
-#pragma warning( disable : 4221 )
+// Remove linker warning LNK4221 on Visual Studio
+namespace { char dummy; }
 #endif
 
 #include "$ctx.filename$.h"
@@ -24,10 +24,6 @@ using namespace eprosima::$ctx.namespace$::exception;
 #include <utility>
 
 $definitions; separator="\n"$
-
-#ifdef _WIN32
-#pragma warning( pop )
-#endif
 >>
 
 module(ctx, module, definition_list) ::= <<
@@ -74,7 +70,7 @@ $exception.scopedname$& $exception.scopedname$::operator=(const $exception.name$
 
 $exception.scopedname$& $exception.scopedname$::operator=($exception.name$&& x)
 {
-	operator=(std::move(x));
+	UserException::operator=(std::move(x));
 	$exception.members : { member |$member_move(member=member)$}; separator="\n"$
 	return *this;
 }

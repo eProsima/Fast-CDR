@@ -1,8 +1,9 @@
 AC_INIT([FastCDR library], [VERSION], [support@eprosima.com], [fastcdr], [http://eprosima.com/])
 AC_PREREQ([2.59])
-AM_INIT_AUTOMAKE([1.10 no-define foreign])
+AM_INIT_AUTOMAKE([1.10 no-define foreign subdir-objects])
 AC_PROG_CXX
 LT_INIT
+AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_FILES([Makefile include/Makefile])
 
 # Check endianess

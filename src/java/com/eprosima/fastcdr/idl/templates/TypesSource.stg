@@ -3,6 +3,11 @@ group TypesSource;
 main(ctx, definitions) ::= <<
 $fileHeader(file=[ctx.filename, ".cpp"], description=["This source file contains the definition of the described types in the IDL file."])$
 
+#ifdef _WIN32
+// Remove linker warning LNK4221 on Visual Studio
+namespace { char dummy; }
+#endif
+
 #include "$ctx.filename$.h"
 
 $if(ctx.cdr)$
@@ -13,15 +18,8 @@ $elseif(ctx.fastcdr)$
 
 $endif$
 
-$if(ctx.fastrpcProduct)$
 #include "$ctx.product$/exceptions/BadParamException.h"
-using namespace eprosima::rpc::exception;
-
-$else$
-#include "fastcdr/exceptions/BadParamException.h"
-using namespace eprosima::fastcdr::exception;
-
-$endif$
+using namespace eprosima::$ctx.namespace$::exception;
 
 #include <utility>
 
@@ -47,6 +45,7 @@ $exports; separator="\n"$
 >>
 
 exception(ctx, exception) ::= <<
+$if(ctx.printexception)$
 $exception.scopedname$::$exception.name$() : UserException()
 {
     $exception.members : { member |$member_default_init(member=member)$}; separator="\n"$
@@ -71,7 +70,7 @@ $exception.scopedname$& $exception.scopedname$::operator=(const $exception.name$
 
 $exception.scopedname$& $exception.scopedname$::operator=($exception.name$&& x)
 {
-	operator=(std::move(x));
+	UserException::operator=(std::move(x));
 	$exception.members : { member |$member_move(member=member)$}; separator="\n"$
 	return *this;
 }
@@ -89,11 +88,11 @@ void $exception.scopedname$::raise() const
 $if(ctx.anyCdr)$
 size_t $exception.scopedname$::getMaxCdrSerializedSize(size_t current_alignment)
 {
-    size_t current_align = current_alignment;
+    size_t initial_alignment = current_alignment;
             
-    $exception.members : { member |$max_serialized_size(ctx=ctx, typecode=member.typecode, var="current_align")$}; separator="\n"$
+    $exception.members : { member |$max_serialized_size(ctx=ctx, typecode=member.typecode, var="current_alignment")$}; separator="\n"$
 
-    return current_align;
+    return current_alignment - initial_alignment;
 }
 
 $endif$
@@ -122,6 +121,7 @@ void $exception.scopedname$::deserialize(eprosima::fastcdr::FastCdr &dcdr)
 
 $endif$
 
+$endif$
 >>
 
 operation(ctx, operation, param_list) ::= <<>>
@@ -130,7 +130,18 @@ param_list(parameters) ::= <<>>
 
 param(parameter) ::= <<>>
 
-const_decl(ctx, const) ::= <<>>
+const_decl(ctx, const) ::= <<
+$if(const.parent)$
+$if(const.parent.isInterface)$
+$if(const.typeCode.isType_5)$
+const $const.typeCode.cppTypename$ $const.parent.scopedname$::$const.name$ = $const.value$;
+$elseif(const.typeCode.isType_6)$
+const $const.typeCode.cppTypename$ $const.parent.scopedname$::$const.name$ = $const.value$;
+$endif$
+$endif$
+$endif$
+$endif$
+>>
 
 typedef_decl(ctx, typedefs) ::= <<>>
 
@@ -171,11 +182,11 @@ $struct.scopedname$& $struct.scopedname$::operator=($struct.name$ &&x)
 $if(ctx.anyCdr)$
 size_t $struct.scopedname$::getMaxCdrSerializedSize(size_t current_alignment)
 {
-    size_t current_align = current_alignment;
+    size_t initial_alignment = current_alignment;
             
-    $struct.members : { member |$max_serialized_size(ctx=ctx, typecode=member.typecode, var="current_align")$}; separator="\n"$
+    $struct.members : { member |$max_serialized_size(ctx=ctx, typecode=member.typecode, var="current_alignment")$}; separator="\n"$
 
-    return current_align;
+    return current_alignment - initial_alignment;
 }
 
 $endif$
@@ -289,23 +300,23 @@ $union.members:{$public_unionmember_declaration(class=union.scopedname, member=i
 $if(ctx.anyCdr)$
 size_t $union.scopedname$::getMaxCdrSerializedSize(size_t current_alignment)
 {
-    size_t current_align = current_alignment;
-    size_t reset_align = 0;
+    size_t initial_alignment = current_alignment;
+    size_t reset_alignment = 0;
     size_t union_max_size_serialized = 0;
 
-    $max_serialized_size(ctx=ctx, typecode=union.discriminator, var="current_align")$
+    $max_serialized_size(ctx=ctx, typecode=union.discriminator, var="current_alignment")$
 
     $union.members : { member |
-    reset_align = current_align;
+    reset_alignment = current_alignment;
 
-    $max_serialized_size(ctx=ctx, typecode=member.typecode, var="reset_align")$
+    $max_serialized_size(ctx=ctx, typecode=member.typecode, var="reset_alignment")$
 
-    if(union_max_size_serialized < reset_align)
-        union_max_size_serialized = reset_align;
+    if(union_max_size_serialized < reset_alignment)
+        union_max_size_serialized = reset_alignment;
 
     }; separator="\n"$
 
-    return union_max_size_serialized;
+    return union_max_size_serialized - initial_alignment;
 }
 
 $endif$

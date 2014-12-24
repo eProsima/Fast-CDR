@@ -145,7 +145,7 @@ $endif$
 
 typedef_decl(ctx, typedefs) ::= <<>>
 
-struct_type(ctx, struct) ::= <<
+struct_type(ctx, struct, extensions) ::= <<
 $struct.scopedname$::$struct.name$()
 {
     $struct.members:{ member |$member_default_init(member=member)$}; separator="\n"$
@@ -214,6 +214,8 @@ void $struct.scopedname$::deserialize(eprosima::fastcdr::FastCdr &dcdr)
 }
 
 $endif$
+
+$extensions : {$it$}; separator="\n"$
 >>
 
 union_type(ctx, union) ::= <<

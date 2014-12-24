@@ -180,7 +180,7 @@ typedef_decl(ctx, typedefs) ::= <<
 $typedefs : { typedef |typedef $typedef.typedefContentTypeCode.cppTypename$ $typedef.name$;}; separator="\n"$
 >>
 
-struct_type(ctx, struct) ::= <<
+struct_type(ctx, struct, extensions) ::= <<
 /*!
  * @brief This class represents the structure $struct.name$ defined by the user in the IDL file.
  * @ingroup $ctx.trimfilename$
@@ -228,13 +228,15 @@ public:
     $size_functions(struct)$
 
     $serialization_functions(struct)$
+
+    $extensions : {$it$}; separator="\n"$
     
 private:
     $struct.members:{$private_member_declaration(it)$}; separator="\n"$
 };
 >>
 
-union_type(ctx, union) ::= <<
+union_type(ctx, union, extensions) ::= <<
 /*!
  * @brief This class represents the union $union.name$ defined by the user in the IDL file.
  * @ingroup $ctx.trimfilename$
@@ -301,6 +303,8 @@ public:
     $size_functions(union)$
 
     $serialization_functions(union)$
+
+    $extensions : {$it$}; separator="\n"$
     
 private:
     $private_declaration(typecode=union.discriminator, name="_d")$

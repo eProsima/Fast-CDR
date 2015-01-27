@@ -39,7 +39,7 @@ if($preffix$$object.name$.$sizeFunction.(object.typecode.stType)$ <= $object.typ
 $endif$scdr << $serializeCasting(typecode=object.typecode)$$preffix$$object.name$;
 $if(object.typecode.maxsize)$
 else
-    throw eprosima::$ctx.namespace$::exception::BadParamException(std::string("$object.name$ field exceeds the maximum length"));
+    throw eprosima::$ctx.namespace$::exception::BadParamException("$object.name$ field exceeds the maximum length");
 $endif$
 >>
 

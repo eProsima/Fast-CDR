@@ -77,7 +77,7 @@ $definitions; separator="\n"$
 >>
 
 // TODO name -> module
-module(ctx, module, definition_list) ::= <<
+module(ctx, parent, module, definition_list) ::= <<
 namespace $module.name$
 {
     $definition_list$
@@ -88,7 +88,7 @@ definition_list(definitions) ::= <<
 $definitions; separator="\n"$
 >>
 
-interface(ctx, interface, export_list) ::= <<
+interface(ctx, parent, interface, export_list) ::= <<
 /*!
  * @brief This class represents the interface $interface.name$ defined by the user in the IDL file.
  * @ingroup $ctx.trimfilename$
@@ -105,7 +105,7 @@ export_list(exports) ::= <<
 $exports; separator="\n"$
 >>
 
-exception(ctx, exception) ::= <<
+exception(ctx, parent, exception) ::= <<
 $if(ctx.printexception)$
 /*!
  * @brief This class implementes the user exception $exception.scopedname$
@@ -161,7 +161,7 @@ private:
 $endif$
 >>
 
-operation(ctx, operation, param_list) ::= <<
+operation(ctx, parent, operation, param_list) ::= <<
 $if(ctx.printoperation)$
 virtual $paramRetType(operation.rettype)$ $operation.name$($paramDeclarations(params=operation.parameters)$) = 0;
 
@@ -172,15 +172,15 @@ param_list(parameters) ::= <<>>
 
 param(parameter) ::= <<>>
 
-const_decl(ctx, const) ::= <<
+const_decl(ctx, parent, const) ::= <<
 $if(const.parent)$$if(const.parent.isInterface)$static $endif$$endif$const $const.typeCode.cppTypename$ $const.name$$if(!const.parent)$ = $const.value$$elseif(!const.parent.isInterface)$ = $const.value$$elseif(!const.typeCode.isType_5)$$if(!const.typeCode.isType_6)$ = $const.value$$endif$$endif$;
 >>
 
-typedef_decl(ctx, typedefs) ::= <<
+typedef_decl(ctx, parent, typedefs) ::= <<
 $typedefs : { typedef |typedef $typedef.typedefContentTypeCode.cppTypename$ $typedef.name$;}; separator="\n"$
 >>
 
-struct_type(ctx, struct, extensions) ::= <<
+struct_type(ctx, parent, struct, extensions) ::= <<
 /*!
  * @brief This class represents the structure $struct.name$ defined by the user in the IDL file.
  * @ingroup $ctx.trimfilename$
@@ -236,7 +236,7 @@ private:
 };
 >>
 
-union_type(ctx, union, extensions) ::= <<
+union_type(ctx, parent, union, extensions) ::= <<
 /*!
  * @brief This class represents the union $union.name$ defined by the user in the IDL file.
  * @ingroup $ctx.trimfilename$
@@ -313,7 +313,7 @@ private:
 };
 >>
 
-enum_type(ctx, enum) ::= <<
+enum_type(ctx, parent, enum) ::= <<
 /*!
  * @brief This class represents the enumeration $enum.name$ defined by the user in the IDL file.
  * @ingroup $ctx.trimfilename$

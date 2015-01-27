@@ -26,7 +26,7 @@ using namespace eprosima::$ctx.namespace$::exception;
 $definitions; separator="\n"$
 >>
 
-module(ctx, module, definition_list) ::= <<
+module(ctx, parent, module, definition_list) ::= <<
 $definition_list$
 >>
 
@@ -35,7 +35,7 @@ $definitions; separator="\n"$
 
 >>
 
-interface(ctx, interface, export_list) ::= <<
+interface(ctx, parent, interface, export_list) ::= <<
 $export_list$
 >>
 
@@ -44,7 +44,7 @@ $exports; separator="\n"$
 
 >>
 
-exception(ctx, exception) ::= <<
+exception(ctx, parent, exception) ::= <<
 $if(ctx.printexception)$
 $exception.scopedname$::$exception.name$() : UserException()
 {
@@ -124,13 +124,13 @@ $endif$
 $endif$
 >>
 
-operation(ctx, operation, param_list) ::= <<>>
+operation(ctx, parent, operation, param_list) ::= <<>>
 
 param_list(parameters) ::= <<>>
 
 param(parameter) ::= <<>>
 
-const_decl(ctx, const) ::= <<
+const_decl(ctx, parent, const) ::= <<
 $if(const.parent)$
 $if(const.parent.isInterface)$
 $if(const.typeCode.isType_5)$
@@ -143,9 +143,9 @@ $endif$
 $endif$
 >>
 
-typedef_decl(ctx, typedefs) ::= <<>>
+typedef_decl(ctx, parent, typedefs) ::= <<>>
 
-struct_type(ctx, struct, extensions) ::= <<
+struct_type(ctx, parent, struct, extensions) ::= <<
 $struct.scopedname$::$struct.name$()
 {
     $struct.members:{ member |$member_default_init(member=member)$}; separator="\n"$
@@ -218,7 +218,7 @@ $endif$
 $extensions : {$it$}; separator="\n"$
 >>
 
-union_type(ctx, union) ::= <<
+union_type(ctx, parent, union) ::= <<
 $union.scopedname$::$union.name$()
 {
     m__d = $union.defaultvalue$;
@@ -369,7 +369,7 @@ $endif$
 
 >>
 
-enum_type(ctx, enum) ::= <<>>
+enum_type(ctx, parent, enum) ::= <<>>
 
 /***** Utils *****/
 

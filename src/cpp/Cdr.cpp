@@ -570,6 +570,30 @@ Cdr& Cdr::serialize(const char *string_t, Endianness endianness)
     return *this;
 }
 
+Cdr& Cdr::serializeArray(const bool *bool_t, size_t numElements)
+{
+    size_t totalSize = sizeof(*bool_t)*numElements;
+
+    if(((m_lastPosition - m_currentPosition) >= totalSize) || resize(totalSize))
+    {
+        // Save last datasize.
+        m_lastDataSize = sizeof(*bool_t);
+
+        for(size_t count = 0; count < numElements; ++count)
+        {
+            uint8_t value = 0;
+
+            if(bool_t[count])
+                value = 1;
+            m_currentPosition++ << value;
+        }
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+}
+
 Cdr& Cdr::serializeArray(const char *char_t, size_t numElements)
 {
     size_t totalSize = sizeof(*char_t)*numElements;
@@ -1300,6 +1324,36 @@ const char* Cdr::readString(uint32_t &length)
 	throw eprosima::fastcdr::exception::NotEnoughMemoryException(eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
+Cdr& Cdr::deserializeArray(bool *bool_t, size_t numElements)
+{
+    size_t totalSize = sizeof(*bool_t)*numElements;
+
+    if((m_lastPosition - m_currentPosition) >= totalSize)
+    {
+        // Save last datasize.
+        m_lastDataSize = sizeof(*bool_t);
+
+        for(size_t count = 0; count < numElements; ++count)
+        {
+            uint8_t value = 0;
+            m_currentPosition++ >> value;
+
+            if(value == 1)
+            {
+                bool_t[count] = true;
+            }
+            else if(value == 0)
+            {
+                bool_t[count] = false;
+            }
+        }
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+}
+
 Cdr& Cdr::deserializeArray(char *char_t, size_t numElements)
 {
     size_t totalSize = sizeof(*char_t)*numElements;
@@ -1643,6 +1697,77 @@ Cdr& Cdr::deserializeArray(double *double_t, size_t numElements, Endianness endi
     {
         m_swapBytes = auxSwap;
         ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::serializeBoolSequence(const std::vector<bool> &vector_t)
+{
+    state state(*this);
+
+    *this << (int32_t)vector_t.size();
+
+    size_t totalSize = vector_t.size()*sizeof(bool);
+
+    if(((m_lastPosition - m_currentPosition) >= totalSize) || resize(totalSize))
+    {
+        // Save last datasize.
+        m_lastDataSize = sizeof(bool);
+
+        for(size_t count = 0; count < vector_t.size(); ++count)
+        {
+            uint8_t value = 0;
+            std::vector<bool>::const_reference ref = vector_t[count];
+
+            if(ref)
+                value = 1;
+            m_currentPosition++ << value;
+        }
+    }
+    else
+    {
+        setState(state);
+        throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::deserializeBoolSequence(std::vector<bool> &vector_t)
+{
+    uint32_t seqLength = 0;
+    state state(*this);
+
+    *this >> seqLength;
+
+    vector_t.resize(seqLength);
+    size_t totalSize = seqLength*sizeof(bool);
+
+    if((m_lastPosition - m_currentPosition) >= totalSize)
+    {
+        // Save last datasize.
+        m_lastDataSize = sizeof(bool);
+
+        for(uint32_t count = 0; count < seqLength; ++count)
+        {
+            uint8_t value = 0;
+            m_currentPosition++ >> value;
+
+            if(value == 1)
+            {
+                vector_t[count] = true;
+            }
+            else if(value == 0)
+            {
+                vector_t[count] = false;
+            }
+        }
+    }
+    else
+    {
+        setState(state);
+        throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
     return *this;

@@ -43,6 +43,8 @@ const std::array<float, 5> float_array_t = {{float_t, float_t + 1, float_t + 2, 
 const float float_array_2_t[5] = {float_t + 4, float_t + 3, float_t + 2, float_t + 1, float_t};
 const std::array<double, 5> double_array_t = {{double_t, double_t + 1, double_t + 2, double_t + 3, double_t + 4}};
 const double double_array_2_t[5] = {double_t + 4, double_t + 3, double_t + 2, double_t + 1, double_t};
+const std::array<bool, 5> bool_array_t = {{true, false, true, false, true}};
+const bool bool_array_2_t[5] = {false, true, false, true, false};
 const std::vector<uint8_t> octet_vector_t(octet_array_2_t, octet_array_2_t + sizeof(octet_array_2_t) / sizeof(uint8_t));
 const std::vector<char> char_vector_t(char_array_2_t, char_array_2_t + sizeof(char_array_2_t) / sizeof(char));
 const std::vector<uint16_t> ushort_vector_t(ushort_array_2_t, ushort_array_2_t + sizeof(ushort_array_2_t) / sizeof(uint16_t));
@@ -53,6 +55,7 @@ const std::vector<uint64_t> ulonglong_vector_t(ulonglong_array_2_t, ulonglong_ar
 const std::vector<int64_t> longlong_vector_t(longlong_array_2_t, longlong_array_2_t + sizeof(longlong_array_2_t) / sizeof(int64_t));
 const std::vector<float> float_vector_t(float_array_2_t, float_array_2_t + sizeof(float_array_2_t) / sizeof(float));
 const std::vector<double> double_vector_t(double_array_2_t, double_array_2_t + sizeof(double_array_2_t) / sizeof(double));
+const std::vector<bool> bool_vector_t(bool_array_2_t, bool_array_2_t + sizeof(bool_array_2_t) / sizeof(bool));
 const std::array<std::array<std::array<uint32_t, 3>, 2>, 2> triple_ulong_array_t = {{ {{ {{1, 2, 3}}, {{4, 5, 6}} }}, {{ {{7, 8, 9}}, {{10, 11, 12}} }} }};
 // Added because error 336.
 const uint8_t octet_seq_t[5] = {5, 4, 3, 2, 1};
@@ -80,10 +83,10 @@ bool CDRTests()
     try
     {
         cdr_ser << octet_t << char_t << ushort_t << short_t << ulong_t << long_t << ulonglong_t << longlong_t << float_t << double_t << bool_t << string_t;
-        cdr_ser << octet_array_t << char_array_t << ushort_array_t << short_array_t << ulong_array_t << long_array_t << ulonglong_array_t << longlong_array_t << float_array_t << double_array_t;
+        cdr_ser << octet_array_t << char_array_t << ushort_array_t << short_array_t << ulong_array_t << long_array_t << ulonglong_array_t << longlong_array_t << float_array_t << double_array_t << bool_array_t;
         cdr_ser.serializeArray(octet_array_2_t, 5).serializeArray(char_array_2_t, 5).serializeArray(ushort_array_2_t, 5).serializeArray(short_array_2_t, 5).serializeArray(ulong_array_2_t, 5);
-        cdr_ser.serializeArray(long_array_2_t, 5).serializeArray(ulonglong_array_2_t, 5).serializeArray(longlong_array_2_t, 5).serializeArray(float_array_2_t, 5).serializeArray(double_array_2_t, 5);
-        cdr_ser << octet_vector_t << char_vector_t << ushort_vector_t << short_vector_t << ulong_vector_t << long_vector_t << ulonglong_vector_t << longlong_vector_t << float_vector_t << double_vector_t;
+        cdr_ser.serializeArray(long_array_2_t, 5).serializeArray(ulonglong_array_2_t, 5).serializeArray(longlong_array_2_t, 5).serializeArray(float_array_2_t, 5).serializeArray(double_array_2_t, 5).serializeArray(bool_array_2_t, 5);
+        cdr_ser << octet_vector_t << char_vector_t << ushort_vector_t << short_vector_t << ulong_vector_t << long_vector_t << ulonglong_vector_t << longlong_vector_t << float_vector_t << double_vector_t << bool_vector_t;
         cdr_ser << triple_ulong_array_t;
         cdr_ser.serializeSequence(octet_seq_t, 5).serializeSequence(char_seq_t, 5).serializeSequence(ushort_seq_t, 5).serializeSequence(short_seq_t, 5);
         cdr_ser.serializeSequence(ulong_seq_t, 5).serializeSequence(long_seq_t, 5).serializeSequence(ulonglong_seq_t, 5).serializeSequence(longlong_seq_t, 5);
@@ -131,6 +134,8 @@ bool CDRTests()
     float float_array_2_value[5];
     std::array<double, 5> double_array_value;
     double double_array_2_value[5];
+    std::array<bool, 5> bool_array_value;
+    bool bool_array_2_value[5];
     std::vector<uint8_t> octet_vector_value;
     std::vector<char> char_vector_value;
     std::vector<uint16_t> ushort_vector_value;
@@ -141,6 +146,7 @@ bool CDRTests()
     std::vector<int64_t> longlong_vector_value;
     std::vector<float> float_vector_value;
     std::vector<double> double_vector_value;
+    std::vector<bool> bool_vector_value;
     std::array<std::array<std::array<uint32_t, 3>, 2>, 2> triple_ulong_array_value;
     uint8_t *octet_seq_value = NULL; size_t octet_seq_len;
     char *char_seq_value = NULL; size_t char_seq_len;
@@ -157,10 +163,10 @@ bool CDRTests()
     try
     {
         cdr_des >> octet_value >> char_value >> ushort_value >> short_value >> ulong_value >> long_value >> ulonglong_value >> longlong_value >> float_value >> double_value >> bool_value >> string_value;
-        cdr_des >> octet_array_value >> char_array_value >> ushort_array_value >> short_array_value >> ulong_array_value >> long_array_value >> ulonglong_array_value >> longlong_array_value >> float_array_value >> double_array_value;
+        cdr_des >> octet_array_value >> char_array_value >> ushort_array_value >> short_array_value >> ulong_array_value >> long_array_value >> ulonglong_array_value >> longlong_array_value >> float_array_value >> double_array_value >> bool_array_value;
         cdr_des.deserializeArray(octet_array_2_value, 5).deserializeArray(char_array_2_value, 5).deserializeArray(ushort_array_2_value, 5).deserializeArray(short_array_2_value, 5).deserializeArray(ulong_array_2_value, 5);
-        cdr_des.deserializeArray(long_array_2_value, 5).deserializeArray(ulonglong_array_2_value, 5).deserializeArray(longlong_array_2_value, 5).deserializeArray(float_array_2_value, 5).deserializeArray(double_array_2_value, 5);
-        cdr_des >> octet_vector_value >> char_vector_value >> ushort_vector_value >> short_vector_value >> ulong_vector_value >> long_vector_value >> ulonglong_vector_value >> longlong_vector_value >> float_vector_value >> double_vector_value;
+        cdr_des.deserializeArray(long_array_2_value, 5).deserializeArray(ulonglong_array_2_value, 5).deserializeArray(longlong_array_2_value, 5).deserializeArray(float_array_2_value, 5).deserializeArray(double_array_2_value, 5).deserializeArray(bool_array_2_value, 5);
+        cdr_des >> octet_vector_value >> char_vector_value >> ushort_vector_value >> short_vector_value >> ulong_vector_value >> long_vector_value >> ulonglong_vector_value >> longlong_vector_value >> float_vector_value >> double_vector_value >> bool_vector_value;
         cdr_des >> triple_ulong_array_value;
         cdr_des.deserializeSequence(octet_seq_value, octet_seq_len).deserializeSequence(char_seq_value, char_seq_len).deserializeSequence(ushort_seq_value, ushort_seq_len); 
         cdr_des.deserializeSequence(short_seq_value, short_seq_len).deserializeSequence(ulong_seq_value, ulong_seq_len).deserializeSequence(long_seq_value, long_seq_len); 
@@ -197,6 +203,7 @@ bool CDRTests()
     returnedValue &= longlong_array_value == longlong_array_t;
     returnedValue &= float_array_value == float_array_t;
     returnedValue &= double_array_value == double_array_t;
+    returnedValue &= bool_array_value == bool_array_t;
 
     returnedValue &= octet_array_2_value[0] == octet_array_2_t[0];
     returnedValue &= octet_array_2_value[1] == octet_array_2_t[1];
@@ -248,6 +255,11 @@ bool CDRTests()
     returnedValue &= double_array_2_value[2] == double_array_2_t[2];
     returnedValue &= double_array_2_value[3] == double_array_2_t[3];
     returnedValue &= double_array_2_value[4] == double_array_2_t[4];
+    returnedValue &= bool_array_2_value[0] == bool_array_2_t[0];
+    returnedValue &= bool_array_2_value[1] == bool_array_2_t[1];
+    returnedValue &= bool_array_2_value[2] == bool_array_2_t[2];
+    returnedValue &= bool_array_2_value[3] == bool_array_2_t[3];
+    returnedValue &= bool_array_2_value[4] == bool_array_2_t[4];
 
     returnedValue &= octet_vector_value == octet_vector_t;
     returnedValue &= char_vector_value == char_vector_t;
@@ -259,6 +271,7 @@ bool CDRTests()
     returnedValue &= longlong_vector_value == longlong_vector_t;
     returnedValue &= float_vector_value == float_vector_t;
     returnedValue &= double_vector_value == double_vector_t;
+    returnedValue &= bool_vector_value == bool_vector_t;
 
     returnedValue &= triple_ulong_array_t == triple_ulong_array_value;
     
@@ -390,10 +403,10 @@ bool FastCDRTests()
     try
     {
         cdr_ser << octet_t << char_t << ushort_t << short_t << ulong_t << long_t << ulonglong_t << longlong_t << float_t << double_t << bool_t << string_t;
-        cdr_ser << octet_array_t << char_array_t << ushort_array_t << short_array_t << ulong_array_t << long_array_t << ulonglong_array_t << longlong_array_t << float_array_t << double_array_t;
+        cdr_ser << octet_array_t << char_array_t << ushort_array_t << short_array_t << ulong_array_t << long_array_t << ulonglong_array_t << longlong_array_t << float_array_t << double_array_t << bool_array_t;
         cdr_ser.serializeArray(octet_array_2_t, 5).serializeArray(char_array_2_t, 5).serializeArray(ushort_array_2_t, 5).serializeArray(short_array_2_t, 5).serializeArray(ulong_array_2_t, 5);
-        cdr_ser.serializeArray(long_array_2_t, 5).serializeArray(ulonglong_array_2_t, 5).serializeArray(longlong_array_2_t, 5).serializeArray(float_array_2_t, 5).serializeArray(double_array_2_t, 5);
-        cdr_ser << octet_vector_t << char_vector_t << ushort_vector_t << short_vector_t << ulong_vector_t << long_vector_t << ulonglong_vector_t << longlong_vector_t << float_vector_t << double_vector_t;
+        cdr_ser.serializeArray(long_array_2_t, 5).serializeArray(ulonglong_array_2_t, 5).serializeArray(longlong_array_2_t, 5).serializeArray(float_array_2_t, 5).serializeArray(double_array_2_t, 5).serializeArray(bool_array_2_t, 5);
+        cdr_ser << octet_vector_t << char_vector_t << ushort_vector_t << short_vector_t << ulong_vector_t << long_vector_t << ulonglong_vector_t << longlong_vector_t << float_vector_t << double_vector_t << bool_vector_t;
         cdr_ser << triple_ulong_array_t;
         cdr_ser.serializeSequence(octet_seq_t, 5).serializeSequence(char_seq_t, 5).serializeSequence(ushort_seq_t, 5).serializeSequence(short_seq_t, 5);
         cdr_ser.serializeSequence(ulong_seq_t, 5).serializeSequence(long_seq_t, 5).serializeSequence(ulonglong_seq_t, 5).serializeSequence(longlong_seq_t, 5);
@@ -441,6 +454,8 @@ bool FastCDRTests()
     float float_array_2_value[5];
     std::array<double, 5> double_array_value;
     double double_array_2_value[5];
+    std::array<bool, 5> bool_array_value;
+    bool bool_array_2_value[5];
     std::vector<uint8_t> octet_vector_value;
     std::vector<char> char_vector_value;
     std::vector<uint16_t> ushort_vector_value;
@@ -451,6 +466,7 @@ bool FastCDRTests()
     std::vector<int64_t> longlong_vector_value;
     std::vector<float> float_vector_value;
     std::vector<double> double_vector_value;
+    std::vector<bool> bool_vector_value;
     std::array<std::array<std::array<uint32_t, 3>, 2>, 2> triple_ulong_array_value;
     uint8_t *octet_seq_value = NULL; size_t octet_seq_len;
     char *char_seq_value = NULL; size_t char_seq_len;
@@ -467,10 +483,10 @@ bool FastCDRTests()
     try
     {
         cdr_des >> octet_value >> char_value >> ushort_value >> short_value >> ulong_value >> long_value >> ulonglong_value >> longlong_value >> float_value >> double_value >> bool_value >> string_value;
-        cdr_des >> octet_array_value >> char_array_value >> ushort_array_value >> short_array_value >> ulong_array_value >> long_array_value >> ulonglong_array_value >> longlong_array_value >> float_array_value >> double_array_value;
+        cdr_des >> octet_array_value >> char_array_value >> ushort_array_value >> short_array_value >> ulong_array_value >> long_array_value >> ulonglong_array_value >> longlong_array_value >> float_array_value >> double_array_value >> bool_array_value;
         cdr_des.deserializeArray(octet_array_2_value, 5).deserializeArray(char_array_2_value, 5).deserializeArray(ushort_array_2_value, 5).deserializeArray(short_array_2_value, 5).deserializeArray(ulong_array_2_value, 5);
-        cdr_des.deserializeArray(long_array_2_value, 5).deserializeArray(ulonglong_array_2_value, 5).deserializeArray(longlong_array_2_value, 5).deserializeArray(float_array_2_value, 5).deserializeArray(double_array_2_value, 5);
-        cdr_des >> octet_vector_value >> char_vector_value >> ushort_vector_value >> short_vector_value >> ulong_vector_value >> long_vector_value >> ulonglong_vector_value >> longlong_vector_value >> float_vector_value >> double_vector_value;
+        cdr_des.deserializeArray(long_array_2_value, 5).deserializeArray(ulonglong_array_2_value, 5).deserializeArray(longlong_array_2_value, 5).deserializeArray(float_array_2_value, 5).deserializeArray(double_array_2_value, 5).deserializeArray(bool_array_2_value, 5);
+        cdr_des >> octet_vector_value >> char_vector_value >> ushort_vector_value >> short_vector_value >> ulong_vector_value >> long_vector_value >> ulonglong_vector_value >> longlong_vector_value >> float_vector_value >> double_vector_value >> bool_vector_value;
         cdr_des >> triple_ulong_array_value;
         cdr_des.deserializeSequence(octet_seq_value, octet_seq_len).deserializeSequence(char_seq_value, char_seq_len).deserializeSequence(ushort_seq_value, ushort_seq_len); 
         cdr_des.deserializeSequence(short_seq_value, short_seq_len).deserializeSequence(ulong_seq_value, ulong_seq_len).deserializeSequence(long_seq_value, long_seq_len); 
@@ -507,6 +523,7 @@ bool FastCDRTests()
     returnedValue &= longlong_array_value == longlong_array_t;
     returnedValue &= float_array_value == float_array_t;
     returnedValue &= double_array_value == double_array_t;
+    returnedValue &= bool_array_value == bool_array_t;
 
     returnedValue &= octet_array_2_value[0] == octet_array_2_t[0];
     returnedValue &= octet_array_2_value[1] == octet_array_2_t[1];
@@ -558,6 +575,11 @@ bool FastCDRTests()
     returnedValue &= double_array_2_value[2] == double_array_2_t[2];
     returnedValue &= double_array_2_value[3] == double_array_2_t[3];
     returnedValue &= double_array_2_value[4] == double_array_2_t[4];
+    returnedValue &= bool_array_2_value[0] == bool_array_2_t[0];
+    returnedValue &= bool_array_2_value[1] == bool_array_2_t[1];
+    returnedValue &= bool_array_2_value[2] == bool_array_2_t[2];
+    returnedValue &= bool_array_2_value[3] == bool_array_2_t[3];
+    returnedValue &= bool_array_2_value[4] == bool_array_2_t[4];
 
     returnedValue &= octet_vector_value == octet_vector_t;
     returnedValue &= char_vector_value == char_vector_t;
@@ -569,6 +591,7 @@ bool FastCDRTests()
     returnedValue &= longlong_vector_value == longlong_vector_t;
     returnedValue &= float_vector_value == float_vector_t;
     returnedValue &= double_vector_value == double_vector_t;
+    returnedValue &= bool_vector_value == bool_vector_t;
 
     returnedValue &= triple_ulong_array_t == triple_ulong_array_value;
     

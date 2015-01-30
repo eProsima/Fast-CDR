@@ -19,8 +19,8 @@ const uint32_t ulong_t = 4294967200;
 const int32_t long_t = -2147483600;
 const uint64_t ulonglong_t = 18446744073709551600u;
 const int64_t longlong_t = -9223372036800;
-const float float_t = std::numeric_limits<float>::min();
-const double double_t = std::numeric_limits<double>::min();
+const float float_tt = std::numeric_limits<float>::min();
+const double double_tt = std::numeric_limits<double>::min();
 const bool bool_t = true;
 const std::string string_t = "Hola a todos, esto es un test";
 const std::array<uint8_t, 5> octet_array_t = {{1, 2, 3, 4, 5}};
@@ -39,10 +39,10 @@ const std::array<uint64_t, 5> ulonglong_array_t = {{18446744073709551600u, 18446
 const uint64_t ulonglong_array_2_t[5] = {18446744073709551604u, 18446744073709551603u, 18446744073709551602u, 18446744073709551601u, 18446744073709551600u};
 const std::array<int64_t, 5> longlong_array_t = {{-9223372036800, -9223372036801, -9223372036802, -9223372036803, -9223372036804}};
 const int64_t longlong_array_2_t[5] = {-9223372036804, -9223372036803, -9223372036802, -9223372036801, -9223372036800};
-const std::array<float, 5> float_array_t = {{float_t, float_t + 1, float_t + 2, float_t + 3, float_t + 4}};
-const float float_array_2_t[5] = {float_t + 4, float_t + 3, float_t + 2, float_t + 1, float_t};
-const std::array<double, 5> double_array_t = {{double_t, double_t + 1, double_t + 2, double_t + 3, double_t + 4}};
-const double double_array_2_t[5] = {double_t + 4, double_t + 3, double_t + 2, double_t + 1, double_t};
+const std::array<float, 5> float_array_t = {{float_tt, float_tt + 1, float_tt + 2, float_tt + 3, float_tt + 4}};
+const float float_array_2_t[5] = {float_tt + 4, float_tt + 3, float_tt + 2, float_tt + 1, float_tt};
+const std::array<double, 5> double_array_t = {{double_tt, double_tt + 1, double_tt + 2, double_tt + 3, double_tt + 4}};
+const double double_array_2_t[5] = {double_tt + 4, double_tt + 3, double_tt + 2, double_tt + 1, double_tt};
 const std::array<bool, 5> bool_array_t = {{true, false, true, false, true}};
 const bool bool_array_2_t[5] = {false, true, false, true, false};
 const std::vector<uint8_t> octet_vector_t(octet_array_2_t, octet_array_2_t + sizeof(octet_array_2_t) / sizeof(uint8_t));
@@ -66,8 +66,8 @@ const uint32_t ulong_seq_t[5] = {4294967204, 4294967203, 4294967202, 4294967201,
 const int32_t long_seq_t[5] = {-2147483604, -2147483603, -2147483602, -2147483601, -2147483600};
 const uint64_t ulonglong_seq_t[5] = {18446744073709551604u, 18446744073709551603u, 18446744073709551602u, 18446744073709551601u, 18446744073709551600u};
 const int64_t longlong_seq_t[5] = {-9223372036804, -9223372036803, -9223372036802, -9223372036801, -9223372036800};
-const float float_seq_t[5] = {float_t + 4, float_t + 3, float_t + 2, float_t + 1, float_t};
-const double double_seq_t[5] = {double_t + 4, double_t + 3, double_t + 2, double_t + 1, double_t};
+const float float_seq_t[5] = {float_tt + 4, float_tt + 3, float_tt + 2, float_tt + 1, float_tt};
+const double double_seq_t[5] = {double_tt + 4, double_tt + 3, double_tt + 2, double_tt + 1, double_tt};
 // Added because error 337
 const char *c_string_t = "HOLA";
 
@@ -82,7 +82,7 @@ bool CDRTests()
 
     try
     {
-        cdr_ser << octet_t << char_t << ushort_t << short_t << ulong_t << long_t << ulonglong_t << longlong_t << float_t << double_t << bool_t << string_t;
+        cdr_ser << octet_t << char_t << ushort_t << short_t << ulong_t << long_t << ulonglong_t << longlong_t << float_tt << double_tt << bool_t << string_t;
         cdr_ser << octet_array_t << char_array_t << ushort_array_t << short_array_t << ulong_array_t << long_array_t << ulonglong_array_t << longlong_array_t << float_array_t << double_array_t << bool_array_t;
         cdr_ser.serializeArray(octet_array_2_t, 5).serializeArray(char_array_2_t, 5).serializeArray(ushort_array_2_t, 5).serializeArray(short_array_2_t, 5).serializeArray(ulong_array_2_t, 5);
         cdr_ser.serializeArray(long_array_2_t, 5).serializeArray(ulonglong_array_2_t, 5).serializeArray(longlong_array_2_t, 5).serializeArray(float_array_2_t, 5).serializeArray(double_array_2_t, 5).serializeArray(bool_array_2_t, 5);
@@ -188,8 +188,8 @@ bool CDRTests()
     returnedValue &= long_value == long_t;
     returnedValue &= ulonglong_value == ulonglong_t;
     returnedValue &= longlong_value == longlong_t;
-    returnedValue &= float_value == float_t;
-    returnedValue &= double_value == double_t;
+    returnedValue &= float_value == float_tt;
+    returnedValue &= double_value == double_tt;
     returnedValue &= bool_value == bool_t;
     returnedValue &= string_value == string_t;
 
@@ -402,7 +402,7 @@ bool FastCDRTests()
 
     try
     {
-        cdr_ser << octet_t << char_t << ushort_t << short_t << ulong_t << long_t << ulonglong_t << longlong_t << float_t << double_t << bool_t << string_t;
+        cdr_ser << octet_t << char_t << ushort_t << short_t << ulong_t << long_t << ulonglong_t << longlong_t << float_tt << double_tt << bool_t << string_t;
         cdr_ser << octet_array_t << char_array_t << ushort_array_t << short_array_t << ulong_array_t << long_array_t << ulonglong_array_t << longlong_array_t << float_array_t << double_array_t << bool_array_t;
         cdr_ser.serializeArray(octet_array_2_t, 5).serializeArray(char_array_2_t, 5).serializeArray(ushort_array_2_t, 5).serializeArray(short_array_2_t, 5).serializeArray(ulong_array_2_t, 5);
         cdr_ser.serializeArray(long_array_2_t, 5).serializeArray(ulonglong_array_2_t, 5).serializeArray(longlong_array_2_t, 5).serializeArray(float_array_2_t, 5).serializeArray(double_array_2_t, 5).serializeArray(bool_array_2_t, 5);
@@ -508,8 +508,8 @@ bool FastCDRTests()
     returnedValue &= long_value == long_t;
     returnedValue &= ulonglong_value == ulonglong_t;
     returnedValue &= longlong_value == longlong_t;
-    returnedValue &= float_value == float_t;
-    returnedValue &= double_value == double_t;
+    returnedValue &= float_value == float_tt;
+    returnedValue &= double_value == double_tt;
     returnedValue &= bool_value == bool_t;
     returnedValue &= string_value == string_t;
 

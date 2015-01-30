@@ -745,11 +745,13 @@ namespace eprosima
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
+#ifndef _MSC_VER
                 template<class _T = bool>
                     Cdr& serialize(const std::vector<bool> &vector_t)
                     {
                         return serializeBoolSequence(vector_t);
                     }
+#endif
 
                 /*!
                  * @brief This function template serializes a sequence.
@@ -776,6 +778,14 @@ namespace eprosima
 
                         return *this;
                     }
+
+#ifdef _MSC_VER
+				template<>
+					Cdr& serialize<bool>(const std::vector<bool> &vector_t)
+					{
+						return serializeBoolSequence(vector_t);
+					}
+#endif
 
                 /*!
                  * @brief This function template serializes a sequence with a different endianness.
@@ -1524,11 +1534,13 @@ namespace eprosima
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
                  */
+#ifndef _MSC_VER
                 template<class _T = bool>
                     Cdr& deserialize(std::vector<bool> &vector_t)
                     {
                         return deserializeBoolSequence(vector_t);
                     }
+#endif
 
                 /*!
                  * @brief This function template deserializes a sequence.
@@ -1557,6 +1569,14 @@ namespace eprosima
 
                         return *this;
                     }
+
+#ifdef _MSC_VER
+				template<>
+					Cdr& deserialize<bool>(std::vector<bool> &vector_t)
+					{
+						return deserializeBoolSequence(vector_t);
+					}
+#endif
 
                 /*!
                  * @brief This function template deserializes a sequence with a different endianness.

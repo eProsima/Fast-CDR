@@ -569,11 +569,13 @@ namespace eprosima
                  * @return Reference to the eprosima::fastcdr::FastCdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
                  */
+#ifndef _MSC_VER
                 template<class _T = bool>
                     FastCdr& serialize(const std::vector<bool> &vector_t)
                     {
                         return serializeBoolSequence(vector_t);
                     }
+#endif
 
                 /*!
                  * @brief This function template serializes a sequence.
@@ -600,6 +602,14 @@ namespace eprosima
 
                         return *this;
                     }
+
+#ifdef _MSC_VER
+				template<>
+					FastCdr& serialize<bool>(const std::vector<bool> &vector_t)
+					{
+						return serializeBoolSequence(vector_t);
+					}
+#endif
 
                 // TODO
                 template<class _T>
@@ -1006,11 +1016,13 @@ namespace eprosima
                  * @return Reference to the eprosima::fastcdr::FastCdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
                  */
+#ifndef _MSC_VER
                 template<class _T = bool>
                     FastCdr& deserialize(std::vector<bool> &vector_t)
                     {
                         return deserializeBoolSequence(vector_t);
                     }
+#endif
 
                 /*!
                  * @brief This function template deserializes a sequence.
@@ -1039,6 +1051,14 @@ namespace eprosima
 
                         return *this;
                     }
+
+#ifdef _MSC_VER
+				template<>
+					FastCdr& deserialize<bool>(std::vector<bool> &vector_t)
+					{
+						return deserializeBoolSequence(vector_t);
+					}
+#endif
 
                 // TODO
                 template<class _T>

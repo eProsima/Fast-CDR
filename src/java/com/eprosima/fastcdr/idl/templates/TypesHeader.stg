@@ -88,6 +88,8 @@ definition_list(definitions) ::= <<
 $definitions; separator="\n"$
 >>
 
+annotation(ctx, annotation) ::= <<>>
+
 interface(ctx, parent, interface, export_list) ::= <<
 /*!
  * @brief This class represents the interface $interface.name$ defined by the user in the IDL file.

@@ -1,0 +1,18 @@
+group gradle;
+
+main(name) ::= <<
+// internal plugins
+apply plugin: 'java'
+
+description = """"""
+
+sourceSets.main.java {
+    srcDir './'
+}
+
+//general properties
+jar {
+	baseName = '$name$'
+    version =  '1.0.0'
+}
+>>

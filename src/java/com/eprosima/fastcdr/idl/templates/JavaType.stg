@@ -1,0 +1,44 @@
+/*************************************************************************
+ * Copyright (c) 2013 eProsima. All rights reserved.
+ *
+ * This copy of FASTRPC is licensed to you under the terms described in the
+ * FASTRPC_LICENSE file included in this distribution.
+ *
+ *************************************************************************/
+
+group JavaType;
+
+main(ctx, definitions, package) ::= <<
+package $package$;
+
+import java.util.ArrayList;
+
+$definitions$
+>>
+
+interface(ctx, parent, interface, exports) ::= <<
+public class $interface.name$
+{
+    $exports$
+}
+>>
+
+struct_type(ctx, parent, struct) ::= <<
+public class $struct.name$
+{
+    $struct.members : { member |
+    public void set$member.javaName$($member.typecode.javaTypename$ $member.name$)
+    {
+        $member.name$_ = $member.name$;
+    }
+
+    public $member.typecode.javaTypename$ get$member.javaName$()
+    {
+        return $member.name$_;
+    }
+
+    }; separator="\n"$
+
+    $struct.members : { member |private $member.typecode.javaTypename$ $member.name$_; }; separator="\n"$
+}
+>>

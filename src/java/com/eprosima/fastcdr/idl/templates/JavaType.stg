@@ -20,6 +20,50 @@ interface(ctx, parent, interface, exports) ::= <<
 public class $interface.name$
 {
     $exports$
+
+    private native long $interface.name$_init(String toAddress);
+
+    public boolean isInit() { return (pointer_ != 0); }
+
+    public $interface.name$(String toAddress)
+    {
+        pointer_ = $interface.name$_init(toAddress);
+    }
+
+    private native void $interface.name$_delete(long pointer);
+
+    public void dispose()
+    {
+        if(pointer_ != 0)
+        {
+            $interface.name$_delete(pointer_);
+            pointer_ = 0;
+        }
+    }
+
+    $interface.operations : {operation |
+    private native $if(operation.rettype)$$operation.rettype.javaTypename$$else$void$endif$
+    $interface.name$_$operation.name$(long pointer$if(operation.parameters)$, $endif$
+    $operation.parameters : {param |
+    $param.typecode.javaTypename$ $param.name$
+    }; separator=", "$);
+
+    public $if(operation.rettype)$$operation.rettype.javaTypename$$else$void$endif$
+    $operation.name$(
+    $operation.parameters : {param |
+    $param.typecode.javaTypename$ $param.name$
+    }; separator=", "$)
+    {
+        if(pointer_ != 0)
+            $if(operation.rettype)$return $endif$$interface.name$_$operation.name$(pointer_$if(operation.parameters)$, $endif$
+            $operation.parameters : {param | $param.name$}; separator=", "$);
+
+        $if(operation.rettype)$return null;$endif$
+    }
+
+    }; separator="\n"$
+
+    private long pointer_;
 }
 >>
 

@@ -75,11 +75,18 @@ public class $interface.name$
 struct_type(ctx, parent, struct) ::= <<
 public class $struct.name$
 {
+    public $struct.name$()
+    {
+        $struct.members : { member |$if(member.typecode.isType_e)$$member.name$_ = new $member.typecode.javaTypename$();$endif$}; separator="\n"$
+    }
+
     $struct.members : { member |
+    $if(!member.typecode.isType_e)$
     public void set$member.javaName$($member.typecode.javaTypename$ $member.name$)
     {
         $member.name$_ = $member.name$;
     }
+    $endif$
 
     public $member.typecode.javaTypename$ get$member.javaName$()
     {

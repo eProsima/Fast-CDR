@@ -19,6 +19,11 @@ $definitions$
 interface(ctx, parent, interface, exports) ::= <<
 public class $interface.name$
 {
+    static
+    {
+        System.loadLibrary("$ctx.filename$JNI");
+    }
+
     $exports$
 
     private native long $interface.name$_init(String toAddress);

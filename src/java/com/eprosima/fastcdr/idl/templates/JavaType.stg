@@ -77,7 +77,10 @@ public class $struct.name$
 {
     public $struct.name$()
     {
-        $struct.members : { member |$if(member.typecode.isType_e)$$member.name$_ = new $member.typecode.javaTypename$();$endif$}; separator="\n"$
+        $struct.members : { member |
+        $if(!member.typecode.primitive)$$member.name$_ = new $member.typecode.javaTypename$();$endif$
+        $if(member.typecode.isType_d)$$member.name$_ = new $member.typecode.javaTypename$();$endif$
+        }; separator="\n"$
     }
 
     $struct.members : { member |

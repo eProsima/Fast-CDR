@@ -144,6 +144,11 @@ namespace eprosima
                 void reset();
 
                 /*!
+                 * @brief This function returns the pointer to the current used buffer.
+                 */
+                char* getBufferPointer();
+
+                /*!
                  * @brief This function returns the current position in the CDR stream.
                  * @return Pointer to the current position in the buffer.
                  */

@@ -166,6 +166,11 @@ bool Cdr::jump(size_t numBytes)
     return returnedValue;
 }
 
+char* Cdr::getBufferPointer()
+{
+    return m_cdrBuffer.getBuffer();
+}
+
 char* Cdr::getCurrentPosition()
 {
     return &m_currentPosition;

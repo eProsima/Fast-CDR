@@ -97,6 +97,24 @@ public class $struct.name$
 
     }; separator="\n"$
 
+    @Override
+    public boolean equals(Object other)
+    {
+        if(other == null) return false;
+        if(other == this) return true;
+        if(!(other instanceof $struct.name$)) return false;
+        $struct.name$ otherMyClass = ($struct.name$)other;
+        boolean returnedValue = true;
+
+        $struct.members : { member |
+        $if(member.typecode.primitive)$returnedValue &= this.$member.name$_ == otherMyClass.$member.name$_;
+        $else$returnedValue &= this.$member.name$_.equals(otherMyClass.$member.name$_);
+        $endif$
+        }; separator="\n"$
+
+        return returnedValue;
+    }
+
     $struct.members : { member |private $member.typecode.javaTypename$ $member.name$_; }; separator="\n"$
 }
 >>

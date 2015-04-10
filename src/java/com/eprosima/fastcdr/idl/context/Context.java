@@ -30,4 +30,17 @@ public interface Context
 
     /*** End ***/
 
+    /*** Java support block ***/
+
+    public void setPackage(String pack);
+
+    public boolean isIsPackageEmpty();
+
+    public String getPackage();
+
+    public String getPackageDir();
+
+    public String getPackageUnder();
+
+    /*** End ***/
 }

@@ -13,6 +13,7 @@ import com.eprosima.idl.parser.tree.TypeDeclaration;
 import org.antlr.stringtemplate.*;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.io.*;
 
 public class TypesGenerator
@@ -29,11 +30,11 @@ public class TypesGenerator
      * @brief This function generates data types in Java.
      * It uses a context that was processed by the IDL parser.
      */
-    public boolean generate(Context context, String packagDir, String packag)
+    public boolean generate(Context context, String packagDir, String packag, Map<String, String> extensions)
     {
         ArrayList<Definition> definitions = context.getDefinitions();
         
-        boolean returnedValue = processDefinitions(context, definitions, packagDir, packag);
+        boolean returnedValue = processDefinitions(context, definitions, packagDir, packag, extensions);
 
         if(returnedValue)
         {
@@ -52,7 +53,7 @@ public class TypesGenerator
         return returnedValue;
     }
 
-    public boolean processDefinitions(Context context, ArrayList<Definition> definitions, String packagDir, String packag)
+    public boolean processDefinitions(Context context, ArrayList<Definition> definitions, String packagDir, String packag, Map<String, String> extensions)
     {
         if(definitions != null)
         {
@@ -76,7 +77,7 @@ public class TypesGenerator
                     }
                     
                     if(!processDefinitions(context, module.getDefinitions(), outputDir + File.separator,
-                            packag + "." + module.getName()))
+                            packag + "." + module.getName(), extensions))
                         return false;
                 }
                 else if(definition.isIsInterface())
@@ -88,13 +89,25 @@ public class TypesGenerator
                     ifcst.setAttribute("ctx", context);
                     ifcst.setAttribute("parent", ifc.getParent());
                     ifcst.setAttribute("interface", ifc);
-                    if(processExports(context, ifc.getExports(), ifcst))
+
+                    StringTemplate extensionst = null;
+                    String extensionname = null;
+                    if(extensions != null && (extensionname = extensions.get("interface")) != null)
+                    {
+                        extensionst = stg_.getInstanceOf(extensionname);
+                        extensionst.setAttribute("ctx", context);
+                        extensionst.setAttribute("parent", ifc.getParent());
+                        extensionst.setAttribute("interface", ifc);
+                        ifcst.setAttribute("extension", extensionst.toString());
+                    }
+                    
+                    if(processExports(context, ifc.getExports(), ifcst, extensions))
                     {
                         // Save file.
                         StringTemplate st = stg_.getInstanceOf("main");
                         st.setAttribute("ctx", context);
                         st.setAttribute("definitions", ifcst.toString());
-                        st.setAttribute("package", packag);
+                        st.setAttribute("package", (!packag.isEmpty() ? packag : null));
                         if(!writeFile(packagDir + ifc.getName() + ".java", st))
                         {
                             System.out.println(ColorMessage.error() + "Cannot write file " + packagDir + ifc.getName() + ".java");
@@ -109,7 +122,7 @@ public class TypesGenerator
                     TypeDeclaration typedecl = (TypeDeclaration)definition;
 
                     // get StringTemplate of the structure
-                    StringTemplate typest = processTypeDeclaration(context, typedecl);
+                    StringTemplate typest = processTypeDeclaration(context, typedecl, extensions);
 
                     if(typest != null)
                     {
@@ -117,7 +130,7 @@ public class TypesGenerator
                         StringTemplate st = stg_.getInstanceOf("main");
                         st.setAttribute("ctx", context);
                         st.setAttribute("definitions", typest.toString());
-                        st.setAttribute("package", packag);
+                        st.setAttribute("package", (!packag.isEmpty() ? packag : null));
                         if(!writeFile(packagDir + typedecl.getName() + ".java", st))
                         {
                             System.out.println(ColorMessage.error() + "Cannot write file " + packagDir + typedecl.getName() + ".java");
@@ -131,7 +144,7 @@ public class TypesGenerator
         return true;
     }
 
-    public boolean processExports(Context context, ArrayList<Export> exports, StringTemplate ifcst)
+    public boolean processExports(Context context, ArrayList<Export> exports, StringTemplate ifcst, Map<String, String> extensions)
     {
         for(Export export : exports)
         {
@@ -140,7 +153,7 @@ public class TypesGenerator
                 TypeDeclaration typedecl = (TypeDeclaration)export;
 
                 // get StringTemplate of the structure
-                StringTemplate typest = processTypeDeclaration(context, typedecl);
+                StringTemplate typest = processTypeDeclaration(context, typedecl, extensions);
 
                 if(typest != null)
                 {
@@ -153,19 +166,36 @@ public class TypesGenerator
         return true;
     }
 
-    public StringTemplate processTypeDeclaration(Context context, TypeDeclaration typedecl)
+    public StringTemplate processTypeDeclaration(Context context, TypeDeclaration typedecl, Map<String, String> extensions)
     {
-        StringTemplate typest = null;
+        StringTemplate typest = null, extensionst = null;
+        String extensionname = null;
         System.out.println("processTypesDeclaration " + typedecl.getName());
 
         if(typedecl.getTypeCode().getKind() == TypeCode.KIND_STRUCT)
         {
             typest = stg_.getInstanceOf("struct_type");
             typest.setAttribute("struct", typedecl.getTypeCode());
+
+            // Get extension
+            if(extensions != null && (extensionname =  extensions.get("struct_type")) != null)
+            {
+                extensionst = stg_.getInstanceOf(extensionname);
+                extensionst.setAttribute("struct", typedecl.getTypeCode()); 
+            }
         }
 
         if(typest != null)
         {
+            // Generate extension
+            if(extensionst != null)
+            {
+                extensionst.setAttribute("ctx", context); 
+                extensionst.setAttribute("parent", typedecl.getParent()); 
+                typest.setAttribute("extension", extensionst.toString());
+            }
+
+            // Main stringtemplate
             typest.setAttribute("ctx", context);
             typest.setAttribute("parent", typedecl.getParent());
         }

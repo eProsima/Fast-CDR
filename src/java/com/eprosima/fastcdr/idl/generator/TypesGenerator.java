@@ -108,6 +108,14 @@ public class TypesGenerator
                         st.setAttribute("ctx", context);
                         st.setAttribute("definitions", ifcst.toString());
                         st.setAttribute("package", (!packag.isEmpty() ? packag : null));
+
+                        if(extensions != null && (extensionname = extensions.get("main")) != null)
+                        {
+                            extensionst = stg_.getInstanceOf(extensionname);
+                            extensionst.setAttribute("ctx", context);
+                            st.setAttribute("extension", extensionst.toString());
+                        }
+
                         if(!writeFile(packagDir + ifc.getName() + ".java", st))
                         {
                             System.out.println(ColorMessage.error() + "Cannot write file " + packagDir + ifc.getName() + ".java");
@@ -131,6 +139,16 @@ public class TypesGenerator
                         st.setAttribute("ctx", context);
                         st.setAttribute("definitions", typest.toString());
                         st.setAttribute("package", (!packag.isEmpty() ? packag : null));
+
+                        StringTemplate extensionst = null;
+                        String extensionname = null;
+                        if(extensions != null && (extensionname = extensions.get("main")) != null)
+                        {
+                            extensionst = stg_.getInstanceOf(extensionname);
+                            extensionst.setAttribute("ctx", context);
+                            st.setAttribute("extension", extensionst.toString());
+                        }
+
                         if(!writeFile(packagDir + typedecl.getName() + ".java", st))
                         {
                             System.out.println(ColorMessage.error() + "Cannot write file " + packagDir + typedecl.getName() + ".java");

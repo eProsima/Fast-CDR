@@ -17,7 +17,7 @@ $fileHeader(file=[ctx.filename, ".h"], description=["This header file contains t
 
 // TODO Poner en el contexto.
 $if(ctx.printexception)$
-#include "$ctx.product$/exceptions/UserException.h"
+#include <$ctx.product$/exceptions/UserException.h>
 $endif$
 
 $ctx.directIncludeDependencies : {include | #include "$include$.h"}; separator="\n"$
@@ -60,7 +60,9 @@ namespace eprosima
     }
 }
 
-$elseif(ctx.fastcdr)$
+$endif$
+
+$if(ctx.fastcdr)$
 namespace eprosima
 {
     namespace fastcdr
@@ -496,7 +498,9 @@ eProsima_user_DllExport void serialize(eprosima::fastcdr::Cdr &cdr) const;
  */
 eProsima_user_DllExport void deserialize(eprosima::fastcdr::Cdr &cdr);
 
-$elseif(ctx.fastcdr)$
+$endif$
+
+$if(ctx.fastcdr)$
 /*!
  * @brief This function serializes an object using FastCDR serialization.
  * @param cdr FastCDR serialization object.

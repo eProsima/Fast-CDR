@@ -11,15 +11,17 @@ namespace { char dummy; }
 #include "$ctx.filename$.h"
 
 $if(ctx.cdr)$
-#include "fastcdr/Cdr.h"
-
-$elseif(ctx.fastcdr)$
-#include "fastcdr/FastCdr.h"
+#include <fastcdr/Cdr.h>
 
 $endif$
 
-#include "$ctx.product$/exceptions/BadParamException.h"
-using namespace eprosima::$ctx.namespace$::exception;
+$if(ctx.fastcdr)$
+#include <fastcdr/FastCdr.h>
+
+$endif$
+
+#include <fastcdr/exceptions/BadParamException.h>
+using namespace eprosima::fastcdr::exception;
 
 #include <utility>
 
@@ -110,7 +112,9 @@ void $exception.scopedname$::deserialize(eprosima::fastcdr::Cdr &dcdr)
     $exception.members : { member |$object_deserialization(ctx=ctx, object=member, preffix="m_")$}; separator="\n"$
 }
 
-$else$
+$endif$
+
+$if(ctx.fastcdr)$
 void $exception.scopedname$::serialize(eprosima::fastcdr::FastCdr &scdr) const
 {
     $exception.members : { member |$object_serialization(ctx=ctx, object=member, preffix="m_")$}; separator="\n"$

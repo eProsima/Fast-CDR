@@ -208,7 +208,9 @@ void $struct.scopedname$::deserialize(eprosima::fastcdr::Cdr &dcdr)
     $struct.members : { member |$object_deserialization(ctx=ctx, object=member, preffix="m_")$}; separator="\n"$
 }
 
-$elseif(ctx.fastcdr)$
+$endif$
+
+$if(ctx.fastcdr)$
 void $struct.scopedname$::serialize(eprosima::fastcdr::FastCdr &scdr) const
 {
     $struct.members : { member |$object_serialization(ctx=ctx, object=member, preffix="m_")$}; separator="\n"$
@@ -356,7 +358,9 @@ void $union.scopedname$::deserialize(eprosima::fastcdr::Cdr &dcdr)
     }
 }
 
-$elseif(ctx.fastcdr)$
+$endif$
+
+$if(ctx.fastcdr)$
 void $union.scopedname$::serialize(eprosima::fastcdr::FastCdr &scdr) const
 {
     scdr << $serializeCasting(typecode=union.discriminator)$m__d;

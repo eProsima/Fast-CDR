@@ -30,7 +30,7 @@ public class TypesGenerator
      * @brief This function generates data types in Java.
      * It uses a context that was processed by the IDL parser.
      */
-    public boolean generate(Context context, String packagDir, String packag, Map<String, String> extensions)
+    public boolean generate(Context context, String packagDir, String packag, String libraryName, Map<String, String> extensions)
     {
         ArrayList<Definition> definitions = context.getDefinitions();
         
@@ -41,7 +41,7 @@ public class TypesGenerator
             // Create gradle build script.
             StringTemplateGroup gradlestg = tmanager_.createStringTemplateGroup("gradle");
             StringTemplate gradlest = gradlestg.getInstanceOf("main");
-            gradlest.setAttribute("name", context.getFilename());
+            gradlest.setAttribute("name", libraryName);
 
             if(!writeFile(outputDir_ + "build.gradle", gradlest))
             {

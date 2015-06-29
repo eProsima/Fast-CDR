@@ -6,7 +6,7 @@
  *
  *************************************************************************/
 
-#include "fastcdr/exceptions/Exception.h"
+#include "Exception.h"
 
 using namespace eprosima::fastcdr::exception;
 

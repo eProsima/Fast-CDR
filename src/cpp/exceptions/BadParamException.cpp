@@ -6,7 +6,7 @@
  *
  *************************************************************************/
 
-#include <fastcdr/exceptions/BadParamException.h>
+#include "BadParamException.h"
 
 using namespace eprosima::fastcdr::exception;
 

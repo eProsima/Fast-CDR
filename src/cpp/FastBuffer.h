@@ -9,7 +9,7 @@
 #ifndef _FASTCDR_CDRBUFFER_H_
 #define _FASTCDR_CDRBUFFER_H_
 
-#include "fastcdr/FastCdr_dll.h"
+#include "FastCdr_dll.h"
 #include <stdint.h>
 #include <cstdio>
 #include <string.h>

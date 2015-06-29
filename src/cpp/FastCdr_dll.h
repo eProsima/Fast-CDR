@@ -48,7 +48,7 @@
 #if !defined(FASTCDR_SOURCE) && !defined(EPROSIMA_ALL_NO_LIB) \
     && !defined(FASTCDR_NO_LIB)
 
-#include "fastcdr/FastCdr_version.h"
+#include "config.h"
 
 // Set properties.
 #define EPROSIMA_LIB_NAME fastcdr

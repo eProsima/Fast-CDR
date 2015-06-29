@@ -6,10 +6,10 @@
  *
  *************************************************************************/
 
-#ifndef _FASTCDR_EXCEPTIONS_BADPARAMEXCEPTION_H_
-#define _FASTCDR_EXCEPTIONS_BADPARAMEXCEPTION_H_
+#ifndef _FASTCDR_EXCEPTIONS_NOTENOUGHMEMORYEXCEPTION_H_
+#define _FASTCDR_EXCEPTIONS_NOTENOUGHMEMORYEXCEPTION_H_
 
-#include <fastcdr/exceptions/Exception.h>
+#include "Exception.h"
 
 namespace eprosima
 {
@@ -18,10 +18,10 @@ namespace eprosima
         namespace exception
         {
             /*!
-             * @brief This class is thrown as an exception when a invalid parameter was being serialized.
+             * @brief This class is thrown as an exception when the buffer's internal memory reachs its size limit.
              * @ingroup EXCEPTIONMODULE
              */
-            class BadParamException : public Exception
+            class NotEnoughMemoryException : public Exception
             {
                 public:
 
@@ -30,46 +30,46 @@ namespace eprosima
                      *
                      * @param message A error message. This message is copied.
                      */
-                    Cdr_DllAPI BadParamException(const char* const &message);
+                    Cdr_DllAPI NotEnoughMemoryException(const char* const &message);
 
                     /*!
                      * @brief Default copy constructor.
                      *
-                     * @param ex BadParamException that will be copied.
+                     * @param ex NotEnoughMemoryException that will be copied.
                      */
-                    Cdr_DllAPI BadParamException(const BadParamException &ex);
+                    Cdr_DllAPI NotEnoughMemoryException(const NotEnoughMemoryException &ex);
 
                     /*!
                      * @brief Default move constructor.
                      *
-                     * @param ex BadParamException that will be moved.
+                     * @param ex NotEnoughMemoryException that will be moved.
                      */
-                    Cdr_DllAPI BadParamException(BadParamException&& ex);
+                    Cdr_DllAPI NotEnoughMemoryException(NotEnoughMemoryException&& ex);
 
                     /*!
                      * @brief Assigment operation.
                      *
-                     * @param ex BadParamException that will be copied.
+                     * @param ex NotEnoughMemoryException that will be copied.
                      */
-                    Cdr_DllAPI BadParamException& operator=(const BadParamException &ex);
+                    Cdr_DllAPI NotEnoughMemoryException& operator=(const NotEnoughMemoryException &ex);
 
                     /*!
                      * @brief Assigment operation.
                      *
-                     * @param ex BadParamException that will be moved.
+                     * @param ex NotEnoughMemoryException that will be moved.
                      */
-                    BadParamException& operator=(BadParamException&& ex);
+                    Cdr_DllAPI NotEnoughMemoryException& operator=(NotEnoughMemoryException&& ex);
 
                     //! @brief Default constructor
-                    virtual Cdr_DllAPI ~BadParamException() throw();
+                    virtual Cdr_DllAPI ~NotEnoughMemoryException() throw();
 
                     //! @brief This function throws the object as exception.
                     virtual Cdr_DllAPI void raise() const;
 
                     //! @brief Default message used in the library.
-                    static Cdr_DllAPI const char* const BAD_PARAM_MESSAGE_DEFAULT;
+                    static Cdr_DllAPI const char* const NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT;
             };
         } //namespace exception
     } //namespace fastcdr
 } //namespace eprosima
-#endif // _FASTCDR_EXCEPTIONS_BADPARAMEXCEPTION_H_
+#endif // _FASTCDR_EXCEPTIONS_NOTENOUGHMEMORYEXCEPTION_H_

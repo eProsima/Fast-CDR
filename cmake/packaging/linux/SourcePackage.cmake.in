@@ -1,0 +1,15 @@
+# Copy configure.ac
+execute_process(COMMAND cp @PROJECT_SOURCE_DIR@/configure.ac ${CPACK_TOPLEVEL_DIRECTORY}/${CPACK_PACKAGE_FILE_NAME}
+    RESULT_VARIABLE EXECUTE_RESULT)
+
+if(NOT EXECUTE_RESULT EQUAL 0)
+    message(FATAL_ERROR "Failed the copy of configure.ac")
+endif()
+
+# Run autoreconf
+execute_process(COMMAND autoreconf -fi ${CPACK_TOPLEVEL_DIRECTORY}/${CPACK_PACKAGE_FILE_NAME}
+    RESULT_VARIABLE EXECUTE_RESULT)
+
+if(NOT EXECUTE_RESULT EQUAL 0)
+    message(FATAL_ERROR "Failed the execution of autoreconf")
+endif()

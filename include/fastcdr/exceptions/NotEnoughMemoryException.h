@@ -39,12 +39,14 @@ namespace eprosima
                      */
                     Cdr_DllAPI NotEnoughMemoryException(const NotEnoughMemoryException &ex);
 
+#ifdef FASTCDR_SUPPORTS_CXX01
                     /*!
                      * @brief Default move constructor.
                      *
                      * @param ex NotEnoughMemoryException that will be moved.
                      */
                     Cdr_DllAPI NotEnoughMemoryException(NotEnoughMemoryException&& ex);
+#endif
 
                     /*!
                      * @brief Assigment operation.
@@ -53,12 +55,14 @@ namespace eprosima
                      */
                     Cdr_DllAPI NotEnoughMemoryException& operator=(const NotEnoughMemoryException &ex);
 
+#ifdef FASTCDR_SUPPORTS_CXX01
                     /*!
                      * @brief Assigment operation.
                      *
                      * @param ex NotEnoughMemoryException that will be moved.
                      */
                     Cdr_DllAPI NotEnoughMemoryException& operator=(NotEnoughMemoryException&& ex);
+#endif
 
                     //! @brief Default constructor
                     virtual Cdr_DllAPI ~NotEnoughMemoryException() throw();

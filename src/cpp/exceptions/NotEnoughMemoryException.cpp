@@ -6,7 +6,7 @@
  *
  *************************************************************************/
 
-#include "NotEnoughMemoryException.h"
+#include <fastcdr/exceptions/NotEnoughMemoryException.h>
 
 using namespace eprosima::fastcdr::exception;
 
@@ -20,9 +20,11 @@ NotEnoughMemoryException::NotEnoughMemoryException(const NotEnoughMemoryExceptio
 {
 }
 
+#ifdef FASTCDR_SUPPORTS_CXX01
 NotEnoughMemoryException::NotEnoughMemoryException(NotEnoughMemoryException&& ex) : Exception(std::move(ex))
 {
 }
+#endif
 
 NotEnoughMemoryException& NotEnoughMemoryException::operator=(const NotEnoughMemoryException &ex)
 {
@@ -34,6 +36,7 @@ NotEnoughMemoryException& NotEnoughMemoryException::operator=(const NotEnoughMem
     return *this;
 }
 
+#ifdef FASTCDR_SUPPORTS_CXX01
 NotEnoughMemoryException& NotEnoughMemoryException::operator=(NotEnoughMemoryException&& ex)
 {
     if(this != &ex)
@@ -43,6 +46,7 @@ NotEnoughMemoryException& NotEnoughMemoryException::operator=(NotEnoughMemoryExc
 
     return *this;
 }
+#endif
 
 NotEnoughMemoryException::~NotEnoughMemoryException() throw()
 {

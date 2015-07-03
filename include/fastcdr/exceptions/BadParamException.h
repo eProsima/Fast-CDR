@@ -39,12 +39,14 @@ namespace eprosima
                      */
                     Cdr_DllAPI BadParamException(const BadParamException &ex);
 
+#ifdef FASTCDR_SUPPORTS_CXX01
                     /*!
                      * @brief Default move constructor.
                      *
                      * @param ex BadParamException that will be moved.
                      */
                     Cdr_DllAPI BadParamException(BadParamException&& ex);
+#endif
 
                     /*!
                      * @brief Assigment operation.
@@ -53,12 +55,14 @@ namespace eprosima
                      */
                     Cdr_DllAPI BadParamException& operator=(const BadParamException &ex);
 
+#ifdef FASTCDR_SUPPORTS_CXX01
                     /*!
                      * @brief Assigment operation.
                      *
                      * @param ex BadParamException that will be moved.
                      */
                     BadParamException& operator=(BadParamException&& ex);
+#endif
 
                     //! @brief Default constructor
                     virtual Cdr_DllAPI ~BadParamException() throw();

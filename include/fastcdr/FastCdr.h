@@ -13,9 +13,13 @@
 #include "FastBuffer.h"
 #include "exceptions/NotEnoughMemoryException.h"
 #include <stdint.h>
+#include <malloc.h>
 #include <string>
-#include <array>
 #include <vector>
+
+#ifdef FASTCDR_SUPPORTS_CXX01
+#include <array>
+#endif
 
 namespace eprosima
 {
@@ -197,6 +201,7 @@ namespace eprosima
                  */
                 inline FastCdr& operator<<(const std::string &string_t){return serialize(string_t);}
 
+#ifdef FASTCDR_SUPPORTS_CXX01
                 /*!
                  * @brief This operator template is used to serialize arrays.
                  * @param array_t The array that will be serialized in the buffer.
@@ -205,6 +210,7 @@ namespace eprosima
                  */
                 template<class _T, size_t _Size>
                     inline FastCdr& operator<<(const std::array<_T, _Size> &array_t){return serialize<_T, _Size>(array_t);}
+#endif
 
                 /*!
                  * @brief This operator template is used to serialize sequences.
@@ -326,6 +332,7 @@ namespace eprosima
                  */
                 inline FastCdr& operator>>(std::string &string_t){return deserialize(string_t);}
 
+#ifdef FASTCDR_SUPPORTS_CXX01
                 /*!
                  * @brief This operator template is used to deserialize arrays.
                  * @param array_t The variable that will store the array read from the buffer.
@@ -334,6 +341,7 @@ namespace eprosima
                  */
                 template<class _T, size_t _Size>
                     inline FastCdr& operator>>(std::array<_T, _Size> &array_t){return deserialize<_T, _Size>(array_t);}
+#endif
 
                 /*!
                  * @brief This operator template is used to deserialize sequences.
@@ -553,6 +561,7 @@ namespace eprosima
 				inline
                 FastCdr& serialize(const std::string &string_t) {return serialize(string_t.c_str());}
 
+#ifdef FASTCDR_SUPPORTS_CXX01
                 /*!
                  * @brief This function template serializes an array.
                  * @param array_t The array that will be serialized in the buffer.
@@ -562,6 +571,7 @@ namespace eprosima
                 template<class _T, size_t _Size>
                     inline FastCdr& serialize(const std::array<_T, _Size> &array_t)
                     { return serializeArray(array_t.data(), array_t.size());}
+#endif
 
                 /*!
                  * @brief This function template serializes a sequence of booleans.
@@ -569,7 +579,7 @@ namespace eprosima
                  * @return Reference to the eprosima::fastcdr::FastCdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
                  */
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && defined(FASTCDR_SUPPORTS_CXX01)
                 template<class _T = bool>
                     FastCdr& serialize(const std::vector<bool> &vector_t)
                     {
@@ -1000,6 +1010,7 @@ namespace eprosima
 					return *this;
 				}
 
+#ifdef FASTCDR_SUPPORTS_CXX01
                 /*!
                  * @brief This function template deserializes an array.
                  * @param array_t The variable that will store the array read from the buffer.
@@ -1009,6 +1020,7 @@ namespace eprosima
                 template<class _T, size_t _Size>
                     inline FastCdr& deserialize(std::array<_T, _Size> &array_t)
                     { return deserializeArray(array_t.data(), array_t.size());}
+#endif
 
                 /*!
                  * @brief This function template deserializes a sequence of booleans.
@@ -1016,7 +1028,7 @@ namespace eprosima
                  * @return Reference to the eprosima::fastcdr::FastCdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
                  */
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && defined(FASTCDR_SUPPORTS_CXX01)
                 template<class _T = bool>
                     FastCdr& deserialize(std::vector<bool> &vector_t)
                     {
@@ -1250,6 +1262,7 @@ namespace eprosima
 
                 FastCdr& deserializeBoolSequence(std::vector<bool> &vector_t);
 
+#ifdef FASTCDR_SUPPORTS_CXX01
                 /*!
                  * @brief This function template detects the content type of the STD container array and serializes the array.
                  * @param array_t The array that will be serialized in the buffer.
@@ -1275,6 +1288,7 @@ namespace eprosima
                     {
                         return deserializeArray(array_t->data(), numElements * array_t->size());
                     }
+#endif
 
                 bool resize(size_t minSizeInc);
 

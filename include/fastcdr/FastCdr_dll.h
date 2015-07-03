@@ -9,6 +9,8 @@
 #ifndef _FASTCDR_FASTCDR_DLL_H_
 #define _FASTCDR_FASTCDR_DLL_H_
 
+#include "config.h"
+
 // normalize macros
 #if !defined(FASTCDR_DYN_LINK) && !defined(FASTCDR_STATIC_LINK) \
     && !defined(EPROSIMA_ALL_DYN_LINK) && !defined(EPROSIMA_ALL_STATIC_LINK)
@@ -47,8 +49,6 @@
 
 #if !defined(FASTCDR_SOURCE) && !defined(EPROSIMA_ALL_NO_LIB) \
     && !defined(FASTCDR_NO_LIB)
-
-#include "config.h"
 
 // Set properties.
 #define EPROSIMA_LIB_NAME fastcdr

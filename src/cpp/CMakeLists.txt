@@ -20,8 +20,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANG)
         check_cxx_compiler_flag(--std=c++0x SUPPORTS_CXX01)
         if(SUPPORTS_CXX01)
             add_compile_options(--std=c++0x)
-        set(FASTCDR_SUPPORTS_CXX01 1)
-        else()
+            set(FASTCDR_SUPPORTS_CXX01 1)
         endif()
     endif()
 endif()
@@ -46,6 +45,7 @@ if(WIN32)
     add_definitions(-DFASTCDR_DYN_LINK)
 endif()
 
+include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # Create library
@@ -93,3 +93,26 @@ if(WIN32)
     set_target_properties(fastcdr_static PROPERTIES ARCHIVE_OUTPUT_DIRECTORY_RELEASE
         ${PROJECT_BINARY_DIR}/lib)
 endif()
+
+###############################################################################
+# Packaging
+###############################################################################
+
+install(TARGETS fastcdr
+    LIBRARY DESTINATION lib
+    COMPONENT fastcdr_libraries
+    )
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    DESTINATION src
+    COMPONENT fastcdr_source
+    FILES_MATCHING
+    PATTERN "*.cpp"
+    PATTERN "*.h"
+    )
+
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/fastcdr
+    DESTINATION include
+    COMPONENT fastcdr_headers
+    FILES_MATCHING PATTERN "*.h"
+    )

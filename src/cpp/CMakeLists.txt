@@ -1,5 +1,7 @@
+include(${DEV_ENV_DIR}/cmake/dev/set_sources.cmake)
+
 # Set source files
-set(FASTCDR_SOURCES
+set_sources(
     Cdr.cpp
     FastCdr.cpp
     FastBuffer.cpp
@@ -36,7 +38,8 @@ test_big_endian(BIG_ENDIAN)
 set(__BIG_ENDIAN__ ${BIG_ENDIAN})
 set(__LITTLE_ENDIAN__ !${BIG_ENDIAN})
 
-configure_file(config.h.cmake config.h)
+configure_file(${PROJECT_SOURCE_DIR}/cmake/config.h.in
+    ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 # Definitions
 # If Windows, set define for export dll functions
@@ -49,7 +52,10 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # Create library
-add_library(fastcdr SHARED ${FASTCDR_SOURCES})
+add_library(fastcdr SHARED ${${PROJECT_NAME}_SOURCES})
+
+# Define public headers
+target_include_directories(fastcdr PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 #Rename in Windows the debug library
 if(WIN32)
@@ -77,6 +83,9 @@ if(WIN32)
     # Create library
     add_library(fastcdr_static STATIC ${SFC_SOURCES})
 
+    # Define public headers
+    target_include_directories(fastcdr_static PUBLIC ${PROJECT_SOURCE_DIR}/include)
+
     # Rename the library to have a "lib" before.
     set_target_properties(fastcdr_static PROPERTIES DEBUG_OUTPUT_NAME libfastcdrd)
     set_target_properties(fastcdr_static PROPERTIES OUTPUT_NAME libfastcdr)
@@ -103,16 +112,14 @@ install(TARGETS fastcdr
     COMPONENT fastcdr_libraries
     )
 
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    DESTINATION src
-    COMPONENT fastcdr_source
-    FILES_MATCHING
-    PATTERN "*.cpp"
-    PATTERN "*.h"
-    )
+if(WIN32)
+    install(TARGETS fastcdr_static
+        LIBRARY DESTINATION lib
+        COMPONENT fastcdr_libraries
+        )
+endif()
 
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/fastcdr
-    DESTINATION include
+set_public_headers_directory(${PROJECT_SOURCE_DIR}/include
+    DESTINATION .
     COMPONENT fastcdr_headers
-    FILES_MATCHING PATTERN "*.h"
     )

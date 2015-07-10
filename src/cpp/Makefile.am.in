@@ -1,0 +1,10 @@
+ACLOCAL_AMFLAGS = -I m4 --install
+
+lib_LTLIBRARIES = libfastcdr.la
+libfastcdr_la_SOURCES = ${${PROJECT_NAME}_SOURCES_AUTOTOOLS}
+libfastcdr_la_LDFLAGS = -version-number VERSION_MAJOR:VERSION_MINOR:VERSION_RELEASE
+
+AM_CPPFLAGS = -std=c++0x -DFASTCDR_SOURCE
+
+fastcdr_licenciasdir = $(datadir)/doc/fastcdr
+fastcdr_licencias_DATA = FASTCDR_LIBRARY_LICENSE.txt LGPLv3_LICENSE.txt

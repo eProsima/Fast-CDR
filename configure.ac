@@ -46,8 +46,9 @@ AC_PROG_CPP
 AC_CONFIG_MACRO_DIR([m4])
 LT_INIT
 
-#AC_CONFIG_HEADERS(include/fastcdr/config.h)
-#AC_CONFIG_FILES([Makefile
-#                 src/Makefile])
+AC_CONFIG_HEADERS(include/fastcdr/config.h)
+AC_CONFIG_FILES([Makefile
+                 include/Makefile
+                 src/cpp/Makefile])
 
 AC_OUTPUT

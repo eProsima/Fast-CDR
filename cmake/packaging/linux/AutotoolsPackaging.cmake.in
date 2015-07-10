@@ -1,0 +1,51 @@
+# Copy configure.ac
+execute_process(COMMAND cp configure.ac ${CPACK_TOPLEVEL_DIRECTORY}/${CPACK_PACKAGE_FILE_NAME}
+    WORKING_DIRECTORY @PROJECT_SOURCE_DIR@
+    RESULT_VARIABLE EXECUTE_RESULT)
+
+if(NOT EXECUTE_RESULT EQUAL 0)
+    message(FATAL_ERROR "Failed the copy of configure.ac")
+endif()
+
+# Copy Makefile.am
+execute_process(COMMAND cp Makefile.am ${CPACK_TOPLEVEL_DIRECTORY}/${CPACK_PACKAGE_FILE_NAME}
+    WORKING_DIRECTORY @PROJECT_SOURCE_DIR@
+    RESULT_VARIABLE EXECUTE_RESULT)
+
+if(NOT EXECUTE_RESULT EQUAL 0)
+    message(FATAL_ERROR "Failed the copy of Makefile.am")
+endif()
+
+# Copy include/Makefile.am
+execute_process(COMMAND cp --parents include/Makefile.am ${CPACK_TOPLEVEL_DIRECTORY}/${CPACK_PACKAGE_FILE_NAME}
+    WORKING_DIRECTORY @PROJECT_BINARY_DIR@
+    RESULT_VARIABLE EXECUTE_RESULT)
+
+if(NOT EXECUTE_RESULT EQUAL 0)
+    message(FATAL_ERROR "Failed the copy of include/Makefile.am")
+endif()
+
+# Copy src/cpp/Makefile.am
+execute_process(COMMAND cp --parents src/cpp/Makefile.am ${CPACK_TOPLEVEL_DIRECTORY}/${CPACK_PACKAGE_FILE_NAME}
+    WORKING_DIRECTORY @PROJECT_BINARY_DIR@
+    RESULT_VARIABLE EXECUTE_RESULT)
+
+if(NOT EXECUTE_RESULT EQUAL 0)
+    message(FATAL_ERROR "Failed the copy of src/cpp/Makefile.am")
+endif()
+
+# Create include/fastcdr
+execute_process(COMMAND mkdir ${CPACK_TOPLEVEL_DIRECTORY}/${CPACK_PACKAGE_FILE_NAME}/include/fastcdr
+    RESULT_VARIABLE EXECUTE_RESULT)
+
+if(NOT EXECUTE_RESULT EQUAL 0)
+    message(FATAL_ERROR "Failed the creation of include/fastcdr")
+endif()
+
+# Run autoreconf
+execute_process(COMMAND autoreconf -fi ${CPACK_TOPLEVEL_DIRECTORY}/${CPACK_PACKAGE_FILE_NAME}
+    RESULT_VARIABLE EXECUTE_RESULT)
+
+if(NOT EXECUTE_RESULT EQUAL 0)
+    message(FATAL_ERROR "Failed the execution of autoreconf")
+endif()

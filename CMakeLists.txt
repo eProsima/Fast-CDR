@@ -64,37 +64,43 @@ message(STATUS "Version: ${PROJECT_VERSION}")
 message(STATUS "To change de version modify the file configure.ac")
 
 ###############################################################################
+# Verify thirdparties
+###############################################################################
+include(${PROJECT_SOURCE_DIR}/cmake/dev/thirdparty.cmake)
+message(STATUS "Checking thirdparties...")
+check_thirdparties()
+
+###############################################################################
+# Set DEV_ENV_DIR and EPROSIMA_COMMON_CODE_DIR
+# This variables are required.
+###############################################################################
+set(DEV_ENV_DIR ${PROJECT_SOURCE_DIR}/thirdparty/dev-env)
+set(EPROSIMA_COMMON_CODE_DIR ${PROJECT_SOURCE_DIR}/thirdparty/eprosima-common-code)
+
+
+###############################################################################
 # Compile FastCDR library.
 ###############################################################################
-add_subdirectory(src)
+add_subdirectory(src/cpp)
 
 ###############################################################################
 # Packaging
 ###############################################################################
-
-#set(CPACK_GENERATOR RPM)
-#
-## For Linux generate TGZ with sourcecode.
-#if(UNIX)
-#    set(CPACK_SOURCE_GENERATOR TGZ)
-#    set(CPACK_SOURCE_PACKAGE_FILE_NAME eProsima_FastCDR-${PROJECT_VERSION}-Linux)
-#    set(CPACK_SOURCE_INSTALLED_DIRECTORIES "${CMAKE_SOURCE_DIR}/src/cpp;src;${CMAKE_SOURCE_DIR}/include;include")
-#    set(CPACK_SOURCE_INSTALL_COMMANDS "cp ${CMAKE_SOURCEDIR}/configure.ac ${CPACK_SOURCE_PACKAGE_FILE_NAME}; $autoreconf -fi")
-#    execute_process(
-#        COMMAND cp "${CMAKE_SOURCEDIR}/configure.ac" .
-#        COMMAND autoreconf -fi
-#        WORKING_DIRECTORY "${CMAKE_SOURCE_PACKAGE_FILENAME}"
-#        )
-#endif()
+include(${PROJECT_SOURCE_DIR}/cmake/packaging/eProsimaPackaging.cmake)
 
 #set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/packaging)
 # For Linux generate TGZ with sourcecode.
-set(CPACK_GENERATOR TGZ)
-set(CPACK_PACKAGE_FILE_NAME eProsima_FastCDR-${PROJECT_VERSION}-Linux)
-set(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE 1)
-set(CPACK_COMPONENTS_ALL fastcdr_source fastcdr_headers)
-set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
-configure_file(${PROJECT_SOURCE_DIR}/cmake/packaging/linux/SourcePackage.cmake.in ${PROJECT_BINARY_DIR}/cmake/packaging/linux/SourcePackage.cmake @ONLY)
-set(CPACK_INSTALL_SCRIPT ${PROJECT_BINARY_DIR}/cmake/packaging/linux/SourcePackage.cmake)
+#set(CPACK_GENERATOR TGZ)
+#set(CPACK_PACKAGE_FILE_NAME eProsima_FastCDR-${PROJECT_VERSION}-Linux)
+#set(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE 1)
+#set(CPACK_COMPONENTS_ALL fastcdr_source fastcdr_headers)
+#set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+#configure_file(${PROJECT_SOURCE_DIR}/cmake/packaging/linux/SourcePackage.cmake.in ${PROJECT_BINARY_DIR}/cmake/packaging/linux/SourcePackage.cmake @ONLY)
+#set(CPACK_SOURCE_INSTALL_SCRIPT ${PROJECT_BINARY_DIR}/cmake/packaging/linux/SourcePackage.cmake)
+#set(CPACK_SOURCE_GENERATOR TGZ)
+#set(CPACK_PROJECT_CONFIG_FILE ${CMAKE_SOURCE_DIR}/cmake/packaging/linux/SourcePackage.cmake)
 
-include(CPack)
+#set(CPACK_GENERATOR RPM)
+#set(CPACK_PROJECT_CONFIG_FILE ${CMAKE_SOURCE_DIR}/cmake/packaging/linux/RPMPackage.cmake)
+
+#include(CPack)

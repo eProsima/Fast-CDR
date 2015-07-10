@@ -26,7 +26,7 @@ elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     configure_file(${PROJECT_SOURCE_DIR}/cmake/packaging/linux/AutotoolsPackaging.cmake.in ${PROJECT_BINARY_DIR}/cmake/packaging/linux/AutotoolsPackaging.cmake @ONLY)
 
     # Prepare scripts for autotools
-    include(${DEV_ENV_DIR}/cmake/packaging/autotools_generator_utility.cmake)
+    include(${PROJECT_SOURCE_DIR}/cmake/packaging/linux/autotools_generator_utility.cmake)
     generate_autotools_generator_script()
 
     # Ignore not source files

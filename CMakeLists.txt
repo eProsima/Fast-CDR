@@ -17,7 +17,7 @@ endif()
 project("fastcdr")
 set(PROJECT_NAME_LARGE "eProsima Fast CDR")
 
-message(STATUS "Building ${PROJECT_NAME_LAGE}")
+message(STATUS "Configuring ${PROJECT_NAME_LAGE}")
 
 ###############################################################################
 # Version information                                                         #
@@ -64,19 +64,11 @@ message(STATUS "Version: ${PROJECT_VERSION}")
 message(STATUS "To change de version modify the file configure.ac")
 
 ###############################################################################
-# Verify thirdparties
+# Test system configuration
 ###############################################################################
-include(${PROJECT_SOURCE_DIR}/cmake/dev/thirdparty.cmake)
-message(STATUS "Checking thirdparties...")
-check_thirdparties()
-
-###############################################################################
-# Set DEV_ENV_DIR and EPROSIMA_COMMON_CODE_DIR
-# This variables are required.
-###############################################################################
-set(DEV_ENV_DIR ${PROJECT_SOURCE_DIR}/thirdparty/dev-env)
-set(EPROSIMA_COMMON_CODE_DIR ${PROJECT_SOURCE_DIR}/thirdparty/eprosima-common-code)
-
+include(${PROJECT_SOURCE_DIR}/cmake/dev/check_configuration.cmake)
+check_stdcxx()
+check_endianness()
 
 ###############################################################################
 # Compile FastCDR library.

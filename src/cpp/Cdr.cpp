@@ -6,16 +6,18 @@
  *
  *************************************************************************/
 
-#include <fastcdr/Cdr.h>
-#include <fastcdr/exceptions/BadParamException.h>
+#include <Cdr.h>
+#include <exceptions/BadParamException.h>
 
 using namespace eprosima::fastcdr;
 using namespace ::exception;
 
-#if defined(__LITTLE_ENDIAN__)
+#if defined(FASTCDR_LITTLE_ENDIAN)
     const Cdr::Endianness Cdr::DEFAULT_ENDIAN = LITTLE_ENDIANNESS;
-#elif defined (__BIG_ENDIAN__)
+#elif defined (FASTCDR_BIG_ENDIAN)
     const Cdr::Endianness Cdr::DEFAULT_ENDIAN = BIG_ENDIANNESS;
+#else
+#error Cannot detect system endianness
 #endif
 
 Cdr::state::state(Cdr &cdr) : m_currentPosition(cdr.m_currentPosition), m_alignPosition(cdr.m_alignPosition),

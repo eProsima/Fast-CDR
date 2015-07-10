@@ -19,16 +19,9 @@ AC_PREREQ([2.59])
 AM_INIT_AUTOMAKE([1.10 no-define foreign subdir-objects])
 
 # Makes version available in config.h
-AC_DEFINE(VERSION_MAJOR, version_major, [Smart Flow Controller version major])
-AC_DEFINE(VERSION_MINOR, version_minor, [Smart Flow Controller version minor])
-AC_DEFINE(VERSION_MICRO, version_micro, [Smart Flow Controller version micro])
-# Makes version available in Makefile.am
-VERSION_MAJOR=version_major
-AC_SUBST(VERSION_MAJOR)
-VERSION_MINOR=version_minor
-AC_SUBST(VERSION_MINOR)
-VERSION_MICRO=version_micro
-AC_SUBST(VERSION_MICRO)
+AC_DEFINE(VERSION_MAJOR, version_major, [fastcdr version major])
+AC_DEFINE(VERSION_MINOR, version_minor, [fastcdr version minor])
+AC_DEFINE(VERSION_MICRO, version_micro, [fastcdr version micro])
 
 # Check endianess
 AC_C_BIGENDIAN(

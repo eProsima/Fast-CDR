@@ -1,4 +1,4 @@
-include(${DEV_ENV_DIR}/cmake/dev/set_sources.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/dev/set_sources.cmake)
 
 # Set source files
 set_sources(
@@ -10,36 +10,13 @@ set_sources(
     exceptions/BadParamException.cpp
 )
 
-# Check C++11
-include(CheckCXXCompilerFlag)
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANG)
-    check_cxx_compiler_flag(--std=c++11 SUPPORTS_CXX11)
-    if(SUPPORTS_CXX11)
-        add_compile_options(--std=c++11)
-        set(FASTCDR_SUPPORTS_CXX11 1)
-        set(FASTCDR_SUPPORTS_CXX01 1)
-    else()
-        check_cxx_compiler_flag(--std=c++0x SUPPORTS_CXX01)
-        if(SUPPORTS_CXX01)
-            add_compile_options(--std=c++0x)
-            set(FASTCDR_SUPPORTS_CXX01 1)
-        endif()
-    endif()
-endif()
-
 # Set version
 set(VERSION_MAJOR ${PROJECT_MAJOR_VERSION})
 set(VERSION_MINOR ${PROJECT_MINOR_VERSION})
 set(VERSION_MICRO ${PROJECT_MICRO_VERSION})
 
-# Test endianness
-include(TestBigEndian)
-test_big_endian(BIG_ENDIAN)
-set(__BIG_ENDIAN__ ${BIG_ENDIAN})
-set(__LITTLE_ENDIAN__ !${BIG_ENDIAN})
-
 configure_file(${PROJECT_SOURCE_DIR}/cmake/config.h.in
-    ${CMAKE_CURRENT_BINARY_DIR}/config.h)
+    ${PROJECT_BINARY_DIR}/include/fastcdr/config.h)
 
 # Definitions
 # If Windows, set define for export dll functions
@@ -48,14 +25,17 @@ if(WIN32)
     add_definitions(-DFASTCDR_DYN_LINK)
 endif()
 
-include_directories(${PROJECT_SOURCE_DIR}/include)
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+# Include public api
+include_directories(${PROJECT_SOURCE_DIR}/include/fastcdr)
+# Include generated config.h
+include_directories(${PROJECT_BINARY_DIR}/include/fastcdr)
 
 # Create library
 add_library(fastcdr SHARED ${${PROJECT_NAME}_SOURCES})
 
 # Define public headers
 target_include_directories(fastcdr PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(fastcdr PUBLIC ${PROJECT_BINARY_DIR}/include)
 
 #Rename in Windows the debug library
 if(WIN32)

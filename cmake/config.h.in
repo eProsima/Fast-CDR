@@ -10,7 +10,7 @@
 #cmakedefine FASTCDR_SUPPORTS_CXX01
 
 // Endianness defines
-#cmakedefine __BIG_ENDIAN__
-#cmakedefine __LITTLE_ENDIAN__
+#cmakedefine FASTCDR_BIG_ENDIAN
+#cmakedefine FASTCDR_LITTLE_ENDIAN
 
 #endif // _FASTCDR_CONFIG_H_

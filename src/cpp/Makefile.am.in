@@ -4,4 +4,4 @@ lib_LTLIBRARIES = libfastcdr.la
 libfastcdr_la_SOURCES = ${${PROJECT_NAME}_SOURCES_AUTOTOOLS}
 libfastcdr_la_LDFLAGS = -version-number ${PROJECT_VERSION_AUTOTOOLS}
 
-AM_CPPFLAGS = -std=c++0x -DFASTCDR_SOURCE
+AM_CPPFLAGS = -DFASTCDR_SOURCE

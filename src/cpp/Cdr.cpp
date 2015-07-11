@@ -12,12 +12,10 @@
 using namespace eprosima::fastcdr;
 using namespace ::exception;
 
-#if defined(FASTCDR_LITTLE_ENDIAN)
-    const Cdr::Endianness Cdr::DEFAULT_ENDIAN = LITTLE_ENDIANNESS;
-#elif defined (FASTCDR_BIG_ENDIAN)
+#if __BIG_ENDIAN__
     const Cdr::Endianness Cdr::DEFAULT_ENDIAN = BIG_ENDIANNESS;
 #else
-#error Cannot detect system endianness
+    const Cdr::Endianness Cdr::DEFAULT_ENDIAN = LITTLE_ENDIANNESS;
 #endif
 
 Cdr::state::state(Cdr &cdr) : m_currentPosition(cdr.m_currentPosition), m_alignPosition(cdr.m_alignPosition),

@@ -23,10 +23,13 @@ AC_DEFINE(VERSION_MAJOR, version_major, [fastcdr version major])
 AC_DEFINE(VERSION_MINOR, version_minor, [fastcdr version minor])
 AC_DEFINE(VERSION_MICRO, version_micro, [fastcdr version micro])
 
+# Check stdcxx
+AX_CXX_COMPILE_STDCXX_11(,optional)
+
 # Check endianess
 AC_C_BIGENDIAN(
   AC_DEFINE(__BIG_ENDIAN__, 1, [machine is bigendian]),
-  AC_DEFINE(__LITTLE_ENDIAN__, 1, [machine is littleendian]),
+  AC_DEFINE(__BIG_ENDIAN__, 0, [machine is littleendian]),
   AC_MSG_ERROR(unknown endianess),
   AC_MSG_ERROR(universial endianess not supported)
 )
@@ -39,7 +42,7 @@ AC_PROG_CPP
 AC_CONFIG_MACRO_DIR([m4])
 LT_INIT
 
-AC_CONFIG_HEADERS(include/fastcdr/config.h)
+AC_CONFIG_HEADERS(include/fastcdr/config.h:include/fastcdr/config.h.in)
 AC_CONFIG_FILES([Makefile
                  include/Makefile
                  src/cpp/Makefile])

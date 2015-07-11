@@ -6,11 +6,13 @@
 #define VERSION_MICRO @VERSION_MICRO@
 
 // C++11 support defines
-#cmakedefine FASTCDR_SUPPORTS_CXX11
-#cmakedefine FASTCDR_SUPPORTS_CXX01
+#ifndef HAVE_CXX11
+#define HAVE_CXX11 @HAVE_CXX11@
+#endif
 
 // Endianness defines
-#cmakedefine FASTCDR_BIG_ENDIAN
-#cmakedefine FASTCDR_LITTLE_ENDIAN
+#ifndef __BIG_ENDIAN__
+#define __BIG_ENDIAN__ @__BIG_ENDIAN__@
+#endif
 
 #endif // _FASTCDR_CONFIG_H_

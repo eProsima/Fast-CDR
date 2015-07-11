@@ -15,7 +15,7 @@ set(VERSION_MAJOR ${PROJECT_MAJOR_VERSION})
 set(VERSION_MINOR ${PROJECT_MINOR_VERSION})
 set(VERSION_MICRO ${PROJECT_MICRO_VERSION})
 
-configure_file(${PROJECT_SOURCE_DIR}/cmake/config.h.in
+configure_file(${PROJECT_SOURCE_DIR}/include/fastcdr/config.h.in
     ${PROJECT_BINARY_DIR}/include/fastcdr/config.h)
 
 # Definitions

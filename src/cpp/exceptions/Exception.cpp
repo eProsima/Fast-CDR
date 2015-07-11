@@ -18,7 +18,7 @@ Exception::Exception(const Exception &ex) : m_message(ex.m_message)
 {
 }
 
-#ifdef FASTCDR_SUPPORTS_CXX01
+#if HAVE_STDCXX_0X
 Exception::Exception(Exception&& ex) : m_message(std::move(ex.m_message))
 {
 }
@@ -30,7 +30,7 @@ Exception& Exception::operator=(const Exception &ex)
     return *this;
 }
 
-#ifdef FASTCDR_SUPPORTS_CXX01
+#if HAVE_STDCXX_0X
 Exception& Exception::operator=(Exception&&)
 {
     m_message = std::move(m_message);

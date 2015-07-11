@@ -20,7 +20,7 @@ NotEnoughMemoryException::NotEnoughMemoryException(const NotEnoughMemoryExceptio
 {
 }
 
-#ifdef FASTCDR_SUPPORTS_CXX01
+#if HAVE_STDCXX_0X
 NotEnoughMemoryException::NotEnoughMemoryException(NotEnoughMemoryException&& ex) : Exception(std::move(ex))
 {
 }
@@ -36,7 +36,7 @@ NotEnoughMemoryException& NotEnoughMemoryException::operator=(const NotEnoughMem
     return *this;
 }
 
-#ifdef FASTCDR_SUPPORTS_CXX01
+#if HAVE_STDCXX_0X
 NotEnoughMemoryException& NotEnoughMemoryException::operator=(NotEnoughMemoryException&& ex)
 {
     if(this != &ex)

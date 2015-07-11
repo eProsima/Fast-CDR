@@ -20,7 +20,7 @@ BadParamException::BadParamException(const BadParamException &ex) : Exception(ex
 {
 }
 
-#ifdef FASTCDR_SUPPORTS_CXX01
+#if HAVE_STDCXX_0X
 BadParamException::BadParamException(BadParamException&& ex) : Exception(std::move(ex))
 {
 }
@@ -36,7 +36,7 @@ BadParamException& BadParamException::operator=(const BadParamException &ex)
     return *this;
 }
 
-#ifdef FASTCDR_SUPPORTS_CXX01
+#if HAVE_STDCXX_0X
 BadParamException& BadParamException::operator=(BadParamException&& ex)
 {
     if(this != &ex)

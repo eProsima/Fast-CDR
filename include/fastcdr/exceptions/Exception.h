@@ -56,7 +56,7 @@ namespace eprosima
                      */
                     Cdr_DllAPI Exception(const Exception &ex);
 
-#ifdef FASTCDR_SUPPORTS_CXX01
+#if HAVE_STDCXX_0X
                     /*!
                      * @brief Default move constructor.
                      *
@@ -72,7 +72,7 @@ namespace eprosima
                      */
                     Cdr_DllAPI Exception& operator=(const Exception &ex);
 
-#ifdef FASTCDR_SUPPORTS_CXX01
+#if HAVE_STDCXX_0X
                     /*!
                      * @brief Assigment operation.
                      *

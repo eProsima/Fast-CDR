@@ -8,7 +8,7 @@ if(${CPACK_GENERATOR} STREQUAL "TGZ" )
     if(${CPACK_TOPLEVEL_TAG} STREQUAL "Linux-Source")
 
         # Include to prepare Makefiles
-        include(@PROJECT_BINARY_DIR@/cmake/packaging/autotools_generator.cmake) 
+        include(@PROJECT_BINARY_DIR@/cmake/packaging/linux/autotools_generator.cmake) 
 
         # Prepare Makefile.am for autotools
         generate_sources_for_autotools()

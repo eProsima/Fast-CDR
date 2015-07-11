@@ -13,5 +13,10 @@ macro(generate_public_headers_for_autotools)
             string(CONCAT @PROJECT_NAME@_PUBLIC_HEADERS_AUTOTOOLS ${@PROJECT_NAME@_PUBLIC_HEADERS_AUTOTOOLS} " " ${@PROJECT_NAME@_PUBLIC_HEADER})
         endforeach()
     endforeach()
+
+    set(@PROJECT_NAME@_PUBLIC_HEADERS_FILES_TMP @@PROJECT_NAME@_PUBLIC_HEADERS_FILES@)
+    foreach(file ${@PROJECT_NAME@_PUBLIC_HEADERS_FILES_TMP})
+        string(CONCAT @PROJECT_NAME@_PUBLIC_HEADERS_AUTOTOOLS ${@PROJECT_NAME@_PUBLIC_HEADERS_AUTOTOOLS} " " ${file})
+    endforeach()
 endmacro()
 

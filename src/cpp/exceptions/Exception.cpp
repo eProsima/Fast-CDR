@@ -18,7 +18,7 @@ Exception::Exception(const Exception &ex) : m_message(ex.m_message)
 {
 }
 
-#if HAVE_STDCXX_0X
+#if HAVE_CXX11
 Exception::Exception(Exception&& ex) : m_message(std::move(ex.m_message))
 {
 }
@@ -30,7 +30,7 @@ Exception& Exception::operator=(const Exception &ex)
     return *this;
 }
 
-#if HAVE_STDCXX_0X
+#if HAVE_CXX11
 Exception& Exception::operator=(Exception&&)
 {
     m_message = std::move(m_message);

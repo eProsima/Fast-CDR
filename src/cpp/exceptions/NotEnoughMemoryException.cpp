@@ -20,7 +20,7 @@ NotEnoughMemoryException::NotEnoughMemoryException(const NotEnoughMemoryExceptio
 {
 }
 
-#if HAVE_STDCXX_0X
+#if HAVE_CXX11
 NotEnoughMemoryException::NotEnoughMemoryException(NotEnoughMemoryException&& ex) : Exception(std::move(ex))
 {
 }
@@ -36,7 +36,7 @@ NotEnoughMemoryException& NotEnoughMemoryException::operator=(const NotEnoughMem
     return *this;
 }
 
-#if HAVE_STDCXX_0X
+#if HAVE_CXX11
 NotEnoughMemoryException& NotEnoughMemoryException::operator=(NotEnoughMemoryException&& ex)
 {
     if(this != &ex)

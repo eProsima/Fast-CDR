@@ -39,7 +39,7 @@ namespace eprosima
                      */
                     Cdr_DllAPI BadParamException(const BadParamException &ex);
 
-#if HAVE_STDCXX_0X
+#if HAVE_CXX11
                     /*!
                      * @brief Default move constructor.
                      *
@@ -55,7 +55,7 @@ namespace eprosima
                      */
                     Cdr_DllAPI BadParamException& operator=(const BadParamException &ex);
 
-#if HAVE_STDCXX_0X
+#if HAVE_CXX11
                     /*!
                      * @brief Assigment operation.
                      *

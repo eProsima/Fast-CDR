@@ -103,3 +103,8 @@ set_public_headers_directory(${PROJECT_SOURCE_DIR}/include
     DESTINATION .
     COMPONENT fastcdr_headers
     )
+
+set_public_header(${PROJECT_BINARY_DIR}/include fastcdr/config.h
+    DESTINATION include/fastcdr
+    COMPONENT fastcdr_headers
+    )

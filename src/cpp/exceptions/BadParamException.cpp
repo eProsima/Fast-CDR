@@ -20,7 +20,7 @@ BadParamException::BadParamException(const BadParamException &ex) : Exception(ex
 {
 }
 
-#if HAVE_STDCXX_0X
+#if HAVE_CXX11
 BadParamException::BadParamException(BadParamException&& ex) : Exception(std::move(ex))
 {
 }
@@ -36,7 +36,7 @@ BadParamException& BadParamException::operator=(const BadParamException &ex)
     return *this;
 }
 
-#if HAVE_STDCXX_0X
+#if HAVE_CXX11
 BadParamException& BadParamException::operator=(BadParamException&& ex)
 {
     if(this != &ex)

@@ -16,7 +16,7 @@ set(VERSION_MINOR ${PROJECT_MINOR_VERSION})
 set(VERSION_MICRO ${PROJECT_MICRO_VERSION})
 
 configure_file(${PROJECT_SOURCE_DIR}/include/fastcdr/config.h.in
-    ${PROJECT_BINARY_DIR}/include/fastcdr/config.h)
+    ${PROJECT_SOURCE_DIR}/include/fastcdr/config.h)
 
 # Definitions
 # If Windows, set define for export dll functions
@@ -27,8 +27,6 @@ endif()
 
 # Include public api
 include_directories(${PROJECT_SOURCE_DIR}/include/fastcdr)
-# Include generated config.h
-include_directories(${PROJECT_BINARY_DIR}/include/fastcdr)
 
 # Create library
 add_library(fastcdr SHARED ${${PROJECT_NAME}_SOURCES})
@@ -61,7 +59,7 @@ endif()
 # Create the static libraries in Windows
 if(WIN32)
     # Create library
-    add_library(fastcdr_static STATIC ${SFC_SOURCES})
+    add_library(fastcdr_static STATIC ${${PROJECT_NAME}_SOURCES})
 
     # Define public headers
     target_include_directories(fastcdr_static PUBLIC ${PROJECT_SOURCE_DIR}/include)
@@ -101,10 +99,5 @@ endif()
 
 set_public_headers_directory(${PROJECT_SOURCE_DIR}/include
     DESTINATION .
-    COMPONENT fastcdr_headers
-    )
-
-set_public_header(${PROJECT_BINARY_DIR}/include fastcdr/config.h
-    DESTINATION include/fastcdr
     COMPONENT fastcdr_headers
     )

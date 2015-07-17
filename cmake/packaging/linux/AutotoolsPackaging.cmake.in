@@ -12,7 +12,7 @@ execute_process(COMMAND cp FASTCDR_LIBRARY_LICENSE.txt ${CPACK_TOPLEVEL_DIRECTOR
     RESULT_VARIABLE EXECUTE_RESULT)
 
 if(NOT EXECUTE_RESULT EQUAL 0)
-    message(FATAL_ERROR "Failed the copy of fastcdr license")
+    message(FATAL_ERROR "Failed the copy of @PROJECT_NAME@ license")
 endif()
 
 # Copy configure.ac
@@ -51,12 +51,12 @@ if(NOT EXECUTE_RESULT EQUAL 0)
     message(FATAL_ERROR "Failed the copy of src/cpp/Makefile.am")
 endif()
 
-# Create include/fastcdr
-execute_process(COMMAND mkdir ${CPACK_TOPLEVEL_DIRECTORY}/${CPACK_PACKAGE_FILE_NAME}/include/fastcdr
+# Create include/@PROJECT_NAME@
+execute_process(COMMAND mkdir ${CPACK_TOPLEVEL_DIRECTORY}/${CPACK_PACKAGE_FILE_NAME}/include/@PROJECT_NAME@
     RESULT_VARIABLE EXECUTE_RESULT)
 
 if(NOT EXECUTE_RESULT EQUAL 0)
-    message(FATAL_ERROR "Failed the creation of include/fastcdr")
+    message(FATAL_ERROR "Failed the creation of include/@PROJECT_NAME@")
 endif()
 
 # Run autoreconf

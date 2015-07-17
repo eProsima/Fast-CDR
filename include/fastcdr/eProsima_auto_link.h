@@ -31,8 +31,10 @@
     #if defined(EPROSIMA_LIB_NAME) \
 	&& defined(EPROSIMA_LIB_PREFIX) \
 	&& defined(EPROSIMA_LIB_DEBUG_TAG) \
-	&& defined(VERSION_STR)
-        #pragma comment(lib, EPROSIMA_LIB_PREFIX EPROSIMA_STRINGIZE(EPROSIMA_LIB_NAME) EPROSIMA_LIB_DEBUG_TAG "-" VERSION_STR ".lib")
+	&& defined(VERSION_MAJOR) \
+	&& defined(VERSION_MINOR) \
+	&& defined(VERSION_MICRO)
+        #pragma comment(lib, EPROSIMA_LIB_PREFIX EPROSIMA_STRINGIZE(EPROSIMA_LIB_NAME) EPROSIMA_LIB_DEBUG_TAG "-" EPROSIMA_STRINGIZE(VERSION_MAJOR) "." EPROSIMA_STRINGIZE(VERSION_MINOR) "." EPROSIMA_STRINGIZE(VERSION_MICRO) ".lib")
     #else
     #error "Some required macros where not defined"
     #endif

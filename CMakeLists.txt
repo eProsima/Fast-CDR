@@ -1,7 +1,7 @@
 ###############################################################################
 # CMake build rules for FastCDR                                               #
 ###############################################################################
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.7)
 
 # Set CMAKE_BUILD_TYPE to Release by default.
 if(DEFINED CMAKE_BUILD_TYPE)
@@ -15,7 +15,9 @@ else()
 endif()
 
 project("fastcdr")
-set(PROJECT_NAME_LARGE "eProsima Fast CDR")
+set(PROJECT_NAME_LARGE "Fast CDR")
+set(${PROJECT_NAME}_DESCRIPTION_SUMMARY "C++ library for serialize using CDR serialization")
+set(${PROJECT_NAME}_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} library provides two serialization mechanisms. One is the standard CDR serialization mechanism, while the other is a faster implementation of it.")
 
 message(STATUS "Configuring ${PROJECT_NAME_LAGE}")
 
@@ -64,11 +66,30 @@ message(STATUS "Version: ${PROJECT_VERSION}")
 message(STATUS "To change de version modify the file configure.ac")
 
 ###############################################################################
+# Load external eProsima projects.
+###############################################################################
+option(EPROSIMA_BUILD "Activate the use of internal thirdparties" OFF)
+
+###############################################################################
+# Generation of windows installers.
+###############################################################################
+if(WIN32)
+    option(EPROSIMA_INSTALLER "Activate the creation of a build to create windows installers" OFF)
+endif()
+
+###############################################################################
 # Test system configuration
 ###############################################################################
 include(${PROJECT_SOURCE_DIR}/cmake/dev/check_configuration.cmake)
 check_stdcxx()
 check_endianness()
+
+###############################################################################
+# Check MSVC architecture
+###############################################################################
+if(MSVC OR MSVC_IDE)
+    check_msvc_arch()
+endif()
 
 ###############################################################################
 # Compile FastCDR library.
@@ -86,20 +107,3 @@ add_subdirectory(test)
 # Packaging
 ###############################################################################
 include(${PROJECT_SOURCE_DIR}/cmake/packaging/eProsimaPackaging.cmake)
-
-#set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/packaging)
-# For Linux generate TGZ with sourcecode.
-#set(CPACK_GENERATOR TGZ)
-#set(CPACK_PACKAGE_FILE_NAME eProsima_FastCDR-${PROJECT_VERSION}-Linux)
-#set(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE 1)
-#set(CPACK_COMPONENTS_ALL fastcdr_source fastcdr_headers)
-#set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
-#configure_file(${PROJECT_SOURCE_DIR}/cmake/packaging/linux/SourcePackage.cmake.in ${PROJECT_BINARY_DIR}/cmake/packaging/linux/SourcePackage.cmake @ONLY)
-#set(CPACK_SOURCE_INSTALL_SCRIPT ${PROJECT_BINARY_DIR}/cmake/packaging/linux/SourcePackage.cmake)
-#set(CPACK_SOURCE_GENERATOR TGZ)
-#set(CPACK_PROJECT_CONFIG_FILE ${CMAKE_SOURCE_DIR}/cmake/packaging/linux/SourcePackage.cmake)
-
-#set(CPACK_GENERATOR RPM)
-#set(CPACK_PROJECT_CONFIG_FILE ${CMAKE_SOURCE_DIR}/cmake/packaging/linux/RPMPackage.cmake)
-
-#include(CPack)

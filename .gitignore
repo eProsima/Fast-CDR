@@ -2,6 +2,8 @@
 *~
 # Temporaly GVim files.
 *.swp
+# Build directory
+build/
 # Visual Studio user configuration files.
 *.vcxproj.user
 *.sdf

@@ -51,6 +51,16 @@ if(NOT EXECUTE_RESULT EQUAL 0)
     message(FATAL_ERROR "Failed the copy of src/cpp/Makefile.am")
 endif()
 
+# Copy m4 diretory
+execute_process(COMMAND cp -r m4 ${CPACK_TOPLEVEL_DIRECTORY}/${CPACK_PACKAGE_FILE_NAME}
+    WORKING_DIRECTORY @PROJECT_SOURCE_DIR@
+    RESULT_VARIABLE EXECUTE_RESULT)
+
+if(NOT EXECUTE_RESULT EQUAL 0)
+    message(FATAL_ERROR "Failed the copy of configure.ac")
+endif()
+
+
 # Create include/@PROJECT_NAME@
 execute_process(COMMAND mkdir ${CPACK_TOPLEVEL_DIRECTORY}/${CPACK_PACKAGE_FILE_NAME}/include/@PROJECT_NAME@
     RESULT_VARIABLE EXECUTE_RESULT)

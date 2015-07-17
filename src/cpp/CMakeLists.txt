@@ -16,7 +16,7 @@ set(VERSION_MINOR ${PROJECT_MINOR_VERSION})
 set(VERSION_MICRO ${PROJECT_MICRO_VERSION})
 
 configure_file(${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/config.h.in
-    ${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/config.h)
+    ${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}/config.h)
 
 # Definitions
 # If Windows, set define for export dll functions
@@ -26,7 +26,9 @@ if(WIN32)
 endif()
 
 # Include public api
-include_directories(${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME})
+include_directories(${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}
+    ${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}
+    )
 
 # Create libraries
 if(MSVC OR MSVC_IDE)
@@ -57,7 +59,7 @@ else()
 endif()
 
 # Define public headers
-target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include)
 
 ###############################################################################
 # Packaging
@@ -65,6 +67,12 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 # Install public headers
 set_public_headers_directory(${PROJECT_SOURCE_DIR}/include
+    DESTINATION .
+    COMPONENT headers
+    )
+
+# Install config.h header
+install(FILES ${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}/config.h
     DESTINATION .
     COMPONENT headers
     )

@@ -49,6 +49,9 @@ if(MSVC OR MSVC_IDE)
         ${PROJECT_BINARY_DIR}/lib)
     set_target_properties(${PROJECT_NAME} ${PROJECT_NAME}_static PROPERTIES ARCHIVE_OUTPUT_DIRECTORY_RELEASE
         ${PROJECT_BINARY_DIR}/lib)
+
+    # Define public headers for static library
+    target_include_directories(${PROJECT_NAME}_static PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include)
 else()
     #Create library
     add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES})

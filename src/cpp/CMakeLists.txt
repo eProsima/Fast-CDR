@@ -62,21 +62,23 @@ else()
 endif()
 
 # Define public headers
-target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include)
+target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+    )
 
 ###############################################################################
 # Packaging
 ###############################################################################
 
 # Install public headers
-set_public_headers_directory(${PROJECT_SOURCE_DIR}/include
-    DESTINATION .
+set_public_headers_directory(${PROJECT_SOURCE_DIR}/include ${PROJECT_NAME}
+    DESTINATION ${INCLUDE_INSTALL_DIR}
     COMPONENT headers
     )
 
 # Install config.h header
 install(FILES ${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}/config.h
-    DESTINATION include/${PROJECT_NAME}
+    DESTINATION ${INCLUDE_INSTALL_DIR}/${PROJECT_NAME}
     COMPONENT headers
     )
 
@@ -88,7 +90,7 @@ if(MSVC OR MSVC_IDE)
     if(EPROSIMA_INSTALLER)
         ## i86Win32VS2010
         install(DIRECTORY ${PROJECT_BINARY_DIR}/../i86Win32VS2010/lib/
-            DESTINATION lib/i86Win32VS2010
+            DESTINATION ${LIB_INSTALL_DIR}/i86Win32VS2010
             COMPONENT libraries_i86Win32VS2010
             FILES_MATCHING
             PATTERN "*${PROJECT_NAME}*-${PROJECT_VERSION}*"
@@ -99,7 +101,7 @@ if(MSVC OR MSVC_IDE)
 
         # x64Win64VS2010
         install(DIRECTORY ${PROJECT_BINARY_DIR}/../x64Win64VS2010/lib/
-            DESTINATION lib/x64Win64VS2010
+            DESTINATION ${LIB_INSTALL_DIR}/x64Win64VS2010
             COMPONENT libraries_x64Win64VS2010
             FILES_MATCHING
             PATTERN "*${PROJECT_NAME}*-${PROJECT_VERSION}*"
@@ -110,7 +112,7 @@ if(MSVC OR MSVC_IDE)
 
         # i86Win32VS2013
         install(DIRECTORY ${PROJECT_BINARY_DIR}/../i86Win32VS2013/lib/
-            DESTINATION lib/i86Win32VS2013
+            DESTINATION ${LIB_INSTALL_DIR}/i86Win32VS2013
             COMPONENT libraries_i86Win32VS2013
             FILES_MATCHING
             PATTERN "*${PROJECT_NAME}*-${PROJECT_VERSION}*"
@@ -121,7 +123,7 @@ if(MSVC OR MSVC_IDE)
 
         # x64Win64VS2013
         install(DIRECTORY ${PROJECT_BINARY_DIR}/../x64Win64VS2013/lib/
-            DESTINATION lib/x64Win64VS2013
+            DESTINATION ${LIB_INSTALL_DIR}/x64Win64VS2013
             COMPONENT libraries_x64Win64VS2013
             FILES_MATCHING
             PATTERN "*${PROJECT_NAME}*-${PROJECT_VERSION}*"
@@ -131,16 +133,18 @@ if(MSVC OR MSVC_IDE)
         set(CPACK_COMPONENT_LIBRARIES_X64WIN64VS2013_GROUP "Libraries" PARENT_SCOPE)
     else()
         install(TARGETS ${PROJECT_NAME}
-            RUNTIME DESTINATION lib/${MSVC_ARCH}
-            LIBRARY DESTINATION lib/${MSVC_ARCH}
-            ARCHIVE DESTINATION lib/${MSVC_ARCH}
+            EXPORT ${PROJECT_NAME}Targets
+            RUNTIME DESTINATION ${LIB_INSTALL_DIR}/${MSVC_ARCH}
+            LIBRARY DESTINATION ${LIB_INSTALL_DIR}/${MSVC_ARCH}
+            ARCHIVE DESTINATION ${LIB_INSTALL_DIR}/${MSVC_ARCH}
             COMPONENT libraries_${MSVC_ARCH}
             )
 
         install(TARGETS ${PROJECT_NAME}_static
-            RUNTIME DESTINATION lib/${MSVC_ARCH}
-            LIBRARY DESTINATION lib/${MSVC_ARCH}
-            ARCHIVE DESTINATION lib/${MSVC_ARCH}
+            EXPORT ${PROJECT_NAME}Targets
+            RUNTIME DESTINATION ${LIB_INSTALL_DIR}/${MSVC_ARCH}
+            LIBRARY DESTINATION ${LIB_INSTALL_DIR}/${MSVC_ARCH}
+            ARCHIVE DESTINATION ${LIB_INSTALL_DIR}/${MSVC_ARCH}
             COMPONENT libraries_${MSVC_ARCH}
             )
 
@@ -153,9 +157,10 @@ if(MSVC OR MSVC_IDE)
     set(CPACK_COMPONENT_GROUP_LIBRARIES_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} libraries" PARENT_SCOPE)
 else()
     install(TARGETS ${PROJECT_NAME}
-        RUNTIME DESTINATION lib
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
+        EXPORT ${PROJECT_NAME}Targets
+        RUNTIME DESTINATION ${LIB_INSTALL_DIR}
+        LIBRARY DESTINATION ${LIB_INSTALL_DIR}
+        ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
         COMPONENT libraries
         )
 

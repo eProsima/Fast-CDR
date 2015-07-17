@@ -16,7 +16,6 @@ endif()
 
 project("fastcdr")
 set(PROJECT_NAME_LARGE "Fast CDR")
-string(TOUPPER "${PROJECT_NAME}" PROJECT_NAME_UPPER)
 set(${PROJECT_NAME}_DESCRIPTION_SUMMARY "C++ library for serialize using CDR serialization")
 set(${PROJECT_NAME}_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} library provides two serialization mechanisms. One is the standard CDR serialization mechanism, while the other is a faster implementation of it.")
 
@@ -91,6 +90,12 @@ check_endianness()
 if(MSVC OR MSVC_IDE)
     check_msvc_arch()
 endif()
+
+###############################################################################
+# Installation paths
+###############################################################################
+set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for C++ headers")
+set(LIB_INSTALL_DIR lib/ CACHE PATH "Installation directory for libraries")
 
 ###############################################################################
 # Compile FastCDR library.

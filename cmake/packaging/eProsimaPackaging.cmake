@@ -1,4 +1,6 @@
+###############################################################################
 # Set common CPACK variables.
+###############################################################################
 
 set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
 
@@ -14,8 +16,35 @@ set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_MINOR_VERSION})
 set(CPACK_PACKAGE_VERSION_PATH ${PROJECT_MICRO_VERSION})
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 
+string(TOUPPER "${PROJECT_NAME}" PROJECT_NAME_UPPER)
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/${PROJECT_NAME_UPPER}_LIBRARY_LICENSE.txt")
 
+###############################################################################
+# Create CMake package config file
+###############################################################################
+export(EXPORT ${PROJECT_NAME}Targets FILE ${PROJECT_BINARY_DIR}/cmake/packaging/${PROJECT_NAME}Targets.cmake)
+install(EXPORT ${PROJECT_NAME}Targets
+    DESTINATION ${LIB_INSTALL_DIR}/${PROJECT_NAME}/cmake
+    )
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(${PROJECT_SOURCE_DIR}/cmake/packaging/Config.cmake.in
+    ${PROJECT_BINARY_DIR}/cmake/packaging/${PROJECT_NAME}Config.cmake
+    INSTALL_DESTINATION ${LIB_INSTALL_DIR}/${PROJECT_NAME}/cmake
+    PATH_VARS INCLUDE_INSTALL_DIR LIB_INSTALL_DIR
+    )
+write_basic_package_version_file(${PROJECT_BINARY_DIR}/cmake/packaging/${PROJECT_NAME}ConfigVersion.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+    )
+install(FILES ${PROJECT_BINARY_DIR}/cmake/packaging/${PROJECT_NAME}Config.cmake
+    ${PROJECT_BINARY_DIR}/cmake/packaging/${PROJECT_NAME}ConfigVersion.cmake
+    DESTINATION ${LIB_INSTALL_DIR}/${PROJECT_NAME}/cmake
+    )
+
+###############################################################################
+# Platform and architecture dependant
+###############################################################################
 if(WIN32)
     set(CPACK_GENERATOR NSIS)
 

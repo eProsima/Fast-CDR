@@ -1,5 +1,5 @@
-#ifndef _FASTCDR_CONFIG_H_
-#define _FASTCDR_CONFIG_H_
+#ifndef _@PROJECT_NAME_UPPER@_CONFIG_H_
+#define _@PROJECT_NAME_UPPER@_CONFIG_H_
 
 #define VERSION_MAJOR @VERSION_MAJOR@
 #define VERSION_MINOR @VERSION_MINOR@
@@ -15,4 +15,4 @@
 #define __BIG_ENDIAN__ @__BIG_ENDIAN__@
 #endif
 
-#endif // _FASTCDR_CONFIG_H_
+#endif // _@PROJECT_NAME_UPPER@_CONFIG_H_

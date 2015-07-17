@@ -73,7 +73,7 @@ set_public_headers_directory(${PROJECT_SOURCE_DIR}/include
 
 # Install config.h header
 install(FILES ${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}/config.h
-    DESTINATION .
+    DESTINATION include/${PROJECT_NAME}
     COMPONENT headers
     )
 

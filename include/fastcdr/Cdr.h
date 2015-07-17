@@ -9,7 +9,7 @@
 #ifndef _FASTCDR_CDR_H_
 #define _FASTCDR_CDR_H_
 
-#include "FastCdr_dll.h"
+#include "fastcdr_dll.h"
 #include "FastBuffer.h"
 #include "exceptions/NotEnoughMemoryException.h"
 #include <stdint.h>

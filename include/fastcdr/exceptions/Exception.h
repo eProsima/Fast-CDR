@@ -9,7 +9,7 @@
 #ifndef _FASTCDR_EXCEPTIONS_EXCEPTION_H_
 #define _FASTCDR_EXCEPTIONS_EXCEPTION_H_
 
-#include "../FastCdr_dll.h"
+#include "../fastcdr_dll.h"
 #include <string>
 #include <exception>
 

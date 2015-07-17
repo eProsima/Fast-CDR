@@ -25,6 +25,3 @@ cscope.out
 *.pyc
 # Installers
 *.tar.gz
-
-# Generated headers
-include/fastcdr/config.h

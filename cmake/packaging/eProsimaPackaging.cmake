@@ -22,10 +22,12 @@ set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/${PROJECT_NAME_UPPER}_LIB
 ###############################################################################
 # Create CMake package config file
 ###############################################################################
-export(EXPORT ${PROJECT_NAME}Targets FILE ${PROJECT_BINARY_DIR}/cmake/packaging/${PROJECT_NAME}Targets.cmake)
-install(EXPORT ${PROJECT_NAME}Targets
-    DESTINATION ${LIB_INSTALL_DIR}/${PROJECT_NAME}/cmake
-    )
+if(NOT EPROSIMA_INSTALLER)
+    export(EXPORT ${PROJECT_NAME}Targets FILE ${PROJECT_BINARY_DIR}/cmake/packaging/${PROJECT_NAME}Targets.cmake)
+    install(EXPORT ${PROJECT_NAME}Targets
+        DESTINATION ${LIB_INSTALL_DIR}/${PROJECT_NAME}/cmake
+        )
+endif()
 
 include(CMakePackageConfigHelpers)
 configure_package_config_file(${PROJECT_SOURCE_DIR}/cmake/packaging/Config.cmake.in

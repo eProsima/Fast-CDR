@@ -51,7 +51,9 @@ if(MSVC OR MSVC_IDE)
         ${PROJECT_BINARY_DIR}/lib)
 
     # Define public headers for static library
-    target_include_directories(${PROJECT_NAME}_static PUBLIC ${PROJECT_SOURCE_DIR}/include ${PROJECT_BINARY_DIR}/include)
+    target_include_directories(${PROJECT_NAME}_static PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+        )
 else()
     #Create library
     add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES})

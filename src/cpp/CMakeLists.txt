@@ -22,9 +22,6 @@ configure_file(${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/config.h.in
 # Definitions
 # If Windows, set define for export dll functions
 add_definitions(-DFASTCDR_SOURCE)
-if(WIN32)
-    add_definitions(-DFASTCDR_DYN_LINK)
-endif()
 
 # Include public api
 include_directories(${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}
@@ -56,6 +53,9 @@ if(MSVC OR MSVC_IDE)
             ${PROJECT_BINARY_DIR}/lib)
         set_target_properties(${PROJECT_NAME} ${PROJECT_NAME}_static PROPERTIES ARCHIVE_OUTPUT_DIRECTORY_RELEASE
             ${PROJECT_BINARY_DIR}/lib)
+
+        # Export symbols in DLL libraries
+        target_compile_definitions(${PROJECT_NAME} PRIVATE FASTCDR_DYN_LINK)
 
         # Define public headers
         target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>

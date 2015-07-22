@@ -108,15 +108,7 @@ if(MSVC OR MSVC_IDE)
         install_msvc_libraries(i86Win32VS2013)
         install_msvc_libraries(x64Win64VS2013)
     else()
-        install(TARGETS ${PROJECT_NAME}
-            EXPORT ${PROJECT_NAME}Targets
-            RUNTIME DESTINATION ${LIB_INSTALL_DIR}/${MSVC_ARCH}
-            LIBRARY DESTINATION ${LIB_INSTALL_DIR}/${MSVC_ARCH}
-            ARCHIVE DESTINATION ${LIB_INSTALL_DIR}/${MSVC_ARCH}
-            COMPONENT libraries_${MSVC_ARCH}
-            )
-
-        install(TARGETS ${PROJECT_NAME}_static
+        install(TARGETS ${PROJECT_NAME} ${PROJEC_NAME}_static
             EXPORT ${PROJECT_NAME}Targets
             RUNTIME DESTINATION ${LIB_INSTALL_DIR}/${MSVC_ARCH}
             LIBRARY DESTINATION ${LIB_INSTALL_DIR}/${MSVC_ARCH}

@@ -114,4 +114,29 @@ add_subdirectory(test)
 ###############################################################################
 # Packaging
 ###############################################################################
+# Install licenses
+install(FILES ${PROJECT_SOURCE_DIR}/FASTCDR_LIBRARY_LICENSE.txt
+    ${PROJECT_SOURCE_DIR}/LGPLv3_LICENSE.txt
+    DESTINATION .
+    COMPONENT licenses
+    )
+set(CPACK_COMPONENT_LICENSES_HIDDEN 1)
+
+set(CPACK_COMPONENTS_ALL headers licenses)
+
+if(MSVC OR MSVC_IDE)
+    if(EPROSIMA_INSTALLER)
+        set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL}
+            libraries_i86Win32VS2010
+            libraries_x64Win64VS2010
+            libraries_i86Win32VS2013
+            libraries_x64Win64VS2013
+            )
+    else()
+        set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} libraries_${MSVC_ARCH})
+    endif()
+else()
+    set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} libraries)
+endif()
+
 include(${PROJECT_SOURCE_DIR}/cmake/packaging/eProsimaPackaging.cmake)

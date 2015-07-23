@@ -102,7 +102,7 @@ set(CPACK_COMPONENT_HEADERS_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} C++ Head
 
 # Install sources
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/cpp
-    DESTINATION ./src
+    DESTINATION src
     COMPONENT sources
     FILES_MATCHING
     PATTERN "*.c"

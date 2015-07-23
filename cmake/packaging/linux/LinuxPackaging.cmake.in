@@ -8,7 +8,6 @@ if(${CPACK_GENERATOR} STREQUAL "TGZ" )
         # Define name of the TGZ file
         set(CPACK_PACKAGE_FILE_NAME eProsima_${PROJECT_NAME_STYLED}-@PROJECT_VERSION@-Linux)
         set(CPACK_COMPONENTS_ALL headers sources licenses)
-        set(CPACK_MONOLITHIC_INSTALL OFF)
         set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
         set(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE ON)
 

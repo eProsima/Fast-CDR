@@ -92,7 +92,7 @@ set_public_headers_directory(${PROJECT_SOURCE_DIR}/include ${PROJECT_NAME}
     )
 
 # Install config.h header
-install(FILES ${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}/config.h
+set_public_header(${PROJECT_BINARY_DIR}/include ${PROJECT_NAME} config.h
     DESTINATION ${INCLUDE_INSTALL_DIR}/${PROJECT_NAME}
     COMPONENT headers
     )

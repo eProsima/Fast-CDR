@@ -68,15 +68,20 @@ message(STATUS "Version: ${PROJECT_VERSION}")
 message(STATUS "To change de version modify the file configure.ac")
 
 ###############################################################################
-# Load external eProsima projects.
-###############################################################################
-option(EPROSIMA_BUILD "Activate the use of internal thirdparties" OFF)
-
-###############################################################################
 # Generation of windows installers.
 ###############################################################################
 if(WIN32)
     option(EPROSIMA_INSTALLER "Activate the creation of a build to create windows installers" OFF)
+endif()
+
+###############################################################################
+# Load external eProsima projects.
+###############################################################################
+
+option(EPROSIMA_BUILD "Activate the use of internal thirdparties" OFF)
+
+if(EPROSIMA_INSTALLER)
+    set(EPROSIMA_BUILD ON)
 endif()
 
 ###############################################################################

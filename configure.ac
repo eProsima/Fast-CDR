@@ -19,9 +19,9 @@ AC_PREREQ([2.59])
 AM_INIT_AUTOMAKE([1.10 no-define foreign subdir-objects])
 
 # Makes version available in config.h
-AC_DEFINE(VERSION_MAJOR, version_major, [fastcdr version major])
-AC_DEFINE(VERSION_MINOR, version_minor, [fastcdr version minor])
-AC_DEFINE(VERSION_MICRO, version_micro, [fastcdr version micro])
+AC_DEFINE(FASTCDR_VERSION_MAJOR, version_major, [fastcdr version major])
+AC_DEFINE(FASTCDR_VERSION_MINOR, version_minor, [fastcdr version minor])
+AC_DEFINE(FASTCDR_VERSION_MICRO, version_micro, [fastcdr version micro])
 
 # Check stdcxx
 AX_CXX_COMPILE_STDCXX_11(,optional)
@@ -42,7 +42,7 @@ AC_PROG_CPP
 AC_CONFIG_MACRO_DIR([m4])
 LT_INIT
 
-AC_CONFIG_HEADERS(include/fastcdr/config.h:include/fastcdr/config.h.in)
+AC_CONFIG_HEADERS([include/fastcdr/config.h:include/fastcdr/config.h.in])
 AC_CONFIG_FILES([Makefile
                  include/Makefile
                  src/cpp/Makefile])

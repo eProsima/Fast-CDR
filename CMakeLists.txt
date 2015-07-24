@@ -27,7 +27,7 @@ message(STATUS "Configuring ${PROJECT_NAME_LAGE}")
 # Version information                                                         #
 ###############################################################################
 
-#If not set, copy over FastCDR version from configure.ac
+#If not set, copy over product version from configure.ac
 if(NOT PROJECT_MAJOR_VERSION)
     file(STRINGS
         ${PROJECT_SOURCE_DIR}/configure.ac
@@ -105,7 +105,7 @@ set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for C++ head
 set(LIB_INSTALL_DIR lib/ CACHE PATH "Installation directory for libraries")
 
 ###############################################################################
-# Compile FastCDR library.
+# Compile library.
 ###############################################################################
 add_subdirectory(src/cpp)
 

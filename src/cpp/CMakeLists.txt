@@ -21,7 +21,7 @@ configure_file(${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/config.h.in
 
 # Definitions
 # If Windows, set define for export dll functions
-add_definitions(-DFASTCDR_SOURCE)
+add_definitions(-D${PROJECT_NAME_UPPER}_SOURCE)
 
 # Include public api
 include_directories(${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}
@@ -55,7 +55,7 @@ if(MSVC OR MSVC_IDE)
             ${PROJECT_BINARY_DIR}/lib)
 
         # Export symbols in DLL libraries
-        target_compile_definitions(${PROJECT_NAME} PRIVATE FASTCDR_DYN_LINK)
+        target_compile_definitions(${PROJECT_NAME} PRIVATE ${PROJECT_NAME_UPPER}_DYN_LINK)
 
         # Define public headers
         target_include_directories(${PROJECT_NAME} PUBLIC

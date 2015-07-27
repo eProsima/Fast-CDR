@@ -9,7 +9,7 @@
 #ifndef _FASTCDR_FASTCDR_DLL_H_
 #define _FASTCDR_FASTCDR_DLL_H_
 
-#include <fastcdr/config.h>
+#include "config.h"
 
 // normalize macros
 #if !defined(FASTCDR_DYN_LINK) && !defined(FASTCDR_STATIC_LINK) \

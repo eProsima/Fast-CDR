@@ -6,8 +6,8 @@
  *
  *************************************************************************/
 
-#include "fastcdr/FastCdr.h"
-#include "fastcdr/exceptions/BadParamException.h"
+#include <FastCdr.h>
+#include <exceptions/BadParamException.h>
 #include <string.h>
 
 using namespace eprosima::fastcdr;
@@ -104,6 +104,27 @@ FastCdr& FastCdr::serialize(const char *string_t)
 		serialize(length);
 
     return *this;
+}
+
+FastCdr& FastCdr::serializeArray(const bool *bool_t, size_t numElements)
+{
+    size_t totalSize = sizeof(*bool_t)*numElements;
+
+    if(((m_lastPosition - m_currentPosition) >= totalSize) || resize(totalSize))
+    {
+        for(size_t count = 0; count < numElements; ++count)
+        {
+            uint8_t value = 0;
+
+            if(bool_t[count])
+                value = 1;
+            m_currentPosition++ << value;
+        }
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::serializeArray(const char *char_t, size_t numElements)
@@ -275,6 +296,33 @@ const char* FastCdr::readString(uint32_t &length)
 	throw eprosima::fastcdr::exception::NotEnoughMemoryException(eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
+FastCdr& FastCdr::deserializeArray(bool *bool_t, size_t numElements)
+{
+    size_t totalSize = sizeof(*bool_t)*numElements;
+
+    if((m_lastPosition - m_currentPosition) >= totalSize)
+    {
+        for(size_t count = 0; count < numElements; ++count)
+        {
+            uint8_t value = 0;
+            m_currentPosition++ >> value;
+
+            if(value == 1)
+            {
+                bool_t[count] = true;
+            }
+            else if(value == 0)
+            {
+                bool_t[count] = false;
+            }
+        }
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+}
+
 FastCdr& FastCdr::deserializeArray(char *char_t, size_t numElements)
 {
     size_t totalSize = sizeof(*char_t)*numElements;
@@ -373,4 +421,69 @@ FastCdr& FastCdr::deserializeArray(double *double_t, size_t numElements)
     }
 
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+}
+
+FastCdr& FastCdr::serializeBoolSequence(const std::vector<bool> &vector_t)
+{
+    state state(*this);
+
+    *this << (int32_t)vector_t.size();
+
+    size_t totalSize = vector_t.size()*sizeof(bool);
+
+    if(((m_lastPosition - m_currentPosition) >= totalSize) || resize(totalSize))
+    {
+        for(size_t count = 0; count < vector_t.size(); ++count)
+        {
+            uint8_t value = 0;
+            std::vector<bool>::const_reference ref = vector_t[count];
+
+            if(ref)
+                value = 1;
+            m_currentPosition++ << value;
+        }
+    }
+    else
+    {
+        setState(state);
+        throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    }
+
+    return *this;
+}
+
+FastCdr& FastCdr::deserializeBoolSequence(std::vector<bool> &vector_t)
+{
+    uint32_t seqLength = 0;
+    state state(*this);
+
+    *this >> seqLength;
+
+    vector_t.resize(seqLength);
+    size_t totalSize = seqLength*sizeof(bool);
+
+    if((m_lastPosition - m_currentPosition) >= totalSize)
+    {
+        for(uint32_t count = 0; count < seqLength; ++count)
+        {
+            uint8_t value = 0;
+            m_currentPosition++ >> value;
+
+            if(value == 1)
+            {
+                vector_t[count] = true;
+            }
+            else if(value == 0)
+            {
+                vector_t[count] = false;
+            }
+        }
+    }
+    else
+    {
+        setState(state);
+        throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    }
+
+    return *this;
 }

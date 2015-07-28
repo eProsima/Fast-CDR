@@ -9,7 +9,7 @@
 #ifndef _FASTCDR_EXCEPTIONS_EXCEPTION_H_
 #define _FASTCDR_EXCEPTIONS_EXCEPTION_H_
 
-#include "fastcdr/FastCdr_dll.h"
+#include "../fastcdr_dll.h"
 #include <string>
 #include <exception>
 
@@ -56,12 +56,14 @@ namespace eprosima
                      */
                     Cdr_DllAPI Exception(const Exception &ex);
 
+#if HAVE_CXX11
                     /*!
                      * @brief Default move constructor.
                      *
                      * @param ex Exception that will be moved.
                      */
                     Cdr_DllAPI Exception(Exception&& ex);
+#endif
 
                     /*!
                      * @brief Assigment operation.
@@ -70,12 +72,14 @@ namespace eprosima
                      */
                     Cdr_DllAPI Exception& operator=(const Exception &ex);
 
+#if HAVE_CXX11
                     /*!
                      * @brief Assigment operation.
                      *
                      * @param ex Exception that will be moved.
                      */
                     Cdr_DllAPI Exception& operator=(Exception&&);
+#endif
 
                 private:
 

@@ -6,7 +6,7 @@
  *
  *************************************************************************/
 
-#include "fastcdr/exceptions/Exception.h"
+#include <exceptions/Exception.h>
 
 using namespace eprosima::fastcdr::exception;
 
@@ -18,9 +18,11 @@ Exception::Exception(const Exception &ex) : m_message(ex.m_message)
 {
 }
 
+#if HAVE_CXX11
 Exception::Exception(Exception&& ex) : m_message(std::move(ex.m_message))
 {
 }
+#endif
 
 Exception& Exception::operator=(const Exception &ex)
 {
@@ -28,11 +30,13 @@ Exception& Exception::operator=(const Exception &ex)
     return *this;
 }
 
+#if HAVE_CXX11
 Exception& Exception::operator=(Exception&&)
 {
     m_message = std::move(m_message);
     return *this;
 }
+#endif
 
 Exception::~Exception() throw()
 {

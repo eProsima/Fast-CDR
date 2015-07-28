@@ -6,7 +6,7 @@
  *
  *************************************************************************/
 
-#include "fastcdr/FastBuffer.h"
+#include <FastBuffer.h>
 
 #include <malloc.h>
 

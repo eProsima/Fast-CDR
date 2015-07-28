@@ -9,13 +9,17 @@
 #ifndef _FASTCDR_CDR_H_
 #define _FASTCDR_CDR_H_
 
-#include "fastcdr/FastCdr_dll.h"
-#include "fastcdr/FastBuffer.h"
-#include "fastcdr/exceptions/NotEnoughMemoryException.h"
+#include "fastcdr_dll.h"
+#include "FastBuffer.h"
+#include "exceptions/NotEnoughMemoryException.h"
 #include <stdint.h>
+#include <malloc.h>
 #include <string>
-#include <array>
 #include <vector>
+
+#if HAVE_CXX11
+#include <array>
+#endif
 
 namespace eprosima
 {
@@ -142,6 +146,11 @@ namespace eprosima
                  * @brief This function resets the current position in the buffer to the beginning.
                  */
                 void reset();
+
+                /*!
+                 * @brief This function returns the pointer to the current used buffer.
+                 */
+                char* getBufferPointer();
 
                 /*!
                  * @brief This function returns the current position in the CDR stream.
@@ -282,6 +291,7 @@ namespace eprosima
                  */
                 inline Cdr& operator<<(const std::string &string_t){return serialize(string_t);}
 
+#if HAVE_CXX11
                 /*!
                  * @brief This operator template is used to serialize arrays.
                  * @param array_t The array that will be serialized in the buffer.
@@ -290,6 +300,7 @@ namespace eprosima
                  */
                 template<class _T, size_t _Size>
                     inline Cdr& operator<<(const std::array<_T, _Size> &array_t){return serialize<_T, _Size>(array_t);}
+#endif
 
                 /*!
                  * @brief This operator template is used to serialize sequences.
@@ -411,6 +422,7 @@ namespace eprosima
                  */
                 inline Cdr& operator>>(std::string &string_t){return deserialize(string_t);}
 
+#if HAVE_CXX11
                 /*!
                  * @brief This operator template is used to deserialize arrays.
                  * @param array_t The variable that will store the array read from the buffer.
@@ -419,6 +431,7 @@ namespace eprosima
                  */
                 template<class _T, size_t _Size>
                     inline Cdr& operator>>(std::array<_T, _Size> &array_t){return deserialize<_T, _Size>(array_t);}
+#endif
 
                 /*!
                  * @brief This operator template is used to deserialize sequences.
@@ -718,6 +731,7 @@ namespace eprosima
 				inline
                 Cdr& serialize(const std::string &string_t, Endianness endianness)  {return serialize(string_t.c_str(), endianness);}
 
+#if HAVE_CXX11
                 /*!
                  * @brief This function template serializes an array.
                  * @param array_t The array that will be serialized in the buffer.
@@ -738,6 +752,21 @@ namespace eprosima
                 template<class _T, size_t _Size>
                     inline Cdr& serialize(const std::array<_T, _Size> &array_t, Endianness endianness)
                     { return serializeArray(array_t.data(), array_t.size(), endianness);}
+#endif
+
+                /*!
+                 * @brief This function template serializes a sequence of booleans.
+                 * @param vector_t The sequence that will be serialized in the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
+#if !defined(_MSC_VER) && HAVE_CXX11
+                template<class _T = bool>
+                    Cdr& serialize(const std::vector<bool> &vector_t)
+                    {
+                        return serializeBoolSequence(vector_t);
+                    }
+#endif
 
                 /*!
                  * @brief This function template serializes a sequence.
@@ -764,6 +793,14 @@ namespace eprosima
 
                         return *this;
                     }
+
+#ifdef _MSC_VER 
+				template<>
+					Cdr& serialize<bool>(const std::vector<bool> &vector_t)
+					{
+						return serializeBoolSequence(vector_t);
+					}
+#endif
 
                 /*!
                  * @brief This function template serializes a sequence with a different endianness.
@@ -1029,6 +1066,29 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
                 Cdr& serializeArray(const double *double_t, size_t numElements, Endianness endianness);
+
+                /*!
+                 * @brief This function serializes an array of booleans.
+                 * @param bool_t The array of booleans that will be serialized in the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
+                Cdr& serializeArray(const bool *bool_t, size_t numElements);
+
+                /*!
+                 * @brief This function serializes an array of booleans with a different endianness.
+                 * @param bool_t The array of booleans that will be serialized in the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @param endianness Endianness that will be used in the serialization of this value.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
+                inline
+                    Cdr& serializeArray(const bool *bool_t, size_t numElements, Endianness endianness)
+                    {
+                        return serializeArray(bool_t, numElements);
+                    }
 
                 // TODO
 				inline
@@ -1462,6 +1522,7 @@ namespace eprosima
 					return *this;
 				}
 
+#if HAVE_CXX11
                 /*!
                  * @brief This function template deserializes an array.
                  * @param array_t The variable that will store the array read from the buffer.
@@ -1482,6 +1543,21 @@ namespace eprosima
                 template<class _T, size_t _Size>
                     inline Cdr& deserialize(std::array<_T, _Size> &array_t, Endianness endianness)
                     { return deserializeArray(array_t.data(), array_t.size(), endianness);}
+#endif
+
+                /*!
+                 * @brief This function template deserializes a sequence.
+                 * @param vector_t The variable that will store the sequence read from the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+#if !defined(_MSC_VER) && HAVE_CXX11
+                template<class _T = bool>
+                    Cdr& deserialize(std::vector<bool> &vector_t)
+                    {
+                        return deserializeBoolSequence(vector_t);
+                    }
+#endif
 
                 /*!
                  * @brief This function template deserializes a sequence.
@@ -1510,6 +1586,14 @@ namespace eprosima
 
                         return *this;
                     }
+
+#ifdef _MSC_VER
+				template<>
+					Cdr& deserialize<bool>(std::vector<bool> &vector_t)
+					{
+						return deserializeBoolSequence(vector_t);
+					}
+#endif
 
                 /*!
                  * @brief This function template deserializes a sequence with a different endianness.
@@ -1776,6 +1860,29 @@ namespace eprosima
                  */
                 Cdr& deserializeArray(double *double_t, size_t numElements, Endianness endianness);
 
+                /*!
+                 * @brief This function deserializes an array of booleans.
+                 * @param bool_t The variable that will store the array of booleans read from the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                Cdr& deserializeArray(bool *bool_t, size_t numElements);
+
+                /*!
+                 * @brief This function deserializes an array of booleans with a different endianness.
+                 * @param bool_t The variable that will store the array of booleans read from the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @param endianness Endianness that will be used in the serialization of this value.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                inline
+                    Cdr& deserializeArray(bool *bool_t, size_t numElements, Endianness endianness)
+                    {
+                        return deserializeArray(bool_t, numElements);
+                    }
+
                 // TODO
 				inline
                 Cdr& deserializeArray(std::string *string_t, size_t numElements)
@@ -1906,6 +2013,11 @@ namespace eprosima
 
             private:
 
+                Cdr& serializeBoolSequence(const std::vector<bool> &vector_t);
+
+                Cdr& deserializeBoolSequence(std::vector<bool> &vector_t);
+
+#if HAVE_CXX11
                 /*!
                  * @brief This function template detects the content type of the STD container array and serializes the array.
                  * @param array_t The array that will be serialized in the buffer.
@@ -1959,6 +2071,7 @@ namespace eprosima
                     {
                         return deserializeArray(array_t->data(), numElements * array_t->size(), endianness);
                     }
+#endif
 
                 /*!
                  * @brief This function returns the extra bytes regarding the allignment.

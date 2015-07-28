@@ -9,7 +9,7 @@
 #ifndef _FASTCDR_EXCEPTIONS_BADPARAMEXCEPTION_H_
 #define _FASTCDR_EXCEPTIONS_BADPARAMEXCEPTION_H_
 
-#include <fastcdr/exceptions/Exception.h>
+#include "Exception.h"
 
 namespace eprosima
 {
@@ -39,12 +39,14 @@ namespace eprosima
                      */
                     Cdr_DllAPI BadParamException(const BadParamException &ex);
 
+#if HAVE_CXX11
                     /*!
                      * @brief Default move constructor.
                      *
                      * @param ex BadParamException that will be moved.
                      */
                     Cdr_DllAPI BadParamException(BadParamException&& ex);
+#endif
 
                     /*!
                      * @brief Assigment operation.
@@ -53,12 +55,14 @@ namespace eprosima
                      */
                     Cdr_DllAPI BadParamException& operator=(const BadParamException &ex);
 
+#if HAVE_CXX11
                     /*!
                      * @brief Assigment operation.
                      *
                      * @param ex BadParamException that will be moved.
                      */
                     BadParamException& operator=(BadParamException&& ex);
+#endif
 
                     //! @brief Default constructor
                     virtual Cdr_DllAPI ~BadParamException() throw();

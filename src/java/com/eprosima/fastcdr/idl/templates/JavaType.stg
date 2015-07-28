@@ -1,0 +1,77 @@
+/*************************************************************************
+ * Copyright (c) 2013 eProsima. All rights reserved.
+ *
+ * This copy of FASTRPC is licensed to you under the terms described in the
+ * FASTRPC_LICENSE file included in this distribution.
+ *
+ *************************************************************************/
+
+group JavaType;
+
+main(ctx, definitions, package) ::= <<
+$if(package)$
+package $package$;
+$endif$
+
+import java.util.ArrayList;
+
+$definitions$
+>>
+
+interface(ctx, parent, interface, exports, extension) ::= <<
+public class $interface.name$
+{
+    $extension$
+
+    $exports$
+}
+>>
+
+struct_type(ctx, parent, struct, extension) ::= <<
+public class $struct.name$
+{
+    public $struct.name$()
+    {
+        $struct.members : { member |
+        $if(!member.typecode.primitive)$$member.name$_ = new $member.typecode.javaTypename$();$endif$
+        }; separator="\n"$
+    }
+
+    $struct.members : { member |
+    $if(!member.typecode.isType_e)$
+    public void set$member.javaName$($member.typecode.javaTypename$ $member.name$)
+    {
+        $member.name$_ = $member.name$;
+    }
+    $endif$
+
+    public $member.typecode.javaTypename$ get$member.javaName$()
+    {
+        return $member.name$_;
+    }
+
+    }; separator="\n"$
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if(other == null) return false;
+        if(other == this) return true;
+        if(!(other instanceof $struct.name$)) return false;
+        $struct.name$ otherMyClass = ($struct.name$)other;
+        boolean returnedValue = true;
+
+        $struct.members : { member |
+        $if(member.typecode.primitive)$returnedValue &= this.$member.name$_ == otherMyClass.$member.name$_;
+        $else$returnedValue &= this.$member.name$_.equals(otherMyClass.$member.name$_);
+        $endif$
+        }; separator="\n"$
+
+        return returnedValue;
+    }
+
+    $struct.members : { member |private $member.typecode.javaTypename$ $member.name$_; }; separator="\n"$
+
+    $extension$
+}
+>>

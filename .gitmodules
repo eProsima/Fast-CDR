@@ -1,6 +1,0 @@
-[submodule "thirdparty/dev-env"]
-	path = thirdparty/dev-env
-	url = https://github.com/eProsima/Dev-Env.git
-[submodule "thirdparty/eprosima-common-code"]
-	path = thirdparty/eprosima-common-code
-	url = https://github.com/eProsima/eProsima-Common-Code.git

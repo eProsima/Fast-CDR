@@ -37,10 +37,10 @@ if(NOT((MSVC OR MSVC_IDE) AND EPROSIMA_INSTALLER))
         DESTINATION ${LIB_INSTALL_DIR}/${PROJECT_NAME}/cmake
         COMPONENT cmake
         )
-
-    set(CPACK_COMPONENT_CMAKE_HIDDEN 1)
-    set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} cmake)
 endif()
+
+set(CPACK_COMPONENT_CMAKE_HIDDEN 1)
+set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} cmake)
 
 ###############################################################################
 # Platform and architecture dependant

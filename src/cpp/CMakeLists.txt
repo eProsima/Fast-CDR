@@ -124,7 +124,6 @@ endif()
 
 # Install libraries
 if(MSVC OR MSVC_IDE)
-    set(PROJECT_TARGETS_IN_CONFIG_FILE "")
     if(EPROSIMA_INSTALLER)
         install_msvc_libraries(i86Win32VS2010)
         install_msvc_libraries(x64Win64VS2010)
@@ -133,26 +132,21 @@ if(MSVC OR MSVC_IDE)
     else()
         install(TARGETS ${PROJECT_NAME}_${MSVC_ARCH} ${PROJECT_NAME}_${MSVC_ARCH}_static
             EXPORT ${PROJECT_NAME}Targets
-            RUNTIME DESTINATION ${LIB_INSTALL_DIR}/${MSVC_ARCH}
-            LIBRARY DESTINATION ${LIB_INSTALL_DIR}/${MSVC_ARCH}
-            ARCHIVE DESTINATION ${LIB_INSTALL_DIR}/${MSVC_ARCH}
+            RUNTIME DESTINATION ${LIB_INSTALL_DIR}
+            LIBRARY DESTINATION ${LIB_INSTALL_DIR}
+            ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
             COMPONENT libraries_${MSVC_ARCH}
             )
 
-        if(NOT EPROSIMA_INSTALLER)
-            export(EXPORT ${PROJECT_NAME}Targets FILE ${PROJECT_BINARY_DIR}/cmake/packaging/${PROJECT_NAME}Targets.cmake)
-            install(EXPORT ${PROJECT_NAME}Targets
-                DESTINATION ${LIB_INSTALL_DIR}/${MSVC_ARCH}/${PROJECT_NAME}/cmake
-                COMPONENT cmake
-                )
-            set(PROJECT_TARGETS_IN_CONFIG_FILE
-                "include(\${${PROJECT_NAME}_LIB_DIR}/${MSVC_ARCH}/${PROJECT_NAME}/cmake/${PROJECT_NAME}Targets.cmake)\n"
-                PARENT_SCOPE)
-        endif()
+        export(EXPORT ${PROJECT_NAME}Targets FILE ${PROJECT_BINARY_DIR}/cmake/packaging/${PROJECT_NAME}Targets.cmake)
+        install(EXPORT ${PROJECT_NAME}Targets
+            DESTINATION ${LIB_INSTALL_DIR}/${PROJECT_NAME}/cmake
+            COMPONENT cmake
+            )
 
         # Install pdb files
         install(DIRECTORY ${PROJECT_BINARY_DIR}/lib/
-            DESTINATION ${LIB_INSTALL_DIR}/${MSVC_ARCH}
+            DESTINATION ${LIB_INSTALL_DIR}
             COMPONENT libraries_${MSVC_ARCH}
             FILES_MATCHING
             PATTERN "*.pdb"
@@ -179,9 +173,6 @@ else()
         DESTINATION ${LIB_INSTALL_DIR}/${PROJECT_NAME}/cmake
         COMPONENT cmake
         )
-    set(PROJECT_TARGETS_IN_CONFIG_FILE
-        "include(\${${PROJECT_NAME}_LIB_DIR}/${PROJECT_NAME}/cmake/${PROJECT_NAME}Targets.cmake)\n"
-        PARENT_SCOPE)
 
     set(CPACK_COMPONENT_LIBRARIES_DISPLAY_NAME "Libraries" PARENT_SCOPE)
     set(CPACK_COMPONENT_LIBRARIES_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} libraries" PARENT_SCOPE)

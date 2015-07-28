@@ -33,15 +33,12 @@ endmacro()
 
 macro(install_msvc_libraries platform)
     install(DIRECTORY ${PROJECT_BINARY_DIR}/../${platform}/lib/
-        DESTINATION ${LIB_INSTALL_DIR}/${platform}
+        DESTINATION lib/${platform}
         COMPONENT libraries_${platform}
         FILES_MATCHING
         PATTERN "*${PROJECT_NAME}*-${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION}*"
         PATTERN "*.cmake"
         )
-    set(PROJECT_TARGETS_IN_CONFIG_FILE "${PROJECT_TARGETS_IN_CONFIG_FILE}"
-        "include(\${${PROJECT_NAME}_LIB_DIR}/${platform}/${PROJECT_NAME}/cmake/${PROJECT_NAME}Targets.cmake\n)"
-        PARENT_SCOPE)
     string(TOUPPER "${platform}" ${platform}_UPPER)
     set(CPACK_COMPONENT_LIBRARIES_${${platform}_UPPER}_DISPLAY_NAME "${platform}" PARENT_SCOPE)
     set(CPACK_COMPONENT_LIBRARIES_${${platform}_UPPER}_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} libraries for platform ${platform}" PARENT_SCOPE)

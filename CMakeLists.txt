@@ -102,7 +102,11 @@ endif()
 # Installation paths
 ###############################################################################
 set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for C++ headers")
-set(LIB_INSTALL_DIR lib/ CACHE PATH "Installation directory for libraries")
+if(MSVC OR MSVC_IDE)
+    set(LIB_INSTALL_DIR lib/${MSVC_ARCH}/ CACHE PATH "Installation directory for libraries")
+else()
+    set(LIB_INSTALL_DIR lib/ CACHE PATH "Installation directory for libraries")
+endif()
 
 ###############################################################################
 # Compile library.

@@ -36,35 +36,35 @@ if(MSVC OR MSVC_IDE)
         generate_msvc_libraries(i86Win32VS2013)
         generate_msvc_libraries(x64Win64VS2013)
     else()
-        add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES})
-        set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME ${PROJECT_NAME}-${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION})
-        set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_OUTPUT_NAME ${PROJECT_NAME}d-${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION})
+        add_library(${PROJECT_NAME}_${MSVC_ARCH} SHARED ${${PROJECT_NAME}_SOURCES})
+        set_target_properties(${PROJECT_NAME}_${MSVC_ARCH} PROPERTIES OUTPUT_NAME ${PROJECT_NAME}-${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION})
+        set_target_properties(${PROJECT_NAME}_${MSVC_ARCH} PROPERTIES DEBUG_OUTPUT_NAME ${PROJECT_NAME}d-${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION})
 
-        add_library(${PROJECT_NAME}_static STATIC ${${PROJECT_NAME}_SOURCES})
+        add_library(${PROJECT_NAME}_${MSVC_ARCH}_static STATIC ${${PROJECT_NAME}_SOURCES})
         # Rename the library to have a "lib" before.
-        set_target_properties(${PROJECT_NAME}_static PROPERTIES OUTPUT_NAME lib${PROJECT_NAME}-${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION})
-        set_target_properties(${PROJECT_NAME}_static PROPERTIES DEBUG_OUTPUT_NAME lib${PROJECT_NAME}d-${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION})
+        set_target_properties(${PROJECT_NAME}_${MSVC_ARCH}_static PROPERTIES OUTPUT_NAME lib${PROJECT_NAME}-${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION})
+        set_target_properties(${PROJECT_NAME}_${MSVC_ARCH}_static PROPERTIES DEBUG_OUTPUT_NAME lib${PROJECT_NAME}d-${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION})
 
-        set_target_properties(${PROJECT_NAME} ${PROJECT_NAME}_static PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG
+        set_target_properties(${PROJECT_NAME}_${MSVC_ARCH} ${PROJECT_NAME}_${MSVC_ARCH}_static PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG
             ${PROJECT_BINARY_DIR}/lib)
-        set_target_properties(${PROJECT_NAME} ${PROJECT_NAME}_static PROPERTIES ARCHIVE_OUTPUT_DIRECTORY_DEBUG
+        set_target_properties(${PROJECT_NAME}_${MSVC_ARCH} ${PROJECT_NAME}_${MSVC_ARCH}_static PROPERTIES ARCHIVE_OUTPUT_DIRECTORY_DEBUG
             ${PROJECT_BINARY_DIR}/lib)
-        set_target_properties(${PROJECT_NAME} ${PROJECT_NAME}_static PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE
+        set_target_properties(${PROJECT_NAME}_${MSVC_ARCH} ${PROJECT_NAME}_${MSVC_ARCH}_static PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE
             ${PROJECT_BINARY_DIR}/lib)
-        set_target_properties(${PROJECT_NAME} ${PROJECT_NAME}_static PROPERTIES ARCHIVE_OUTPUT_DIRECTORY_RELEASE
+        set_target_properties(${PROJECT_NAME}_${MSVC_ARCH} ${PROJECT_NAME}_${MSVC_ARCH}_static PROPERTIES ARCHIVE_OUTPUT_DIRECTORY_RELEASE
             ${PROJECT_BINARY_DIR}/lib)
 
         # Export symbols in DLL libraries
-        target_compile_definitions(${PROJECT_NAME} PRIVATE ${PROJECT_NAME_UPPER}_DYN_LINK)
+        target_compile_definitions(${PROJECT_NAME}_${MSVC_ARCH} PRIVATE ${PROJECT_NAME_UPPER}_DYN_LINK)
 
         # Define public headers
-        target_include_directories(${PROJECT_NAME} PUBLIC
+        target_include_directories(${PROJECT_NAME}_${MSVC_ARCH} PUBLIC
             $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}>
             $<INSTALL_INTERFACE:include>
             )
 
         # Define public headers for static library
-        target_include_directories(${PROJECT_NAME}_static PUBLIC
+        target_include_directories(${PROJECT_NAME}_${MSVC_ARCH}_static PUBLIC
             $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}>
             $<INSTALL_INTERFACE:include>
             )
@@ -124,19 +124,31 @@ endif()
 
 # Install libraries
 if(MSVC OR MSVC_IDE)
+    set(PROJECT_TARGETS_IN_CONFIG_FILE "")
     if(EPROSIMA_INSTALLER)
         install_msvc_libraries(i86Win32VS2010)
         install_msvc_libraries(x64Win64VS2010)
         install_msvc_libraries(i86Win32VS2013)
         install_msvc_libraries(x64Win64VS2013)
     else()
-        install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_static
+        install(TARGETS ${PROJECT_NAME}_${MSVC_ARCH} ${PROJECT_NAME}_${MSVC_ARCH}_static
             EXPORT ${PROJECT_NAME}Targets
             RUNTIME DESTINATION ${LIB_INSTALL_DIR}/${MSVC_ARCH}
             LIBRARY DESTINATION ${LIB_INSTALL_DIR}/${MSVC_ARCH}
             ARCHIVE DESTINATION ${LIB_INSTALL_DIR}/${MSVC_ARCH}
             COMPONENT libraries_${MSVC_ARCH}
             )
+
+        if(NOT EPROSIMA_INSTALLER)
+            export(EXPORT ${PROJECT_NAME}Targets FILE ${PROJECT_BINARY_DIR}/cmake/packaging/${PROJECT_NAME}Targets.cmake)
+            install(EXPORT ${PROJECT_NAME}Targets
+                DESTINATION ${LIB_INSTALL_DIR}/${MSVC_ARCH}/${PROJECT_NAME}/cmake
+                COMPONENT cmake
+                )
+            set(PROJECT_TARGETS_IN_CONFIG_FILE
+                "include(\${${PROJECT_NAME}_LIB_DIR}/${MSVC_ARCH}/${PROJECT_NAME}/cmake/${PROJECT_NAME}Targets.cmake)\n"
+                PARENT_SCOPE)
+        endif()
 
         # Install pdb files
         install(DIRECTORY ${PROJECT_BINARY_DIR}/lib/
@@ -161,6 +173,15 @@ else()
         ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
         COMPONENT libraries
         )
+
+    export(EXPORT ${PROJECT_NAME}Targets FILE ${PROJECT_BINARY_DIR}/cmake/packaging/${PROJECT_NAME}Targets.cmake)
+    install(EXPORT ${PROJECT_NAME}Targets
+        DESTINATION ${LIB_INSTALL_DIR}/${PROJECT_NAME}/cmake
+        COMPONENT cmake
+        )
+    set(PROJECT_TARGETS_IN_CONFIG_FILE
+        "include(\${${PROJECT_NAME}_LIB_DIR}/${PROJECT_NAME}/cmake/${PROJECT_NAME}Targets.cmake)\n"
+        PARENT_SCOPE)
 
     set(CPACK_COMPONENT_LIBRARIES_DISPLAY_NAME "Libraries" PARENT_SCOPE)
     set(CPACK_COMPONENT_LIBRARIES_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} libraries" PARENT_SCOPE)

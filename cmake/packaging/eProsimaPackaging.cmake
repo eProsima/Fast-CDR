@@ -24,16 +24,16 @@ set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/${PROJECT_NAME_UPPER}_LIB
 if(NOT((MSVC OR MSVC_IDE) AND EPROSIMA_INSTALLER))
     include(CMakePackageConfigHelpers)
     configure_package_config_file(${PROJECT_SOURCE_DIR}/cmake/packaging/Config.cmake.in
-        ${PROJECT_BINARY_DIR}/cmake/packaging/${PROJECT_NAME}Config.cmake
+        ${PROJECT_BINARY_DIR}/cmake/config/${PROJECT_NAME}Config.cmake
         INSTALL_DESTINATION ${LIB_INSTALL_DIR}/${PROJECT_NAME}/cmake
         PATH_VARS INCLUDE_INSTALL_DIR LIB_INSTALL_DIR
         )
-    write_basic_package_version_file(${PROJECT_BINARY_DIR}/cmake/packaging/${PROJECT_NAME}ConfigVersion.cmake
+    write_basic_package_version_file(${PROJECT_BINARY_DIR}/cmake/config/${PROJECT_NAME}ConfigVersion.cmake
         VERSION ${PROJECT_VERSION}
         COMPATIBILITY SameMajorVersion
         )
-    install(FILES ${PROJECT_BINARY_DIR}/cmake/packaging/${PROJECT_NAME}Config.cmake
-        ${PROJECT_BINARY_DIR}/cmake/packaging/${PROJECT_NAME}ConfigVersion.cmake
+    install(FILES ${PROJECT_BINARY_DIR}/cmake/config/${PROJECT_NAME}Config.cmake
+        ${PROJECT_BINARY_DIR}/cmake/config/${PROJECT_NAME}ConfigVersion.cmake
         DESTINATION ${LIB_INSTALL_DIR}/${PROJECT_NAME}/cmake
         COMPONENT cmake
         )

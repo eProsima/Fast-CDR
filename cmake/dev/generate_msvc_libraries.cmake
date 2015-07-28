@@ -39,7 +39,7 @@ macro(install_msvc_libraries platform)
         PATTERN "*${PROJECT_NAME}*-${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION}*"
         )
     install(DIRECTORY ${PROJECT_BINARY_DIR}/../${platform}/cmake/config/
-        DESTINATION lib/${platform}
+        DESTINATION lib/${platform}/${PROJECT_NAME}/cmake
         COMPONENT cmake
         FILES_MATCHING
         PATTERN "*.cmake"

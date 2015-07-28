@@ -139,7 +139,7 @@ if(MSVC OR MSVC_IDE)
             )
 
         # Install pdb files
-        install(DIRECTORY ${LIB_INSTALL_DIR}/${MSVC_ARCH}/
+        install(DIRECTORY ${PROJECT_BINARY_DIR}/lib/${MSVC_ARCH}/
             DESTINATION ${LIB_INSTALL_DIR}/${MSVC_ARCH}
             COMPONENT libraries_${MSVC_ARCH}
             FILES_MATCHING

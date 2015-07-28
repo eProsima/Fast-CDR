@@ -138,6 +138,14 @@ if(MSVC OR MSVC_IDE)
             COMPONENT libraries_${MSVC_ARCH}
             )
 
+        # Install pdb files
+        install(DIRECTORY ${LIB_INSTALL_DR}/${MSVC_ARCH}/
+            DESTINATION ${LIB_INSTALL_DIR}/${MSVC_ARCH}
+            COMPONENT libraries_${MSVC_ARCH}
+            FILES_MATCHING
+            PATTERN "*.pdb"
+            )
+
         string(TOUPPER "${MSVC_ARCH}" MSVC_ARCH_UPPER)
         set(CPACK_COMPONENT_LIBRARIES_${MSVC_ARCH_UPPER}_DISPLAY_NAME "${MSVC_ARCH}" PARENT_SCOPE)
         set(CPACK_COMPONENT_LIBRARIES_${MSVC_ARCH_UPPER}_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} libraries for platform ${MSVC_ARCH}" PARENT_SCOPE)

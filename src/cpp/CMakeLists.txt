@@ -23,11 +23,6 @@ configure_file(${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/config.h.in
 # If Windows, set define for export dll functions
 add_definitions(-D${PROJECT_NAME_UPPER}_SOURCE)
 
-# Include public api
-include_directories(${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}
-    ${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}
-    )
-
 # Create libraries
 if(MSVC OR MSVC_IDE)
     if(EPROSIMA_INSTALLER)

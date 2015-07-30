@@ -6,7 +6,7 @@
  *
  *************************************************************************/
 
-#include <exceptions/NotEnoughMemoryException.h>
+#include <fastcdr/exceptions/NotEnoughMemoryException.h>
 
 using namespace eprosima::fastcdr::exception;
 

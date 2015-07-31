@@ -78,7 +78,7 @@ endif()
 # Load external eProsima projects.
 ###############################################################################
 
-option(EPROSIMA_BUILD "Activate the use of internal thirdparties" OFF)
+option(EPROSIMA_BUILD "Activate internal building" OFF)
 
 if(EPROSIMA_INSTALLER)
     set(EPROSIMA_BUILD ON)

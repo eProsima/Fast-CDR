@@ -39,7 +39,7 @@ namespace eprosima
                      */
                     Cdr_DllAPI NotEnoughMemoryException(const NotEnoughMemoryException &ex);
 
-#if HAVE_CXX11
+#if HAVE_CXX0X
                     /*!
                      * @brief Default move constructor.
                      *
@@ -55,7 +55,7 @@ namespace eprosima
                      */
                     Cdr_DllAPI NotEnoughMemoryException& operator=(const NotEnoughMemoryException &ex);
 
-#if HAVE_CXX11
+#if HAVE_CXX0X
                     /*!
                      * @brief Assigment operation.
                      *

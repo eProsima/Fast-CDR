@@ -1,7 +1,7 @@
 ###############################################################################
 # CMake build rules for FastCDR                                               #
 ###############################################################################
-cmake_minimum_required(VERSION 2.8.7)
+cmake_minimum_required(VERSION 2.8.11)
 
 # Set CMAKE_BUILD_TYPE to Release by default.
 if(DEFINED CMAKE_BUILD_TYPE)
@@ -78,7 +78,7 @@ endif()
 # Load external eProsima projects.
 ###############################################################################
 
-option(EPROSIMA_BUILD "Activate the use of internal thirdparties" OFF)
+option(EPROSIMA_BUILD "Activate internal building" OFF)
 
 if(EPROSIMA_INSTALLER)
     set(EPROSIMA_BUILD ON)

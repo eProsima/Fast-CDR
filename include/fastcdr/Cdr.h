@@ -17,7 +17,7 @@
 #include <string>
 #include <vector>
 
-#if HAVE_CXX11
+#if HAVE_CXX0X
 #include <array>
 #endif
 
@@ -291,7 +291,7 @@ namespace eprosima
                  */
                 inline Cdr& operator<<(const std::string &string_t){return serialize(string_t);}
 
-#if HAVE_CXX11
+#if HAVE_CXX0X
                 /*!
                  * @brief This operator template is used to serialize arrays.
                  * @param array_t The array that will be serialized in the buffer.
@@ -422,7 +422,7 @@ namespace eprosima
                  */
                 inline Cdr& operator>>(std::string &string_t){return deserialize(string_t);}
 
-#if HAVE_CXX11
+#if HAVE_CXX0X
                 /*!
                  * @brief This operator template is used to deserialize arrays.
                  * @param array_t The variable that will store the array read from the buffer.
@@ -731,7 +731,7 @@ namespace eprosima
 				inline
                 Cdr& serialize(const std::string &string_t, Endianness endianness)  {return serialize(string_t.c_str(), endianness);}
 
-#if HAVE_CXX11
+#if HAVE_CXX0X
                 /*!
                  * @brief This function template serializes an array.
                  * @param array_t The array that will be serialized in the buffer.
@@ -760,7 +760,7 @@ namespace eprosima
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
-#if !defined(_MSC_VER) && HAVE_CXX11
+#if !defined(_MSC_VER) && HAVE_CXX0X
                 template<class _T = bool>
                     Cdr& serialize(const std::vector<bool> &vector_t)
                     {
@@ -1522,7 +1522,7 @@ namespace eprosima
 					return *this;
 				}
 
-#if HAVE_CXX11
+#if HAVE_CXX0X
                 /*!
                  * @brief This function template deserializes an array.
                  * @param array_t The variable that will store the array read from the buffer.
@@ -1551,7 +1551,7 @@ namespace eprosima
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
                  */
-#if !defined(_MSC_VER) && HAVE_CXX11
+#if !defined(_MSC_VER) && HAVE_CXX0X
                 template<class _T = bool>
                     Cdr& deserialize(std::vector<bool> &vector_t)
                     {
@@ -2017,7 +2017,7 @@ namespace eprosima
 
                 Cdr& deserializeBoolSequence(std::vector<bool> &vector_t);
 
-#if HAVE_CXX11
+#if HAVE_CXX0X
                 /*!
                  * @brief This function template detects the content type of the STD container array and serializes the array.
                  * @param array_t The array that will be serialized in the buffer.

@@ -6,7 +6,7 @@
  *
  *************************************************************************/
 
-#include <exceptions/BadParamException.h>
+#include <fastcdr/exceptions/BadParamException.h>
 
 using namespace eprosima::fastcdr::exception;
 
@@ -20,7 +20,7 @@ BadParamException::BadParamException(const BadParamException &ex) : Exception(ex
 {
 }
 
-#if HAVE_CXX11
+#if HAVE_CXX0X
 BadParamException::BadParamException(BadParamException&& ex) : Exception(std::move(ex))
 {
 }
@@ -36,7 +36,7 @@ BadParamException& BadParamException::operator=(const BadParamException &ex)
     return *this;
 }
 
-#if HAVE_CXX11
+#if HAVE_CXX0X
 BadParamException& BadParamException::operator=(BadParamException&& ex)
 {
     if(this != &ex)

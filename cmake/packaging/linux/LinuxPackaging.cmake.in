@@ -7,7 +7,7 @@ if(${CPACK_GENERATOR} STREQUAL "TGZ" )
     if(${CPACK_TOPLEVEL_TAG} STREQUAL "Linux")
         # Define name of the TGZ file
         set(CPACK_PACKAGE_FILE_NAME eProsima_${PROJECT_NAME_STYLED}-@PROJECT_VERSION@-Linux)
-        set(CPACK_COMPONENTS_ALL headers sources licenses)
+        set(CPACK_COMPONENTS_ALL headers sources)
         set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
         set(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE ON)
 

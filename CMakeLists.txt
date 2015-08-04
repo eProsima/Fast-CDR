@@ -107,6 +107,12 @@ if(MSVC OR MSVC_IDE)
 else()
     set(LIB_INSTALL_DIR lib/ CACHE PATH "Installation directory for libraries")
 endif()
+set(DATA_INSTALL_DIR share/ CACHE PATH "Installation directory for data")
+if(WIN32)
+    set(LICENSE_INSTALL_DIR . CACHE PATH "Installation directory for licenses")
+else()
+    set(LICENSE_INSTALL_DIR ${DATA_INSTALL_DIR}/${PROJECT_NAME} CACHE PATH "Installation directory for licenses")
+endif()
 
 ###############################################################################
 # Compile library.
@@ -126,7 +132,7 @@ add_subdirectory(test)
 # Install licenses
 install(FILES ${PROJECT_SOURCE_DIR}/FASTCDR_LIBRARY_LICENSE.txt
     ${PROJECT_SOURCE_DIR}/LGPLv3_LICENSE.txt
-    DESTINATION .
+    DESTINATION ${LICENSE_INSTALL_DIR}
     COMPONENT licenses
     )
 set(CPACK_COMPONENT_LICENSES_HIDDEN 1)

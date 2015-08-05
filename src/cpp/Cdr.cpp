@@ -1777,3 +1777,27 @@ Cdr& Cdr::deserializeBoolSequence(std::vector<bool> &vector_t)
 
     return *this;
 }
+
+Cdr& Cdr::deserializeStringSequence(std::string *&sequence_t, size_t &numElements)
+{
+    uint32_t seqLength = 0;
+    state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        sequence_t = (std::string*)calloc(seqLength, sizeof(std::string));
+        for(uint32_t count; count < seqLength; ++count)
+            new(&sequence_t[count]) std::string;
+        deserializeArray(sequence_t, seqLength);
+    }
+    catch(eprosima::fastcdr::exception::Exception &ex)
+    {
+        setState(state);
+        ex.raise();
+    }
+
+    numElements = seqLength;
+    return *this;
+}

@@ -122,9 +122,12 @@ add_subdirectory(src/cpp)
 ###############################################################################
 # Testing
 ###############################################################################
-enable_testing()
-include(CTest)
-add_subdirectory(test)
+find_package(GTest)
+if(GTEST_FOUND)
+    enable_testing()
+    include(CTest)
+    add_subdirectory(test)
+endif()
 
 ###############################################################################
 # Packaging

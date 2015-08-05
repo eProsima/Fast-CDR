@@ -1224,6 +1224,14 @@ namespace eprosima
                         return *this;
                     }
 
+#if !defined(_MSC_VER) && HAVE_CXX0X
+                template<class _T = std::string>
+                    FastCdr& deserializeSequence(std::string *&sequence_t, size_t &numElements)
+                    {
+                        return deserializeStringSequence(sequence_t, numElements);
+                    }
+#endif
+
                 /*!
                  * @brief This function template deserializes a raw sequence.
                  * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
@@ -1256,11 +1264,21 @@ namespace eprosima
                         return *this;
                     }
 
+#ifdef _MSC_VER
+				template<>
+					FastCdr& deserializeSequence<std::string>(std::string *&sequence_t, size_t &numElements)
+					{
+                        return deserializeStringSequence(sequence_t, numElements);
+					}
+#endif
+
             private:
 
                 FastCdr& serializeBoolSequence(const std::vector<bool> &vector_t);
 
                 FastCdr& deserializeBoolSequence(std::vector<bool> &vector_t);
+
+                FastCdr& deserializeStringSequence(std::string *&sequence_t, size_t &numElements);
 
 #if HAVE_CXX0X
                 /*!

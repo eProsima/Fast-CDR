@@ -1300,6 +1300,8 @@ TEST(CDRResizeTests, SequenceOctet)
 
     EXPECT_EQ(octet_seq_len, 5);
     EXPECT_ARRAY_EQ(octet_seq_value, octet_seq_t, octet_seq_len);
+
+    free(octet_seq_value);
 }
 
 TEST(CDRResizeTests, SequenceChar)
@@ -1325,6 +1327,8 @@ TEST(CDRResizeTests, SequenceChar)
 
     EXPECT_EQ(char_seq_len, 5);
     EXPECT_ARRAY_EQ(char_seq_value, char_seq_t, char_seq_len);
+
+    free(char_seq_value);
 }
 
 TEST(CDRResizeTests, SequenceUnsignedShort)
@@ -1350,6 +1354,8 @@ TEST(CDRResizeTests, SequenceUnsignedShort)
 
     EXPECT_EQ(ushort_seq_len, 5);
     EXPECT_ARRAY_EQ(ushort_seq_value, ushort_seq_t, ushort_seq_len);
+
+    free(ushort_seq_value);
 }
 
 TEST(CDRResizeTests, SequenceShort)
@@ -1375,6 +1381,8 @@ TEST(CDRResizeTests, SequenceShort)
 
     EXPECT_EQ(short_seq_len, 5);
     EXPECT_ARRAY_EQ(short_seq_value, short_seq_t, short_seq_len);
+
+    free(short_seq_value);
 }
 
 TEST(CDRResizeTests, SequenceUnsignedLong)
@@ -1400,6 +1408,8 @@ TEST(CDRResizeTests, SequenceUnsignedLong)
 
     EXPECT_EQ(ulong_seq_len, 5);
     EXPECT_ARRAY_EQ(ulong_seq_value, ulong_seq_t, ulong_seq_len);
+
+    free(ulong_seq_value);
 }
 
 TEST(CDRResizeTests, SequenceLong)
@@ -1425,6 +1435,8 @@ TEST(CDRResizeTests, SequenceLong)
 
     EXPECT_EQ(long_seq_len, 5);
     EXPECT_ARRAY_EQ(long_seq_value, long_seq_t, long_seq_len);
+
+    free(long_seq_value);
 }
 
 TEST(CDRResizeTests, SequenceUnsignedLongLong)
@@ -1450,6 +1462,8 @@ TEST(CDRResizeTests, SequenceUnsignedLongLong)
 
     EXPECT_EQ(ulonglong_seq_len, 5);
     EXPECT_ARRAY_EQ(ulonglong_seq_value, ulonglong_seq_t, ulonglong_seq_len);
+
+    free(ulonglong_seq_value);
 }
 
 TEST(CDRResizeTests, SequenceLongLong)
@@ -1475,6 +1489,8 @@ TEST(CDRResizeTests, SequenceLongLong)
 
     EXPECT_EQ(longlong_seq_len, 5);
     EXPECT_ARRAY_EQ(longlong_seq_value, longlong_seq_t, longlong_seq_len);
+
+    free(longlong_seq_value);
 }
 
 TEST(CDRResizeTests, SequenceFloat)
@@ -1500,6 +1516,8 @@ TEST(CDRResizeTests, SequenceFloat)
 
     EXPECT_EQ(float_seq_len, 5);
     EXPECT_ARRAY_FLOAT_EQ(float_seq_value, float_seq_t, float_seq_len);
+
+    free(float_seq_value);
 }
 
 TEST(CDRResizeTests, SequenceDouble)
@@ -1525,6 +1543,8 @@ TEST(CDRResizeTests, SequenceDouble)
 
     EXPECT_EQ(double_seq_len, 5);
     EXPECT_ARRAY_DOUBLE_EQ(double_seq_value, double_seq_t, double_seq_len);
+
+    free(double_seq_value);
 }
 
 TEST(CDRResizeTests, SequenceBoolean)
@@ -1550,6 +1570,8 @@ TEST(CDRResizeTests, SequenceBoolean)
 
     EXPECT_EQ(bool_seq_len, 5);
     EXPECT_ARRAY_EQ(bool_seq_value, bool_seq_t, bool_seq_len);
+
+    free(bool_seq_value);
 }
 
 TEST(CDRResizeTests, SequenceString)
@@ -1575,6 +1597,10 @@ TEST(CDRResizeTests, SequenceString)
 
     EXPECT_EQ(string_seq_len, 5);
     EXPECT_ARRAY_EQ(string_seq_value, string_seq_t, string_seq_len);
+
+    for(size_t count = 0; count < string_seq_len; ++count)
+        string_seq_value[count].~basic_string();
+    free(string_seq_value);
 }
 
 TEST(CDRResizeTests, CString)
@@ -1599,6 +1625,8 @@ TEST(CDRResizeTests, CString)
     });
 
     EXPECT_EQ(strcmp(c_string_value, c_string_t) , 0);
+
+    free(c_string_value);
 }
 
 TEST(CDRResizeTests, Complete)
@@ -1769,6 +1797,18 @@ TEST(CDRResizeTests, Complete)
     EXPECT_ARRAY_DOUBLE_EQ(double_seq_value, double_seq_t, 5);
 
     EXPECT_EQ(strcmp(c_string_t, c_string_value), 0);
+
+    free(octet_seq_value);
+    free(char_seq_value);
+    free(ushort_seq_value);
+    free(short_seq_value);
+    free(ulong_seq_value);
+    free(long_seq_value);
+    free(ulonglong_seq_value);
+    free(longlong_seq_value);
+    free(float_seq_value);
+    free(double_seq_value);
+    free(c_string_value);
 }
 
 TEST(FastCDRResizeTests, Octet)
@@ -2970,6 +3010,8 @@ TEST(FastCDRResizeTests, SequenceOctet)
 
     EXPECT_EQ(octet_seq_len, 5);
     EXPECT_ARRAY_EQ(octet_seq_value, octet_seq_t, octet_seq_len);
+
+    free(octet_seq_value);
 }
 
 TEST(FastCDRResizeTests, SequenceChar)
@@ -2995,6 +3037,8 @@ TEST(FastCDRResizeTests, SequenceChar)
 
     EXPECT_EQ(char_seq_len, 5);
     EXPECT_ARRAY_EQ(char_seq_value, char_seq_t, char_seq_len);
+
+    free(char_seq_value);
 }
 
 TEST(FastCDRResizeTests, SequenceUnsignedShort)
@@ -3020,6 +3064,8 @@ TEST(FastCDRResizeTests, SequenceUnsignedShort)
 
     EXPECT_EQ(ushort_seq_len, 5);
     EXPECT_ARRAY_EQ(ushort_seq_value, ushort_seq_t, ushort_seq_len);
+
+    free(ushort_seq_value);
 }
 
 TEST(FastCDRResizeTests, SequenceShort)
@@ -3045,6 +3091,8 @@ TEST(FastCDRResizeTests, SequenceShort)
 
     EXPECT_EQ(short_seq_len, 5);
     EXPECT_ARRAY_EQ(short_seq_value, short_seq_t, short_seq_len);
+
+    free(short_seq_value);
 }
 
 TEST(FastCDRResizeTests, SequenceUnsignedLong)
@@ -3070,6 +3118,8 @@ TEST(FastCDRResizeTests, SequenceUnsignedLong)
 
     EXPECT_EQ(ulong_seq_len, 5);
     EXPECT_ARRAY_EQ(ulong_seq_value, ulong_seq_t, ulong_seq_len);
+
+    free(ulong_seq_value);
 }
 
 TEST(FastCDRResizeTests, SequenceLong)
@@ -3095,6 +3145,8 @@ TEST(FastCDRResizeTests, SequenceLong)
 
     EXPECT_EQ(long_seq_len, 5);
     EXPECT_ARRAY_EQ(long_seq_value, long_seq_t, long_seq_len);
+
+    free(long_seq_value);
 }
 
 TEST(FastCDRResizeTests, SequenceUnsignedLongLong)
@@ -3120,6 +3172,8 @@ TEST(FastCDRResizeTests, SequenceUnsignedLongLong)
 
     EXPECT_EQ(ulonglong_seq_len, 5);
     EXPECT_ARRAY_EQ(ulonglong_seq_value, ulonglong_seq_t, ulonglong_seq_len);
+
+    free(ulonglong_seq_value);
 }
 
 TEST(FastCDRResizeTests, SequenceLongLong)
@@ -3145,6 +3199,8 @@ TEST(FastCDRResizeTests, SequenceLongLong)
 
     EXPECT_EQ(longlong_seq_len, 5);
     EXPECT_ARRAY_EQ(longlong_seq_value, longlong_seq_t, longlong_seq_len);
+
+    free(longlong_seq_value);
 }
 
 TEST(FastCDRResizeTests, SequenceFloat)
@@ -3170,6 +3226,8 @@ TEST(FastCDRResizeTests, SequenceFloat)
 
     EXPECT_EQ(float_seq_len, 5);
     EXPECT_ARRAY_FLOAT_EQ(float_seq_value, float_seq_t, float_seq_len);
+
+    free(float_seq_value);
 }
 
 TEST(FastCDRResizeTests, SequenceDouble)
@@ -3195,6 +3253,8 @@ TEST(FastCDRResizeTests, SequenceDouble)
 
     EXPECT_EQ(double_seq_len, 5);
     EXPECT_ARRAY_DOUBLE_EQ(double_seq_value, double_seq_t, double_seq_len);
+
+    free(double_seq_value);
 }
 
 TEST(FastCDRResizeTests, SequenceBoolean)
@@ -3220,6 +3280,8 @@ TEST(FastCDRResizeTests, SequenceBoolean)
 
     EXPECT_EQ(bool_seq_len, 5);
     EXPECT_ARRAY_EQ(bool_seq_value, bool_seq_t, bool_seq_len);
+
+    free(bool_seq_value);
 }
 
 TEST(FastCDRResizeTests, SequenceString)
@@ -3245,6 +3307,10 @@ TEST(FastCDRResizeTests, SequenceString)
 
     EXPECT_EQ(string_seq_len, 5);
     EXPECT_ARRAY_EQ(string_seq_value, string_seq_t, string_seq_len);
+
+    for(size_t count = 0; count < string_seq_len; ++count)
+        string_seq_value[count].~basic_string();
+    free(string_seq_value);
 }
 
 TEST(FastCDRResizeTests, CString)
@@ -3269,6 +3335,8 @@ TEST(FastCDRResizeTests, CString)
     });
 
     EXPECT_EQ(strcmp(c_string_value, c_string_t) , 0);
+
+    free(c_string_value);
 }
 
 
@@ -3440,4 +3508,16 @@ TEST(FastCDRResizeTests, Complete)
     EXPECT_ARRAY_DOUBLE_EQ(double_seq_value, double_seq_t, 5);
 
     EXPECT_EQ(strcmp(c_string_t, c_string_value), 0);
+
+    free(octet_seq_value);
+    free(char_seq_value);
+    free(ushort_seq_value);
+    free(short_seq_value);
+    free(ulong_seq_value);
+    free(long_seq_value);
+    free(ulonglong_seq_value);
+    free(longlong_seq_value);
+    free(float_seq_value);
+    free(double_seq_value);
+    free(c_string_value);
 }

@@ -2465,6 +2465,8 @@ TEST(CDRTests, SequenceOctet)
     EXPECT_EQ(octet_seq_len, 5);
     EXPECT_ARRAY_EQ(octet_seq_value, octet_seq_t, octet_seq_len);
 
+    free(octet_seq_value);
+
     // Check bad case without space
     char buffer_bad[1];
 
@@ -2514,6 +2516,8 @@ TEST(CDRTests, SequenceChar)
 
     EXPECT_EQ(char_seq_len, 5);
     EXPECT_ARRAY_EQ(char_seq_value, char_seq_t, char_seq_len);
+
+    free(char_seq_value);
 
     // Check bad case without space
     char buffer_bad[1];
@@ -2565,6 +2569,8 @@ TEST(CDRTests, SequenceUnsignedShort)
     EXPECT_EQ(ushort_seq_len, 5);
     EXPECT_ARRAY_EQ(ushort_seq_value, ushort_seq_t, ushort_seq_len);
 
+    free(ushort_seq_value);
+
     // Check bad case without space
     char buffer_bad[1];
 
@@ -2614,6 +2620,8 @@ TEST(CDRTests, SequenceShort)
 
     EXPECT_EQ(short_seq_len, 5);
     EXPECT_ARRAY_EQ(short_seq_value, short_seq_t, short_seq_len);
+
+    free(short_seq_value);
 
     // Check bad case without space
     char buffer_bad[1];
@@ -2665,6 +2673,8 @@ TEST(CDRTests, SequenceUnsignedLong)
     EXPECT_EQ(ulong_seq_len, 5);
     EXPECT_ARRAY_EQ(ulong_seq_value, ulong_seq_t, ulong_seq_len);
 
+    free(ulong_seq_value);
+
     // Check bad case without space
     char buffer_bad[1];
 
@@ -2714,6 +2724,8 @@ TEST(CDRTests, SequenceLong)
 
     EXPECT_EQ(long_seq_len, 5);
     EXPECT_ARRAY_EQ(long_seq_value, long_seq_t, long_seq_len);
+
+    free(long_seq_value);
 
     // Check bad case without space
     char buffer_bad[1];
@@ -2765,6 +2777,8 @@ TEST(CDRTests, SequenceUnsignedLongLong)
     EXPECT_EQ(ulonglong_seq_len, 5);
     EXPECT_ARRAY_EQ(ulonglong_seq_value, ulonglong_seq_t, ulonglong_seq_len);
 
+    free(ulonglong_seq_value);
+
     // Check bad case without space
     char buffer_bad[1];
 
@@ -2814,6 +2828,8 @@ TEST(CDRTests, SequenceLongLong)
 
     EXPECT_EQ(longlong_seq_len, 5);
     EXPECT_ARRAY_EQ(longlong_seq_value, longlong_seq_t, longlong_seq_len);
+
+    free(longlong_seq_value);
 
     // Check bad case without space
     char buffer_bad[1];
@@ -2865,6 +2881,8 @@ TEST(CDRTests, SequenceFloat)
     EXPECT_EQ(float_seq_len, 5);
     EXPECT_ARRAY_FLOAT_EQ(float_seq_value, float_seq_t, float_seq_len);
 
+    free(float_seq_value);
+
     // Check bad case without space
     char buffer_bad[1];
 
@@ -2914,6 +2932,8 @@ TEST(CDRTests, SequenceDouble)
 
     EXPECT_EQ(double_seq_len, 5);
     EXPECT_ARRAY_DOUBLE_EQ(double_seq_value, double_seq_t, double_seq_len);
+
+    free(double_seq_value);
 
     // Check bad case without space
     char buffer_bad[1];
@@ -2965,6 +2985,8 @@ TEST(CDRTests, SequenceBoolean)
     EXPECT_EQ(bool_seq_len, 5);
     EXPECT_ARRAY_EQ(bool_seq_value, bool_seq_t, bool_seq_len);
 
+    free(bool_seq_value);
+
     // Check bad case without space
     char buffer_bad[1];
 
@@ -3015,6 +3037,11 @@ TEST(CDRTests, SequenceString)
     EXPECT_EQ(string_seq_len, 5);
     EXPECT_ARRAY_EQ(string_seq_value, string_seq_t, string_seq_len);
 
+    for(size_t count = 0; count < string_seq_len; ++count)
+        string_seq_value[count].~basic_string();
+
+    free(string_seq_value);
+
     // Check bad case without space
     char buffer_bad[1];
 
@@ -3063,6 +3090,8 @@ TEST(CDRTests, CString)
     });
 
     EXPECT_EQ(strcmp(c_string_value, c_string_t) , 0);
+
+    free(c_string_value);
 
     // Check bad case without space
     char buffer_bad[1];
@@ -3257,6 +3286,18 @@ TEST(CDRTests, Complete)
     EXPECT_ARRAY_DOUBLE_EQ(double_seq_value, double_seq_t, 5);
 
     EXPECT_EQ(strcmp(c_string_t, c_string_value), 0);
+
+    free(octet_seq_value);
+    free(char_seq_value);
+    free(ushort_seq_value);
+    free(short_seq_value);
+    free(ulong_seq_value);
+    free(long_seq_value);
+    free(ulonglong_seq_value);
+    free(longlong_seq_value);
+    free(float_seq_value);
+    free(double_seq_value);
+    free(c_string_value);
 }
 
 TEST(FastCDRTests, Octet)
@@ -5621,6 +5662,8 @@ TEST(FastCDRTests, SequenceOctet)
     EXPECT_EQ(octet_seq_len, 5);
     EXPECT_ARRAY_EQ(octet_seq_value, octet_seq_t, octet_seq_len);
 
+    free(octet_seq_value);
+
     // Check bad case without space
     char buffer_bad[1];
 
@@ -5670,6 +5713,8 @@ TEST(FastCDRTests, SequenceChar)
 
     EXPECT_EQ(char_seq_len, 5);
     EXPECT_ARRAY_EQ(char_seq_value, char_seq_t, char_seq_len);
+
+    free(char_seq_value);
 
     // Check bad case without space
     char buffer_bad[1];
@@ -5721,6 +5766,8 @@ TEST(FastCDRTests, SequenceUnsignedShort)
     EXPECT_EQ(ushort_seq_len, 5);
     EXPECT_ARRAY_EQ(ushort_seq_value, ushort_seq_t, ushort_seq_len);
 
+    free(ushort_seq_value);
+
     // Check bad case without space
     char buffer_bad[1];
 
@@ -5770,6 +5817,8 @@ TEST(FastCDRTests, SequenceShort)
 
     EXPECT_EQ(short_seq_len, 5);
     EXPECT_ARRAY_EQ(short_seq_value, short_seq_t, short_seq_len);
+
+    free(short_seq_value);
 
     // Check bad case without space
     char buffer_bad[1];
@@ -5821,6 +5870,8 @@ TEST(FastCDRTests, SequenceUnsignedLong)
     EXPECT_EQ(ulong_seq_len, 5);
     EXPECT_ARRAY_EQ(ulong_seq_value, ulong_seq_t, ulong_seq_len);
 
+    free(ulong_seq_value);
+
     // Check bad case without space
     char buffer_bad[1];
 
@@ -5870,6 +5921,8 @@ TEST(FastCDRTests, SequenceLong)
 
     EXPECT_EQ(long_seq_len, 5);
     EXPECT_ARRAY_EQ(long_seq_value, long_seq_t, long_seq_len);
+
+    free(long_seq_value);
 
     // Check bad case without space
     char buffer_bad[1];
@@ -5921,6 +5974,8 @@ TEST(FastCDRTests, SequenceUnsignedLongLong)
     EXPECT_EQ(ulonglong_seq_len, 5);
     EXPECT_ARRAY_EQ(ulonglong_seq_value, ulonglong_seq_t, ulonglong_seq_len);
 
+    free(ulonglong_seq_value);
+
     // Check bad case without space
     char buffer_bad[1];
 
@@ -5970,6 +6025,8 @@ TEST(FastCDRTests, SequenceLongLong)
 
     EXPECT_EQ(longlong_seq_len, 5);
     EXPECT_ARRAY_EQ(longlong_seq_value, longlong_seq_t, longlong_seq_len);
+
+    free(longlong_seq_value);
 
     // Check bad case without space
     char buffer_bad[1];
@@ -6021,6 +6078,8 @@ TEST(FastCDRTests, SequenceFloat)
     EXPECT_EQ(float_seq_len, 5);
     EXPECT_ARRAY_FLOAT_EQ(float_seq_value, float_seq_t, float_seq_len);
 
+    free(float_seq_value);
+
     // Check bad case without space
     char buffer_bad[1];
 
@@ -6070,6 +6129,8 @@ TEST(FastCDRTests, SequenceDouble)
 
     EXPECT_EQ(double_seq_len, 5);
     EXPECT_ARRAY_DOUBLE_EQ(double_seq_value, double_seq_t, double_seq_len);
+
+    free(double_seq_value);
 
     // Check bad case without space
     char buffer_bad[1];
@@ -6121,6 +6182,8 @@ TEST(FastCDRTests, SequenceBoolean)
     EXPECT_EQ(bool_seq_len, 5);
     EXPECT_ARRAY_EQ(bool_seq_value, bool_seq_t, bool_seq_len);
 
+    free(bool_seq_value);
+
     // Check bad case without space
     char buffer_bad[1];
 
@@ -6171,6 +6234,11 @@ TEST(FastCDRTests, SequenceString)
     EXPECT_EQ(string_seq_len, 5);
     EXPECT_ARRAY_EQ(string_seq_value, string_seq_t, string_seq_len);
 
+    for(size_t count = 0; count < string_seq_len; ++count)
+        string_seq_value[count].~basic_string();
+
+    free(string_seq_value);
+
     // Check bad case without space
     char buffer_bad[1];
 
@@ -6219,6 +6287,8 @@ TEST(FastCDRTests, CString)
     });
 
     EXPECT_EQ(strcmp(c_string_value, c_string_t) , 0);
+
+    free(c_string_value);
 
     // Check bad case without space
     char buffer_bad[1];
@@ -6414,4 +6484,16 @@ TEST(FastCDRTests, Complete)
     EXPECT_ARRAY_DOUBLE_EQ(double_seq_value, double_seq_t, 5);
 
     EXPECT_EQ(strcmp(c_string_t, c_string_value), 0);
+
+    free(octet_seq_value);
+    free(char_seq_value);
+    free(ushort_seq_value);
+    free(short_seq_value);
+    free(ulong_seq_value);
+    free(long_seq_value);
+    free(ulonglong_seq_value);
+    free(longlong_seq_value);
+    free(float_seq_value);
+    free(double_seq_value);
+    free(c_string_value);
 }

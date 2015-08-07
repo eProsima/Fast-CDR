@@ -1788,7 +1788,7 @@ Cdr& Cdr::deserializeStringSequence(std::string *&sequence_t, size_t &numElement
     try
     {
         sequence_t = (std::string*)calloc(seqLength, sizeof(std::string));
-        for(uint32_t count; count < seqLength; ++count)
+        for(uint32_t count = 0; count < seqLength; ++count)
             new(&sequence_t[count]) std::string;
         deserializeArray(sequence_t, seqLength);
     }

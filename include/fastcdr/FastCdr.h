@@ -13,7 +13,11 @@
 #include "FastBuffer.h"
 #include "exceptions/NotEnoughMemoryException.h"
 #include <stdint.h>
+#if defined(__MACH__)
+#include <stdlib.h>
+#else
 #include <malloc.h>
+#endif
 #include <string>
 #include <vector>
 

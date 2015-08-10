@@ -8,7 +8,11 @@
 
 #include <fastcdr/FastBuffer.h>
 
+#if defined(__MACH__)
+#include <stdlib.h>
+#else
 #include <malloc.h>
+#endif
 
 #define BUFFER_START_LENGTH 200
 

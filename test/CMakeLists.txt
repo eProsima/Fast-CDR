@@ -14,10 +14,4 @@ if(NOT ((MSVC OR MSVC_IDE) AND EPROSIMA_INSTALLER))
     add_executable(UnitTests ${UNITTESTS_SOURCE})
     add_gtest(UnitTests ${UNITTESTS_SOURCE})
     target_link_libraries(UnitTests fastcdr ${GTEST_BOTH_LIBRARIES})
-
-    # Add environment
-    if(WIN32)
-        set_tests_properties(UnitTests PROPERTIES ENVIRONMENT
-            "PATH=${PROJECT_BINARY_DIR}/lib\\;$ENV{PATH}")
-    endif()
 endif()

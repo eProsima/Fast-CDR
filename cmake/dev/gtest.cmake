@@ -11,9 +11,19 @@ macro(add_gtest test)
                 add_test(${GTEST_GROUP_NAME}.${GTEST_NAME}
                     ${test}
                     --gtest_filter=${GTEST_GROUP_NAME}.${GTEST_NAME})
+                # Add environment
+                if(WIN32)
+                    set_tests_properties(${GTEST_GROUP_NAME}.${GTEST_NAME} PROPERTIES ENVIRONMENT
+                        "PATH=${PROJECT_BINARY_DIR}/lib\\;$ENV{PATH}")
+                endif()
             endforeach()
         endforeach()
     else()
         add_test(${test} ${test})
+        # Add environment
+        if(WIN32)
+            set_tests_properties(${test} PROPERTIES ENVIRONMENT
+                "PATH=${PROJECT_BINARY_DIR}/lib\\;$ENV{PATH}")
+        endif()
     endif()
 endmacro()

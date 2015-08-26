@@ -491,7 +491,7 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
                 inline
-                    Cdr& serialize(const char char_t, Endianness endianness)
+                    Cdr& serialize(const char char_t, Endianness /*endianness*/)
                     {
                         return serialize(char_t);
                     }
@@ -684,7 +684,7 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
                 inline
-                    Cdr& serialize(const bool bool_t, Endianness endianness)
+                    Cdr& serialize(const bool bool_t, Endianness /*endianness*/)
                     {
                         return serialize(bool_t);
                     }
@@ -859,7 +859,7 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
                 inline
-                    Cdr& serializeArray(const uint8_t *octet_t, size_t numElements, Endianness endianness)
+                    Cdr& serializeArray(const uint8_t *octet_t, size_t numElements, Endianness /*endianness*/)
                     {
                         return serializeArray((const char*)octet_t, numElements);
                     }
@@ -882,7 +882,7 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
                 inline
-                    Cdr& serializeArray(const char *char_t, size_t numElements, Endianness endianness)
+                    Cdr& serializeArray(const char *char_t, size_t numElements, Endianness /*endianness*/)
                     {
                         return serializeArray(char_t, numElements);
                     }
@@ -1085,7 +1085,7 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
                 inline
-                    Cdr& serializeArray(const bool *bool_t, size_t numElements, Endianness endianness)
+                    Cdr& serializeArray(const bool *bool_t, size_t numElements, Endianness /*endianness*/)
                     {
                         return serializeArray(bool_t, numElements);
                     }
@@ -1252,7 +1252,7 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
                  */
                 inline
-                    Cdr& deserialize(char &char_t, Endianness endianness)
+                    Cdr& deserialize(char &char_t, Endianness /*endianness*/)
                     {
                         return deserialize(char_t);
                     }
@@ -1453,7 +1453,7 @@ namespace eprosima
                  * @exception exception::BadParamException This exception is thrown when trying to deserialize an invalid value.
                  */
                 inline
-                    Cdr& deserialize(bool &bool_t, Endianness endianness)
+                    Cdr& deserialize(bool &bool_t, Endianness /*endianness*/)
                     {
                         return deserialize(bool_t);
                     };
@@ -1675,7 +1675,7 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
                  */
                 inline
-                    Cdr& deserializeArray(char *char_t, size_t numElements, Endianness endianness)
+                    Cdr& deserializeArray(char *char_t, size_t numElements, Endianness /*endianness*/)
                     {
                         return deserializeArray(char_t, numElements);
                     }
@@ -1878,7 +1878,7 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
                  */
                 inline
-                    Cdr& deserializeArray(bool *bool_t, size_t numElements, Endianness endianness)
+                    Cdr& deserializeArray(bool *bool_t, size_t numElements, Endianness /*endianness*/)
                     {
                         return deserializeArray(bool_t, numElements);
                     }

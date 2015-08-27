@@ -13,7 +13,9 @@
 using namespace eprosima::fastcdr;
 using namespace ::exception;
 
-FastCdr::state::state(FastCdr &fastcdr) : m_currentPosition(fastcdr.m_currentPosition) {}
+FastCdr::state::state(const FastCdr &fastcdr) : m_currentPosition(fastcdr.m_currentPosition) {}
+
+FastCdr::state::state(const state &state) : m_currentPosition(state.m_currentPosition) {}
 
 FastCdr::FastCdr(FastBuffer &cdrBuffer) : m_cdrBuffer(cdrBuffer), m_currentPosition(cdrBuffer.begin()), m_lastPosition(cdrBuffer.end())
 {

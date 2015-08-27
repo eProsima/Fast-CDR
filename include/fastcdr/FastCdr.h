@@ -45,11 +45,11 @@ namespace eprosima
                     /*!
                      * @brief Default constructor.
                      */
-                    state(FastCdr &fastcdr);
+                    state(const FastCdr &fastcdr);
 
                     private:
 
-                    state(const state&) NON_COPYABLE_CXX11;
+                    state(const state&);
 
                     state& operator=(const state&) NON_COPYABLE_CXX11;
 

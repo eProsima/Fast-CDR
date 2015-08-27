@@ -82,11 +82,11 @@ namespace eprosima
                     /*!
                      * @brief Default constructor.
                      */
-                    state(Cdr &cdr);
+                    state(const Cdr &cdr);
 
                     private:
 
-                    state(const state&) NON_COPYABLE_CXX11;
+                    state(const state&);
 
                     state& operator=(const state&) NON_COPYABLE_CXX11;
 

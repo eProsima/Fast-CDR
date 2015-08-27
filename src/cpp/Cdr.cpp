@@ -18,8 +18,11 @@ using namespace ::exception;
     const Cdr::Endianness Cdr::DEFAULT_ENDIAN = LITTLE_ENDIANNESS;
 #endif
 
-Cdr::state::state(Cdr &cdr) : m_currentPosition(cdr.m_currentPosition), m_alignPosition(cdr.m_alignPosition),
+Cdr::state::state(const Cdr &cdr) : m_currentPosition(cdr.m_currentPosition), m_alignPosition(cdr.m_alignPosition),
     m_swapBytes(cdr.m_swapBytes), m_lastDataSize(cdr.m_lastDataSize) {}
+
+Cdr::state::state(const state &state) : m_currentPosition(state.m_currentPosition), m_alignPosition(state.m_alignPosition),
+    m_swapBytes(state.m_swapBytes), m_lastDataSize(state.m_lastDataSize) {}
 
 Cdr::Cdr(FastBuffer &cdrBuffer, const Endianness endianness, const CdrType cdrType) : m_cdrBuffer(cdrBuffer),
     m_cdrType(cdrType), m_plFlag(DDS_CDR_WITHOUT_PL), m_options(0), m_endianness((uint8_t)endianness),

@@ -44,6 +44,9 @@ namespace eprosima
 
                 //! @brief This enumeration represents the two posible values of the flag that points if the content is a parameter list (only in DDS CDR).
                 typedef enum
+#ifdef HAVE_CXX0X
+                    : uint8_t
+#endif
                 {
                     //! @brief Specifies that the content is not a parameter list.
                     DDS_CDR_WITHOUT_PL = 0x0,
@@ -55,6 +58,9 @@ namespace eprosima
                  * @brief This enumeration represents endianness types.
                  */
                 typedef enum
+#ifdef HAVE_CXX0X
+                    : uint8_t
+#endif
                 {
                     //! @brief Big endianness.
                     BIG_ENDIANNESS = 0x0,
@@ -79,6 +85,10 @@ namespace eprosima
                     state(Cdr &cdr);
 
                     private:
+
+                    state(const state&) NON_COPYABLE_CXX11;
+
+                    state& operator=(const state&) NON_COPYABLE_CXX11;
 
                     //! @brief The position in the buffer when the state was created.
                     const FastBuffer::iterator m_currentPosition;
@@ -2031,6 +2041,10 @@ namespace eprosima
 
             private:
 
+                Cdr(const Cdr&) NON_COPYABLE_CXX11;
+
+                Cdr& operator=(const Cdr&) NON_COPYABLE_CXX11;
+
                 Cdr& serializeBoolSequence(const std::vector<bool> &vector_t);
 
                 Cdr& deserializeBoolSequence(std::vector<bool> &vector_t);
@@ -2129,7 +2143,7 @@ namespace eprosima
                 uint16_t m_options;
 
                 //! @brief The endianness that will be applied over the buffer.
-                unsigned char m_endianness;
+                uint8_t m_endianness;
 
                 //! @brief This attribute specifies if it is needed to swap the bytes.
                 bool m_swapBytes;

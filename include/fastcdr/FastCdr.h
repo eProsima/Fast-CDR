@@ -49,6 +49,10 @@ namespace eprosima
 
                     private:
 
+                    state(const state&) NON_COPYABLE_CXX11;
+
+                    state& operator=(const state&) NON_COPYABLE_CXX11;
+
                     //! @brief The position in the buffer when the state was created.
                     const FastBuffer::iterator m_currentPosition;
                 };
@@ -1275,6 +1279,10 @@ namespace eprosima
 #endif
 
             private:
+
+                FastCdr(const FastCdr&) NON_COPYABLE_CXX11;
+
+                FastCdr& operator=(const FastCdr&) NON_COPYABLE_CXX11;
 
                 FastCdr& serializeBoolSequence(const std::vector<bool> &vector_t);
 

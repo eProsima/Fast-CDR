@@ -44,6 +44,9 @@ namespace eprosima
 
                 //! @brief This enumeration represents the two posible values of the flag that points if the content is a parameter list (only in DDS CDR).
                 typedef enum
+#ifdef HAVE_CXX0X
+                    : uint8_t
+#endif
                 {
                     //! @brief Specifies that the content is not a parameter list.
                     DDS_CDR_WITHOUT_PL = 0x0,
@@ -55,6 +58,9 @@ namespace eprosima
                  * @brief This enumeration represents endianness types.
                  */
                 typedef enum
+#ifdef HAVE_CXX0X
+                    : uint8_t
+#endif
                 {
                     //! @brief Big endianness.
                     BIG_ENDIANNESS = 0x0,
@@ -76,9 +82,13 @@ namespace eprosima
                     /*!
                      * @brief Default constructor.
                      */
-                    state(Cdr &cdr);
+                    state(const Cdr &cdr);
 
                     private:
+
+                    state(const state&);
+
+                    state& operator=(const state&) NON_COPYABLE_CXX11;
 
                     //! @brief The position in the buffer when the state was created.
                     const FastBuffer::iterator m_currentPosition;
@@ -491,7 +501,7 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
                 inline
-                    Cdr& serialize(const char char_t, Endianness endianness)
+                    Cdr& serialize(const char char_t, Endianness /*endianness*/)
                     {
                         return serialize(char_t);
                     }
@@ -684,7 +694,7 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
                 inline
-                    Cdr& serialize(const bool bool_t, Endianness endianness)
+                    Cdr& serialize(const bool bool_t, Endianness /*endianness*/)
                     {
                         return serialize(bool_t);
                     }
@@ -859,7 +869,7 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
                 inline
-                    Cdr& serializeArray(const uint8_t *octet_t, size_t numElements, Endianness endianness)
+                    Cdr& serializeArray(const uint8_t *octet_t, size_t numElements, Endianness /*endianness*/)
                     {
                         return serializeArray((const char*)octet_t, numElements);
                     }
@@ -882,7 +892,7 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
                 inline
-                    Cdr& serializeArray(const char *char_t, size_t numElements, Endianness endianness)
+                    Cdr& serializeArray(const char *char_t, size_t numElements, Endianness /*endianness*/)
                     {
                         return serializeArray(char_t, numElements);
                     }
@@ -1085,7 +1095,7 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
                 inline
-                    Cdr& serializeArray(const bool *bool_t, size_t numElements, Endianness endianness)
+                    Cdr& serializeArray(const bool *bool_t, size_t numElements, Endianness /*endianness*/)
                     {
                         return serializeArray(bool_t, numElements);
                     }
@@ -1252,7 +1262,7 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
                  */
                 inline
-                    Cdr& deserialize(char &char_t, Endianness endianness)
+                    Cdr& deserialize(char &char_t, Endianness /*endianness*/)
                     {
                         return deserialize(char_t);
                     }
@@ -1453,7 +1463,7 @@ namespace eprosima
                  * @exception exception::BadParamException This exception is thrown when trying to deserialize an invalid value.
                  */
                 inline
-                    Cdr& deserialize(bool &bool_t, Endianness endianness)
+                    Cdr& deserialize(bool &bool_t, Endianness /*endianness*/)
                     {
                         return deserialize(bool_t);
                     };
@@ -1675,7 +1685,7 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
                  */
                 inline
-                    Cdr& deserializeArray(char *char_t, size_t numElements, Endianness endianness)
+                    Cdr& deserializeArray(char *char_t, size_t numElements, Endianness /*endianness*/)
                     {
                         return deserializeArray(char_t, numElements);
                     }
@@ -1878,7 +1888,7 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
                  */
                 inline
-                    Cdr& deserializeArray(bool *bool_t, size_t numElements, Endianness endianness)
+                    Cdr& deserializeArray(bool *bool_t, size_t numElements, Endianness /*endianness*/)
                     {
                         return deserializeArray(bool_t, numElements);
                     }
@@ -1950,6 +1960,14 @@ namespace eprosima
                         return *this;
                     }
 
+#if !defined(_MSC_VER) && HAVE_CXX0X
+                template<class _T = std::string>
+                    Cdr& deserializeSequence(std::string *&sequence_t, size_t &numElements)
+                    {
+                        return deserializeStringSequence(sequence_t, numElements);
+                    }
+#endif
+
                 /*!
                  * @brief This function template deserializes a raw sequence.
                  * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
@@ -1974,6 +1992,8 @@ namespace eprosima
                         }
                         catch(eprosima::fastcdr::exception::Exception &ex)
                         {
+                            free(sequence_t);
+                            sequence_t = NULL;
                             setState(state);
                             ex.raise();
                         }
@@ -1981,6 +2001,14 @@ namespace eprosima
                         numElements = seqLength;
                         return *this;
                     }
+
+#ifdef _MSC_VER
+				template<>
+					Cdr& deserializeSequence<std::string>(std::string *&sequence_t, size_t &numElements)
+					{
+                        return deserializeStringSequence(sequence_t, numElements);
+					}
+#endif
 
                 /*!
                  * @brief This function template deserializes a raw sequence with a different endianness.
@@ -2013,9 +2041,15 @@ namespace eprosima
 
             private:
 
+                Cdr(const Cdr&) NON_COPYABLE_CXX11;
+
+                Cdr& operator=(const Cdr&) NON_COPYABLE_CXX11;
+
                 Cdr& serializeBoolSequence(const std::vector<bool> &vector_t);
 
                 Cdr& deserializeBoolSequence(std::vector<bool> &vector_t);
+
+                Cdr& deserializeStringSequence(std::string *&sequence_t, size_t &numElements);
 
 #if HAVE_CXX0X
                 /*!
@@ -2109,7 +2143,7 @@ namespace eprosima
                 uint16_t m_options;
 
                 //! @brief The endianness that will be applied over the buffer.
-                unsigned char m_endianness;
+                uint8_t m_endianness;
 
                 //! @brief This attribute specifies if it is needed to swap the bytes.
                 bool m_swapBytes;

@@ -45,9 +45,13 @@ namespace eprosima
                     /*!
                      * @brief Default constructor.
                      */
-                    state(FastCdr &fastcdr);
+                    state(const FastCdr &fastcdr);
 
                     private:
+
+                    state(const state&);
+
+                    state& operator=(const state&) NON_COPYABLE_CXX11;
 
                     //! @brief The position in the buffer when the state was created.
                     const FastBuffer::iterator m_currentPosition;
@@ -1224,6 +1228,14 @@ namespace eprosima
                         return *this;
                     }
 
+#if !defined(_MSC_VER) && HAVE_CXX0X
+                template<class _T = std::string>
+                    FastCdr& deserializeSequence(std::string *&sequence_t, size_t &numElements)
+                    {
+                        return deserializeStringSequence(sequence_t, numElements);
+                    }
+#endif
+
                 /*!
                  * @brief This function template deserializes a raw sequence.
                  * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
@@ -1248,6 +1260,8 @@ namespace eprosima
                         }
                         catch(eprosima::fastcdr::exception::Exception &ex)
                         {
+                            free(sequence_t);
+                            sequence_t = NULL;
                             setState(state);
                             ex.raise();
                         }
@@ -1256,11 +1270,25 @@ namespace eprosima
                         return *this;
                     }
 
+#ifdef _MSC_VER
+				template<>
+					FastCdr& deserializeSequence<std::string>(std::string *&sequence_t, size_t &numElements)
+					{
+                        return deserializeStringSequence(sequence_t, numElements);
+					}
+#endif
+
             private:
+
+                FastCdr(const FastCdr&) NON_COPYABLE_CXX11;
+
+                FastCdr& operator=(const FastCdr&) NON_COPYABLE_CXX11;
 
                 FastCdr& serializeBoolSequence(const std::vector<bool> &vector_t);
 
                 FastCdr& deserializeBoolSequence(std::vector<bool> &vector_t);
+
+                FastCdr& deserializeStringSequence(std::string *&sequence_t, size_t &numElements);
 
 #if HAVE_CXX0X
                 /*!

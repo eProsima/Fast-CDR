@@ -13,7 +13,9 @@
 using namespace eprosima::fastcdr;
 using namespace ::exception;
 
-FastCdr::state::state(FastCdr &fastcdr) : m_currentPosition(fastcdr.m_currentPosition) {}
+FastCdr::state::state(const FastCdr &fastcdr) : m_currentPosition(fastcdr.m_currentPosition) {}
+
+FastCdr::state::state(const state &state) : m_currentPosition(state.m_currentPosition) {}
 
 FastCdr::FastCdr(FastBuffer &cdrBuffer) : m_cdrBuffer(cdrBuffer), m_currentPosition(cdrBuffer.begin()), m_lastPosition(cdrBuffer.end())
 {
@@ -485,5 +487,31 @@ FastCdr& FastCdr::deserializeBoolSequence(std::vector<bool> &vector_t)
         throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
+    return *this;
+}
+
+FastCdr& FastCdr::deserializeStringSequence(std::string *&sequence_t, size_t &numElements)
+{
+    uint32_t seqLength = 0;
+    state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        sequence_t = (std::string*)calloc(seqLength, sizeof(std::string));
+        for(uint32_t count = 0; count < seqLength; ++count)
+            new(&sequence_t[count]) std::string;
+        deserializeArray(sequence_t, seqLength);
+    }
+    catch(eprosima::fastcdr::exception::Exception &ex)
+    {
+        free(sequence_t);
+        sequence_t = NULL;
+        setState(state);
+        ex.raise();
+    }
+
+    numElements = seqLength;
     return *this;
 }

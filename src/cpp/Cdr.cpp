@@ -18,11 +18,14 @@ using namespace ::exception;
     const Cdr::Endianness Cdr::DEFAULT_ENDIAN = LITTLE_ENDIANNESS;
 #endif
 
-Cdr::state::state(Cdr &cdr) : m_currentPosition(cdr.m_currentPosition), m_alignPosition(cdr.m_alignPosition),
+Cdr::state::state(const Cdr &cdr) : m_currentPosition(cdr.m_currentPosition), m_alignPosition(cdr.m_alignPosition),
     m_swapBytes(cdr.m_swapBytes), m_lastDataSize(cdr.m_lastDataSize) {}
 
+Cdr::state::state(const state &state) : m_currentPosition(state.m_currentPosition), m_alignPosition(state.m_alignPosition),
+    m_swapBytes(state.m_swapBytes), m_lastDataSize(state.m_lastDataSize) {}
+
 Cdr::Cdr(FastBuffer &cdrBuffer, const Endianness endianness, const CdrType cdrType) : m_cdrBuffer(cdrBuffer),
-    m_cdrType(cdrType), m_plFlag(DDS_CDR_WITHOUT_PL), m_options(0), m_endianness(endianness),
+    m_cdrType(cdrType), m_plFlag(DDS_CDR_WITHOUT_PL), m_options(0), m_endianness((uint8_t)endianness),
     m_swapBytes(endianness == DEFAULT_ENDIAN ? false : true), m_lastDataSize(0), m_currentPosition(cdrBuffer.begin()),
     m_alignPosition(cdrBuffer.begin()), m_lastPosition(cdrBuffer.end())
 {
@@ -30,7 +33,7 @@ Cdr::Cdr(FastBuffer &cdrBuffer, const Endianness endianness, const CdrType cdrTy
 
 Cdr& Cdr::read_encapsulation()
 {
-    uint8_t dummy, encapsulationKind;
+    uint8_t dummy = 0, encapsulationKind = 0;
     state state(*this);
 
     try
@@ -99,7 +102,7 @@ Cdr& Cdr::serialize_encapsulation()
         }
 
         // Construct encapsulation byte.
-        encapsulationKind = (m_plFlag | m_endianness);
+        encapsulationKind = ((uint8_t)m_plFlag | m_endianness);
 
         // Serialize the encapsulation byte.
         (*this) << encapsulationKind;
@@ -1775,5 +1778,31 @@ Cdr& Cdr::deserializeBoolSequence(std::vector<bool> &vector_t)
         throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
+    return *this;
+}
+
+Cdr& Cdr::deserializeStringSequence(std::string *&sequence_t, size_t &numElements)
+{
+    uint32_t seqLength = 0;
+    state state(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        sequence_t = (std::string*)calloc(seqLength, sizeof(std::string));
+        for(uint32_t count = 0; count < seqLength; ++count)
+            new(&sequence_t[count]) std::string;
+        deserializeArray(sequence_t, seqLength);
+    }
+    catch(eprosima::fastcdr::exception::Exception &ex)
+    {
+        free(sequence_t);
+        sequence_t = NULL;
+        setState(state);
+        ex.raise();
+    }
+
+    numElements = seqLength;
     return *this;
 }

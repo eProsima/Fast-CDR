@@ -25,6 +25,7 @@ static const float float_tt = std::numeric_limits<float>::min();
 static const double double_tt = std::numeric_limits<double>::min();
 static const bool bool_t = true;
 static const std::string string_t = "Hola a todos, esto es un test";
+static const std::string emptystring_t = "";
 static const std::array<uint8_t, 5> octet_array_t = {{1, 2, 3, 4, 5}};
 static const uint8_t octet_array_2_t[5] = {5, 4, 3, 2, 1};
 static const std::array<char, 5> char_array_t = {{'A', 'B', 'C', 'D', 'E'}};
@@ -612,6 +613,55 @@ TEST(CDRTests, String)
     EXPECT_THROW(
     {
         cdr_ser_bad << string_t;
+    },
+    NotEnoughMemoryException);
+
+    // Deseriazliation.
+    Cdr cdr_des_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_des_bad >> string_value;
+    },
+    NotEnoughMemoryException);
+}
+
+TEST(CDRTests, EmptyString)
+{
+    // Check good case.
+    char buffer[BUFFER_LENGTH];
+
+    // Serialization.
+    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+    Cdr cdr_ser(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser << emptystring_t;
+    });
+
+    // Deseriazliation.
+    Cdr cdr_des(cdrbuffer);
+
+    std::string string_value;
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des >> string_value;
+    });
+
+    EXPECT_EQ(string_value, emptystring_t);
+
+    // Check bad case without space
+    char buffer_bad[1];
+
+    // Serialization.
+    FastBuffer cdrbuffer_bad(buffer_bad, 1);
+    Cdr cdr_ser_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_ser_bad << emptystring_t;
     },
     NotEnoughMemoryException);
 
@@ -3809,6 +3859,55 @@ TEST(FastCDRTests, String)
     EXPECT_THROW(
     {
         cdr_ser_bad << string_t;
+    },
+    NotEnoughMemoryException);
+
+    // Deseriazliation.
+    FastCdr cdr_des_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_des_bad >> string_value;
+    },
+    NotEnoughMemoryException);
+}
+
+TEST(FastCDRTests, EmptyString)
+{
+    // Check good case.
+    char buffer[BUFFER_LENGTH];
+
+    // Serialization.
+    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+    FastCdr cdr_ser(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser << emptystring_t;
+    });
+
+    // Deseriazliation.
+    FastCdr cdr_des(cdrbuffer);
+
+    std::string string_value;
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des >> string_value;
+    });
+
+    EXPECT_EQ(string_value, emptystring_t);
+
+    // Check bad case without space
+    char buffer_bad[1];
+
+    // Serialization.
+    FastBuffer cdrbuffer_bad(buffer_bad, 1);
+    FastCdr cdr_ser_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_ser_bad << emptystring_t;
     },
     NotEnoughMemoryException);
 

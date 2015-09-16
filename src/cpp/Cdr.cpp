@@ -532,12 +532,15 @@ Cdr& Cdr::serialize(const bool bool_t)
 
 Cdr& Cdr::serialize(const char *string_t)
 {
-    uint32_t length = (uint32_t)strlen(string_t);
-    Cdr::state state(*this);
+    uint32_t length = 0;
+    
+    if(string_t != nullptr)
+        length = (uint32_t)strlen(string_t) + 1;
 
     if(length > 0)
     {
-		serialize(++length);
+        Cdr::state state(*this);
+		serialize(length);
 
         if(((m_lastPosition - m_currentPosition) >= length) || resize(length))
         {

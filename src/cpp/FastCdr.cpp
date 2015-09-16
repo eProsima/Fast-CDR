@@ -84,12 +84,15 @@ FastCdr& FastCdr::serialize(const bool bool_t)
 
 FastCdr& FastCdr::serialize(const char *string_t)
 {
-    uint32_t length = (uint32_t)strlen(string_t);
-    FastCdr::state state(*this);
+    uint32_t length = 0;
+    
+    if(string_t != nullptr)
+        length = (uint32_t)strlen(string_t) + 1;
 
     if(length > 0)
     {
-		serialize(++length);
+        FastCdr::state state(*this);
+		serialize(length);
 
         if(((m_lastPosition - m_currentPosition) >= length) || resize(length))
         {

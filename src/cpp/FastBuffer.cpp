@@ -8,7 +8,11 @@
 
 #include <fastcdr/FastBuffer.h>
 
+#if !__APPLE__
 #include <malloc.h>
+#else
+#include <stdlib.h>
+#endif
 
 #define BUFFER_START_LENGTH 200
 

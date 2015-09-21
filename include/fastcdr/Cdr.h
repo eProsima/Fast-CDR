@@ -13,9 +13,14 @@
 #include "FastBuffer.h"
 #include "exceptions/NotEnoughMemoryException.h"
 #include <stdint.h>
-#include <malloc.h>
 #include <string>
 #include <vector>
+
+#if !__APPLE__
+#include <malloc.h>
+#else
+#include <stdlib.h>
+#endif
 
 #if HAVE_CXX0X
 #include <array>

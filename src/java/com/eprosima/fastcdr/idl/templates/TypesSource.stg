@@ -229,7 +229,11 @@ $extensions : {$it$}; separator="\n"$
 union_type(ctx, parent, union) ::= <<
 $union.scopedname$::$union.name$()
 {
+    $if(union.defaultvalue)$
     m__d = $union.defaultvalue$;
+    $else$
+    m__d = $first(first(union.members).labels)$;
+    $endif$
     $union.members:{ member |$member_default_init(member=member)$}; separator="\n"$
 }
 

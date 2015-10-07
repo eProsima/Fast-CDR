@@ -202,6 +202,30 @@ public class TypesGenerator
                 extensionst.setAttribute("struct", typedecl.getTypeCode()); 
             }
         }
+        else if(typedecl.getTypeCode().getKind() == TypeCode.KIND_UNION)
+        {
+            typest = stg_.getInstanceOf("union_type");
+            typest.setAttribute("union", typedecl.getTypeCode());
+
+            // Get extension
+            if(extensions != null && (extensionname =  extensions.get("union_type")) != null)
+            {
+                extensionst = stg_.getInstanceOf(extensionname);
+                extensionst.setAttribute("union", typedecl.getTypeCode()); 
+            }
+        }
+        else if(typedecl.getTypeCode().getKind() == TypeCode.KIND_ENUM)
+        {
+            typest = stg_.getInstanceOf("enum_type");
+            typest.setAttribute("enum", typedecl.getTypeCode());
+
+            // Get extension
+            if(extensions != null && (extensionname =  extensions.get("enum_type")) != null)
+            {
+                extensionst = stg_.getInstanceOf(extensionname);
+                extensionst.setAttribute("enum", typedecl.getTypeCode()); 
+            }
+        }
 
         if(typest != null)
         {

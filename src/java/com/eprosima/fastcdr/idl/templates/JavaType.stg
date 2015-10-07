@@ -75,3 +75,148 @@ public class $struct.name$
     $extension$
 }
 >>
+
+union_type(ctx, parent, union, extension) ::= <<
+public class $union.name$
+{
+    public $union.name$()
+    {
+        $if(union.javaDefaultvalue)$
+        d__ = $union.javaDefaultvalue$;
+        $else$
+        d__ = $first(first(union.members).javaLabels)$;
+        $endif$
+
+        $union.members : { member |
+        $if(!member.typecode.primitive)$$member.name$_ = new $member.typecode.javaTypename$();$endif$
+        }; separator="\n"$
+    }
+
+    public $union.discriminator.javaTypename$ getDiscriminator()
+    {
+        return d__;
+    }
+
+    $union.members : { member |
+    $if(!member.typecode.isType_e)$
+    public void set$member.javaName$($member.typecode.javaTypename$ $member.name$)
+    {
+        $member.name$_ = $member.name$;
+
+        $if(member.default)$
+            d__ = $union.javaDefaultvalue$;
+        $else$
+            d__ = $first(member.javaLabels)$;
+        $endif$
+    }
+
+    public void set$member.javaName$($union.discriminator.javaTypename$ discriminator, $member.typecode.javaTypename$ $member.name$)
+        throws Exception
+    {
+        $if(member.default)$
+        if($[union.javaDefaultvalue, member.javaLabels] : {label | discriminator == $label$}; separator=" || "$)
+        $else$
+        if($member.javaLabels : {label | discriminator == $label$}; separator=" || "$)
+        $endif$
+        {
+            $member.name$_ = $member.name$;
+            d__ = discriminator;
+            return;
+        }
+
+        throw new Exception("Given discriminator is not a valid value for member $member.name$");
+    }
+    $endif$
+
+    public $member.typecode.javaTypename$ get$member.javaName$()
+        throws Exception
+    {
+        $if(member.default)$
+        if($[union.javaDefaultvalue, member.javaLabels] : {label | d__ == $label$}; separator=" || "$)
+        $else$
+        if($member.javaLabels : {label | d__ == $label$}; separator=" || "$)
+        $endif$
+            return $member.name$_;
+
+        throw new Exception("Union member not selected by discriminator");
+    }
+
+    }; separator="\n"$
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if(other == null) return false;
+        if(other == this) return true;
+        if(!(other instanceof $union.name$)) return false;
+        $union.name$ otherMyClass = ($union.name$)other;
+
+        if(this.d__ == otherMyClass.d__)
+        {
+            $union.members : { member |
+                $if(member.default)$
+                if($[union.javaDefaultvalue, member.javaLabels] : {label | d__ == $label$}; separator=" || "$)
+                $else$
+                if($member.javaLabels : {label | d__ == $label$}; separator=" || "$)
+                $endif$
+                {
+                    if(this.$member.name$_ == otherMyClass.$member.name$_)
+                        return true;
+                    else
+                        return false;
+                }
+        }; separator="\n"$
+        }
+
+        return false;
+    }
+
+    $union.discriminator.javaTypename$ d__;
+
+    $union.members : { member |private $member.typecode.javaTypename$ $member.name$_; }; separator="\n"$
+
+    $extension$
+}
+>>
+
+enum_type(ctx, parent, enum, extension) ::= <<
+public class $enum.name$
+{
+    $enum.members:{ member |
+        public static final int _$member.name$ = $i$ - 1;
+
+        public static final $enum.name$ $member.name$ = new $enum.name$(_$member.name$);
+
+    }; separator="\n"$
+
+    public int value()
+    {
+        return value_;
+    }
+
+    public static $enum.name$ from_int(int value)
+    {
+        return new $enum.name$(value);
+    }
+    
+    protected $enum.name$(int value)
+    {
+        value = value_;
+    }
+
+    @Override
+    public boolean equals(Object other)
+    {
+        if(other == null) return false;
+        if(other == this) return true;
+        if(!(other instanceof $enum.name$)) return false;
+        $enum.name$ otherMyClass = ($enum.name$)other;
+
+        return this.value_ == otherMyClass.value_;
+    }
+
+    private int value_ = 0;
+
+    $extension$
+}
+>>

@@ -92,6 +92,7 @@ endif()
 ###############################################################################
 
 option(EPROSIMA_BUILD "Activate internal building" OFF)
+option(MINION "Tells if it is a subproject of a superproject" OFF)
 
 if(EPROSIMA_INSTALLER)
     set(EPROSIMA_BUILD ON)
@@ -115,11 +116,7 @@ endif()
 # Installation paths
 ###############################################################################
 set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for C++ headers")
-if((MSVC OR MSVC_IDE) AND EPROSIMA_BUILD)
-    set(LIB_INSTALL_DIR lib/${MSVC_ARCH}/ CACHE PATH "Installation directory for libraries")
-else()
-    set(LIB_INSTALL_DIR lib/ CACHE PATH "Installation directory for libraries")
-endif()
+set(LIB_INSTALL_DIR lib/ CACHE PATH "Installation directory for libraries")
 set(DATA_INSTALL_DIR share/ CACHE PATH "Installation directory for data")
 if(WIN32)
     set(LICENSE_INSTALL_DIR . CACHE PATH "Installation directory for licenses")

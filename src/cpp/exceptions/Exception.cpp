@@ -31,9 +31,9 @@ Exception& Exception::operator=(const Exception &ex)
 }
 
 #if HAVE_CXX0X
-Exception& Exception::operator=(Exception&&)
+Exception& Exception::operator=(Exception&& ex)
 {
-    m_message = std::move(m_message);
+    m_message = std::move(ex.m_message);
     return *this;
 }
 #endif

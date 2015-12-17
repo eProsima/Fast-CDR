@@ -1291,7 +1291,7 @@ TEST(CDRResizeTests, SequenceOctet)
     // Deseriazliation.
     Cdr cdr_des(cdrbuffer);
 
-    uint8_t *octet_seq_value = NULL; size_t octet_seq_len;
+    uint8_t *octet_seq_value = NULL; size_t octet_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -1318,7 +1318,7 @@ TEST(CDRResizeTests, SequenceChar)
     // Deseriazliation.
     Cdr cdr_des(cdrbuffer);
 
-    char *char_seq_value = NULL; size_t char_seq_len;
+    char *char_seq_value = NULL; size_t char_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -1345,7 +1345,7 @@ TEST(CDRResizeTests, SequenceUnsignedShort)
     // Deseriazliation.
     Cdr cdr_des(cdrbuffer);
 
-    uint16_t *ushort_seq_value = NULL; size_t ushort_seq_len;
+    uint16_t *ushort_seq_value = NULL; size_t ushort_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -1372,7 +1372,7 @@ TEST(CDRResizeTests, SequenceShort)
     // Deseriazliation.
     Cdr cdr_des(cdrbuffer);
 
-    int16_t *short_seq_value = NULL; size_t short_seq_len;
+    int16_t *short_seq_value = NULL; size_t short_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -1399,7 +1399,7 @@ TEST(CDRResizeTests, SequenceUnsignedLong)
     // Deseriazliation.
     Cdr cdr_des(cdrbuffer);
 
-    uint32_t *ulong_seq_value = NULL; size_t ulong_seq_len;
+    uint32_t *ulong_seq_value = NULL; size_t ulong_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -1426,7 +1426,7 @@ TEST(CDRResizeTests, SequenceLong)
     // Deseriazliation.
     Cdr cdr_des(cdrbuffer);
 
-    int32_t *long_seq_value = NULL; size_t long_seq_len;
+    int32_t *long_seq_value = NULL; size_t long_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -1453,7 +1453,7 @@ TEST(CDRResizeTests, SequenceUnsignedLongLong)
     // Deseriazliation.
     Cdr cdr_des(cdrbuffer);
 
-    uint64_t *ulonglong_seq_value = NULL; size_t ulonglong_seq_len;
+    uint64_t *ulonglong_seq_value = NULL; size_t ulonglong_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -1480,7 +1480,7 @@ TEST(CDRResizeTests, SequenceLongLong)
     // Deseriazliation.
     Cdr cdr_des(cdrbuffer);
 
-    int64_t *longlong_seq_value = NULL; size_t longlong_seq_len;
+    int64_t *longlong_seq_value = NULL; size_t longlong_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -1507,7 +1507,7 @@ TEST(CDRResizeTests, SequenceFloat)
     // Deseriazliation.
     Cdr cdr_des(cdrbuffer);
 
-    float *float_seq_value = NULL; size_t float_seq_len;
+    float *float_seq_value = NULL; size_t float_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -1534,7 +1534,7 @@ TEST(CDRResizeTests, SequenceDouble)
     // Deseriazliation.
     Cdr cdr_des(cdrbuffer);
 
-    double *double_seq_value = NULL; size_t double_seq_len;
+    double *double_seq_value = NULL; size_t double_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -1561,7 +1561,7 @@ TEST(CDRResizeTests, SequenceBoolean)
     // Deseriazliation.
     Cdr cdr_des(cdrbuffer);
 
-    bool *bool_seq_value = NULL; size_t bool_seq_len;
+    bool *bool_seq_value = NULL; size_t bool_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -1588,7 +1588,7 @@ TEST(CDRResizeTests, SequenceString)
     // Deseriazliation.
     Cdr cdr_des(cdrbuffer);
 
-    std::string *string_seq_value = NULL; size_t string_seq_len;
+    std::string *string_seq_value = NULL; size_t string_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -3001,7 +3001,7 @@ TEST(FastCDRResizeTests, SequenceOctet)
     // Deseriazliation.
     FastCdr cdr_des(cdrbuffer);
 
-    uint8_t *octet_seq_value = NULL; size_t octet_seq_len;
+    uint8_t *octet_seq_value = NULL; size_t octet_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -3028,7 +3028,7 @@ TEST(FastCDRResizeTests, SequenceChar)
     // Deseriazliation.
     FastCdr cdr_des(cdrbuffer);
 
-    char *char_seq_value = NULL; size_t char_seq_len;
+    char *char_seq_value = NULL; size_t char_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -3055,7 +3055,7 @@ TEST(FastCDRResizeTests, SequenceUnsignedShort)
     // Deseriazliation.
     FastCdr cdr_des(cdrbuffer);
 
-    uint16_t *ushort_seq_value = NULL; size_t ushort_seq_len;
+    uint16_t *ushort_seq_value = NULL; size_t ushort_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -3082,7 +3082,7 @@ TEST(FastCDRResizeTests, SequenceShort)
     // Deseriazliation.
     FastCdr cdr_des(cdrbuffer);
 
-    int16_t *short_seq_value = NULL; size_t short_seq_len;
+    int16_t *short_seq_value = NULL; size_t short_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -3109,7 +3109,7 @@ TEST(FastCDRResizeTests, SequenceUnsignedLong)
     // Deseriazliation.
     FastCdr cdr_des(cdrbuffer);
 
-    uint32_t *ulong_seq_value = NULL; size_t ulong_seq_len;
+    uint32_t *ulong_seq_value = NULL; size_t ulong_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -3136,7 +3136,7 @@ TEST(FastCDRResizeTests, SequenceLong)
     // Deseriazliation.
     FastCdr cdr_des(cdrbuffer);
 
-    int32_t *long_seq_value = NULL; size_t long_seq_len;
+    int32_t *long_seq_value = NULL; size_t long_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -3163,7 +3163,7 @@ TEST(FastCDRResizeTests, SequenceUnsignedLongLong)
     // Deseriazliation.
     FastCdr cdr_des(cdrbuffer);
 
-    uint64_t *ulonglong_seq_value = NULL; size_t ulonglong_seq_len;
+    uint64_t *ulonglong_seq_value = NULL; size_t ulonglong_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -3190,7 +3190,7 @@ TEST(FastCDRResizeTests, SequenceLongLong)
     // Deseriazliation.
     FastCdr cdr_des(cdrbuffer);
 
-    int64_t *longlong_seq_value = NULL; size_t longlong_seq_len;
+    int64_t *longlong_seq_value = NULL; size_t longlong_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -3217,7 +3217,7 @@ TEST(FastCDRResizeTests, SequenceFloat)
     // Deseriazliation.
     FastCdr cdr_des(cdrbuffer);
 
-    float *float_seq_value = NULL; size_t float_seq_len;
+    float *float_seq_value = NULL; size_t float_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -3244,7 +3244,7 @@ TEST(FastCDRResizeTests, SequenceDouble)
     // Deseriazliation.
     FastCdr cdr_des(cdrbuffer);
 
-    double *double_seq_value = NULL; size_t double_seq_len;
+    double *double_seq_value = NULL; size_t double_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -3271,7 +3271,7 @@ TEST(FastCDRResizeTests, SequenceBoolean)
     // Deseriazliation.
     FastCdr cdr_des(cdrbuffer);
 
-    bool *bool_seq_value = NULL; size_t bool_seq_len;
+    bool *bool_seq_value = NULL; size_t bool_seq_len = 0;
 
     EXPECT_NO_THROW(
     {
@@ -3298,7 +3298,7 @@ TEST(FastCDRResizeTests, SequenceString)
     // Deseriazliation.
     FastCdr cdr_des(cdrbuffer);
 
-    std::string *string_seq_value = NULL; size_t string_seq_len;
+    std::string *string_seq_value = NULL; size_t string_seq_len = 0;
 
     EXPECT_NO_THROW(
     {

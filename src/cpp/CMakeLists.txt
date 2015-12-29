@@ -9,12 +9,14 @@ set_sources(
     exceptions/Exception.cpp
     exceptions/NotEnoughMemoryException.cpp
     exceptions/BadParamException.cpp
+    FastCdr.rc
 )
 
 # Set version
 set(${PROJECT_NAME_UPPER}_VERSION_MAJOR ${PROJECT_MAJOR_VERSION})
 set(${PROJECT_NAME_UPPER}_VERSION_MINOR ${PROJECT_MINOR_VERSION})
 set(${PROJECT_NAME_UPPER}_VERSION_MICRO ${PROJECT_MICRO_VERSION})
+set(${PROJECT_NAME_UPPER}_VERSION_STR ${PROJECT_VERSION})
 
 configure_file(${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/config.h.in
     ${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}/config.h)

@@ -151,6 +151,12 @@ namespace eprosima
                 void changeEndianness(Endianness endianness); 
 
                 /*!
+                 * @brief This function returns the current endianness used by the CDR type.
+                 * @return The endianness.
+                 */
+                Endianness endianness() { return m_endianness; }
+
+                /*!
                  * @brief This function skips a number of bytes in the CDR stream buffer.
                  * @param numBytes The number of bytes that will be jumped.
                  * @return True is returned when it works successfully. Otherwise, false is returned.

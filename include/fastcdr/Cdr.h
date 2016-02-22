@@ -154,7 +154,7 @@ namespace eprosima
                  * @brief This function returns the current endianness used by the CDR type.
                  * @return The endianness.
                  */
-                Endianness endianness() { return m_endianness; }
+                Endianness endianness() { return (Endianness)m_endianness; }
 
                 /*!
                  * @brief This function skips a number of bytes in the CDR stream buffer.

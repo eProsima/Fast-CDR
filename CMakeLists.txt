@@ -161,6 +161,8 @@ if(MSVC OR MSVC_IDE)
             libraries_x64Win64VS2010
             libraries_i86Win32VS2013
             libraries_x64Win64VS2013
+            libraries_i86Win32VS2015
+            libraries_x64Win64VS2015
             )
     else()
         set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} libraries_${MSVC_ARCH})

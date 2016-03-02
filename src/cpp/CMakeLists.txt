@@ -32,6 +32,8 @@ if(MSVC OR MSVC_IDE)
         generate_msvc_libraries(x64Win64VS2010)
         generate_msvc_libraries(i86Win32VS2013)
         generate_msvc_libraries(x64Win64VS2013)
+        generate_msvc_libraries(i86Win32VS2015)
+        generate_msvc_libraries(x64Win64VS2015)
     else()
         add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES})
 
@@ -114,6 +116,8 @@ if(MSVC OR MSVC_IDE)
         install_msvc_libraries(x64Win64VS2010)
         install_msvc_libraries(i86Win32VS2013)
         install_msvc_libraries(x64Win64VS2013)
+        install_msvc_libraries(i86Win32VS2015)
+        install_msvc_libraries(x64Win64VS2015)
     else()
         install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_static
             EXPORT ${PROJECT_NAME}Targets

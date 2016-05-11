@@ -51,6 +51,13 @@ set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} cmake)
 # Platform and architecture dependant
 ###############################################################################
 if(WIN32)
+    if(EPROSIMA_INSTALLER_MINION)
+        install(FILES ${PROJECT_SOURCE_DIR}/cmake/packaging/windows/${PROJECT_NAME}Config.cmake
+            DESTINATION ${LIB_INSTALL_DIR}/${PROJECT_NAME}/cmake
+            COMPONENT cmake
+            )
+    endif()
+
     set(CPACK_GENERATOR NSIS)
 
     configure_file(${PROJECT_SOURCE_DIR}/cmake/packaging/windows/WindowsPackaging.cmake.in ${PROJECT_BINARY_DIR}/cmake/packaging/windows/WindowsPackaging.cmake @ONLY)

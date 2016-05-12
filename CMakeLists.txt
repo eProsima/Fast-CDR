@@ -149,7 +149,7 @@ endif()
 ###############################################################################
 # Install licenses
 install(FILES ${PROJECT_SOURCE_DIR}/FASTCDR_LIBRARY_LICENSE.txt
-    ${PROJECT_SOURCE_DIR}/LGPLv3_LICENSE.txt
+    ${PROJECT_SOURCE_DIR}/MPLv2_LICENSE.txt
     DESTINATION ${LICENSE_INSTALL_DIR}
     COMPONENT licenses
     )

@@ -20,6 +20,12 @@ macro(check_gtest)
         endif()
     endif()
     find_package(GTest)
+
+    if(GTEST_FOUND)
+        find_package(Threads REQUIRED)
+        set(GTEST_LIBRARIES ${GTEST_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+        set(GTEST_BOTH_LIBRARIES ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+    endif()
 endmacro()
 
 macro(add_gtest test)

@@ -89,9 +89,12 @@ namespace eprosima
                      */
                     state(const Cdr &cdr);
 
-                    private:
-
+                    /*!
+                     * @brief Copy constructor.
+                     */
                     state(const state&);
+
+                    private:
 
                     state& operator=(const state&) NON_COPYABLE_CXX11;
 

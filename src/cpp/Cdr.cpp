@@ -633,9 +633,9 @@ Cdr& Cdr::serializeArray(const int16_t *short_t, size_t numElements)
         // Save last datasize.
         m_lastDataSize = sizeof(*short_t);
 
-        // Align
-        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
-        makeAlign(align);
+        // Align if there are any elements
+        if(numElements)
+            makeAlign(align);
 
         if(m_swapBytes)
         {
@@ -690,9 +690,9 @@ Cdr& Cdr::serializeArray(const int32_t *long_t, size_t numElements)
         // Save last datasize.
         m_lastDataSize = sizeof(*long_t);
 
-        // Align
-        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
-        makeAlign(align);
+        // Align if there are any elements
+        if(numElements)
+            makeAlign(align);
 
         if(m_swapBytes)
         {
@@ -775,9 +775,9 @@ Cdr& Cdr::serializeArray(const int64_t *longlong_t, size_t numElements)
         // Save last datasize.
         m_lastDataSize = sizeof(*longlong_t);
 
-        // Align
-        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
-        makeAlign(align);
+        // Align if there are any elements
+        if(numElements)
+            makeAlign(align);
 
         if(m_swapBytes)
         {
@@ -838,9 +838,9 @@ Cdr& Cdr::serializeArray(const float *float_t, size_t numElements)
         // Save last datasize.
         m_lastDataSize = sizeof(*float_t);
 
-        // Align
-        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
-        makeAlign(align);
+        // Align if there are any elements
+        if(numElements)
+            makeAlign(align);
 
         if(m_swapBytes)
         {
@@ -897,9 +897,9 @@ Cdr& Cdr::serializeArray(const double *double_t, size_t numElements)
         // Save last datasize.
         m_lastDataSize = sizeof(*double_t);
 
-        // Align
-        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
-        makeAlign(align);
+        // Align if there are any elements
+        if(numElements)
+            makeAlign(align);
 
         if(m_swapBytes)
         {
@@ -1393,9 +1393,9 @@ Cdr& Cdr::deserializeArray(int16_t *short_t, size_t numElements)
         // Save last datasize.
         m_lastDataSize = sizeof(*short_t);
 
-        // Align
-        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
-        makeAlign(align);
+        // Align if there are any elements
+        if(numElements)
+            makeAlign(align);
 
         if(m_swapBytes)
         {
@@ -1450,9 +1450,9 @@ Cdr& Cdr::deserializeArray(int32_t *long_t, size_t numElements)
         // Save last datasize.
         m_lastDataSize = sizeof(*long_t);
 
-        // Align
-        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
-        makeAlign(align);
+        // Align if there are any elements
+        if(numElements)
+            makeAlign(align);
 
         if(m_swapBytes)
         {
@@ -1539,9 +1539,9 @@ Cdr& Cdr::deserializeArray(int64_t *longlong_t, size_t numElements)
         // Save last datasize.
         m_lastDataSize = sizeof(*longlong_t);
 
-        // Align
-        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
-        makeAlign(align);
+        // Align if there are any elements
+        if(numElements)
+            makeAlign(align);
 
         if(m_swapBytes)
         {
@@ -1602,9 +1602,9 @@ Cdr& Cdr::deserializeArray(float *float_t, size_t numElements)
         // Save last datasize.
         m_lastDataSize = sizeof(*float_t);
 
-        // Align
-        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
-        makeAlign(align);
+        // Align if there are any elements
+        if(numElements)
+            makeAlign(align);
 
         if(m_swapBytes)
         {
@@ -1661,9 +1661,9 @@ Cdr& Cdr::deserializeArray(double *double_t, size_t numElements)
         // Save last datasize.
         m_lastDataSize = sizeof(*double_t);
 
-        // Align
-        // TODO Creo que hay casos que hay que alinear, pero DDS no lo hace. Hay que ver si CORBA si alinea.
-        makeAlign(align);
+        // Align if there are any elements
+        if(numElements)
+            makeAlign(align);
 
         if(m_swapBytes)
         {

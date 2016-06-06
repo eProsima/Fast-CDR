@@ -247,7 +247,7 @@ FastCdr& FastCdr::deserialize(bool &bool_t)
             return *this;
         }
 
-        throw BadParamException(BadParamException::BAD_PARAM_MESSAGE_DEFAULT);
+        throw BadParamException("Got unexpected byte value in deserialize for bool (expected 0 or 1)");
     }
 
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);

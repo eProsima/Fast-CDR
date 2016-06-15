@@ -76,7 +76,7 @@ Cdr& Cdr::read_encapsulation()
         }
         else
         {
-            throw BadParamException(BadParamException::BAD_PARAM_MESSAGE_DEFAULT);
+            throw BadParamException("Unexpected CDR type received in Cdr::read_encapsulation");
         }
     }
 
@@ -1262,7 +1262,7 @@ Cdr& Cdr::deserialize(bool &bool_t)
             return *this;
         }
 
-        throw BadParamException(BadParamException::BAD_PARAM_MESSAGE_DEFAULT);
+        throw BadParamException("Unexpected byte value in Cdr::deserialize(bool), expected 0 or 1");
     }
 
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
@@ -1778,6 +1778,8 @@ Cdr& Cdr::deserializeBoolSequence(std::vector<bool> &vector_t)
             else if(value == 0)
             {
                 vector_t[count] = false;
+            } else {
+              throw BadParamException("Unexpected byte value in Cdr::deserializeBoolSequence, expected 0 or 1");
             }
         }
     }

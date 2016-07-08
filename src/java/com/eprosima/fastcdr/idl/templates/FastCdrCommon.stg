@@ -84,6 +84,27 @@ $var$ += $typecode.scopedname$::getMaxCdrSerializedSize($var$);
 $endif$
 >>
 
+serialized_size_type(ctx, typecode, var) ::= <<
+$if(typecode.primitive)$
+$var$ += $typecode.size$$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $typecode.size$)$endif$;
+$endif$
+>>
+
+serialized_size(ctx, object, data, var) ::= <<
+$if(object.typecode.primitive)$
+$var$ += $object.typecode.size$$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $object.typecode.size$)$endif$;
+$elseif(object.typecode.isType_d)$
+$var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$ + $data$.$object.name$.size() + 1;
+$elseif(object.typecode.isType_e)$
+$var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$;
+$sequence_serialized_size(ctx=ctx, typecodeSeq=object.typecode, data=[data, ".", object.name], var=var, loopvar=ctx.newLoopVarName)$
+$elseif(object.typecode.isType_f)$
+$array_serialized_size(ctx=ctx, typecodeArr=object.typecode, data=[data, ".", object.name], var=var, loopvar=ctx.newLoopVarName)$
+$else$
+$var$ += $object.typecode.scopedname$::getCdrSerializedSize($data$.$object.name$, $var$);
+$endif$
+>>
+
 sequence_max_serialized_size(ctx, typecodeSeq, var, loopvar) ::= <<
 $if(typecodeSeq.contentTypeCode.primitive)$
 $var$ += ($typecodeSeq.maxsize$ * $typecodeSeq.contentTypeCode.size$)$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $typecodeSeq.contentTypeCode.size$)$endif$;
@@ -107,6 +128,29 @@ $endif$
 $endif$
 >>
 
+sequence_serialized_size(ctx, typecodeSeq, data, var, loopvar) ::= <<
+$if(typecodeSeq.contentTypeCode.primitive)$
+$var$ += ($data$.size() * $typecodeSeq.contentTypeCode.size$)$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $typecodeSeq.contentTypeCode.size$)$endif$;
+$elseif(typecodeSeq.contentTypeCode.isType_d)$
+for(size_t $loopvar$ = 0; $loopvar$ < $data$.size(); ++$loopvar$)
+{
+    $var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$ + $data$.at($loopvar$).size() + 1;
+}
+$else$
+for(size_t $loopvar$ = 0; $loopvar$ < $data$.size(); ++$loopvar$)
+{
+$if(typecodeSeq.contentTypeCode.isType_e)$
+    $var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$;
+    $sequence_serialized_size(ctx=ctx, typecodeSeq=typecodeSeq.contentTypeCode, data=[data, ".at(", loopvar, ")"], var=var, loopvar=ctx.nextLoopVarName)$
+$elseif(typecodeSeq.contentTypeCode.isType_f)$
+$array_serialized_size(ctx=ctx, typecodeArr=typecodeSeq.contentTypeCode, data=[data, ".at(", loopvar, ")"], var=var, loopvar=ctx.nextLoopVarName)$
+$else$
+    $var$ += $typecodeSeq.contentTypeCode.scopedname$::getCdrSerializedSize($data$.at($loopvar$), $var$);
+$endif$
+}
+$endif$
+>>
+
 array_max_serialized_size(ctx, typecodeArr, var, loopvar) ::= <<
 $if(typecodeArr.contentTypeCode.primitive)$
 $var$ += ($typecodeArr.size$ * $typecodeArr.contentTypeCode.size$)$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $typecodeArr.contentTypeCode.size$)$endif$;
@@ -125,6 +169,29 @@ $elseif(typecodeArr.contentTypeCode.isType_f)$
 $array_max_serialized_size(ctx=ctx, typecodeArr=typecodeArr.contentTypeCode, var=var, loopvar=ctx.nextLoopVarName)$
 $else$
     $var$ += $typecodeArr.contentTypeCode.scopedname$::getMaxCdrSerializedSize($var$);
+$endif$
+}
+$endif$
+>>
+
+array_serialized_size(ctx, typecodeArr, data, var, loopvar) ::= <<
+$if(typecodeArr.contentTypeCode.primitive)$
+$var$ += ($typecodeArr.size$ * $typecodeArr.contentTypeCode.size$)$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $typecodeArr.contentTypeCode.size$)$endif$;
+$elseif(typecodeArr.contentTypeCode.isType_d)$
+for(size_t $loopvar$ = 0; $loopvar$ < $typecodeArr.size$; ++$loopvar$)
+{
+    $var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$ + $data$.at($loopvar$) + 1;
+}
+$else$
+for(size_t $loopvar$ = 0; $loopvar$ < $typecodeArr.size$; ++$loopvar$)
+{
+$if(typecodeArr.contentTypeCode.isType_e)$
+    $var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$;
+    $sequence_serialized_size(ctx=ctx, typecodeArr=typecodeArr.contentTypeCode, data=[data, ".at(", loopvar, ")"], var=var, loopvar=ctx.nextLoopVarName)$
+$elseif(typecodeArr.contentTypeCode.isType_f)$
+$array_serialized_size(ctx=ctx, typecodeArr=typecodeArr.contentTypeCode, data=[data, ".at(", loopvar, ")"], var=var, loopvar=ctx.nextLoopVarName)$
+$else$
+    $var$ += $typecodeArr.contentTypeCode.scopedname$::getCdrSerializedSize($data$.at($loopvar$), $var$);
 $endif$
 }
 $endif$

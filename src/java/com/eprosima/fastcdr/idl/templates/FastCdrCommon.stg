@@ -58,17 +58,6 @@ dcdr \>> $deserializeCasting(typecode=object.typecode)$$preffix$$object.name$;
 >>
 
 // TODO Todos los tipos. MEJORAR. size of 1 no deberia generar alignment.
-serialized_size(param, var) ::= <<
-$if(param.typecode.primitive)$
-$var$ += $param.typecode.size$ + eprosima::fastcdr::Cdr::alignment($var$, $param.typecode.size$);
-$elseif(param.typecode.isType_d)$
-// TODO $var$ += $param.name$.length();
-$else$
-// TODO
-$endif$
->>
-
-// TODO Todos los tipos. MEJORAR. size of 1 no deberia generar alignment.
 max_serialized_size(ctx, typecode, var) ::= <<
 $if(typecode.primitive)$
 $var$ += $typecode.size$$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $typecode.size$)$endif$;

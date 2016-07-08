@@ -376,7 +376,7 @@ size_t $union.scopedname$::getCdrSerializedSize(const $union.scopedname$& data, 
 
     $serialized_size_type(ctx=ctx, typecode=union.discriminator, var="current_alignment")$
 
-    switch(m__d)
+    switch(data.__d())
     {
         $union.members:{ member |$unionmember_case_selection_sesize(ctx=ctx, member=member, data="data", var="current_alignment")$}; separator="\n"$
         $unionmemberdefault_case_selection_sesize(ctx=ctx, member=union.defaultMember, data="data", var="current_alignment")$

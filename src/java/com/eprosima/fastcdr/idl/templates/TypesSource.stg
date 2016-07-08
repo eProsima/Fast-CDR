@@ -373,22 +373,16 @@ size_t $union.scopedname$::getMaxCdrSerializedSize(size_t current_alignment)
 size_t $union.scopedname$::getCdrSerializedSize(const $union.scopedname$& data, size_t current_alignment)
 {
     size_t initial_alignment = current_alignment;
-    size_t reset_alignment = 0;
-    size_t union_max_size_serialized = 0;
 
     $serialized_size_type(ctx=ctx, typecode=union.discriminator, var="current_alignment")$
 
-    $union.members : { member |
-    reset_alignment = current_alignment;
+    switch(m__d)
+    {
+        $union.members:{ member |$unionmember_case_selection_sesize(ctx=ctx, member=member, data="data", var="current_alignment")$}; separator="\n"$
+        $unionmemberdefault_case_selection_sesize(ctx=ctx, member=union.defaultMember, data="data", var="current_alignment")$
+    }
 
-    $serialized_size(ctx=ctx, object=member, data="data", var="reset_alignment")$
-
-    if(union_max_size_serialized < reset_alignment)
-        union_max_size_serialized = reset_alignment;
-
-    }; separator="\n"$
-
-    return union_max_size_serialized - initial_alignment;
+    return current_alignment - initial_alignment;
 }
 
 $endif$
@@ -650,6 +644,25 @@ default:
 $if(member)$
 $if(member.default)$
 $object_deserialization(ctx=ctx, object=member, preffix="m_")$
+$endif$
+$endif$
+
+break;
+>>
+
+unionmember_case_selection_sesize(ctx, member, data, var) ::= <<
+$if(member.labels)$
+$member.labels:{ label |case $label$:}; separator="\n"$
+$serialized_size(ctx=ctx, object=member, data=[data, ".", member.name, "()"], var=var)$
+break;
+$endif$
+>>
+
+unionmemberdefault_case_selection_sesize(ctx, member, data, var) ::= <<
+default:
+$if(member)$
+$if(member.default)$
+$serialized_size(ctx=ctx, object=member, data=[data, ".", member.name, "()"], var=var)$
 $endif$
 $endif$
 

@@ -148,7 +148,7 @@ add_subdirectory(src/cpp)
 ###############################################################################
 # Testing
 ###############################################################################
-if(NOT EPROSIMA_INSTALLER)
+if(EPROSIMA_BUILD_TESTS AND NOT EPROSIMA_INSTALLER)
     include(${PROJECT_SOURCE_DIR}/cmake/dev/gtest.cmake)
     check_gtest()
     if(GTEST_FOUND)

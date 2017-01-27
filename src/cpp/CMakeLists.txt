@@ -76,11 +76,7 @@ if(MSVC OR MSVC_IDE)
     endif()
 else()
     #Create library
-    if(EPROSIMA_HONOR_BUILD_SHARED_LIBS)
-      add_library(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCES})
-    else()
-      add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES})
-    endif()
+    add_library(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCES})
 
     # Define public headers
     target_include_directories(${PROJECT_NAME} PUBLIC

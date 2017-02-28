@@ -1025,7 +1025,7 @@ Cdr& Cdr::deserialize(int32_t &long_t)
     size_t align = alignment(sizeof(long_t));
     size_t sizeAligned = sizeof(long_t) + align;
 
-    if((m_lastPosition - m_currentPosition) >= sizeAligned)
+    if((m_lastPosition - m_currentPosition) >= sizeAligned || resize(sizeAligned))
     {
         // Save last datasize.
         m_lastDataSize = sizeof(long_t);
@@ -1326,7 +1326,7 @@ const char* Cdr::readString(uint32_t &length)
 	{
 		return returnedValue;
 	}
-	else if((m_lastPosition - m_currentPosition) >= length)
+	else if((m_lastPosition - m_currentPosition) >= length || resize(length))
 	{
 		// Save last datasize.
 		m_lastDataSize = sizeof(uint8_t);
@@ -1375,7 +1375,7 @@ Cdr& Cdr::deserializeArray(char *char_t, size_t numElements)
 {
     size_t totalSize = sizeof(*char_t)*numElements;
 
-    if((m_lastPosition - m_currentPosition) >= totalSize)
+    if((m_lastPosition - m_currentPosition) >= totalSize || resize(totalSize))
     {
         // Save last datasize.
         m_lastDataSize = sizeof(*char_t);

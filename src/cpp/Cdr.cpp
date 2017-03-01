@@ -19,15 +19,15 @@ using namespace eprosima::fastcdr;
 using namespace ::exception;
 
 #if __BIG_ENDIAN__
-    const Cdr::Endianness Cdr::DEFAULT_ENDIAN = BIG_ENDIANNESS;
+const Cdr::Endianness Cdr::DEFAULT_ENDIAN = BIG_ENDIANNESS;
 #else
-    const Cdr::Endianness Cdr::DEFAULT_ENDIAN = LITTLE_ENDIANNESS;
+const Cdr::Endianness Cdr::DEFAULT_ENDIAN = LITTLE_ENDIANNESS;
 #endif
 
 Cdr::state::state(const Cdr &cdr) : m_currentPosition(cdr.m_currentPosition), m_alignPosition(cdr.m_alignPosition),
     m_swapBytes(cdr.m_swapBytes), m_lastDataSize(cdr.m_lastDataSize) {}
 
-Cdr::state::state(const state &state) : m_currentPosition(state.m_currentPosition), m_alignPosition(state.m_alignPosition),
+    Cdr::state::state(const state &state) : m_currentPosition(state.m_currentPosition), m_alignPosition(state.m_alignPosition),
     m_swapBytes(state.m_swapBytes), m_lastDataSize(state.m_lastDataSize) {}
 
 Cdr::Cdr(FastBuffer &cdrBuffer, const Endianness endianness, const CdrType cdrType) : m_cdrBuffer(cdrBuffer),
@@ -91,6 +91,7 @@ Cdr& Cdr::read_encapsulation()
         ex.raise();
     }
 
+    resetAlignment();
     return *this;
 }
 
@@ -130,6 +131,7 @@ Cdr& Cdr::serialize_encapsulation()
         ex.raise();
     }
 
+    resetAlignment();
     return *this;
 }
 
@@ -228,7 +230,7 @@ bool Cdr::resize(size_t minSizeInc)
         m_lastPosition = m_cdrBuffer.end();
         return true;
     }
-    
+
     return false;
 }
 
@@ -255,12 +257,12 @@ Cdr& Cdr::serialize(const int16_t short_t)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(short_t);
-    
+
         // Align.
         makeAlign(align);
 
         if(m_swapBytes)
-        {    
+        {
             const char *dst = reinterpret_cast<const char*>(&short_t);
 
             m_currentPosition++ << dst[1];
@@ -282,7 +284,7 @@ Cdr& Cdr::serialize(const int16_t short_t, Endianness endianness)
 {
     bool auxSwap = m_swapBytes;
     m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-    
+
     try
     {
         serialize(short_t);
@@ -293,7 +295,7 @@ Cdr& Cdr::serialize(const int16_t short_t, Endianness endianness)
         m_swapBytes = auxSwap;
         ex.raise();
     }
-    
+
     return *this;
 }
 
@@ -306,7 +308,7 @@ Cdr& Cdr::serialize(const int32_t long_t)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(long_t);
-    
+
         // Align.
         makeAlign(align);
 
@@ -346,7 +348,7 @@ Cdr& Cdr::serialize(const int32_t long_t, Endianness endianness)
         m_swapBytes = auxSwap;
         ex.raise();
     }
-    
+
     return *this;
 }
 
@@ -359,7 +361,7 @@ Cdr& Cdr::serialize(const int64_t longlong_t)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(longlong_t);
-    
+
         // Align.
         makeAlign(align);
 
@@ -403,7 +405,7 @@ Cdr& Cdr::serialize(const int64_t longlong_t, Endianness endianness)
         m_swapBytes = auxSwap;
         ex.raise();
     }
-    
+
     return *this;
 }
 
@@ -416,7 +418,7 @@ Cdr& Cdr::serialize(const float float_t)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(float_t);
-    
+
         // Align.
         makeAlign(align);
 
@@ -456,7 +458,7 @@ Cdr& Cdr::serialize(const float float_t, Endianness endianness)
         m_swapBytes = auxSwap;
         ex.raise();
     }
-    
+
     return *this;
 }
 
@@ -469,7 +471,7 @@ Cdr& Cdr::serialize(const double double_t)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(double_t);
-    
+
         // Align.
         makeAlign(align);
 
@@ -513,7 +515,7 @@ Cdr& Cdr::serialize(const double double_t, Endianness endianness)
         m_swapBytes = auxSwap;
         ex.raise();
     }
-    
+
     return *this;
 }
 
@@ -539,18 +541,18 @@ Cdr& Cdr::serialize(const bool bool_t)
 Cdr& Cdr::serialize(const char *string_t)
 {
     uint32_t length = 0;
-    
+
     if(string_t != nullptr)
         length = (uint32_t)strlen(string_t) + 1;
 
     if(length > 0)
     {
         Cdr::state state(*this);
-		serialize(length);
+        serialize(length);
 
         if(((m_lastPosition - m_currentPosition) >= length) || resize(length))
         {
-			// Save last datasize.
+            // Save last datasize.
             m_lastDataSize = sizeof(uint8_t);
 
             m_currentPosition.memcopy(string_t, length);
@@ -562,8 +564,8 @@ Cdr& Cdr::serialize(const char *string_t)
             throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
     }
-	else
-		serialize(length);
+    else
+        serialize(length);
 
     return *this;
 }
@@ -583,7 +585,7 @@ Cdr& Cdr::serialize(const char *string_t, Endianness endianness)
         m_swapBytes = auxSwap;
         ex.raise();
     }
-    
+
     return *this;
 }
 
@@ -681,7 +683,7 @@ Cdr& Cdr::serializeArray(const int16_t *short_t, size_t numElements, Endianness 
         m_swapBytes = auxSwap;
         ex.raise();
     }
-    
+
     return *this;
 }
 
@@ -740,7 +742,7 @@ Cdr& Cdr::serializeArray(const int32_t *long_t, size_t numElements, Endianness e
         m_swapBytes = auxSwap;
         ex.raise();
     }
-    
+
     return *this;
 }
 
@@ -766,7 +768,7 @@ Cdr& Cdr::serializeArray(const wchar_t *wchar, size_t numElements, Endianness en
         m_swapBytes = auxSwap;
         ex.raise();
     }
-    
+
     return *this;
 }
 
@@ -1161,7 +1163,7 @@ Cdr& Cdr::deserialize(float &float_t)
         return *this;
     }
 
-   throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::deserialize(float &float_t, Endianness endianness)
@@ -1282,7 +1284,7 @@ Cdr& Cdr::deserialize(char *&string_t)
     }
     else if((m_lastPosition - m_currentPosition) >= length)
     {
-		// Save last datasize.
+        // Save last datasize.
         m_lastDataSize = sizeof(uint8_t);
 
         // Allocate memory.
@@ -1317,28 +1319,28 @@ Cdr& Cdr::deserialize(char *&string_t, Endianness endianness)
 
 const char* Cdr::readString(uint32_t &length)
 {
-	const char* returnedValue = "";
-	state state(*this);
+    const char* returnedValue = "";
+    state state(*this);
 
-	*this >> length;
+    *this >> length;
 
-	if(length == 0)
-	{
-		return returnedValue;
-	}
-	else if((m_lastPosition - m_currentPosition) >= length)
-	{
-		// Save last datasize.
-		m_lastDataSize = sizeof(uint8_t);
+    if(length == 0)
+    {
+        return returnedValue;
+    }
+    else if((m_lastPosition - m_currentPosition) >= length)
+    {
+        // Save last datasize.
+        m_lastDataSize = sizeof(uint8_t);
 
-		returnedValue = &m_currentPosition;
-		m_currentPosition += length;
-		if(returnedValue[length-1] == '\0') --length;
-		return returnedValue;
-	}
+        returnedValue = &m_currentPosition;
+        m_currentPosition += length;
+        if(returnedValue[length-1] == '\0') --length;
+        return returnedValue;
+    }
 
-	setState(state);
-	throw eprosima::fastcdr::exception::NotEnoughMemoryException(eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    setState(state);
+    throw eprosima::fastcdr::exception::NotEnoughMemoryException(eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::deserializeArray(bool *bool_t, size_t numElements)
@@ -1779,7 +1781,7 @@ Cdr& Cdr::deserializeBoolSequence(std::vector<bool> &vector_t)
             {
                 vector_t[count] = false;
             } else {
-              throw BadParamException("Unexpected byte value in Cdr::deserializeBoolSequence, expected 0 or 1");
+                throw BadParamException("Unexpected byte value in Cdr::deserializeBoolSequence, expected 0 or 1");
             }
         }
     }

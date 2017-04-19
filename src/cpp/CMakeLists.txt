@@ -77,6 +77,8 @@ if(MSVC OR MSVC_IDE)
 else()
     #Create library
     add_library(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCES})
+    set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
+    set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_MAJOR_VERSION})
 
     # Define public headers
     target_include_directories(${PROJECT_NAME} PUBLIC

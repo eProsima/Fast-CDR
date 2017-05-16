@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>fast_cdr</name>
+  <version>1.0.1</version>
+  <description>
+    eProsima's implementation of CDR.
+  </description>
+  <maintainer email="william@osrfoundation.org">William Woodall</maintainer>
+  <license>LGPLv3</license>
+
+  <url>https://github.com/eProsima/Fast-CDR</url>
+
+  <export>
+    <build_type>cmake</build_type>
+  </export>
+</package>

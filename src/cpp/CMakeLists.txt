@@ -164,6 +164,12 @@ if(MSVC OR MSVC_IDE)
             PATTERN "*.pdb"
             )
 
+        install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_static.dir/Debug/${PROJECT_NAME}_static.pdb
+            DESTINATION ${LIB_INSTALL_DIR}${DIR_EXTENSION}
+            COMPONENT libraries_${MSVC_ARCH}
+            CONFIGURATIONS Debug
+            )
+
         string(TOUPPER "${MSVC_ARCH}" MSVC_ARCH_UPPER)
         set(CPACK_COMPONENT_LIBRARIES_${MSVC_ARCH_UPPER}_DISPLAY_NAME "${MSVC_ARCH}" PARENT_SCOPE)
         set(CPACK_COMPONENT_LIBRARIES_${MSVC_ARCH_UPPER}_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} libraries for platform ${MSVC_ARCH}" PARENT_SCOPE)

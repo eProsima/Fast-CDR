@@ -43,14 +43,7 @@ $if(params)$$separatorInicial$$endif$$params : {param | /*$param.comment$*/ $par
 >>
 
 object_serialization(ctx, object, preffix) ::= <<
-$if(object.typecode.maxsize)$
-if($preffix$$object.name$.$sizeFunction.(object.typecode.stType)$ <= $object.typecode.maxsize$)
-
-$endif$scdr << $serializeCasting(typecode=object.typecode)$$preffix$$object.name$;
-$if(object.typecode.maxsize)$
-else
-    throw eprosima::fastcdr::exception::BadParamException("$object.name$ field exceeds the maximum length");
-$endif$
+scdr << $serializeCasting(typecode=object.typecode)$$preffix$$object.name$;
 >>
 
 object_deserialization(ctx, object, preffix) ::= <<

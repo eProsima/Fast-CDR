@@ -164,11 +164,13 @@ if(MSVC OR MSVC_IDE)
             PATTERN "*.pdb"
             )
 
-        install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_static.dir/Debug/${PROJECT_NAME}_static.pdb
-            DESTINATION ${LIB_INSTALL_DIR}${DIR_EXTENSION}
-            COMPONENT libraries_${MSVC_ARCH}
-            CONFIGURATIONS Debug
-            )
+        if(NOT (("${MSVC_ARCH}" STREQUAL "i86Win32VS2013") OR ("${MSVC_ARCH}" STREQUAL "x64Win64VS2013")))
+            install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_static.dir/Debug/${PROJECT_NAME}_static.pdb
+                DESTINATION ${LIB_INSTALL_DIR}${DIR_EXTENSION}
+                COMPONENT libraries_${MSVC_ARCH}
+                CONFIGURATIONS Debug
+                )
+        endif()
 
         string(TOUPPER "${MSVC_ARCH}" MSVC_ARCH_UPPER)
         set(CPACK_COMPONENT_LIBRARIES_${MSVC_ARCH_UPPER}_DISPLAY_NAME "${MSVC_ARCH}" PARENT_SCOPE)

@@ -519,6 +519,71 @@ Cdr& Cdr::serialize(const double double_t, Endianness endianness)
     return *this;
 }
 
+Cdr& Cdr::serialize(const long double ldouble_t)
+{
+    size_t align = alignment(sizeof(ldouble_t));
+    size_t sizeAligned = sizeof(ldouble_t) + align;
+
+    if(((m_lastPosition - m_currentPosition) >= sizeAligned) || resize(sizeAligned))
+    {
+        // Save last datasize.
+        m_lastDataSize = sizeof(ldouble_t);
+
+        // Align.
+        makeAlign(align);
+
+        if(m_swapBytes)
+        {
+            const char *dst = reinterpret_cast<const char*>(&ldouble_t);
+
+            m_currentPosition++ << dst[15];
+            m_currentPosition++ << dst[14];
+            m_currentPosition++ << dst[13];
+            m_currentPosition++ << dst[12];
+            m_currentPosition++ << dst[11];
+            m_currentPosition++ << dst[10];
+            m_currentPosition++ << dst[9];
+            m_currentPosition++ << dst[8];
+            m_currentPosition++ << dst[7];
+            m_currentPosition++ << dst[6];
+            m_currentPosition++ << dst[5];
+            m_currentPosition++ << dst[4];
+            m_currentPosition++ << dst[3];
+            m_currentPosition++ << dst[2];
+            m_currentPosition++ << dst[1];
+            m_currentPosition++ << dst[0];
+        }
+        else
+        {
+            m_currentPosition << ldouble_t;
+            m_currentPosition += sizeof(ldouble_t);
+        }
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+}
+
+Cdr& Cdr::serialize(const long double ldouble_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        serialize(ldouble_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
 Cdr& Cdr::serialize(const bool bool_t)
 {
     uint8_t value = 0;
@@ -957,6 +1022,77 @@ Cdr& Cdr::serializeArray(const double *double_t, size_t numElements, Endianness 
     return *this;
 }
 
+Cdr& Cdr::serializeArray(const long double *ldouble_t, size_t numElements)
+{
+    size_t align = alignment(sizeof(*ldouble_t));
+    size_t totalSize = sizeof(*ldouble_t) * numElements;
+    size_t sizeAligned = totalSize + align;
+
+    if(((m_lastPosition - m_currentPosition) >= sizeAligned) || resize(sizeAligned))
+    {
+        // Save last datasize.
+        m_lastDataSize = sizeof(*ldouble_t);
+
+        // Align if there are any elements
+        if(numElements)
+            makeAlign(align);
+
+        if(m_swapBytes)
+        {
+            const char *dst = reinterpret_cast<const char*>(&ldouble_t);
+            const char *end = dst + totalSize;
+
+            for(; dst < end; dst += sizeof(*ldouble_t))
+            {
+                m_currentPosition++ << dst[15];
+                m_currentPosition++ << dst[14];
+                m_currentPosition++ << dst[13];
+                m_currentPosition++ << dst[12];
+                m_currentPosition++ << dst[11];
+                m_currentPosition++ << dst[10];
+                m_currentPosition++ << dst[9];
+                m_currentPosition++ << dst[8];
+                m_currentPosition++ << dst[7];
+                m_currentPosition++ << dst[6];
+                m_currentPosition++ << dst[5];
+                m_currentPosition++ << dst[4];
+                m_currentPosition++ << dst[3];
+                m_currentPosition++ << dst[2];
+                m_currentPosition++ << dst[1];
+                m_currentPosition++ << dst[0];
+            }
+        }
+        else
+        {
+            m_currentPosition.memcopy(ldouble_t, totalSize);
+            m_currentPosition += totalSize;
+        }
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+}
+
+Cdr& Cdr::serializeArray(const long double *ldouble_t, size_t numElements, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        serializeArray(ldouble_t, numElements);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
 Cdr& Cdr::deserialize(char &char_t)
 {
     if((m_lastPosition - m_currentPosition) >= sizeof(char_t))
@@ -1231,6 +1367,63 @@ Cdr& Cdr::deserialize(double &double_t, Endianness endianness)
     try
     {
         deserialize(double_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::deserialize(long double &ldouble_t)
+{
+    size_t align = alignment(sizeof(ldouble_t));
+    size_t sizeAligned = sizeof(ldouble_t) + align;
+
+    if((m_lastPosition - m_currentPosition) >= sizeAligned)
+    {
+        // Save last datasize.
+        m_lastDataSize = sizeof(ldouble_t);
+
+        // Align.
+        makeAlign(align);
+
+        if(m_swapBytes)
+        {
+            char *dst = reinterpret_cast<char*>(&ldouble_t);
+
+            m_currentPosition++ >> dst[7];
+            m_currentPosition++ >> dst[6];
+            m_currentPosition++ >> dst[5];
+            m_currentPosition++ >> dst[4];
+            m_currentPosition++ >> dst[3];
+            m_currentPosition++ >> dst[2];
+            m_currentPosition++ >> dst[1];
+            m_currentPosition++ >> dst[0];
+        }
+        else
+        {
+            m_currentPosition >> ldouble_t;
+            m_currentPosition += sizeof(ldouble_t);
+        }
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+}
+
+Cdr& Cdr::deserialize(long double &ldouble_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        deserialize(ldouble_t);
         m_swapBytes = auxSwap;
     }
     catch(Exception &ex)
@@ -1710,6 +1903,69 @@ Cdr& Cdr::deserializeArray(double *double_t, size_t numElements, Endianness endi
     try
     {
         deserializeArray(double_t, numElements);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::deserializeArray(long double *ldouble_t, size_t numElements)
+{
+    size_t align = alignment(sizeof(*ldouble_t));
+    size_t totalSize = sizeof(*ldouble_t) * numElements;
+    size_t sizeAligned = totalSize + align;
+
+    if((m_lastPosition - m_currentPosition) >= sizeAligned)
+    {
+        // Save last datasize.
+        m_lastDataSize = sizeof(*ldouble_t);
+
+        // Align if there are any elements
+        if(numElements)
+            makeAlign(align);
+
+        if(m_swapBytes)
+        {
+            char *dst = reinterpret_cast<char*>(&ldouble_t);
+            char *end = dst + totalSize;
+
+            for(; dst < end; dst += sizeof(*ldouble_t))
+            {
+                m_currentPosition++ >> dst[7];
+                m_currentPosition++ >> dst[6];
+                m_currentPosition++ >> dst[5];
+                m_currentPosition++ >> dst[4];
+                m_currentPosition++ >> dst[3];
+                m_currentPosition++ >> dst[2];
+                m_currentPosition++ >> dst[1];
+                m_currentPosition++ >> dst[0];
+            }
+        }
+        else
+        {
+            m_currentPosition.rmemcopy(ldouble_t, totalSize);
+            m_currentPosition += totalSize;
+        }
+
+        return *this;
+    }
+
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+}
+
+Cdr& Cdr::deserializeArray(long double *ldouble_t, size_t numElements, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        deserializeArray(ldouble_t, numElements);
         m_swapBytes = auxSwap;
     }
     catch(Exception &ex)

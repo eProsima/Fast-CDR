@@ -37,6 +37,7 @@ static const uint64_t ulonglong_t = 18446744073709551600u;
 static const int64_t longlong_t = -9223372036800;
 static const float float_tt = std::numeric_limits<float>::min();
 static const double double_tt = std::numeric_limits<double>::min();
+static const long double ldouble_tt = std::numeric_limits<long double>::min();
 static const bool bool_t = true;
 static const std::string string_t = "Hola a todos, esto es un test";
 static const std::string emptystring_t = "";
@@ -60,6 +61,8 @@ static const std::array<float, 5> float_array_t = {{float_tt, float_tt + 1, floa
 static const float float_array_2_t[5] = {float_tt + 4, float_tt + 3, float_tt + 2, float_tt + 1, float_tt};
 static const std::array<double, 5> double_array_t = {{double_tt, double_tt + 1, double_tt + 2, double_tt + 3, double_tt + 4}};
 static const double double_array_2_t[5] = {double_tt + 4, double_tt + 3, double_tt + 2, double_tt + 1, double_tt};
+static const std::array<long double, 5> ldouble_array_t = {{ldouble_tt, ldouble_tt + 1, ldouble_tt + 2, ldouble_tt + 3, ldouble_tt + 4}};
+static const long double ldouble_array_2_t[5] = {ldouble_tt + 4, ldouble_tt + 3, ldouble_tt + 2, ldouble_tt + 1, ldouble_tt};
 static const std::array<bool, 5> bool_array_t = {{true, false, true, false, true}};
 static const bool bool_array_2_t[5] = {false, true, false, true, false};
 static const std::array<std::string, 5> string_array_t = {{"HOLA", "ADIOS", "HELLO", "BYE", "GOODBYE"}};
@@ -74,6 +77,7 @@ static const std::vector<uint64_t> ulonglong_vector_t(ulonglong_array_2_t, ulong
 static const std::vector<int64_t> longlong_vector_t(longlong_array_2_t, longlong_array_2_t + sizeof(longlong_array_2_t) / sizeof(int64_t));
 static const std::vector<float> float_vector_t(float_array_2_t, float_array_2_t + sizeof(float_array_2_t) / sizeof(float));
 static const std::vector<double> double_vector_t(double_array_2_t, double_array_2_t + sizeof(double_array_2_t) / sizeof(double));
+static const std::vector<long double> ldouble_vector_t(ldouble_array_2_t, ldouble_array_2_t + sizeof(ldouble_array_2_t) / sizeof(long double));
 static const std::vector<bool> bool_vector_t(bool_array_2_t, bool_array_2_t + sizeof(bool_array_2_t) / sizeof(bool));
 static const std::vector<std::string> string_vector_t(string_array_2_t, string_array_2_t + sizeof(string_array_2_t) / sizeof(std::string));
 static const std::array<std::array<std::array<uint32_t, 3>, 2>, 2> triple_ulong_array_t = {{ {{ {{1, 2, 3}}, {{4, 5, 6}} }}, {{ {{7, 8, 9}}, {{10, 11, 12}} }} }};
@@ -88,6 +92,7 @@ static const uint64_t ulonglong_seq_t[5] = {18446744073709551604u, 1844674407370
 static const int64_t longlong_seq_t[5] = {-9223372036804, -9223372036803, -9223372036802, -9223372036801, -9223372036800};
 static const float float_seq_t[5] = {float_tt + 4, float_tt + 3, float_tt + 2, float_tt + 1, float_tt};
 static const double double_seq_t[5] = {double_tt + 4, double_tt + 3, double_tt + 2, double_tt + 1, double_tt};
+static const long double ldouble_seq_t[5] = {ldouble_tt + 4, ldouble_tt + 3, ldouble_tt + 2, ldouble_tt + 1, ldouble_tt};
 static const bool bool_seq_t[5] = {true, true, false, false, true};
 static const std::string string_seq_t[5] = {"HELLO", "BYE", "GOODBYE", "HOLA", "ADIOS"};
 // Added because error 337
@@ -111,6 +116,14 @@ static void EXPECT_ARRAY_FLOAT_EQ(float *array1, const float *array2, size_t siz
 }
 
 static void EXPECT_ARRAY_DOUBLE_EQ(double *array1, const double *array2, size_t size)
+{
+    for(size_t count = 0; count < size; ++count)
+    {
+        EXPECT_DOUBLE_EQ(array1[count], array2[count]);
+    }
+}
+
+static void EXPECT_ARRAY_LONG_DOUBLE_EQ(long double *array1, const long double *array2, size_t size)
 {
     for(size_t count = 0; count < size; ++count)
     {
@@ -560,6 +573,55 @@ TEST(CDRTests, Double)
     EXPECT_THROW(
     {
         cdr_des_bad >> double_value;
+    },
+    NotEnoughMemoryException);
+}
+
+TEST(CDRTests, LongDouble)
+{
+    // Check good case.
+    char buffer[BUFFER_LENGTH];
+
+    // Serialization.
+    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+    Cdr cdr_ser(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser << ldouble_tt;
+    });
+
+    // Deseriazliation.
+    Cdr cdr_des(cdrbuffer);
+
+    long double ldouble_value = 0;
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des >> ldouble_value;
+    });
+
+    EXPECT_DOUBLE_EQ(ldouble_value, ldouble_tt);
+
+    // Check bad case without space
+    char buffer_bad[1];
+
+    // Serialization.
+    FastBuffer cdrbuffer_bad(buffer_bad, 1);
+    Cdr cdr_ser_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_ser_bad << ldouble_tt;
+    },
+    NotEnoughMemoryException);
+
+    // Deseriazliation.
+    Cdr cdr_des_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_des_bad >> ldouble_value;
     },
     NotEnoughMemoryException);
 }
@@ -1179,6 +1241,55 @@ TEST(CDRTests, STDArrayDouble)
     NotEnoughMemoryException);
 }
 
+TEST(CDRTests, STDArrayLongDouble)
+{
+    // Check good case.
+    char buffer[BUFFER_LENGTH];
+
+    // Serialization.
+    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+    Cdr cdr_ser(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser << ldouble_array_t;
+    });
+
+    // Deseriazliation.
+    Cdr cdr_des(cdrbuffer);
+
+    std::array<long double, 5> ldouble_array_value;
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des >> ldouble_array_value;
+    });
+
+    EXPECT_EQ(ldouble_array_value, ldouble_array_t);
+
+    // Check bad case without space
+    char buffer_bad[1];
+
+    // Serialization.
+    FastBuffer cdrbuffer_bad(buffer_bad, 1);
+    Cdr cdr_ser_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_ser_bad << ldouble_array_t;
+    },
+    NotEnoughMemoryException);
+
+    // Deseriazliation.
+    Cdr cdr_des_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_des_bad >> ldouble_array_value;
+    },
+    NotEnoughMemoryException);
+}
+
 TEST(CDRTests, STDArrayBoolean)
 {
     // Check good case.
@@ -1767,6 +1878,55 @@ TEST(CDRTests, ArrayDouble)
     NotEnoughMemoryException);
 }
 
+TEST(CDRTests, ArrayLongDouble)
+{
+    // Check good case.
+    char buffer[BUFFER_LENGTH];
+
+    // Serialization.
+    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+    Cdr cdr_ser(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser.serializeArray(ldouble_array_2_t, 5);
+    });
+
+    // Deseriazliation.
+    Cdr cdr_des(cdrbuffer);
+
+    long double ldouble_array_2_value[5];
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des.deserializeArray(ldouble_array_2_value, 5);
+    });
+
+    EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_array_2_value, ldouble_array_2_t, 5);
+
+    // Check bad case without space
+    char buffer_bad[1];
+
+    // Serialization.
+    FastBuffer cdrbuffer_bad(buffer_bad, 1);
+    Cdr cdr_ser_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_ser_bad.serializeArray(ldouble_array_2_t, 5);
+    },
+    NotEnoughMemoryException);
+
+    // Deseriazliation.
+    Cdr cdr_des_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_des_bad.deserializeArray(ldouble_array_2_value, 5);
+    },
+    NotEnoughMemoryException);
+}
+
 TEST(CDRTests, ArrayBoolean)
 {
     // Check good case.
@@ -2351,6 +2511,55 @@ TEST(CDRTests, STDVectorDouble)
     EXPECT_THROW(
     {
         cdr_des_bad >> double_vector_value;
+    },
+    NotEnoughMemoryException);
+}
+
+TEST(CDRTests, STDVectorLongDouble)
+{
+    // Check good case.
+    char buffer[BUFFER_LENGTH];
+
+    // Serialization.
+    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+    Cdr cdr_ser(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser << ldouble_vector_t;
+    });
+
+    // Deseriazliation.
+    Cdr cdr_des(cdrbuffer);
+
+    std::vector<long double> ldouble_vector_value;
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des >> ldouble_vector_value;
+    });
+
+    EXPECT_EQ(ldouble_vector_value, ldouble_vector_t);
+
+    // Check bad case without space
+    char buffer_bad[1];
+
+    // Serialization.
+    FastBuffer cdrbuffer_bad(buffer_bad, 1);
+    Cdr cdr_ser_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_ser_bad << ldouble_vector_t;
+    },
+    NotEnoughMemoryException);
+
+    // Deseriazliation.
+    Cdr cdr_des_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_des_bad >> ldouble_vector_value;
     },
     NotEnoughMemoryException);
 }
@@ -3022,6 +3231,58 @@ TEST(CDRTests, SequenceDouble)
     NotEnoughMemoryException);
 }
 
+TEST(CDRTests, SequenceLongDouble)
+{
+    // Check good case.
+    char buffer[BUFFER_LENGTH];
+
+    // Serialization.
+    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+    Cdr cdr_ser(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser.serializeSequence(ldouble_seq_t, 5);
+    });
+
+    // Deseriazliation.
+    Cdr cdr_des(cdrbuffer);
+
+    long double *ldouble_seq_value = NULL; size_t ldouble_seq_len = 0;
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des.deserializeSequence(ldouble_seq_value, ldouble_seq_len);
+    });
+
+    EXPECT_EQ(ldouble_seq_len, 5);
+    EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_seq_value, ldouble_seq_t, ldouble_seq_len);
+
+    free(ldouble_seq_value);
+
+    // Check bad case without space
+    char buffer_bad[1];
+
+    // Serialization.
+    FastBuffer cdrbuffer_bad(buffer_bad, 1);
+    Cdr cdr_ser_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_ser_bad.serializeSequence(ldouble_seq_t, 5);
+    },
+    NotEnoughMemoryException);
+
+    // Deseriazliation.
+    Cdr cdr_des_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_des_bad.deserializeSequence(ldouble_seq_value, ldouble_seq_len);
+    },
+    NotEnoughMemoryException);
+}
+
 TEST(CDRTests, SequenceBoolean)
 {
     // Check good case.
@@ -3190,15 +3451,15 @@ TEST(CDRTests, Complete)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser << octet_t << char_t << ushort_t << short_t << ulong_t << long_t << ulonglong_t << longlong_t << float_tt << double_tt << bool_t << string_t;
-        cdr_ser << octet_array_t << char_array_t << ushort_array_t << short_array_t << ulong_array_t << long_array_t << ulonglong_array_t << longlong_array_t << float_array_t << double_array_t << bool_array_t;
+        cdr_ser << octet_t << char_t << ushort_t << short_t << ulong_t << long_t << ulonglong_t << longlong_t << float_tt << double_tt << ldouble_tt << bool_t << string_t;
+        cdr_ser << octet_array_t << char_array_t << ushort_array_t << short_array_t << ulong_array_t << long_array_t << ulonglong_array_t << longlong_array_t << float_array_t << double_array_t << ldouble_array_t << bool_array_t;
         cdr_ser.serializeArray(octet_array_2_t, 5).serializeArray(char_array_2_t, 5).serializeArray(ushort_array_2_t, 5).serializeArray(short_array_2_t, 5).serializeArray(ulong_array_2_t, 5);
-        cdr_ser.serializeArray(long_array_2_t, 5).serializeArray(ulonglong_array_2_t, 5).serializeArray(longlong_array_2_t, 5).serializeArray(float_array_2_t, 5).serializeArray(double_array_2_t, 5).serializeArray(bool_array_2_t, 5);
-        cdr_ser << octet_vector_t << char_vector_t << ushort_vector_t << short_vector_t << ulong_vector_t << long_vector_t << ulonglong_vector_t << longlong_vector_t << float_vector_t << double_vector_t << bool_vector_t;
+        cdr_ser.serializeArray(long_array_2_t, 5).serializeArray(ulonglong_array_2_t, 5).serializeArray(longlong_array_2_t, 5).serializeArray(float_array_2_t, 5).serializeArray(double_array_2_t, 5).serializeArray(ldouble_array_2_t, 5).serializeArray(bool_array_2_t, 5);
+        cdr_ser << octet_vector_t << char_vector_t << ushort_vector_t << short_vector_t << ulong_vector_t << long_vector_t << ulonglong_vector_t << longlong_vector_t << float_vector_t << double_vector_t << ldouble_vector_t << bool_vector_t;
         cdr_ser << triple_ulong_array_t;
         cdr_ser.serializeSequence(octet_seq_t, 5).serializeSequence(char_seq_t, 5).serializeSequence(ushort_seq_t, 5).serializeSequence(short_seq_t, 5);
         cdr_ser.serializeSequence(ulong_seq_t, 5).serializeSequence(long_seq_t, 5).serializeSequence(ulonglong_seq_t, 5).serializeSequence(longlong_seq_t, 5);
-        cdr_ser.serializeSequence(float_seq_t, 5).serializeSequence(double_seq_t, 5);
+        cdr_ser.serializeSequence(float_seq_t, 5).serializeSequence(double_seq_t, 5).serializeSequence(ldouble_seq_t, 5);
         cdr_ser.serialize(c_string_t);
     });
 
@@ -3215,6 +3476,7 @@ TEST(CDRTests, Complete)
     int64_t longlong_value = 0;
     float float_value = 0;
     double double_value = 0;
+    long double ldouble_value = 0;
     bool bool_value = false;
     std::string string_value = "";
     std::array<uint8_t, 5> octet_array_value;
@@ -3237,6 +3499,8 @@ TEST(CDRTests, Complete)
     float float_array_2_value[5];
     std::array<double, 5> double_array_value;
     double double_array_2_value[5];
+    std::array<long double, 5> ldouble_array_value;
+    long double ldouble_array_2_value[5];
     std::array<bool, 5> bool_array_value;
     bool bool_array_2_value[5];
     std::vector<uint8_t> octet_vector_value;
@@ -3249,6 +3513,7 @@ TEST(CDRTests, Complete)
     std::vector<int64_t> longlong_vector_value;
     std::vector<float> float_vector_value;
     std::vector<double> double_vector_value;
+    std::vector<long double> ldouble_vector_value;
     std::vector<bool> bool_vector_value;
     std::array<std::array<std::array<uint32_t, 3>, 2>, 2> triple_ulong_array_value;
     uint8_t *octet_seq_value = NULL; size_t octet_seq_len;
@@ -3261,20 +3526,21 @@ TEST(CDRTests, Complete)
     int64_t *longlong_seq_value = NULL; size_t longlong_seq_len;
     float *float_seq_value = NULL; size_t float_seq_len;
     double *double_seq_value = NULL; size_t double_seq_len;
+    long double *ldouble_seq_value = NULL; size_t ldouble_seq_len;
     char *c_string_value = NULL;
 
     EXPECT_NO_THROW(
     {
-        cdr_des >> octet_value >> char_value >> ushort_value >> short_value >> ulong_value >> long_value >> ulonglong_value >> longlong_value >> float_value >> double_value >> bool_value >> string_value;
-        cdr_des >> octet_array_value >> char_array_value >> ushort_array_value >> short_array_value >> ulong_array_value >> long_array_value >> ulonglong_array_value >> longlong_array_value >> float_array_value >> double_array_value >> bool_array_value;
+        cdr_des >> octet_value >> char_value >> ushort_value >> short_value >> ulong_value >> long_value >> ulonglong_value >> longlong_value >> float_value >> double_value >> ldouble_value  >> bool_value >> string_value;
+        cdr_des >> octet_array_value >> char_array_value >> ushort_array_value >> short_array_value >> ulong_array_value >> long_array_value >> ulonglong_array_value >> longlong_array_value >> float_array_value >> double_array_value >> ldouble_array_value >> bool_array_value;
         cdr_des.deserializeArray(octet_array_2_value, 5).deserializeArray(char_array_2_value, 5).deserializeArray(ushort_array_2_value, 5).deserializeArray(short_array_2_value, 5).deserializeArray(ulong_array_2_value, 5);
-        cdr_des.deserializeArray(long_array_2_value, 5).deserializeArray(ulonglong_array_2_value, 5).deserializeArray(longlong_array_2_value, 5).deserializeArray(float_array_2_value, 5).deserializeArray(double_array_2_value, 5).deserializeArray(bool_array_2_value, 5);
-        cdr_des >> octet_vector_value >> char_vector_value >> ushort_vector_value >> short_vector_value >> ulong_vector_value >> long_vector_value >> ulonglong_vector_value >> longlong_vector_value >> float_vector_value >> double_vector_value >> bool_vector_value;
+        cdr_des.deserializeArray(long_array_2_value, 5).deserializeArray(ulonglong_array_2_value, 5).deserializeArray(longlong_array_2_value, 5).deserializeArray(float_array_2_value, 5).deserializeArray(double_array_2_value, 5).deserializeArray(ldouble_array_2_value, 5).deserializeArray(bool_array_2_value, 5);
+        cdr_des >> octet_vector_value >> char_vector_value >> ushort_vector_value >> short_vector_value >> ulong_vector_value >> long_vector_value >> ulonglong_vector_value >> longlong_vector_value >> float_vector_value >> double_vector_value >> ldouble_vector_value >> bool_vector_value;
         cdr_des >> triple_ulong_array_value;
         cdr_des.deserializeSequence(octet_seq_value, octet_seq_len).deserializeSequence(char_seq_value, char_seq_len).deserializeSequence(ushort_seq_value, ushort_seq_len); 
         cdr_des.deserializeSequence(short_seq_value, short_seq_len).deserializeSequence(ulong_seq_value, ulong_seq_len).deserializeSequence(long_seq_value, long_seq_len); 
         cdr_des.deserializeSequence(ulonglong_seq_value, ulonglong_seq_len).deserializeSequence(longlong_seq_value, longlong_seq_len).deserializeSequence(float_seq_value, float_seq_len); 
-        cdr_des.deserializeSequence(double_seq_value, double_seq_len);
+        cdr_des.deserializeSequence(double_seq_value, double_seq_len).deserializeSequence(ldouble_seq_value, ldouble_seq_len);
         cdr_des.deserialize(c_string_value);
     });
 
@@ -3288,6 +3554,7 @@ TEST(CDRTests, Complete)
     EXPECT_EQ(longlong_value, longlong_t);
     EXPECT_FLOAT_EQ(float_value, float_tt);
     EXPECT_DOUBLE_EQ(double_value, double_tt);
+    EXPECT_DOUBLE_EQ(ldouble_value, ldouble_tt);
     EXPECT_EQ(bool_value, bool_t);
     EXPECT_EQ(string_value, string_t);
 
@@ -3301,6 +3568,7 @@ TEST(CDRTests, Complete)
     EXPECT_EQ(longlong_array_value, longlong_array_t);
     EXPECT_EQ(float_array_value, float_array_t);
     EXPECT_EQ(double_array_value, double_array_t);
+    EXPECT_EQ(ldouble_array_value, ldouble_array_t);
     EXPECT_EQ(bool_array_value, bool_array_t);
 
     EXPECT_ARRAY_EQ(octet_array_2_value, octet_array_2_t, 5);
@@ -3313,6 +3581,7 @@ TEST(CDRTests, Complete)
     EXPECT_ARRAY_EQ(longlong_array_2_value, longlong_array_2_t, 5);
     EXPECT_ARRAY_FLOAT_EQ(float_array_2_value, float_array_2_t, 5);
     EXPECT_ARRAY_DOUBLE_EQ(double_array_2_value, double_array_2_t, 5);
+    EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_array_2_value, ldouble_array_2_t, 5);
     EXPECT_ARRAY_EQ(bool_array_2_value, bool_array_2_t, 5);
 
     EXPECT_EQ(octet_vector_value, octet_vector_t);
@@ -3325,6 +3594,7 @@ TEST(CDRTests, Complete)
     EXPECT_EQ(longlong_vector_value, longlong_vector_t);
     EXPECT_EQ(float_vector_value, float_vector_t);
     EXPECT_EQ(double_vector_value, double_vector_t);
+    EXPECT_EQ(ldouble_vector_value, ldouble_vector_t);
     EXPECT_EQ(bool_vector_value, bool_vector_t);
 
     EXPECT_EQ(triple_ulong_array_t, triple_ulong_array_value);
@@ -3348,6 +3618,8 @@ TEST(CDRTests, Complete)
     EXPECT_ARRAY_FLOAT_EQ(float_seq_value, float_seq_t, 5);
     EXPECT_EQ(double_seq_len, 5);
     EXPECT_ARRAY_DOUBLE_EQ(double_seq_value, double_seq_t, 5);
+    EXPECT_EQ(ldouble_seq_len, 5);
+    EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_seq_value, ldouble_seq_t, 5);
 
     EXPECT_EQ(strcmp(c_string_t, c_string_value), 0);
 
@@ -3361,6 +3633,7 @@ TEST(CDRTests, Complete)
     free(longlong_seq_value);
     free(float_seq_value);
     free(double_seq_value);
+    free(ldouble_seq_value);
     free(c_string_value);
 }
 
@@ -3806,6 +4079,55 @@ TEST(FastCDRTests, Double)
     EXPECT_THROW(
     {
         cdr_des_bad >> double_value;
+    },
+    NotEnoughMemoryException);
+}
+
+TEST(FastCDRTests, LongDouble)
+{
+    // Check good case.
+    char buffer[BUFFER_LENGTH];
+
+    // Serialization.
+    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+    FastCdr cdr_ser(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser << ldouble_tt;
+    });
+
+    // Deseriazliation.
+    FastCdr cdr_des(cdrbuffer);
+
+    long double ldouble_value = 0;
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des >> ldouble_value;
+    });
+
+    EXPECT_DOUBLE_EQ(ldouble_value, ldouble_tt);
+
+    // Check bad case without space
+    char buffer_bad[1];
+
+    // Serialization.
+    FastBuffer cdrbuffer_bad(buffer_bad, 1);
+    FastCdr cdr_ser_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_ser_bad << ldouble_tt;
+    },
+    NotEnoughMemoryException);
+
+    // Deseriazliation.
+    FastCdr cdr_des_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_des_bad >> ldouble_value;
     },
     NotEnoughMemoryException);
 }
@@ -4425,6 +4747,55 @@ TEST(FastCDRTests, STDArrayDouble)
     NotEnoughMemoryException);
 }
 
+TEST(FastCDRTests, STDArrayLongDouble)
+{
+    // Check good case.
+    char buffer[BUFFER_LENGTH];
+
+    // Serialization.
+    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+    FastCdr cdr_ser(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser << ldouble_array_t;
+    });
+
+    // Deseriazliation.
+    FastCdr cdr_des(cdrbuffer);
+
+    std::array<long double, 5> ldouble_array_value;
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des >> ldouble_array_value;
+    });
+
+    EXPECT_EQ(ldouble_array_value, ldouble_array_t);
+
+    // Check bad case without space
+    char buffer_bad[1];
+
+    // Serialization.
+    FastBuffer cdrbuffer_bad(buffer_bad, 1);
+    FastCdr cdr_ser_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_ser_bad << ldouble_array_t;
+    },
+    NotEnoughMemoryException);
+
+    // Deseriazliation.
+    FastCdr cdr_des_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_des_bad >> ldouble_array_value;
+    },
+    NotEnoughMemoryException);
+}
+
 TEST(FastCDRTests, STDArrayBoolean)
 {
     // Check good case.
@@ -5013,6 +5384,55 @@ TEST(FastCDRTests, ArrayDouble)
     NotEnoughMemoryException);
 }
 
+TEST(FastCDRTests, ArrayLongDouble)
+{
+    // Check good case.
+    char buffer[BUFFER_LENGTH];
+
+    // Serialization.
+    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+    FastCdr cdr_ser(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser.serializeArray(ldouble_array_2_t, 5);
+    });
+
+    // Deseriazliation.
+    FastCdr cdr_des(cdrbuffer);
+
+    long double ldouble_array_2_value[5];
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des.deserializeArray(ldouble_array_2_value, 5);
+    });
+
+    EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_array_2_value, ldouble_array_2_t, 5);
+
+    // Check bad case without space
+    char buffer_bad[1];
+
+    // Serialization.
+    FastBuffer cdrbuffer_bad(buffer_bad, 1);
+    FastCdr cdr_ser_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_ser_bad.serializeArray(ldouble_array_2_t, 5);
+    },
+    NotEnoughMemoryException);
+
+    // Deseriazliation.
+    FastCdr cdr_des_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_des_bad.deserializeArray(ldouble_array_2_value, 5);
+    },
+    NotEnoughMemoryException);
+}
+
 TEST(FastCDRTests, ArrayBoolean)
 {
     // Check good case.
@@ -5597,6 +6017,55 @@ TEST(FastCDRTests, STDVectorDouble)
     EXPECT_THROW(
     {
         cdr_des_bad >> double_vector_value;
+    },
+    NotEnoughMemoryException);
+}
+
+TEST(FastCDRTests, STDVectorLongDouble)
+{
+    // Check good case.
+    char buffer[BUFFER_LENGTH];
+
+    // Serialization.
+    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+    FastCdr cdr_ser(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser << ldouble_vector_t;
+    });
+
+    // Deseriazliation.
+    FastCdr cdr_des(cdrbuffer);
+
+    std::vector<long double> ldouble_vector_value;
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des >> ldouble_vector_value;
+    });
+
+    EXPECT_EQ(ldouble_vector_value, ldouble_vector_t);
+
+    // Check bad case without space
+    char buffer_bad[1];
+
+    // Serialization.
+    FastBuffer cdrbuffer_bad(buffer_bad, 1);
+    FastCdr cdr_ser_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_ser_bad << ldouble_vector_t;
+    },
+    NotEnoughMemoryException);
+
+    // Deseriazliation.
+    FastCdr cdr_des_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_des_bad >> ldouble_vector_value;
     },
     NotEnoughMemoryException);
 }
@@ -6268,6 +6737,58 @@ TEST(FastCDRTests, SequenceDouble)
     NotEnoughMemoryException);
 }
 
+TEST(FastCDRTests, SequenceLongDouble)
+{
+    // Check good case.
+    char buffer[BUFFER_LENGTH];
+
+    // Serialization.
+    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+    FastCdr cdr_ser(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser.serializeSequence(ldouble_seq_t, 5);
+    });
+
+    // Deseriazliation.
+    FastCdr cdr_des(cdrbuffer);
+
+    long double *ldouble_seq_value = NULL; size_t ldouble_seq_len = 0;
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des.deserializeSequence(ldouble_seq_value, ldouble_seq_len);
+    });
+
+    EXPECT_EQ(ldouble_seq_len, 5);
+    EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_seq_value, ldouble_seq_t, ldouble_seq_len);
+
+    free(ldouble_seq_value);
+
+    // Check bad case without space
+    char buffer_bad[1];
+
+    // Serialization.
+    FastBuffer cdrbuffer_bad(buffer_bad, 1);
+    FastCdr cdr_ser_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_ser_bad.serializeSequence(ldouble_seq_t, 5);
+    },
+    NotEnoughMemoryException);
+
+    // Deseriazliation.
+    FastCdr cdr_des_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_des_bad.deserializeSequence(ldouble_seq_value, ldouble_seq_len);
+    },
+    NotEnoughMemoryException);
+}
+
 TEST(FastCDRTests, SequenceBoolean)
 {
     // Check good case.
@@ -6437,15 +6958,15 @@ TEST(FastCDRTests, Complete)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser << octet_t << char_t << ushort_t << short_t << ulong_t << long_t << ulonglong_t << longlong_t << float_tt << double_tt << bool_t << string_t;
-        cdr_ser << octet_array_t << char_array_t << ushort_array_t << short_array_t << ulong_array_t << long_array_t << ulonglong_array_t << longlong_array_t << float_array_t << double_array_t << bool_array_t;
+        cdr_ser << octet_t << char_t << ushort_t << short_t << ulong_t << long_t << ulonglong_t << longlong_t << float_tt << double_tt << ldouble_tt << bool_t << string_t;
+        cdr_ser << octet_array_t << char_array_t << ushort_array_t << short_array_t << ulong_array_t << long_array_t << ulonglong_array_t << longlong_array_t << float_array_t << double_array_t << ldouble_array_t << bool_array_t;
         cdr_ser.serializeArray(octet_array_2_t, 5).serializeArray(char_array_2_t, 5).serializeArray(ushort_array_2_t, 5).serializeArray(short_array_2_t, 5).serializeArray(ulong_array_2_t, 5);
-        cdr_ser.serializeArray(long_array_2_t, 5).serializeArray(ulonglong_array_2_t, 5).serializeArray(longlong_array_2_t, 5).serializeArray(float_array_2_t, 5).serializeArray(double_array_2_t, 5).serializeArray(bool_array_2_t, 5);
-        cdr_ser << octet_vector_t << char_vector_t << ushort_vector_t << short_vector_t << ulong_vector_t << long_vector_t << ulonglong_vector_t << longlong_vector_t << float_vector_t << double_vector_t << bool_vector_t;
+        cdr_ser.serializeArray(long_array_2_t, 5).serializeArray(ulonglong_array_2_t, 5).serializeArray(longlong_array_2_t, 5).serializeArray(float_array_2_t, 5).serializeArray(double_array_2_t, 5).serializeArray(ldouble_array_2_t, 5).serializeArray(bool_array_2_t, 5);
+        cdr_ser << octet_vector_t << char_vector_t << ushort_vector_t << short_vector_t << ulong_vector_t << long_vector_t << ulonglong_vector_t << longlong_vector_t << float_vector_t << double_vector_t << ldouble_vector_t << bool_vector_t;
         cdr_ser << triple_ulong_array_t;
         cdr_ser.serializeSequence(octet_seq_t, 5).serializeSequence(char_seq_t, 5).serializeSequence(ushort_seq_t, 5).serializeSequence(short_seq_t, 5);
         cdr_ser.serializeSequence(ulong_seq_t, 5).serializeSequence(long_seq_t, 5).serializeSequence(ulonglong_seq_t, 5).serializeSequence(longlong_seq_t, 5);
-        cdr_ser.serializeSequence(float_seq_t, 5).serializeSequence(double_seq_t, 5);
+        cdr_ser.serializeSequence(float_seq_t, 5).serializeSequence(double_seq_t, 5).serializeSequence(ldouble_seq_t, 5);
         cdr_ser.serialize(c_string_t);
     });
 
@@ -6462,6 +6983,7 @@ TEST(FastCDRTests, Complete)
     int64_t longlong_value = 0;
     float float_value = 0;
     double double_value = 0;
+    long double ldouble_value = 0;
     bool bool_value = false;
     std::string string_value = "";
     std::array<uint8_t, 5> octet_array_value;
@@ -6484,6 +7006,8 @@ TEST(FastCDRTests, Complete)
     float float_array_2_value[5];
     std::array<double, 5> double_array_value;
     double double_array_2_value[5];
+    std::array<long double, 5> ldouble_array_value;
+    long double ldouble_array_2_value[5];
     std::array<bool, 5> bool_array_value;
     bool bool_array_2_value[5];
     std::vector<uint8_t> octet_vector_value;
@@ -6496,6 +7020,7 @@ TEST(FastCDRTests, Complete)
     std::vector<int64_t> longlong_vector_value;
     std::vector<float> float_vector_value;
     std::vector<double> double_vector_value;
+    std::vector<long double> ldouble_vector_value;
     std::vector<bool> bool_vector_value;
     std::array<std::array<std::array<uint32_t, 3>, 2>, 2> triple_ulong_array_value;
     uint8_t *octet_seq_value = NULL; size_t octet_seq_len;
@@ -6508,20 +7033,21 @@ TEST(FastCDRTests, Complete)
     int64_t *longlong_seq_value = NULL; size_t longlong_seq_len;
     float *float_seq_value = NULL; size_t float_seq_len;
     double *double_seq_value = NULL; size_t double_seq_len;
+    long double *ldouble_seq_value = NULL; size_t ldouble_seq_len;
     char *c_string_value = NULL;
 
     EXPECT_NO_THROW(
     {
-        cdr_des >> octet_value >> char_value >> ushort_value >> short_value >> ulong_value >> long_value >> ulonglong_value >> longlong_value >> float_value >> double_value >> bool_value >> string_value;
-        cdr_des >> octet_array_value >> char_array_value >> ushort_array_value >> short_array_value >> ulong_array_value >> long_array_value >> ulonglong_array_value >> longlong_array_value >> float_array_value >> double_array_value >> bool_array_value;
+        cdr_des >> octet_value >> char_value >> ushort_value >> short_value >> ulong_value >> long_value >> ulonglong_value >> longlong_value >> float_value >> double_value >> ldouble_value >> bool_value >> string_value;
+        cdr_des >> octet_array_value >> char_array_value >> ushort_array_value >> short_array_value >> ulong_array_value >> long_array_value >> ulonglong_array_value >> longlong_array_value >> float_array_value >> double_array_value >> ldouble_array_value >> bool_array_value;
         cdr_des.deserializeArray(octet_array_2_value, 5).deserializeArray(char_array_2_value, 5).deserializeArray(ushort_array_2_value, 5).deserializeArray(short_array_2_value, 5).deserializeArray(ulong_array_2_value, 5);
-        cdr_des.deserializeArray(long_array_2_value, 5).deserializeArray(ulonglong_array_2_value, 5).deserializeArray(longlong_array_2_value, 5).deserializeArray(float_array_2_value, 5).deserializeArray(double_array_2_value, 5).deserializeArray(bool_array_2_value, 5);
-        cdr_des >> octet_vector_value >> char_vector_value >> ushort_vector_value >> short_vector_value >> ulong_vector_value >> long_vector_value >> ulonglong_vector_value >> longlong_vector_value >> float_vector_value >> double_vector_value >> bool_vector_value;
+        cdr_des.deserializeArray(long_array_2_value, 5).deserializeArray(ulonglong_array_2_value, 5).deserializeArray(longlong_array_2_value, 5).deserializeArray(float_array_2_value, 5).deserializeArray(double_array_2_value, 5).deserializeArray(ldouble_array_2_value, 5).deserializeArray(bool_array_2_value, 5);
+        cdr_des >> octet_vector_value >> char_vector_value >> ushort_vector_value >> short_vector_value >> ulong_vector_value >> long_vector_value >> ulonglong_vector_value >> longlong_vector_value >> float_vector_value >> double_vector_value >> ldouble_vector_value >> bool_vector_value;
         cdr_des >> triple_ulong_array_value;
         cdr_des.deserializeSequence(octet_seq_value, octet_seq_len).deserializeSequence(char_seq_value, char_seq_len).deserializeSequence(ushort_seq_value, ushort_seq_len); 
         cdr_des.deserializeSequence(short_seq_value, short_seq_len).deserializeSequence(ulong_seq_value, ulong_seq_len).deserializeSequence(long_seq_value, long_seq_len); 
         cdr_des.deserializeSequence(ulonglong_seq_value, ulonglong_seq_len).deserializeSequence(longlong_seq_value, longlong_seq_len).deserializeSequence(float_seq_value, float_seq_len); 
-        cdr_des.deserializeSequence(double_seq_value, double_seq_len);
+        cdr_des.deserializeSequence(double_seq_value, double_seq_len).deserializeSequence(ldouble_seq_value, ldouble_seq_len);
         cdr_des.deserialize(c_string_value);
     });
 
@@ -6535,6 +7061,7 @@ TEST(FastCDRTests, Complete)
     EXPECT_EQ(longlong_value, longlong_t);
     EXPECT_FLOAT_EQ(float_value, float_tt);
     EXPECT_DOUBLE_EQ(double_value, double_tt);
+    EXPECT_DOUBLE_EQ(ldouble_value, ldouble_tt);
     EXPECT_EQ(bool_value, bool_t);
     EXPECT_EQ(string_value, string_t);
 
@@ -6548,6 +7075,7 @@ TEST(FastCDRTests, Complete)
     EXPECT_EQ(longlong_array_value, longlong_array_t);
     EXPECT_EQ(float_array_value, float_array_t);
     EXPECT_EQ(double_array_value, double_array_t);
+    EXPECT_EQ(ldouble_array_value, ldouble_array_t);
     EXPECT_EQ(bool_array_value, bool_array_t);
 
     EXPECT_ARRAY_EQ(octet_array_2_value, octet_array_2_t, 5);
@@ -6560,6 +7088,7 @@ TEST(FastCDRTests, Complete)
     EXPECT_ARRAY_EQ(longlong_array_2_value, longlong_array_2_t, 5);
     EXPECT_ARRAY_FLOAT_EQ(float_array_2_value, float_array_2_t, 5);
     EXPECT_ARRAY_DOUBLE_EQ(double_array_2_value, double_array_2_t, 5);
+    EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_array_2_value, ldouble_array_2_t, 5);
     EXPECT_ARRAY_EQ(bool_array_2_value, bool_array_2_t, 5);
 
     EXPECT_EQ(octet_vector_value, octet_vector_t);
@@ -6572,6 +7101,7 @@ TEST(FastCDRTests, Complete)
     EXPECT_EQ(longlong_vector_value, longlong_vector_t);
     EXPECT_EQ(float_vector_value, float_vector_t);
     EXPECT_EQ(double_vector_value, double_vector_t);
+    EXPECT_EQ(ldouble_vector_value, ldouble_vector_t);
     EXPECT_EQ(bool_vector_value, bool_vector_t);
 
     EXPECT_EQ(triple_ulong_array_t, triple_ulong_array_value);
@@ -6595,6 +7125,8 @@ TEST(FastCDRTests, Complete)
     EXPECT_ARRAY_FLOAT_EQ(float_seq_value, float_seq_t, 5);
     EXPECT_EQ(double_seq_len, 5);
     EXPECT_ARRAY_DOUBLE_EQ(double_seq_value, double_seq_t, 5);
+    EXPECT_EQ(ldouble_seq_len, 5);
+    EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_seq_value, ldouble_seq_t, 5);
 
     EXPECT_EQ(strcmp(c_string_t, c_string_value), 0);
 
@@ -6608,5 +7140,6 @@ TEST(FastCDRTests, Complete)
     free(longlong_seq_value);
     free(float_seq_value);
     free(double_seq_value);
+    free(ldouble_seq_value);
     free(c_string_value);
 }

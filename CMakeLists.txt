@@ -163,6 +163,15 @@ endif()
 add_subdirectory(src/cpp)
 
 ###############################################################################
+# Testing options
+###############################################################################
+option(EPROSIMA_BUILD_TESTS "Activate the building and execution unit tests and integral tests" OFF)
+
+if(EPROSIMA_BUILD AND NOT EPROSIMA_INSTALLER AND NOT EPROSIMA_INSTALLER_MINION)
+    set(EPROSIMA_BUILD_TESTS ON)
+endif()
+
+###############################################################################
 # Testing
 ###############################################################################
 if(EPROSIMA_BUILD_TESTS AND NOT EPROSIMA_INSTALLER)

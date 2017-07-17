@@ -22,6 +22,8 @@
 
 #include <gtest/gtest.h>
 
+#define EXPECT_LONG_DOUBLE_EQ(val1, val2) (val1 == val2)
+
 using namespace eprosima::fastcdr;
 using namespace ::exception;
 
@@ -127,7 +129,7 @@ static void EXPECT_ARRAY_LONG_DOUBLE_EQ(long double *array1, const long double *
 {
     for(size_t count = 0; count < size; ++count)
     {
-        EXPECT_DOUBLE_EQ(array1[count], array2[count]);
+        EXPECT_LONG_DOUBLE_EQ(array1[count], array2[count]);
     }
 }
 
@@ -601,7 +603,7 @@ TEST(CDRTests, LongDouble)
         cdr_des >> ldouble_value;
     });
 
-    EXPECT_DOUBLE_EQ(ldouble_value, ldouble_tt);
+    EXPECT_LONG_DOUBLE_EQ(ldouble_value, ldouble_tt);
 
     // Check bad case without space
     char buffer_bad[1];
@@ -3554,7 +3556,7 @@ TEST(CDRTests, Complete)
     EXPECT_EQ(longlong_value, longlong_t);
     EXPECT_FLOAT_EQ(float_value, float_tt);
     EXPECT_DOUBLE_EQ(double_value, double_tt);
-    EXPECT_DOUBLE_EQ(ldouble_value, ldouble_tt);
+    EXPECT_LONG_DOUBLE_EQ(ldouble_value, ldouble_tt);
     EXPECT_EQ(bool_value, bool_t);
     EXPECT_EQ(string_value, string_t);
 
@@ -4107,7 +4109,7 @@ TEST(FastCDRTests, LongDouble)
         cdr_des >> ldouble_value;
     });
 
-    EXPECT_DOUBLE_EQ(ldouble_value, ldouble_tt);
+    EXPECT_LONG_DOUBLE_EQ(ldouble_value, ldouble_tt);
 
     // Check bad case without space
     char buffer_bad[1];
@@ -7061,7 +7063,7 @@ TEST(FastCDRTests, Complete)
     EXPECT_EQ(longlong_value, longlong_t);
     EXPECT_FLOAT_EQ(float_value, float_tt);
     EXPECT_DOUBLE_EQ(double_value, double_tt);
-    EXPECT_DOUBLE_EQ(ldouble_value, ldouble_tt);
+    EXPECT_LONG_DOUBLE_EQ(ldouble_value, ldouble_tt);
     EXPECT_EQ(bool_value, bool_t);
     EXPECT_EQ(string_value, string_t);
 

@@ -24,6 +24,8 @@ const Cdr::Endianness Cdr::DEFAULT_ENDIAN = BIG_ENDIANNESS;
 const Cdr::Endianness Cdr::DEFAULT_ENDIAN = LITTLE_ENDIANNESS;
 #endif
 
+constexpr size_t ALIGNMENT_LONG_DOUBLE = 8;
+
 Cdr::state::state(const Cdr &cdr) : m_currentPosition(cdr.m_currentPosition), m_alignPosition(cdr.m_alignPosition),
     m_swapBytes(cdr.m_swapBytes), m_lastDataSize(cdr.m_lastDataSize) {}
 
@@ -521,7 +523,7 @@ Cdr& Cdr::serialize(const double double_t, Endianness endianness)
 
 Cdr& Cdr::serialize(const long double ldouble_t)
 {
-    size_t align = alignment(sizeof(ldouble_t));
+    size_t align = alignment(ALIGNMENT_LONG_DOUBLE);
     size_t sizeAligned = sizeof(ldouble_t) + align;
 
     if(((m_lastPosition - m_currentPosition) >= sizeAligned) || resize(sizeAligned))
@@ -1024,7 +1026,7 @@ Cdr& Cdr::serializeArray(const double *double_t, size_t numElements, Endianness 
 
 Cdr& Cdr::serializeArray(const long double *ldouble_t, size_t numElements)
 {
-    size_t align = alignment(sizeof(*ldouble_t));
+    size_t align = alignment(ALIGNMENT_LONG_DOUBLE);
     size_t totalSize = sizeof(*ldouble_t) * numElements;
     size_t sizeAligned = totalSize + align;
 
@@ -1380,7 +1382,7 @@ Cdr& Cdr::deserialize(double &double_t, Endianness endianness)
 
 Cdr& Cdr::deserialize(long double &ldouble_t)
 {
-    size_t align = alignment(sizeof(ldouble_t));
+    size_t align = alignment(ALIGNMENT_LONG_DOUBLE);
     size_t sizeAligned = sizeof(ldouble_t) + align;
 
     if((m_lastPosition - m_currentPosition) >= sizeAligned)
@@ -1916,7 +1918,7 @@ Cdr& Cdr::deserializeArray(double *double_t, size_t numElements, Endianness endi
 
 Cdr& Cdr::deserializeArray(long double *ldouble_t, size_t numElements)
 {
-    size_t align = alignment(sizeof(*ldouble_t));
+    size_t align = alignment(ALIGNMENT_LONG_DOUBLE);
     size_t totalSize = sizeof(*ldouble_t) * numElements;
     size_t sizeAligned = totalSize + align;
 

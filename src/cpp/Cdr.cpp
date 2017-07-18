@@ -24,7 +24,7 @@ const Cdr::Endianness Cdr::DEFAULT_ENDIAN = BIG_ENDIANNESS;
 const Cdr::Endianness Cdr::DEFAULT_ENDIAN = LITTLE_ENDIANNESS;
 #endif
 
-constexpr size_t ALIGNMENT_LONG_DOUBLE = 8;
+CONSTEXPR size_t ALIGNMENT_LONG_DOUBLE = 8;
 
 Cdr::state::state(const Cdr &cdr) : m_currentPosition(cdr.m_currentPosition), m_alignPosition(cdr.m_alignPosition),
     m_swapBytes(cdr.m_swapBytes), m_lastDataSize(cdr.m_lastDataSize) {}

@@ -35,7 +35,7 @@ string(TOUPPER "${PROJECT_NAME}" PROJECT_NAME_UPPER)
 set(${PROJECT_NAME}_DESCRIPTION_SUMMARY "C++ library for serialize using CDR serialization")
 set(${PROJECT_NAME}_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} library provides two serialization mechanisms. One is the standard CDR serialization mechanism, while the other is a faster implementation that modifies the standard.")
 
-message(STATUS "Configuring ${PROJECT_NAME_LAGE}")
+message(STATUS "Configuring ${PROJECT_NAME_LARGE}")
 
 ###############################################################################
 # Version information                                                         #

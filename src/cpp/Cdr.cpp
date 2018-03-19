@@ -699,6 +699,11 @@ Cdr& Cdr::serializeArray(const char *char_t, size_t numElements)
 
 Cdr& Cdr::serializeArray(const int16_t *short_t, size_t numElements)
 {
+    if(numElements == 0)
+    {
+        return *this;
+    }
+
     size_t align = alignment(sizeof(*short_t));
     size_t totalSize = sizeof(*short_t) * numElements;
     size_t sizeAligned = totalSize + align;
@@ -756,6 +761,11 @@ Cdr& Cdr::serializeArray(const int16_t *short_t, size_t numElements, Endianness 
 
 Cdr& Cdr::serializeArray(const int32_t *long_t, size_t numElements)
 {
+    if(numElements == 0)
+    {
+        return *this;
+    }
+
     size_t align = alignment(sizeof(*long_t));
     size_t totalSize = sizeof(*long_t) * numElements;
     size_t sizeAligned = totalSize + align;
@@ -815,6 +825,11 @@ Cdr& Cdr::serializeArray(const int32_t *long_t, size_t numElements, Endianness e
 
 Cdr& Cdr::serializeArray(const wchar_t *wchar, size_t numElements)
 {
+    if(numElements == 0)
+    {
+        return *this;
+    }
+
     for(size_t count = 0; count < numElements; ++count)
         serialize(wchar[count]);
     return *this;
@@ -841,6 +856,11 @@ Cdr& Cdr::serializeArray(const wchar_t *wchar, size_t numElements, Endianness en
 
 Cdr& Cdr::serializeArray(const int64_t *longlong_t, size_t numElements)
 {
+    if(numElements == 0)
+    {
+        return *this;
+    }
+
     size_t align = alignment(sizeof(*longlong_t));
     size_t totalSize = sizeof(*longlong_t) * numElements;
     size_t sizeAligned = totalSize + align;
@@ -904,6 +924,11 @@ Cdr& Cdr::serializeArray(const int64_t *longlong_t, size_t numElements, Endianne
 
 Cdr& Cdr::serializeArray(const float *float_t, size_t numElements)
 {
+    if(numElements == 0)
+    {
+        return *this;
+    }
+
     size_t align = alignment(sizeof(*float_t));
     size_t totalSize = sizeof(*float_t) * numElements;
     size_t sizeAligned = totalSize + align;
@@ -963,6 +988,11 @@ Cdr& Cdr::serializeArray(const float *float_t, size_t numElements, Endianness en
 
 Cdr& Cdr::serializeArray(const double *double_t, size_t numElements)
 {
+    if(numElements == 0)
+    {
+        return *this;
+    }
+
     size_t align = alignment(sizeof(*double_t));
     size_t totalSize = sizeof(*double_t) * numElements;
     size_t sizeAligned = totalSize + align;
@@ -1026,6 +1056,11 @@ Cdr& Cdr::serializeArray(const double *double_t, size_t numElements, Endianness 
 
 Cdr& Cdr::serializeArray(const long double *ldouble_t, size_t numElements)
 {
+    if(numElements == 0)
+    {
+        return *this;
+    }
+
     size_t align = alignment(ALIGNMENT_LONG_DOUBLE);
     size_t totalSize = sizeof(*ldouble_t) * numElements;
     size_t sizeAligned = totalSize + align;
@@ -1587,6 +1622,11 @@ Cdr& Cdr::deserializeArray(char *char_t, size_t numElements)
 
 Cdr& Cdr::deserializeArray(int16_t *short_t, size_t numElements)
 {
+    if(numElements == 0)
+    {
+        return *this;
+    }
+
     size_t align = alignment(sizeof(*short_t));
     size_t totalSize = sizeof(*short_t) * numElements;
     size_t sizeAligned = totalSize + align;
@@ -1644,6 +1684,11 @@ Cdr& Cdr::deserializeArray(int16_t *short_t, size_t numElements, Endianness endi
 
 Cdr& Cdr::deserializeArray(int32_t *long_t, size_t numElements)
 {
+    if(numElements == 0)
+    {
+        return *this;
+    }
+
     size_t align = alignment(sizeof(*long_t));
     size_t totalSize = sizeof(*long_t) * numElements;
     size_t sizeAligned = totalSize + align;
@@ -1703,6 +1748,11 @@ Cdr& Cdr::deserializeArray(int32_t *long_t, size_t numElements, Endianness endia
 
 Cdr& Cdr::deserializeArray(wchar_t *wchar, size_t numElements)
 {
+    if(numElements == 0)
+    {
+        return *this;
+    }
+
     uint32_t value;
     for(size_t count = 0; count < numElements; ++count)
     {
@@ -1733,6 +1783,11 @@ Cdr& Cdr::deserializeArray(wchar_t *wchar, size_t numElements, Endianness endian
 
 Cdr& Cdr::deserializeArray(int64_t *longlong_t, size_t numElements)
 {
+    if(numElements == 0)
+    {
+        return *this;
+    }
+
     size_t align = alignment(sizeof(*longlong_t));
     size_t totalSize = sizeof(*longlong_t) * numElements;
     size_t sizeAligned = totalSize + align;
@@ -1796,6 +1851,11 @@ Cdr& Cdr::deserializeArray(int64_t *longlong_t, size_t numElements, Endianness e
 
 Cdr& Cdr::deserializeArray(float *float_t, size_t numElements)
 {
+    if(numElements == 0)
+    {
+        return *this;
+    }
+
     size_t align = alignment(sizeof(*float_t));
     size_t totalSize = sizeof(*float_t) * numElements;
     size_t sizeAligned = totalSize + align;
@@ -1855,6 +1915,11 @@ Cdr& Cdr::deserializeArray(float *float_t, size_t numElements, Endianness endian
 
 Cdr& Cdr::deserializeArray(double *double_t, size_t numElements)
 {
+    if(numElements == 0)
+    {
+        return *this;
+    }
+
     size_t align = alignment(sizeof(*double_t));
     size_t totalSize = sizeof(*double_t) * numElements;
     size_t sizeAligned = totalSize + align;
@@ -1918,6 +1983,11 @@ Cdr& Cdr::deserializeArray(double *double_t, size_t numElements, Endianness endi
 
 Cdr& Cdr::deserializeArray(long double *ldouble_t, size_t numElements)
 {
+    if(numElements == 0)
+    {
+        return *this;
+    }
+
     size_t align = alignment(ALIGNMENT_LONG_DOUBLE);
     size_t totalSize = sizeof(*ldouble_t) * numElements;
     size_t sizeAligned = totalSize + align;

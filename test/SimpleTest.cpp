@@ -7145,3 +7145,376 @@ TEST(FastCDRTests, Complete)
     free(ldouble_seq_value);
     free(c_string_value);
 }
+
+// Regression test
+TEST(CDRTests, ZeroSequenceAtTheEnd)
+{
+    char buffer[12];
+    std::vector<uint8_t> octet_zero_sequence;
+    std::vector<char> char_zero_sequence;
+    std::vector<uint16_t> ushort_zero_sequence;
+    std::vector<int16_t> short_zero_sequence;
+    std::vector<uint32_t> ulong_zero_sequence;
+    std::vector<int32_t> long_zero_sequence;
+    std::vector<uint64_t> ulonglong_zero_sequence;
+    std::vector<int64_t> longlong_zero_sequence;
+    std::vector<float> float_zero_sequence;
+    std::vector<double> double_zero_sequence;
+    std::vector<long double> longdouble_zero_sequence;
+    std::vector<bool> bool_zero_sequence;
+
+    // Serialization.
+    FastBuffer cdrbuffer(buffer, 12);
+    Cdr cdr_ser_octet(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_octet << double_tt << octet_zero_sequence;
+    });
+
+    // Deseriazliation.
+    Cdr cdr_des_octet(cdrbuffer);
+
+    double value = 0;
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_octet >> value >> octet_zero_sequence;
+    });
+
+    Cdr cdr_ser_char(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_char << double_tt << char_zero_sequence;
+    });
+
+    // Deseriazliation.
+    Cdr cdr_des_char(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_char >> value >> char_zero_sequence;
+    });
+
+    Cdr cdr_ser_ushort(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_ushort << double_tt << ushort_zero_sequence;
+    });
+
+    // Deseriazliation.
+    Cdr cdr_des_ushort(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_ushort >> value >> ushort_zero_sequence;
+    });
+
+    Cdr cdr_ser_short(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_short << double_tt << short_zero_sequence;
+    });
+
+    // Deseriazliation.
+    Cdr cdr_des_short(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_short >> value >> short_zero_sequence;
+    });
+
+    Cdr cdr_ser_ulong(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_ulong << double_tt << ulong_zero_sequence;
+    });
+
+    // Deseriazliation.
+    Cdr cdr_des_ulong(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_ulong >> value >> ulong_zero_sequence;
+    });
+
+    Cdr cdr_ser_long(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_long << double_tt << long_zero_sequence;
+    });
+
+    // Deseriazliation.
+    Cdr cdr_des_long(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_long >> value >> long_zero_sequence;
+    });
+
+    Cdr cdr_ser_ulonglong(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_ulonglong << double_tt << ulonglong_zero_sequence;
+    });
+
+    // Deseriazliation.
+    Cdr cdr_des_ulonglong(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_ulonglong >> value >> ulonglong_zero_sequence;
+    });
+
+    Cdr cdr_ser_float(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_float << double_tt << float_zero_sequence;
+    });
+
+    // Deseriazliation.
+    Cdr cdr_des_float(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_float >> value >> float_zero_sequence;
+    });
+
+    Cdr cdr_ser_double(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_double << double_tt << double_zero_sequence;
+    });
+
+    // Deseriazliation.
+    Cdr cdr_des_double(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_double >> value >> double_zero_sequence;
+    });
+
+    Cdr cdr_ser_longdouble(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_longdouble << double_tt << longdouble_zero_sequence;
+    });
+
+    // Deseriazliation.
+    Cdr cdr_des_longdouble(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_longdouble >> value >> longdouble_zero_sequence;
+    });
+
+    Cdr cdr_ser_bool(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_bool << double_tt << bool_zero_sequence;
+    });
+
+    // Deseriazliation.
+    Cdr cdr_des_bool(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_bool >> value >> bool_zero_sequence;
+    });
+}
+
+TEST(FastCDRTests, ZeroSequenceAtTheEnd)
+{
+    char buffer[12];
+    std::vector<uint8_t> octet_zero_sequence;
+    std::vector<char> char_zero_sequence;
+    std::vector<uint16_t> ushort_zero_sequence;
+    std::vector<int16_t> short_zero_sequence;
+    std::vector<uint32_t> ulong_zero_sequence;
+    std::vector<int32_t> long_zero_sequence;
+    std::vector<uint64_t> ulonglong_zero_sequence;
+    std::vector<int64_t> longlong_zero_sequence;
+    std::vector<float> float_zero_sequence;
+    std::vector<double> double_zero_sequence;
+    std::vector<long double> longdouble_zero_sequence;
+    std::vector<bool> bool_zero_sequence;
+
+    // Serialization.
+    FastBuffer cdrbuffer(buffer, 12);
+    FastCdr cdr_ser_octet(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_octet << double_tt << octet_zero_sequence;
+    });
+
+    // Deseriazliation.
+    FastCdr cdr_des_octet(cdrbuffer);
+
+    double value = 0;
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_octet >> value >> octet_zero_sequence;
+    });
+
+    FastCdr cdr_ser_char(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_char << double_tt << char_zero_sequence;
+    });
+
+    // Deseriazliation.
+    FastCdr cdr_des_char(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_char >> value >> char_zero_sequence;
+    });
+
+    FastCdr cdr_ser_ushort(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_ushort << double_tt << ushort_zero_sequence;
+    });
+
+    // Deseriazliation.
+    FastCdr cdr_des_ushort(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_ushort >> value >> ushort_zero_sequence;
+    });
+
+    FastCdr cdr_ser_short(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_short << double_tt << short_zero_sequence;
+    });
+
+    // Deseriazliation.
+    FastCdr cdr_des_short(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_short >> value >> short_zero_sequence;
+    });
+
+    FastCdr cdr_ser_ulong(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_ulong << double_tt << ulong_zero_sequence;
+    });
+
+    // Deseriazliation.
+    FastCdr cdr_des_ulong(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_ulong >> value >> ulong_zero_sequence;
+    });
+
+    FastCdr cdr_ser_long(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_long << double_tt << long_zero_sequence;
+    });
+
+    // Deseriazliation.
+    FastCdr cdr_des_long(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_long >> value >> long_zero_sequence;
+    });
+
+    FastCdr cdr_ser_ulonglong(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_ulonglong << double_tt << ulonglong_zero_sequence;
+    });
+
+    // Deseriazliation.
+    FastCdr cdr_des_ulonglong(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_ulonglong >> value >> ulonglong_zero_sequence;
+    });
+
+    FastCdr cdr_ser_float(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_float << double_tt << float_zero_sequence;
+    });
+
+    // Deseriazliation.
+    FastCdr cdr_des_float(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_float >> value >> float_zero_sequence;
+    });
+
+    FastCdr cdr_ser_double(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_double << double_tt << double_zero_sequence;
+    });
+
+    // Deseriazliation.
+    FastCdr cdr_des_double(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_double >> value >> double_zero_sequence;
+    });
+
+    FastCdr cdr_ser_longdouble(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_longdouble << double_tt << longdouble_zero_sequence;
+    });
+
+    // Deseriazliation.
+    FastCdr cdr_des_longdouble(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_longdouble >> value >> longdouble_zero_sequence;
+    });
+
+    FastCdr cdr_ser_bool(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_bool << double_tt << bool_zero_sequence;
+    });
+
+    // Deseriazliation.
+    FastCdr cdr_des_bool(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_bool >> value >> bool_zero_sequence;
+    });
+}

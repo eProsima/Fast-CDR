@@ -42,6 +42,19 @@ FastBuffer::~FastBuffer()
     }
 }
 
+bool FastBuffer::reserve(size_t size)
+{
+    if (m_internalBuffer && m_buffer == NULL)
+    {
+        m_buffer = (char *)malloc(size);
+        if (m_buffer) {
+          m_bufferSize = size;
+          return true;
+        }
+    }
+    return false;
+}
+
 bool FastBuffer::resize(size_t minSizeInc)
 {
     size_t incBufferSize = BUFFER_START_LENGTH;

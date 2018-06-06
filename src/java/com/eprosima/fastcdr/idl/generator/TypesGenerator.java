@@ -75,7 +75,7 @@ public class TypesGenerator
             {
                 if(definition.isIsModule())
                 {
-                    Module module = (Module)definition;
+                    com.eprosima.idl.parser.tree.Module module = (com.eprosima.idl.parser.tree.Module)definition;
 
                     // Create directory for module.
                     String outputDir = packagDir  + module.getName();

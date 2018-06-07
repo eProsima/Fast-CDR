@@ -233,6 +233,14 @@ namespace eprosima
                 inline Cdr& operator<<(const char char_t){return serialize(char_t);}
 
                 /*!
+                 * @brief This operator serializes a int8_t.
+                 * @param int8 The value of the int8_t that will be serialized in the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
+                inline Cdr& operator<<(const int8_t int8){return serialize(int8);}
+
+                /*!
                  * @brief This operator serializes an unsigned short.
                  * @param ushort_t The value of the unsigned short that will be serialized in the buffer.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -374,6 +382,14 @@ namespace eprosima
                 inline Cdr& operator>>(char &char_t){return deserialize(char_t);}
 
                 /*!
+                 * @brief This operator deserializes a int8_t.
+                 * @param int8 The variable that will store the int8_t read from the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                inline Cdr& operator>>(int8_t &int8){return deserialize(int8);}
+
+                /*!
                  * @brief This operator deserializes an unsigned short.
                  * @param ushort_t The variable that will store the unsigned short read from the buffer.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -505,7 +521,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint8_t octet_t)
                     {
-                        return serialize((char)octet_t);
+                        return serialize((const char)octet_t);
                     }
 
                 /*!
@@ -518,7 +534,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint8_t octet_t, Endianness endianness)
                     {
-                        return serialize((char)octet_t, endianness);
+                        return serialize((const char)octet_t, endianness);
                     }
 
                 /*!
@@ -543,6 +559,31 @@ namespace eprosima
                     }
 
                 /*!
+                 * @brief This function serializes an int8_t.
+                 * @param int8 The value of the int8_t that will be serialized in the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
+                inline
+                    Cdr& serialize(const int8_t int8)
+                    {
+                        return serialize((const char)int8);
+                    }
+
+                /*!
+                 * @brief This function serializes an int8_t with a different endianness.
+                 * @param octet_t The value of the int8_t that will be serialized in the buffer.
+                 * @param endianness Endianness that will be used in the serialization of this value.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
+                inline
+                    Cdr& serialize(const int8_t int8, Endianness endianness)
+                    {
+                        return serialize((const char)int8, endianness);
+                    }
+
+                /*!
                  * @brief This function serializes an unsigned short.
                  * @param ushort_t The value of the unsigned short that will be serialized in the buffer.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -551,7 +592,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint16_t ushort_t)
                     {
-                        return serialize((int16_t)ushort_t);
+                        return serialize((const int16_t)ushort_t);
                     }
 
                 /*!
@@ -564,7 +605,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint16_t ushort_t, Endianness endianness)
                     {
-                        return serialize((int16_t)ushort_t, endianness);
+                        return serialize((const int16_t)ushort_t, endianness);
                     }
 
                 /*!
@@ -593,7 +634,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint32_t ulong_t)
                     {
-                        return serialize((int32_t)ulong_t);
+                        return serialize((const int32_t)ulong_t);
                     }
 
                 /*!
@@ -606,7 +647,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint32_t ulong_t, Endianness endianness)
                     {
-                        return serialize((int32_t)ulong_t, endianness);
+                        return serialize((const int32_t)ulong_t, endianness);
                     }
 
                 /*!
@@ -629,13 +670,13 @@ namespace eprosima
                 inline
                     Cdr& serialize(const wchar_t wchar)
                     {
-                        return serialize((uint32_t)wchar);
+                        return serialize((const uint32_t)wchar);
                     }
 
                 inline
                     Cdr& serialize(const wchar_t wchar, Endianness endianness)
                     {
-                        return serialize((uint32_t)wchar, endianness);
+                        return serialize((const uint32_t)wchar, endianness);
                     }
 
                 /*!
@@ -647,7 +688,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint64_t ulonglong_t)
                     {
-                        return serialize((int64_t)ulonglong_t);
+                        return serialize((const int64_t)ulonglong_t);
                     }
 
                 /*!
@@ -660,7 +701,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint64_t ulonglong_t, Endianness endianness)
                     {
-                        return serialize((int64_t)ulonglong_t, endianness);
+                        return serialize((const int64_t)ulonglong_t, endianness);
                     }
 
                 /*!
@@ -911,7 +952,7 @@ namespace eprosima
                 inline
                     Cdr& serializeArray(const uint8_t *octet_t, size_t numElements)
                     {
-                        return serializeArray((const char*)octet_t, numElements);
+                        return serializeArray(reinterpret_cast<const char*>(octet_t), numElements);
                     }
 
                 /*!
@@ -925,7 +966,7 @@ namespace eprosima
                 inline
                     Cdr& serializeArray(const uint8_t *octet_t, size_t numElements, Endianness /*endianness*/)
                     {
-                        return serializeArray((const char*)octet_t, numElements);
+                        return serializeArray(reinterpret_cast<const char*>(octet_t), numElements);
                     }
 
                 /*!
@@ -952,6 +993,33 @@ namespace eprosima
                     }
 
                 /*!
+                 * @brief This function serializes an array of int8_t.
+                 * @param int8 The sequence of int8_t that will be serialized in the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
+                inline
+                    Cdr& serializeArray(const int8_t *int8, size_t numElements)
+                    {
+                        return serializeArray(reinterpret_cast<const char*>(int8), numElements);
+                    }
+
+                /*!
+                 * @brief This function serializes an array of int8_t with a different endianness.
+                 * @param int8 The array of int8_t that will be serialized in the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @param endianness Endianness that will be used in the serialization of this value.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
+                inline
+                    Cdr& serializeArray(const int8_t *int8, size_t numElements, Endianness /*endianness*/)
+                    {
+                        return serializeArray(reinterpret_cast<const char*>(int8), numElements);
+                    }
+
+                /*!
                  * @brief This function serializes an array of unsigned shorts.
                  * @param ushort_t The array of unsigned shorts that will be serialized in the buffer.
                  * @param numElements Number of the elements in the array.
@@ -961,7 +1029,7 @@ namespace eprosima
                 inline
                     Cdr& serializeArray(const uint16_t *ushort_t, size_t numElements)
                     {
-                        return serializeArray((const int16_t*)ushort_t, numElements);
+                        return serializeArray(reinterpret_cast<const int16_t*>(ushort_t), numElements);
                     }
 
                 /*!
@@ -975,7 +1043,7 @@ namespace eprosima
                 inline
                     Cdr& serializeArray(const uint16_t *ushort_t, size_t numElements, Endianness endianness)
                     {
-                        return serializeArray((const int16_t*)ushort_t, numElements, endianness);
+                        return serializeArray(reinterpret_cast<const int16_t*>(ushort_t), numElements, endianness);
                     }
 
                 /*!
@@ -1007,7 +1075,7 @@ namespace eprosima
                 inline
                     Cdr& serializeArray(const uint32_t *ulong_t, size_t numElements)
                     {
-                        return serializeArray((const int32_t*)ulong_t, numElements);
+                        return serializeArray(reinterpret_cast<const int32_t*>(ulong_t), numElements);
                     }
 
                 /*!
@@ -1021,7 +1089,7 @@ namespace eprosima
                 inline
                     Cdr& serializeArray(const uint32_t *ulong_t, size_t numElements, Endianness endianness)
                     {
-                        return serializeArray((const int32_t*)ulong_t, numElements, endianness);
+                        return serializeArray(reinterpret_cast<const int32_t*>(ulong_t), numElements, endianness);
                     }
 
                 /*!
@@ -1057,7 +1125,7 @@ namespace eprosima
                 inline
                     Cdr& serializeArray(const uint64_t *ulonglong_t, size_t numElements)
                     {
-                        return serializeArray((const int64_t*)ulonglong_t, numElements);
+                        return serializeArray(reinterpret_cast<const int64_t*>(ulonglong_t), numElements);
                     }
 
                 /*!
@@ -1071,7 +1139,7 @@ namespace eprosima
                 inline
                     Cdr& serializeArray(const uint64_t *ulonglong_t, size_t numElements, Endianness endianness)
                     {
-                        return serializeArray((const int64_t*)ulonglong_t, numElements, endianness);
+                        return serializeArray(reinterpret_cast<const int64_t*>(ulonglong_t), numElements, endianness);
                     }
 
                 /*!
@@ -1303,7 +1371,7 @@ namespace eprosima
                 inline
                     Cdr& deserialize(uint8_t &octet_t)
                     {
-                        return deserialize((char&)octet_t);
+                        return deserialize(reinterpret_cast<char&>(octet_t));
                     }
 
                 /*!
@@ -1316,7 +1384,7 @@ namespace eprosima
                 inline
                     Cdr& deserialize(uint8_t &octet_t, Endianness endianness)
                     {
-                        return deserialize((char&)octet_t, endianness);
+                        return deserialize(reinterpret_cast<char&>(octet_t), endianness);
                     }
 
                 /*!
@@ -1341,6 +1409,31 @@ namespace eprosima
                     }
 
                 /*!
+                 * @brief This function deserializes an int8_t.
+                 * @param int8 The variable that will store the int8_t read from the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                inline
+                    Cdr& deserialize(int8_t &int8)
+                    {
+                        return deserialize(reinterpret_cast<char&>(int8));
+                    }
+
+                /*!
+                 * @brief This function deserializes an int8_t with a different endianness.
+                 * @param int8 The variable that will store the int8_t read from the buffer.
+                 * @param endianness Endianness that will be used in the serialization of this value.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                inline
+                    Cdr& deserialize(int8_t &int8, Endianness endianness)
+                    {
+                        return deserialize(reinterpret_cast<char&>(int8), endianness);
+                    }
+
+                /*!
                  * @brief This function deserializes an unsigned short.
                  * @param ushort_t The variable that will store the unsigned short read from the buffer.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -1349,7 +1442,7 @@ namespace eprosima
                 inline
                     Cdr& deserialize(uint16_t &ushort_t)
                     {
-                        return deserialize((int16_t&)ushort_t);
+                        return deserialize(reinterpret_cast<int16_t&>(ushort_t));
                     }
 
                 /*!
@@ -1362,7 +1455,7 @@ namespace eprosima
                 inline
                     Cdr& deserialize(uint16_t &ushort_t, Endianness endianness)
                     {
-                        return deserialize((int16_t&)ushort_t, endianness);
+                        return deserialize(reinterpret_cast<int16_t&>(ushort_t), endianness);
                     }
 
                 /*!
@@ -1391,7 +1484,7 @@ namespace eprosima
                 inline
                     Cdr& deserialize(uint32_t &ulong_t)
                     {
-                        return deserialize((int32_t&)ulong_t);
+                        return deserialize(reinterpret_cast<int32_t&>(ulong_t));
                     }
 
                 /*!
@@ -1404,7 +1497,7 @@ namespace eprosima
                 inline
                     Cdr& deserialize(uint32_t &ulong_t, Endianness endianness)
                     {
-                        return deserialize((int32_t&)ulong_t, endianness);
+                        return deserialize(reinterpret_cast<int32_t&>(ulong_t), endianness);
                     }
 
                 /*!
@@ -1429,7 +1522,7 @@ namespace eprosima
                     {
                         uint32_t ret;
                         deserialize(ret);
-                        wchar = (wchar_t)ret;
+                        wchar = static_cast<wchar_t>(ret);
                         return *this;
                     }
 
@@ -1438,7 +1531,7 @@ namespace eprosima
                     {
                         uint32_t ret;
                         deserialize(ret, endianness);
-                        wchar = (wchar_t)ret;
+                        wchar = static_cast<wchar_t>(ret);
                         return *this;
                     }
 
@@ -1451,7 +1544,7 @@ namespace eprosima
                 inline
                     Cdr& deserialize(uint64_t &ulonglong_t)
                     {
-                        return deserialize((int64_t&)ulonglong_t);
+                        return deserialize(reinterpret_cast<int64_t&>(ulonglong_t));
                     }
 
                 /*!
@@ -1464,7 +1557,7 @@ namespace eprosima
                 inline
                     Cdr& deserialize(uint64_t &ulonglong_t, Endianness endianness)
                     {
-                        return deserialize((int64_t&)ulonglong_t, endianness);
+                        return deserialize(reinterpret_cast<int64_t&>(ulonglong_t), endianness);
                     }
 
                 /*!
@@ -1740,7 +1833,7 @@ namespace eprosima
                 inline
                     Cdr& deserializeArray(uint8_t *octet_t, size_t numElements)
                     {
-                        return deserializeArray((char*)octet_t, numElements);
+                        return deserializeArray(reinterpret_cast<char*>(octet_t), numElements);
                     }
 
                 /*!
@@ -1754,7 +1847,7 @@ namespace eprosima
                 inline
                     Cdr& deserializeArray(uint8_t *octet_t, size_t numElements, Endianness endianness)
                     {
-                        return deserializeArray((char*)octet_t, numElements, endianness);
+                        return deserializeArray(reinterpret_cast<char*>(octet_t), numElements, endianness);
                     }
 
                 /*!
@@ -1781,6 +1874,33 @@ namespace eprosima
                     }
 
                 /*!
+                 * @brief This function deserializes an array of int8_t.
+                 * @param int8 The variable that will store the array of int8_t read from the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                inline
+                    Cdr& deserializeArray(int8_t *int8, size_t numElements)
+                    {
+                        return deserializeArray(reinterpret_cast<char*>(int8), numElements);
+                    }
+
+                /*!
+                 * @brief This function deserializes an array of int8_t with a different endianness.
+                 * @param int8 The variable that will store the array of int8_t read from the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @param endianness Endianness that will be used in the serialization of this value.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                inline
+                    Cdr& deserializeArray(int8_t *int8, size_t numElements, Endianness endianness)
+                    {
+                        return deserializeArray(reinterpret_cast<char*>(int8), numElements, endianness);
+                    }
+
+                /*!
                  * @brief This function deserializes an array of unsigned shorts.
                  * @param ushort_t The variable that will store the array of unsigned shorts read from the buffer.
                  * @param numElements Number of the elements in the array.
@@ -1790,7 +1910,7 @@ namespace eprosima
                 inline
                     Cdr& deserializeArray(uint16_t *ushort_t, size_t numElements)
                     {
-                        return deserializeArray((int16_t*)ushort_t, numElements);
+                        return deserializeArray(reinterpret_cast<int16_t*>(ushort_t), numElements);
                     }
 
                 /*!
@@ -1804,7 +1924,7 @@ namespace eprosima
                 inline
                     Cdr& deserializeArray(uint16_t *ushort_t, size_t numElements, Endianness endianness)
                     {
-                        return deserializeArray((int16_t*)ushort_t, numElements, endianness);
+                        return deserializeArray(reinterpret_cast<int16_t*>(ushort_t), numElements, endianness);
                     }
 
                 /*!
@@ -1836,7 +1956,7 @@ namespace eprosima
                 inline
                     Cdr& deserializeArray(uint32_t *ulong_t, size_t numElements)
                     {
-                        return deserializeArray((int32_t*)ulong_t, numElements);
+                        return deserializeArray(reinterpret_cast<int32_t*>(ulong_t), numElements);
                     }
 
                 /*!
@@ -1850,7 +1970,7 @@ namespace eprosima
                 inline
                     Cdr& deserializeArray(uint32_t *ulong_t, size_t numElements, Endianness endianness)
                     {
-                        return deserializeArray((int32_t*)ulong_t, numElements, endianness);
+                        return deserializeArray(reinterpret_cast<int32_t*>(ulong_t), numElements, endianness);
                     }
 
                 /*!
@@ -1886,7 +2006,7 @@ namespace eprosima
                 inline
                     Cdr& deserializeArray(uint64_t *ulonglong_t, size_t numElements)
                     {
-                        return deserializeArray((int64_t*)ulonglong_t, numElements);
+                        return deserializeArray(reinterpret_cast<int64_t*>(ulonglong_t), numElements);
                     }
 
                 /*!
@@ -1900,7 +2020,7 @@ namespace eprosima
                 inline
                     Cdr& deserializeArray(uint64_t *ulonglong_t, size_t numElements, Endianness endianness)
                     {
-                        return deserializeArray((int64_t*)ulonglong_t, numElements, endianness);
+                        return deserializeArray(reinterpret_cast<int64_t*>(ulonglong_t), numElements, endianness);
                     }
 
                 /*!

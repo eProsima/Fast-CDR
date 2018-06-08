@@ -17,18 +17,73 @@
 ###############################################################################
 cmake_minimum_required(VERSION 2.8.11)
 
-# Set CMAKE_BUILD_TYPE to Release by default.
-if(DEFINED CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING
-        "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
-        )
-else()
-    set(CMAKE_BUILD_TYPE Release CACHE STRING
-        "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
-        )
+set(IS_TOP_LEVEL TRUE)
+if(PROJECT_SOURCE_DIR)
+    set(IS_TOP_LEVEL FALSE)
 endif()
 
-project("fastcdr")
+# Set CMAKE_BUILD_TYPE to Release by default.
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    message(STATUS "Setting build type to 'Release' as none was specified.")
+    set(CMAKE_BUILD_TYPE Release CACHE STRING
+        "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+        FORCE)
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
+
+###############################################################################
+# Version information                                                         #
+###############################################################################
+
+#If not set, copy over product version from configure.ac
+file(STRINGS
+    configure.ac
+    LIB_MAJOR_VERSION_TMP
+    REGEX "^m4_define\\(\\[?version_major\\]?, *\\[?[0-9]+\\]?\\)"
+    )
+file(STRINGS
+    configure.ac
+    LIB_MINOR_VERSION_TMP
+    REGEX "^m4_define\\(\\[?version_minor\\]?, *\\[?[0-9]+\\]?\\)"
+    )
+file(STRINGS
+    configure.ac
+    LIB_PATCH_VERSION_TMP
+    REGEX "^m4_define\\(\\[?version_micro\\]?, *\\[?[0-9]+\\]?\\)"
+    )
+
+string(REGEX REPLACE "m4_define\\(\\[?version_major\\]?, *\\[?([0-9]+)\\]?\\)"
+    "\\1"
+    LIB_MAJOR_VERSION
+    ${LIB_MAJOR_VERSION_TMP}
+    )
+string(REGEX REPLACE "m4_define\\(\\[?version_minor\\]?, *\\[?([0-9]+)\\]?\\)"
+    "\\1"
+    LIB_MINOR_VERSION
+    ${LIB_MINOR_VERSION_TMP}
+    )
+string(REGEX REPLACE "m4_define\\(\\[?version_micro\\]?, *\\[?([0-9]+)\\]?\\)"
+    "\\1"
+    LIB_PATCH_VERSION
+    ${LIB_PATCH_VERSION_TMP}
+    )
+
+set(LIB_VERSION_STR "${LIB_MAJOR_VERSION}.${LIB_MINOR_VERSION}.${LIB_PATCH_VERSION}")
+
+###############################################################################
+# Project                                                                     #
+###############################################################################
+if(CMAKE_VERSION VERSION_LESS 3.0)
+    project(fastcdr)
+    set(PROJECT_VERSION_MAJOR "${LIB_MAJOR_VERSION}")
+    set(PROJECT_VERSION_MINOR "${LIB_MINOR_VERSION}")
+    set(PROJECT_VERSION_PATCH "${LIB_PATCH_VERSION}")
+    set(PROJECT_VERSION "${LIB_VERSION_STR}")
+else()
+    cmake_policy(SET CMP0048 NEW)
+    project(fastcdr VERSION "${LIB_VERSION_STR}" LANGUAGES CXX)
+endif()
+
 set(PROJECT_NAME_STYLED "FastCDR")
 set(PROJECT_NAME_LARGE "Fast CDR")
 string(TOUPPER "${PROJECT_NAME}" PROJECT_NAME_UPPER)
@@ -36,48 +91,6 @@ set(${PROJECT_NAME}_DESCRIPTION_SUMMARY "C++ library for serialize using CDR ser
 set(${PROJECT_NAME}_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} library provides two serialization mechanisms. One is the standard CDR serialization mechanism, while the other is a faster implementation that modifies the standard.")
 
 message(STATUS "Configuring ${PROJECT_NAME_LARGE}")
-
-###############################################################################
-# Version information                                                         #
-###############################################################################
-
-#If not set, copy over product version from configure.ac
-if(NOT PROJECT_MAJOR_VERSION)
-    file(STRINGS
-        ${PROJECT_SOURCE_DIR}/configure.ac
-        PROJECT_MAJOR_VERSION_TMP
-        REGEX "^m4_define\\(\\[?version_major\\]?, *\\[?[0-9]+\\]?\\)"
-        )
-    file(STRINGS
-        ${PROJECT_SOURCE_DIR}/configure.ac
-        PROJECT_MINOR_VERSION_TMP
-        REGEX "^m4_define\\(\\[?version_minor\\]?, *\\[?[0-9]+\\]?\\)"
-        )
-    file(STRINGS
-        ${PROJECT_SOURCE_DIR}/configure.ac
-        PROJECT_MICRO_VERSION_TMP
-        REGEX "^m4_define\\(\\[?version_micro\\]?, *\\[?[0-9]+\\]?\\)"
-        )
-
-    string(REGEX REPLACE "m4_define\\(\\[?version_major\\]?, *\\[?([0-9]+)\\]?\\)"
-        "\\1"
-        PROJECT_MAJOR_VERSION
-        ${PROJECT_MAJOR_VERSION_TMP}
-        )
-    string(REGEX REPLACE "m4_define\\(\\[?version_minor\\]?, *\\[?([0-9]+)\\]?\\)"
-        "\\1"
-        PROJECT_MINOR_VERSION
-        ${PROJECT_MINOR_VERSION_TMP}
-        )
-    string(REGEX REPLACE "m4_define\\(\\[?version_micro\\]?, *\\[?([0-9]+)\\]?\\)"
-        "\\1"
-        PROJECT_MICRO_VERSION
-        ${PROJECT_MICRO_VERSION_TMP}
-        )
-endif()
-
-set(PROJECT_VERSION ${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION}.${PROJECT_MICRO_VERSION})
-
 message(STATUS "Version: ${PROJECT_VERSION}")
 message(STATUS "To change de version modify the file configure.ac")
 
@@ -175,14 +188,11 @@ endif()
 ###############################################################################
 # Testing
 ###############################################################################
-if(EPROSIMA_BUILD_TESTS AND NOT EPROSIMA_INSTALLER)
-    include(${PROJECT_SOURCE_DIR}/cmake/dev/gtest.cmake)
-    check_gtest()
-    if(GTEST_FOUND)
-        enable_testing()
-        include(CTest)
-        add_subdirectory(test)
-    endif()
+if(EPROSIMA_BUILD_TESTS AND IS_TOP_LEVEL AND NOT EPROSIMA_INSTALLER)
+    enable_testing()
+    include(CTest)
+
+    add_subdirectory(test)
 endif()
 
 ###############################################################################

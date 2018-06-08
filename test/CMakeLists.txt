@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if(NOT ((MSVC OR MSVC_IDE) AND EPROSIMA_INSTALLER))
-    include(${PROJECT_SOURCE_DIR}/cmake/dev/gtest.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/common/gtest.cmake)
+check_gtest()
 
+if(GTEST_FOUND)
     # If Windows, link against export dll functions
     if(WIN32)
         add_definitions(-DFASTCDR_DYN_LINK)

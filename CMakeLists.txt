@@ -74,7 +74,7 @@ set(LIB_VERSION_STR "${LIB_MAJOR_VERSION}.${LIB_MINOR_VERSION}.${LIB_PATCH_VERSI
 # Project                                                                     #
 ###############################################################################
 if(CMAKE_VERSION VERSION_LESS 3.0)
-    project(fastcdr)
+    project(fastcdr CXX)
     set(PROJECT_VERSION_MAJOR "${LIB_MAJOR_VERSION}")
     set(PROJECT_VERSION_MINOR "${LIB_MINOR_VERSION}")
     set(PROJECT_VERSION_PATCH "${LIB_PATCH_VERSION}")
@@ -146,7 +146,7 @@ endif()
 ###############################################################################
 # Test system configuration
 ###############################################################################
-include(${PROJECT_SOURCE_DIR}/cmake/dev/check_configuration.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/common/check_configuration.cmake)
 check_stdcxx()
 check_compile_feature()
 check_endianness()

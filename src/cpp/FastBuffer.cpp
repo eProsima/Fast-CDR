@@ -24,7 +24,7 @@
 
 using namespace eprosima::fastcdr;
 
-FastBuffer::FastBuffer() : m_buffer(NULL),
+FastBuffer::FastBuffer() : m_buffer(nullptr),
     m_bufferSize(0), m_internalBuffer(true)
 {
 }
@@ -36,7 +36,7 @@ FastBuffer::FastBuffer(char* const buffer, const size_t bufferSize) : m_buffer(b
 
 FastBuffer::~FastBuffer()
 {
-    if(m_internalBuffer && m_buffer != NULL)
+    if(m_internalBuffer && m_buffer != nullptr)
     {
         free(m_buffer);
     }

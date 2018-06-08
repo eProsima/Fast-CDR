@@ -20,6 +20,7 @@
 #include <cstdio>
 #include <string.h>
 #include <cstddef>
+#include <utility>
 
 namespace eprosima
 {
@@ -208,6 +209,23 @@ namespace eprosima
                  */
                 FastBuffer(char* const buffer, const size_t bufferSize);
 
+                //! Move constructor
+                FastBuffer(FastBuffer&& fbuffer) : m_buffer(nullptr), m_bufferSize(0), m_internalBuffer(true)
+                {
+                    std::swap(m_buffer, fbuffer.m_buffer);
+                    std::swap(m_bufferSize, fbuffer.m_bufferSize);
+                    std::swap(m_internalBuffer, fbuffer.m_internalBuffer);
+                }
+
+                //! Move assignment
+                FastBuffer& operator=(FastBuffer&& fbuffer)
+                {
+                    std::swap(m_buffer, fbuffer.m_buffer);
+                    std::swap(m_bufferSize, fbuffer.m_bufferSize);
+                    std::swap(m_internalBuffer, fbuffer.m_internalBuffer);
+                    return *this;
+                }
+
                 /*!
                  * @brief Default destructor.
                  */
@@ -253,6 +271,10 @@ namespace eprosima
                 bool resize(size_t minSizeInc);
 
             private:
+
+                FastBuffer(const FastBuffer&) = delete;
+
+                FastBuffer& operator=(const FastBuffer&) = delete;
 
                 //! @brief Pointer to the stream of bytes that contains the serialized data.
                 char *m_buffer;

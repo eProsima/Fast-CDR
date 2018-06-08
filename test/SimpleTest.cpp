@@ -138,6 +138,41 @@ static void EXPECT_ARRAY_LONG_DOUBLE_EQ(long double *array1, const long double *
     }
 }
 
+TEST(FastBufferTests, Constructors)
+{
+    char buffer[BUFFER_LENGTH];
+
+    /*
+    // Copy assignment
+    {
+        eprosima::fastcdr::FastBuffer buffer1(buffer, BUFFER_LENGTH);
+        buffer1.resize(1000);
+        eprosima::fastcdr::FastBuffer buffer2 = buffer1;
+    }
+
+    // Copy constructor
+    {
+        eprosima::fastcdr::FastBuffer buffer1(buffer, BUFFER_LENGTH);
+        buffer1.resize(1000);
+        eprosima::fastcdr::FastBuffer buffer2(buffer1);
+    }
+    */
+
+    // Move assignment
+    {
+        eprosima::fastcdr::FastBuffer buffer1(buffer, BUFFER_LENGTH);
+        buffer1.resize(1000);
+        eprosima::fastcdr::FastBuffer buffer2 = std::move(buffer1);
+    }
+
+    // Move constructor
+    {
+        eprosima::fastcdr::FastBuffer buffer1(buffer, BUFFER_LENGTH);
+        buffer1.resize(1000);
+        eprosima::fastcdr::FastBuffer buffer2(std::move(buffer1));
+    }
+}
+
 TEST(CDRTests, Octet)
 {
     // Check good case.

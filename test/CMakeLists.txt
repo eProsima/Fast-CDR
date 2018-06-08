@@ -27,7 +27,7 @@ if(GTEST_FOUND)
     ###############################################################################
     set(UNITTESTS_SOURCE SimpleTest.cpp ResizeTest.cpp)
     add_executable(UnitTests ${UNITTESTS_SOURCE})
-    add_gtest(UnitTests ${UNITTESTS_SOURCE})
     target_include_directories(UnitTests PRIVATE ${GTEST_INCLUDE_DIRS})
     target_link_libraries(UnitTests fastcdr ${GTEST_BOTH_LIBRARIES})
+    add_gtest(UnitTests ${UNITTESTS_SOURCE})
 endif()

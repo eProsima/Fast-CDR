@@ -43,11 +43,33 @@ $if(params)$$separatorInicial$$endif$$params : {param | /*$param.comment$*/ $par
 >>
 
 object_serialization(ctx, object, preffix) ::= <<
+$if(object.typecode.isType_f)$
+$if(object.typecode.contentTypeCode.isType_c)$
+scdr.serializeArray(reinterpret_cast<const uint32_t*>($preffix$$object.name$.data()), $preffix$$object.name$.size());
+$else$
 scdr << $serializeCasting(typecode=object.typecode)$$preffix$$object.name$;
+$endif$
+$else$
+scdr << $serializeCasting(typecode=object.typecode)$$preffix$$object.name$;
+$endif$
 >>
 
 object_deserialization(ctx, object, preffix) ::= <<
-dcdr \>> $deserializeCasting(typecode=object.typecode)$$preffix$$object.name$;
+$if(object.typecode.isType_f)$
+$if(object.typecode.contentTypeCode.isType_c)$
+dcdr.deserializeArray(reinterpret_cast<uint32_t*>($preffix$$object.name$.data()), $preffix$$object.name$.size());
+$else$
+dcdr \>> $preffix$$object.name$;
+$endif$
+$else$
+$if(object.typecode.isType_c)$
+uint32_t enum_value = 0;
+dcdr \>> enum_value;
+$preffix$$object.name$ = ($object.typecode.scopedname$)enum_value;
+$else$
+dcdr \>> $preffix$$object.name$;
+$endif$
+$endif$
 >>
 
 // TODO Todos los tipos. MEJORAR. size of 1 no deberia generar alignment.
@@ -182,13 +204,7 @@ $endif$
 
 serializeCasting(typecode) ::= <<
 $if(typecode.isType_c)$
-(uint32_t)
-$endif$
->>
-
-deserializeCasting(typecode) ::= <<
-$if(typecode.isType_c)$
-(uint32_t&)
+(const uint32_t)
 $endif$
 >>
 

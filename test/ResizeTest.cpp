@@ -4161,3 +4161,21 @@ TEST(FastCDRResizeTests, Complete)
     free(ldouble_seq_value);
     free(c_string_value);
 }
+
+TEST(CDRResizeTests, ReserveBuffer)
+{
+    FastBuffer buffer0;
+    EXPECT_EQ(true, buffer0.reserve(100));
+    EXPECT_EQ(100, buffer0.getBufferSize());
+
+    FastBuffer buffer1;
+    EXPECT_EQ(true, buffer1.resize(100));
+    EXPECT_EQ(200, buffer1.getBufferSize());
+    EXPECT_EQ(false, buffer1.reserve(300));
+    EXPECT_EQ(200, buffer1.getBufferSize());
+
+    char raw_buffer[10];
+    FastBuffer buffer2(&raw_buffer[0], 10);
+    EXPECT_EQ(false, buffer2.reserve(100));
+    EXPECT_EQ(10, buffer2.getBufferSize());
+}

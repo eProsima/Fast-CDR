@@ -264,6 +264,13 @@ namespace eprosima
                     }
 
                 /*!
+                 * @brief This function reserves memory for the internal raw buffer. It will only do so if the buffer is not yet allocated and is not externally set.
+                 * @param size The size of the memory to be allocated.
+                 * @return True if the allocation suceeded. False if the raw buffer was set externally or is already allocated.
+                 */
+                bool reserve(size_t size);
+
+                /*!
                  * @brief This function resizes the raw buffer. It will call the user's defined function for this purpose.
                  * @param minSizeInc The minimun growth expected of the current raw buffer.
                  * @return True if the operation works. False if it does not.

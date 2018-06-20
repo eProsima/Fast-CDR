@@ -98,9 +98,6 @@ message(STATUS "To change de version modify the file configure.ac")
 # Generation of windows installers.
 ###############################################################################
 option(EPROSIMA_INSTALLER "Activate the creation of a build to create windows installers" OFF)
-if(WIN32)
-    option(EPROSIMA_INSTALLER_MINION "Informs this is part of an installer" OFF)
-endif()
 
 ###############################################################################
 # Warning level
@@ -137,7 +134,6 @@ option(BUILD_SHARED_LIBS "Create shared libraries by default" ON)
 ###############################################################################
 
 option(EPROSIMA_BUILD "Activate internal building" OFF)
-option(MINION "Tells if it is a subproject of a superproject" OFF)
 
 if(EPROSIMA_INSTALLER)
     set(EPROSIMA_BUILD ON)

@@ -63,9 +63,11 @@ dcdr \>> $preffix$$object.name$;
 $endif$
 $else$
 $if(object.typecode.isType_c)$
-uint32_t enum_value = 0;
-dcdr \>> enum_value;
-$preffix$$object.name$ = ($object.typecode.scopedname$)enum_value;
+{
+    uint32_t enum_value = 0;
+    dcdr \>> enum_value;
+    $preffix$$object.name$ = ($object.typecode.scopedname$)enum_value;
+}
 $else$
 dcdr \>> $preffix$$object.name$;
 $endif$

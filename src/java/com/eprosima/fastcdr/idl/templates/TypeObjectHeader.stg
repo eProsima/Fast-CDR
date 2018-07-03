@@ -57,6 +57,17 @@ public:
     $ctx.filename$TypeFactory();
     ~$ctx.filename$TypeFactory();
 
+    eProsima_user_DllExport TypeIdentifier getBasicIdentifier(std::string &basic_type_name);
+
+    eProsima_user_DllExport TypeIdentifier getStringIdentifier(uint32_t bound, bool wide = false);
+
+    eProsima_user_DllExport TypeIdentifier getSequenceIdentifier(TypeIdentifier *type, uint32_t bound);
+
+    eProsima_user_DllExport TypeIdentifier getArrayIdentifier(TypeIdentifier *type, std::vector<uint32_t> &bound);
+
+    eProsima_user_DllExport TypeIdentifier getMapIdentifier(TypeIdentifier *keyType,
+        TypeIdentifier *valueType, uint32_t bound);
+
     $definitions; separator="\n"$
 
 private:
@@ -68,8 +79,8 @@ private:
 >>
 
 typedef_decl(ctx, parent, typedefs) ::= <<
-eProsima_user_DllExport TypeIdentifier* get$typedef.name$Identifier();
-eProsima_user_DllExport TypeObject* get$typedef.name$Object();
+eProsima_user_DllExport TypeIdentifier* get$typedefs.name$Identifier();
+eProsima_user_DllExport TypeObject* get$typedefs.name$Object();
 
 >>
 

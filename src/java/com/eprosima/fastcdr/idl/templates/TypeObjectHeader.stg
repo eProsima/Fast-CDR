@@ -56,10 +56,10 @@ class $ctx.filename$TypeFactory
 public:
     $ctx.filename$TypeFactory();
     ~$ctx.filename$TypeFactory();
-    eProsima_user_DllExport TypeIdentifier* getTypeIdentifier(const std::string &typeName);
-    eProsima_user_DllExport TypeObject* getTypeObject(const std::string &typeName);
-private:
+
     $definitions; separator="\n"$
+
+private:
     std::map<std::string, TypeIdentifier*> m_Identifiers;
     std::map<std::string, TypeObject*> m_Objects;
 };
@@ -68,26 +68,26 @@ private:
 >>
 
 typedef_decl(ctx, parent, typedefs) ::= <<
-TypeIdentifier* get$typedef.name$Identifier();
-TypeObject* get$typedef.name$Object();
+eProsima_user_DllExport TypeIdentifier* get$typedef.name$Identifier();
+eProsima_user_DllExport TypeObject* get$typedef.name$Object();
 
 >>
 
 enum_type(ctx, parent, enum) ::= <<
-TypeIdentifier* get$enum.name$Identifier();
-TypeObject* get$enum.name$Object();
+eProsima_user_DllExport TypeIdentifier* get$enum.name$Identifier();
+eProsima_user_DllExport TypeObject* get$enum.name$Object();
 
 >>
 
 struct_type(ctx, parent, struct, extensions) ::= <<
-TypeIdentifier* get$struct.name$Identifier();
-TypeObject* get$struct.name$Object();
+eProsima_user_DllExport TypeIdentifier* get$struct.name$Identifier();
+eProsima_user_DllExport TypeObject* get$struct.name$Object();
 
 >>
 
 union_type(ctx, parent, union, extensions) ::= <<
-TypeIdentifier* get$union.name$Identifier();
-TypeObject* get$union.name$Object();
+eProsima_user_DllExport TypeIdentifier* get$union.name$Identifier();
+eProsima_user_DllExport TypeObject* get$union.name$Object();
 
 >>
 /***** Utils *****/

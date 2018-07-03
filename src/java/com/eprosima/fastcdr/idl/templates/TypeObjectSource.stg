@@ -113,7 +113,19 @@ $ctx.filename$TypeFactory::$ctx.filename$TypeFactory()
 
 $ctx.filename$TypeFactory::~$ctx.filename$TypeFactory()
 {
-    // TODO Free all pointers
+    m_Identifiers.iterator id_it = m_Identifiers.begin();
+    while (id_it != m_Identifiers.end())
+    {
+        delete *(id_it->second);
+    }
+    m_Identifiers.clear();
+
+    m_Objects.iterator obj_it = m_Objects.begin();
+    while (obj_it != m_Objects.end())
+    {
+        delete *(obj_it->second);
+    }
+    m_Objects.clear();
 }
 
 $definitions; separator="\n"$
@@ -138,14 +150,14 @@ const_decl(ctx, parent, const) ::= <<>>
 typedef_decl(ctx, parent, typedefs) ::= <<
 TypeIdentifier* $typedefs.scopedname$::get$typedefs.name$Identifier()
 {
-    if (m_Identifiers.find("$typedef.typedefContentTypeCode.cppTypename$") != m_Identifiers.end())
+    if (m_Identifiers.find("$typedefs.typedefContentTypeCode.cppTypename$") != m_Identifiers.end())
     {
-        return m_Identifiers["$typedef.typedefContentTypeCode.cppTypename$"];
+        return m_Identifiers["$typedefs.typedefContentTypeCode.cppTypename$"];
     }
     return nullptr;
 }
 
-TypeIdentifier* $typedefs.scopedname$::get$typedefs.name$Object()
+TypeObject* $typedefs.scopedname$::get$typedefs.name$Object()
 {
     if (m_Objects.find("$typedefs.name$") != m_Objects.end())
     {
@@ -173,7 +185,7 @@ TypeIdentifier* $typedefs.scopedname$::get$typedefs.name$Object()
 
     // Must be defined already
     type_object->minimal().alias_type().body().common().related_type() =
-        m_Identifiers["$typedef.typedefContentTypeCode.cppTypename$"];
+        *m_Identifiers["$typedefs.typedefContentTypeCode.cppTypename$"]; // Make a copy
 
     // Don't add our TypeIdentifier
 
@@ -190,7 +202,6 @@ TypeIdentifier* $enum.scopedname$::get$enum.name$Identifier()
         return m_Identifiers["$enum.name$"];
     }
 
-    // Su TypeObject no lo proporciona, debemos calcularlo
     TypeObject* type_object;
     if (m_Objects.find("$enum.name$") != m_Objects.end())
     {
@@ -226,7 +237,7 @@ TypeIdentifier* $enum.scopedname$::get$enum.name$Identifier()
     m_Identifiers["$enum.name$"] = identifier;
 }
 
-TypeIdentifier* $enum.scopedname$::get$enum.name$Object()
+TypeObject* $enum.scopedname$::get$enum.name$Object()
 {
     if (m_Objects.find("$enum.name$") != m_Objects.end())
     {
@@ -247,8 +258,6 @@ TypeIdentifier* $enum.scopedname$::get$enum.name$Object()
 
     uint32_t value = 0;
     $enum.members:{ member | $enumerated_literal(ctx=ctx, object=member)$}; separator="\n"$
-
-    // TODO, no proporciona un TypeIdentifier!?
 
     m_Objects["$enum.name$"] = type_object;
 }
@@ -279,7 +288,6 @@ type_object->minimal().enumerated_type().literal_seq().emplace_back(mel_$object.
 struct_type(ctx, parent, struct, extensions) ::= <<
 TypeIdentifier* $struct.scopedname$::get$struct.name$Identifier()
 {
-    // Su TypeObject lo proporciona, no debemos calcularlo
     TypeObject* type_object;
     if (m_Objects.find("$enum.name$") != m_Objects.end())
     {
@@ -293,7 +301,7 @@ TypeIdentifier* $struct.scopedname$::get$struct.name$Identifier()
     return &(type_object->minimal().struct_type().header().base_type());
 }
 
-TypeIdentifier* $struct.scopedname$::get$struct.name$Object()
+TypeObject* $struct.scopedname$::get$struct.name$Object()
 {
     if (m_Objects.find("$struct.name$") != m_Objects.end())
     {
@@ -372,7 +380,6 @@ TypeIdentifier* $union.scopedname$::get$union.name$Identifier()
         return m_Identifiers["$union.name$"];
     }
 
-    // Su TypeObject no lo proporciona, debemos calcularlo
     TypeObject* type_object;
     if (m_Objects.find("$union.name$") != m_Objects.end())
     {
@@ -408,7 +415,7 @@ TypeIdentifier* $union.scopedname$::get$union.name$Identifier()
     m_Identifiers["$union.name$"] = identifier;
 }
 
-TypeIdentifier* $union.scopedname$::get$union.name$Object()
+TypeObject* $union.scopedname$::get$union.name$Object()
 {
     if (m_Objects.find("$union.name$") != m_Objects.end())
     {

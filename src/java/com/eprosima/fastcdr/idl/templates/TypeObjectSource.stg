@@ -44,63 +44,63 @@ $ctx.filename$TypeFactory::$ctx.filename$TypeFactory()
     // TK_BYTE_TYPE:
     auxIdent = new TypeIdentifier;
     auxIdent->_d(TK_BYTE_TYPE);
-    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("byte", auxIdent));
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("uint8_t", auxIdent));
     // TK_INT16_TYPE:
     auxIdent = new TypeIdentifier;
     auxIdent->_d(TK_INT16_TYPE);
-    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("int16", auxIdent));
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("int16_t", auxIdent));
     // TK_INT32_TYPE:
     auxIdent = new TypeIdentifier;
     auxIdent->_d(TK_INT32_TYPE);
-    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("int32", auxIdent));
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("int32_t", auxIdent));
     // TK_INT64_TYPE:
     auxIdent = new TypeIdentifier;
     auxIdent->_d(TK_INT64_TYPE);
-    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("int64", auxIdent));
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("int64_t", auxIdent));
     // TK_UINT16_TYPE:
     auxIdent = new TypeIdentifier;
     auxIdent->_d(TK_UINT16_TYPE);
-    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("uint16", auxIdent));
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("uint16_t", auxIdent));
     // TK_UINT32_TYPE:
     auxIdent = new TypeIdentifier;
     auxIdent->_d(TK_UINT32_TYPE);
-    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("uint32", auxIdent));
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("uint32_t", auxIdent));
     // TK_UINT64_TYPE:
     auxIdent = new TypeIdentifier;
     auxIdent->_d(TK_UINT64_TYPE);
-    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("uint64", auxIdent));
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("uint64_t", auxIdent));
     // TK_FLOAT32_TYPE:
     auxIdent = new TypeIdentifier;
     auxIdent->_d(TK_FLOAT32_TYPE);
-    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("float32", auxIdent));
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("float", auxIdent));
     // TK_FLOAT64_TYPE:
     auxIdent = new TypeIdentifier;
     auxIdent->_d(TK_FLOAT64_TYPE);
-    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("float64", auxIdent));
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("double", auxIdent));
     // TK_FLOAT128_TYPE:
     auxIdent = new TypeIdentifier;
     auxIdent->_d(TK_FLOAT128_TYPE);
-    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("float128", auxIdent));
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("long double", auxIdent));
     // TK_CHAR8_TYPE:
     auxIdent = new TypeIdentifier;
     auxIdent->_d(TK_CHAR8_TYPE);
-    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("char8", auxIdent));
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("char", auxIdent));
     // TK_CHAR16_TYPE:
     auxIdent = new TypeIdentifier;
     auxIdent->_d(TK_CHAR16_TYPE);
-    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("char16", auxIdent));
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("wchar", auxIdent));
 
     // Not basic, but "standard"
     // TI_STRING8_SMALL:
     auxIdent = new TypeIdentifier;
     auxIdent->_d(TI_STRING8_SMALL);
     auxIdent->string_sdefn.bound() = 255;
-    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("string", auxIdent));
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("string_255", auxIdent));
     // TI_STRING16_SMALL:
     auxIdent = new TypeIdentifier;
     auxIdent->_d(TI_STRING16_SMALL);
     auxIdent->string_sdefn.bound() = 255;
-    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("wstring", auxIdent));
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("wstring_255", auxIdent));
     // TI_STRING8_LARGE:
     //auxIdent = new TypeIdentifier;
     //auxIdent->_d(TI_STRING8_LARGE);
@@ -108,7 +108,7 @@ $ctx.filename$TypeFactory::$ctx.filename$TypeFactory()
     // TI_STRING16_LARGE:
     //auxIdent = new TypeIdentifier;
     //auxIdent->_d(TI_STRING16_LARGE);
-    //m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("wstring", auxIdent));
+    //m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("std::wstring", auxIdent));
 }
 
 $ctx.filename$TypeFactory::~$ctx.filename$TypeFactory()
@@ -128,285 +128,363 @@ $ctx.filename$TypeFactory::~$ctx.filename$TypeFactory()
     m_Objects.clear();
 }
 
-TypeIdentifier $ctx.filename$TypeFactory::getBasicIdentifier(std::string &basic_type_name)
+TypeIdentifier* $ctx.filename$TypeFactory::getBasicIdentifier(std::string &basic_type_name)
 {
     if (m_Identifiers.find(basic_type_name) != m_Identifiers.end())
     {
-        return *m_Identifiers[basic_type_name]; // Make a copy
+        return m_Identifiers[basic_type_name];
     }
-    TypeIdentifier invalid;
-    return invalid;
+    return nullptr;
 }
 
-TypeIdentifier $ctx.filename$TypeFactory::getStringIdentifier(uint32_t bound, bool wide)
+TypeIdentifier* $ctx.filename$TypeFactory::getStringIdentifier(uint32_t bound, bool wide)
 {
-    TypeIdentifier auxIdent;
-    if (bound < 256)
+    std::stringstream type;
+    type << ((wide) ? "string_" : "wstring_") << bound;
+
+    TypeIdentifier* auxIdent;
+
+    if (m_Identifiers.find(type.str()) != m_Identifiers.end())
     {
-        auxIdent._d(wide ? TI_STRING16_SMALL : TI_STRING8_SMALL);
-        auxIdent.string_sdefn.bound() = static_cast<octet>(bound);
+        return m_Identifiers[type.str()];
     }
     else
     {
-        auxIdent._d(wide ? TI_STRING16_LARGE : TI_STRING8_LARGE);
-        auxIdent.string_ldefn.bound() = bound;
+        if (bound < 256)
+        {
+            auxIdent->_d(wide ? TI_STRING16_SMALL : TI_STRING8_SMALL);
+            auxIdent->string_sdefn.bound() = static_cast<octet>(bound);
+        }
+        else
+        {
+            auxIdent->_d(wide ? TI_STRING16_LARGE : TI_STRING8_LARGE);
+            auxIdent->string_ldefn.bound() = bound;
+        }
+        m_Identifiers[type.str()] = auxIdent;
     }
     return auxIdent;
 }
 
-TypeIdentifier $ctx.filename$TypeFactory::getSequenceIdentifier(TypeIdentifier *type, uint32_t bound)
+TypeIdentifier* $ctx.filename$TypeFactory::getSequenceIdentifier(TypeIdentifier *type, uint32_t bound)
 {
-    TypeIdentifier auxIdent;
-    if (bound < 256)
+    std::stringstream auxType;
+    auxType << "sequence_" << type << "_" << bound;
+
+    TypeIdentifier* auxIdent;
+
+    if (m_Identifiers.find(auxType.str()) != m_Identifiers.end())
     {
-        auxIdent._d(TI_PLAIN_SEQUENCE_SMALL);
-        auxIdent.seq_sdefn().bound() = static_cast<octet>(bound);
-        auxIdent.seq_sdefn().element_identifier() = type;
-        auxIdent.seq_sdefn().header().element_flags().TRY_CONSTRUCT1(false);
-        auxIdent.seq_sdefn().header().element_flags().TRY_CONSTRUCT2(false);
-        auxIdent.seq_sdefn().header().element_flags().IS_EXTERNAL(false);
-        auxIdent.seq_sdefn().header().element_flags().IS_OPTIONAL(false);
-        auxIdent.seq_sdefn().header().element_flags().IS_MUST_UNDERSTAND(false);
-        auxIdent.seq_sdefn().header().element_flags().IS_KEY(false);
-        auxIdent.seq_sdefn().header().element_flags().IS_DEFAULT(false);
-
-        SerializedPayload_t payload(
-            MemberFlags::getMaxCdrSerializedSize() +
-            TypeIdentifier::getMaxCdrSerializedSize() + 1 + 4);
-        eprosima::fastcdr::FastBuffer fastbuffer((char*) payload->data, payload->max_size);
-        // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
-        eprosima::fastcdr::Cdr ser(
-            fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIAN,
-            eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
-        payload->encapsulation = CDR_LE;
-
-        ser << static_cast<octet>(bound);
-        auxIdent.seq_sdefn().element_identifier()->serialize(ser);
-        auxIdent.seq_sdefn().header().element_flags().serialize(ser);
-        payload->length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
-        MD5 objectHash();
-        objectHash.update(payload->data);
-        objectHash.finalize();
-        for(int i = 0; i < 14; ++i)
-        {
-            auxIdent.seq_sdefn().header().equiv_kind()[i] = objectHash.digest[i];
-        }
+        return m_Identifiers[auxType.str()];
     }
     else
     {
-        auxIdent._d(TI_PLAIN_SEQUENCE_LARGE);
-        auxIdent.seq_ldefn().bound() = bound;
-        auxIdent.seq_ldefn().element_identifier() = type;
-        auxIdent.seq_ldefn().header().element_flags().TRY_CONSTRUCT1(false);
-        auxIdent.seq_ldefn().header().element_flags().TRY_CONSTRUCT2(false);
-        auxIdent.seq_ldefn().header().element_flags().IS_EXTERNAL(false);
-        auxIdent.seq_ldefn().header().element_flags().IS_OPTIONAL(false);
-        auxIdent.seq_ldefn().header().element_flags().IS_MUST_UNDERSTAND(false);
-        auxIdent.seq_ldefn().header().element_flags().IS_KEY(false);
-        auxIdent.seq_ldefn().header().element_flags().IS_DEFAULT(false);
-
-        SerializedPayload_t payload(
-            MemberFlags::getMaxCdrSerializedSize() +
-            TypeIdentifier::getMaxCdrSerializedSize() + 4 + 4);
-        eprosima::fastcdr::FastBuffer fastbuffer((char*) payload->data, payload->max_size);
-        // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
-        eprosima::fastcdr::Cdr ser(
-            fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIAN,
-            eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
-        payload->encapsulation = CDR_LE;
-
-        ser << static_cast<octet>(bound);
-        auxIdent.seq_ldefn().element_identifier()->serialize(ser);
-        auxIdent.seq_ldefn().header().element_flags().serialize(ser);
-        payload->length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
-        MD5 objectHash();
-        objectHash.update(payload->data);
-        objectHash.finalize();
-        for(int i = 0; i < 14; ++i)
+        if (bound < 256)
         {
-            auxIdent.seq_ldefn().header().equiv_kind()[i] = objectHash.digest[i];
+            auxIdent->_d(TI_PLAIN_SEQUENCE_SMALL);
+            auxIdent->seq_sdefn().bound() = static_cast<octet>(bound);
+            auxIdent->seq_sdefn().element_identifier() = type;
+            auxIdent->seq_sdefn().header().element_flags().TRY_CONSTRUCT1(false);
+            auxIdent->seq_sdefn().header().element_flags().TRY_CONSTRUCT2(false);
+            auxIdent->seq_sdefn().header().element_flags().IS_EXTERNAL(false);
+            auxIdent->seq_sdefn().header().element_flags().IS_OPTIONAL(false);
+            auxIdent->seq_sdefn().header().element_flags().IS_MUST_UNDERSTAND(false);
+            auxIdent->seq_sdefn().header().element_flags().IS_KEY(false);
+            auxIdent->seq_sdefn().header().element_flags().IS_DEFAULT(false);
+
+            SerializedPayload_t payload(
+                MemberFlags::getMaxCdrSerializedSize() +
+                TypeIdentifier::getMaxCdrSerializedSize() + 1 + 4);
+            eprosima::fastcdr::FastBuffer fastbuffer((char*) payload->data, payload->max_size);
+            // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
+            eprosima::fastcdr::Cdr ser(
+                fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIAN,
+                eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
+            payload->encapsulation = CDR_LE;
+
+            ser << static_cast<octet>(bound);
+            auxIdent->seq_sdefn().element_identifier()->serialize(ser);
+            auxIdent->seq_sdefn().header().element_flags().serialize(ser);
+            payload->length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
+            MD5 objectHash();
+            objectHash.update(payload->data);
+            objectHash.finalize();
+            for(int i = 0; i < 14; ++i)
+            {
+                auxIdent->seq_sdefn().header().equiv_kind()[i] = objectHash.digest[i];
+            }
         }
-    }
-
-    return auxIdent;
-}
-
-TypeIdentifier $ctx.filename$TypeFactory::getArrayIdentifier(TypeIdentifier *type, std::vector<uint32_t> &bound)
-{
-    TypeIdentifier auxIdent;
-    if (bound.size() < 256)
-    {
-        auxIdent._d(TI_PLAIN_ARRAY_SMALL);
-        for (uint32_t b : bound)
+        else
         {
-            auxIdent.array_sdefn().array_bound_seq().push_back(static_cast<octet>(b));
-        }
-        auxIdent.array_sdefn().element_identifier() = type;
-        auxIdent.array_sdefn().header().element_flags().TRY_CONSTRUCT1(false);
-        auxIdent.array_sdefn().header().element_flags().TRY_CONSTRUCT2(false);
-        auxIdent.array_sdefn().header().element_flags().IS_EXTERNAL(false);
-        auxIdent.array_sdefn().header().element_flags().IS_OPTIONAL(false);
-        auxIdent.array_sdefn().header().element_flags().IS_MUST_UNDERSTAND(false);
-        auxIdent.array_sdefn().header().element_flags().IS_KEY(false);
-        auxIdent.array_sdefn().header().element_flags().IS_DEFAULT(false);
+            auxIdent->_d(TI_PLAIN_SEQUENCE_LARGE);
+            auxIdent->seq_ldefn().bound() = bound;
+            auxIdent->seq_ldefn().element_identifier() = type;
+            auxIdent->seq_ldefn().header().element_flags().TRY_CONSTRUCT1(false);
+            auxIdent->seq_ldefn().header().element_flags().TRY_CONSTRUCT2(false);
+            auxIdent->seq_ldefn().header().element_flags().IS_EXTERNAL(false);
+            auxIdent->seq_ldefn().header().element_flags().IS_OPTIONAL(false);
+            auxIdent->seq_ldefn().header().element_flags().IS_MUST_UNDERSTAND(false);
+            auxIdent->seq_ldefn().header().element_flags().IS_KEY(false);
+            auxIdent->seq_ldefn().header().element_flags().IS_DEFAULT(false);
 
-        SerializedPayload_t payload(
-            MemberFlags::getMaxCdrSerializedSize() +
-            TypeIdentifier::getMaxCdrSerializedSize() + bound.size() + 4);
-        eprosima::fastcdr::FastBuffer fastbuffer((char*) payload->data, payload->max_size);
-        // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
-        eprosima::fastcdr::Cdr ser(
-            fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIAN,
-            eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
-        payload->encapsulation = CDR_LE;
+            SerializedPayload_t payload(
+                MemberFlags::getMaxCdrSerializedSize() +
+                TypeIdentifier::getMaxCdrSerializedSize() + 4 + 4);
+            eprosima::fastcdr::FastBuffer fastbuffer((char*) payload->data, payload->max_size);
+            // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
+            eprosima::fastcdr::Cdr ser(
+                fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIAN,
+                eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
+            payload->encapsulation = CDR_LE;
 
-        ser << auxIdent.array_sdefn().array_bound_seq();
-        auxIdent.array_sdefn().element_identifier()->serialize(ser);
-        auxIdent.array_sdefn().header().element_flags().serialize(ser);
-        payload->length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
-        MD5 objectHash();
-        objectHash.update(payload->data);
-        objectHash.finalize();
-        for(int i = 0; i < 14; ++i)
-        {
-            auxIdent.array_sdefn().header().equiv_kind()[i] = objectHash.digest[i];
+            ser << static_cast<octet>(bound);
+            auxIdent->seq_ldefn().element_identifier()->serialize(ser);
+            auxIdent->seq_ldefn().header().element_flags().serialize(ser);
+            payload->length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
+            MD5 objectHash();
+            objectHash.update(payload->data);
+            objectHash.finalize();
+            for(int i = 0; i < 14; ++i)
+            {
+                auxIdent->seq_ldefn().header().equiv_kind()[i] = objectHash.digest[i];
+            }
         }
-    }
-    else
-    {
-        auxIdent._d(TI_PLAIN_ARRAY_LARGE);
-        for (uint32_t b : bound)
-        {
-            auxIdent.array_ldefn().array_bound_seq().push_back(b);
-        }
-        auxIdent.array_ldefn().element_identifier() = type;
-        auxIdent.array_ldefn().header().element_flags().TRY_CONSTRUCT1(false);
-        auxIdent.array_ldefn().header().element_flags().TRY_CONSTRUCT2(false);
-        auxIdent.array_ldefn().header().element_flags().IS_EXTERNAL(false);
-        auxIdent.array_ldefn().header().element_flags().IS_OPTIONAL(false);
-        auxIdent.array_ldefn().header().element_flags().IS_MUST_UNDERSTAND(false);
-        auxIdent.array_ldefn().header().element_flags().IS_KEY(false);
-        auxIdent.array_ldefn().header().element_flags().IS_DEFAULT(false);
-
-        SerializedPayload_t payload(
-            MemberFlags::getMaxCdrSerializedSize() +
-            TypeIdentifier::getMaxCdrSerializedSize() + (bound.size() * 4) + 4);
-        eprosima::fastcdr::FastBuffer fastbuffer((char*) payload->data, payload->max_size);
-        // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
-        eprosima::fastcdr::Cdr ser(
-            fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIAN,
-            eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
-        payload->encapsulation = CDR_LE;
-
-        ser << auxIdent.array_ldefn().array_bound_seq();
-        auxIdent.array_ldefn().element_identifier()->serialize(ser);
-        auxIdent.array_ldefn().header().element_flags().serialize(ser);
-        payload->length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
-        MD5 objectHash();
-        objectHash.update(payload->data);
-        objectHash.finalize();
-        for(int i = 0; i < 14; ++i)
-        {
-            auxIdent.array_ldefn().header().equiv_kind()[i] = objectHash.digest[i];
-        }
+        m_Identifiers[auxType.str()] = auxIdent;
     }
 
     return auxIdent;
 }
 
-TypeIdentifier $ctx.filename$TypeFactory::getMapIdentifier(TypeIdentifier *keyType,
+TypeIdentifier* $ctx.filename$TypeFactory::getArrayIdentifier(TypeIdentifier *type, std::vector<uint32_t> &bound)
+{
+    std::stringstream auxType;
+    auxType << "array_" << type;
+    for (uint32_t b : bound)
+    {
+        auxType << "_" << b;
+    }
+
+    TypeIdentifier* auxIdent;
+
+    if (m_Identifiers.find(auxType.str()) != m_Identifiers.end())
+    {
+        return m_Identifiers[auxType.str()];
+    }
+    else
+    {
+        if (bound.size() < 256)
+        {
+            auxIdent->_d(TI_PLAIN_ARRAY_SMALL);
+            for (uint32_t b : bound)
+            {
+                auxIdent->array_sdefn().array_bound_seq().push_back(static_cast<octet>(b));
+            }
+            auxIdent->array_sdefn().element_identifier() = type;
+            auxIdent->array_sdefn().header().element_flags().TRY_CONSTRUCT1(false);
+            auxIdent->array_sdefn().header().element_flags().TRY_CONSTRUCT2(false);
+            auxIdent->array_sdefn().header().element_flags().IS_EXTERNAL(false);
+            auxIdent->array_sdefn().header().element_flags().IS_OPTIONAL(false);
+            auxIdent->array_sdefn().header().element_flags().IS_MUST_UNDERSTAND(false);
+            auxIdent->array_sdefn().header().element_flags().IS_KEY(false);
+            auxIdent->array_sdefn().header().element_flags().IS_DEFAULT(false);
+
+            SerializedPayload_t payload(
+                MemberFlags::getMaxCdrSerializedSize() +
+                TypeIdentifier::getMaxCdrSerializedSize() + bound.size() + 4);
+            eprosima::fastcdr::FastBuffer fastbuffer((char*) payload->data, payload->max_size);
+            // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
+            eprosima::fastcdr::Cdr ser(
+                fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIAN,
+                eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
+            payload->encapsulation = CDR_LE;
+
+            ser << auxIdent->array_sdefn().array_bound_seq();
+            auxIdent->array_sdefn().element_identifier()->serialize(ser);
+            auxIdent->array_sdefn().header().element_flags().serialize(ser);
+            payload->length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
+            MD5 objectHash();
+            objectHash.update(payload->data);
+            objectHash.finalize();
+            for(int i = 0; i < 14; ++i)
+            {
+                auxIdent->array_sdefn().header().equiv_kind()[i] = objectHash.digest[i];
+            }
+        }
+        else
+        {
+            auxIdent->_d(TI_PLAIN_ARRAY_LARGE);
+            for (uint32_t b : bound)
+            {
+                auxIdent->array_ldefn().array_bound_seq().push_back(b);
+            }
+            auxIdent->array_ldefn().element_identifier() = type;
+            auxIdent->array_ldefn().header().element_flags().TRY_CONSTRUCT1(false);
+            auxIdent->array_ldefn().header().element_flags().TRY_CONSTRUCT2(false);
+            auxIdent->array_ldefn().header().element_flags().IS_EXTERNAL(false);
+            auxIdent->array_ldefn().header().element_flags().IS_OPTIONAL(false);
+            auxIdent->array_ldefn().header().element_flags().IS_MUST_UNDERSTAND(false);
+            auxIdent->array_ldefn().header().element_flags().IS_KEY(false);
+            auxIdent->array_ldefn().header().element_flags().IS_DEFAULT(false);
+
+            SerializedPayload_t payload(
+                MemberFlags::getMaxCdrSerializedSize() +
+                TypeIdentifier::getMaxCdrSerializedSize() + (bound.size() * 4) + 4);
+            eprosima::fastcdr::FastBuffer fastbuffer((char*) payload->data, payload->max_size);
+            // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
+            eprosima::fastcdr::Cdr ser(
+                fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIAN,
+                eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
+            payload->encapsulation = CDR_LE;
+
+            ser << auxIdent->array_ldefn().array_bound_seq();
+            auxIdent->array_ldefn().element_identifier()->serialize(ser);
+            auxIdent->array_ldefn().header().element_flags().serialize(ser);
+            payload->length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
+            MD5 objectHash();
+            objectHash.update(payload->data);
+            objectHash.finalize();
+            for(int i = 0; i < 14; ++i)
+            {
+                auxIdent->array_ldefn().header().equiv_kind()[i] = objectHash.digest[i];
+            }
+        }
+        m_Identifiers[auxType.str()] = auxIdent;
+    }
+
+    return auxIdent;
+}
+
+static size_t split(const std::string &txt, std::vector<uint32_t> &strs, char ch)
+{
+    size_t pos = txt.find( ch );
+    size_t initialPos = 0;
+    strs.clear();
+
+    // Decompose statement
+    while( pos != std::string::npos ) {
+        strs.push_back( std::stoi( txt.substr( initialPos, pos - initialPos ) ) );
+        initialPos = pos + 1;
+
+        pos = txt.find( ch, initialPos );
+    }
+
+    // Add the last one
+    strs.push_back( std::stoi( txt.substr( initialPos, std::min( pos, txt.size() ) - initialPos + 1 ) ) );
+
+    return strs.size();
+}
+
+TypeIdentifier* $ctx.filename$TypeFactory::getArrayIdentifier(TypeIdentifier *type, std::string &bound)
+{
+    std::vector<uint32_t> vecBound;
+    split(bound, vecBound, ' ');
+    return getArrayIdentifier(type, vecBound);
+}
+
+TypeIdentifier* $ctx.filename$TypeFactory::getMapIdentifier(TypeIdentifier *keyType,
     TypeIdentifier *valueType, uint32_t bound)
 {
-    TypeIdentifier auxIdent;
-    if (bound < 256)
+    std::stringstream auxType;
+    auxType << "map_" << keyType << "_" << valueType << "_" << bound;
+
+    TypeIdentifier* auxIdent;
+
+    if (m_Identifiers.find(auxType.str()) != m_Identifiers.end())
     {
-        auxIdent._d(TI_PLAIN_MAP_SMALL);
-        auxIdent.map_sdefn().bound() = static_cast<octet>(bound);
-        auxIdent.map_sdefn().element_identifier() = valueType;
-        auxIdent.map_sdefn().key_identifier() = keyType;
-        auxIdent.map_sdefn().header().element_flags().TRY_CONSTRUCT1(false);
-        auxIdent.map_sdefn().header().element_flags().TRY_CONSTRUCT2(false);
-        auxIdent.map_sdefn().header().element_flags().IS_EXTERNAL(false);
-        auxIdent.map_sdefn().header().element_flags().IS_OPTIONAL(false);
-        auxIdent.map_sdefn().header().element_flags().IS_MUST_UNDERSTAND(false);
-        auxIdent.map_sdefn().header().element_flags().IS_KEY(false);
-        auxIdent.map_sdefn().header().element_flags().IS_DEFAULT(false);
-        auxIdent.map_sdefn().key_flags().TRY_CONSTRUCT1(false);
-        auxIdent.map_sdefn().key_flags().TRY_CONSTRUCT2(false);
-        auxIdent.map_sdefn().key_flags().IS_EXTERNAL(false);
-        auxIdent.map_sdefn().key_flags().IS_OPTIONAL(false);
-        auxIdent.map_sdefn().key_flags().IS_MUST_UNDERSTAND(false);
-        auxIdent.map_sdefn().key_flags().IS_KEY(false);
-        auxIdent.map_sdefn().key_flags().IS_DEFAULT(false);
-
-        SerializedPayload_t payload(
-            2 * MemberFlags::getMaxCdrSerializedSize() +
-            2 * TypeIdentifier::getMaxCdrSerializedSize() + 1 + 4);
-        eprosima::fastcdr::FastBuffer fastbuffer((char*) payload->data, payload->max_size);
-        // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
-        eprosima::fastcdr::Cdr ser(
-            fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIAN,
-            eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
-        payload->encapsulation = CDR_LE;
-
-        ser << static_cast<octet>(bound);
-        auxIdent.map_sdefn().element_identifier()->serialize(ser);
-        auxIdent.map_sdefn().key_identifier()->serialize(ser);
-        auxIdent.map_sdefn().header().element_flags().serialize(ser);
-        auxIdent.map_sdefn().key_flags().serialize(ser);
-        payload->length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
-        MD5 objectHash();
-        objectHash.update(payload->data);
-        objectHash.finalize();
-        for(int i = 0; i < 14; ++i)
-        {
-            auxIdent.map_sdefn().header().equiv_kind()[i] = objectHash.digest[i];
-        }
+        return m_Identifiers[auxType.str()];
     }
     else
     {
-        auxIdent._d(TI_PLAIN_MAP_LARGE);
-        auxIdent.map_ldefn().bound() = bound;
-        auxIdent.map_ldefn().element_identifier() = valueType;
-        auxIdent.map_ldefn().key_identifier() = keyType;
-        auxIdent.map_ldefn().header().element_flags().TRY_CONSTRUCT1(false);
-        auxIdent.map_ldefn().header().element_flags().TRY_CONSTRUCT2(false);
-        auxIdent.map_ldefn().header().element_flags().IS_EXTERNAL(false);
-        auxIdent.map_ldefn().header().element_flags().IS_OPTIONAL(false);
-        auxIdent.map_ldefn().header().element_flags().IS_MUST_UNDERSTAND(false);
-        auxIdent.map_ldefn().header().element_flags().IS_KEY(false);
-        auxIdent.map_ldefn().header().element_flags().IS_DEFAULT(false);
-        auxIdent.map_ldefn().key_flags().TRY_CONSTRUCT1(false);
-        auxIdent.map_ldefn().key_flags().TRY_CONSTRUCT2(false);
-        auxIdent.map_ldefn().key_flags().IS_EXTERNAL(false);
-        auxIdent.map_ldefn().key_flags().IS_OPTIONAL(false);
-        auxIdent.map_ldefn().key_flags().IS_MUST_UNDERSTAND(false);
-        auxIdent.map_ldefn().key_flags().IS_KEY(false);
-        auxIdent.map_ldefn().key_flags().IS_DEFAULT(false);
-
-        SerializedPayload_t payload(
-            2 * MemberFlags::getMaxCdrSerializedSize() +
-            2 * TypeIdentifier::getMaxCdrSerializedSize() + 4 + 4);
-        eprosima::fastcdr::FastBuffer fastbuffer((char*) payload->data, payload->max_size);
-        // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
-        eprosima::fastcdr::Cdr ser(
-            fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIAN,
-            eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
-        payload->encapsulation = CDR_LE;
-
-        ser << static_cast<octet>(bound);
-        auxIdent.map_ldefn().element_identifier()->serialize(ser);
-        auxIdent.map_ldefn().key_identifier()->serialize(ser);
-        auxIdent.map_ldefn().header().element_flags().serialize(ser);
-        auxIdent.map_ldefn().key_flags().serialize(ser);
-        payload->length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
-        MD5 objectHash();
-        objectHash.update(payload->data);
-        objectHash.finalize();
-        for(int i = 0; i < 14; ++i)
+        if (bound < 256)
         {
-            auxIdent.map_ldefn().header().equiv_kind()[i] = objectHash.digest[i];
+            auxIdent->_d(TI_PLAIN_MAP_SMALL);
+            auxIdent->map_sdefn().bound() = static_cast<octet>(bound);
+            auxIdent->map_sdefn().element_identifier() = valueType;
+            auxIdent->map_sdefn().key_identifier() = keyType;
+            auxIdent->map_sdefn().header().element_flags().TRY_CONSTRUCT1(false);
+            auxIdent->map_sdefn().header().element_flags().TRY_CONSTRUCT2(false);
+            auxIdent->map_sdefn().header().element_flags().IS_EXTERNAL(false);
+            auxIdent->map_sdefn().header().element_flags().IS_OPTIONAL(false);
+            auxIdent->map_sdefn().header().element_flags().IS_MUST_UNDERSTAND(false);
+            auxIdent->map_sdefn().header().element_flags().IS_KEY(false);
+            auxIdent->map_sdefn().header().element_flags().IS_DEFAULT(false);
+            auxIdent->map_sdefn().key_flags().TRY_CONSTRUCT1(false);
+            auxIdent->map_sdefn().key_flags().TRY_CONSTRUCT2(false);
+            auxIdent->map_sdefn().key_flags().IS_EXTERNAL(false);
+            auxIdent->map_sdefn().key_flags().IS_OPTIONAL(false);
+            auxIdent->map_sdefn().key_flags().IS_MUST_UNDERSTAND(false);
+            auxIdent->map_sdefn().key_flags().IS_KEY(false);
+            auxIdent->map_sdefn().key_flags().IS_DEFAULT(false);
+
+            SerializedPayload_t payload(
+                2 * MemberFlags::getMaxCdrSerializedSize() +
+                2 * TypeIdentifier::getMaxCdrSerializedSize() + 1 + 4);
+            eprosima::fastcdr::FastBuffer fastbuffer((char*) payload->data, payload->max_size);
+            // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
+            eprosima::fastcdr::Cdr ser(
+                fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIAN,
+                eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
+            payload->encapsulation = CDR_LE;
+
+            ser << static_cast<octet>(bound);
+            auxIdent->map_sdefn().element_identifier()->serialize(ser);
+            auxIdent->map_sdefn().key_identifier()->serialize(ser);
+            auxIdent->map_sdefn().header().element_flags().serialize(ser);
+            auxIdent->map_sdefn().key_flags().serialize(ser);
+            payload->length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
+            MD5 objectHash();
+            objectHash.update(payload->data);
+            objectHash.finalize();
+            for(int i = 0; i < 14; ++i)
+            {
+                auxIdent->map_sdefn().header().equiv_kind()[i] = objectHash.digest[i];
+            }
         }
+        else
+        {
+            auxIdent->_d(TI_PLAIN_MAP_LARGE);
+            auxIdent->map_ldefn().bound() = bound;
+            auxIdent->map_ldefn().element_identifier() = valueType;
+            auxIdent->map_ldefn().key_identifier() = keyType;
+            auxIdent->map_ldefn().header().element_flags().TRY_CONSTRUCT1(false);
+            auxIdent->map_ldefn().header().element_flags().TRY_CONSTRUCT2(false);
+            auxIdent->map_ldefn().header().element_flags().IS_EXTERNAL(false);
+            auxIdent->map_ldefn().header().element_flags().IS_OPTIONAL(false);
+            auxIdent->map_ldefn().header().element_flags().IS_MUST_UNDERSTAND(false);
+            auxIdent->map_ldefn().header().element_flags().IS_KEY(false);
+            auxIdent->map_ldefn().header().element_flags().IS_DEFAULT(false);
+            auxIdent->map_ldefn().key_flags().TRY_CONSTRUCT1(false);
+            auxIdent->map_ldefn().key_flags().TRY_CONSTRUCT2(false);
+            auxIdent->map_ldefn().key_flags().IS_EXTERNAL(false);
+            auxIdent->map_ldefn().key_flags().IS_OPTIONAL(false);
+            auxIdent->map_ldefn().key_flags().IS_MUST_UNDERSTAND(false);
+            auxIdent->map_ldefn().key_flags().IS_KEY(false);
+            auxIdent->map_ldefn().key_flags().IS_DEFAULT(false);
+
+            SerializedPayload_t payload(
+                2 * MemberFlags::getMaxCdrSerializedSize() +
+                2 * TypeIdentifier::getMaxCdrSerializedSize() + 4 + 4);
+            eprosima::fastcdr::FastBuffer fastbuffer((char*) payload->data, payload->max_size);
+            // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
+            eprosima::fastcdr::Cdr ser(
+                fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIAN,
+                eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
+            payload->encapsulation = CDR_LE;
+
+            ser << static_cast<octet>(bound);
+            auxIdent->map_ldefn().element_identifier()->serialize(ser);
+            auxIdent->map_ldefn().key_identifier()->serialize(ser);
+            auxIdent->map_ldefn().header().element_flags().serialize(ser);
+            auxIdent->map_ldefn().key_flags().serialize(ser);
+            payload->length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
+            MD5 objectHash();
+            objectHash.update(payload->data);
+            objectHash.finalize();
+            for(int i = 0; i < 14; ++i)
+            {
+                auxIdent->map_ldefn().header().equiv_kind()[i] = objectHash.digest[i];
+            }
+        }
+        m_Identifiers[auxType.str()] = auxIdent;
     }
 
     return auxIdent;
@@ -646,7 +724,12 @@ mst_$object.name$.common().member_flags().IS_OPTIONAL(false);
 mst_$object.name$.common().member_flags().IS_MUST_UNDERSTAND(false);
 mst_$object.name$.common().member_flags().IS_KEY(false);
 mst_$object.name$.common().member_flags().IS_DEFAULT(false);
-mst_$object.name$.common().member_type_id(m_Identifiers["$object.typecode.typeIdentifier$"]);
+$if(object.typecode.plainType)$
+mst_$object.name$.common().member_type_id($get_type_identifier_recursive(ctx=ctx, type=object.typecode)$);
+$else$
+mst_$object.name$.common().member_type_id(m_Identifiers["$object.typecode.cppTypename$"]);
+$endif$
+
 MD5 $object.name$_hash("$object.name$");
 for(int i = 0; i < 4; ++i)
 {
@@ -655,6 +738,8 @@ for(int i = 0; i < 4; ++i)
 type_object->minimal().struct_type().member_seq().emplace_back(mst_$object.name$);
 
 >>
+
+get_type_identifier_recursive(ctx, type) ::= <<$if(type.isSequenceType)$getSequenceIdentifier($get_type_identifier_recursive(ctx=ctx, type=type.sequenceContentTypeCode)$, $type.maxsize$)$elseif(type.isArrayType)$getArrayIdentifier($get_type_identifier_recursive(ctx=ctx, type=type.arrayContentTypeCode)$, "$type.dimensions:{ dim |$dim$}; separator=" "$")$elseif(type.isSetType)$getSequenceIdentifier($get_type_identifier_recursive(ctx=ctx, type=type.setContentTypeCode)$, $type.maxsize$)$elseif(type.isMapType)$getMapIdentifier($get_type_identifier_recursive(ctx=ctx, type=type.keyTypeCode)$, $get_type_identifier_recursiv(ctx=ctx, type=type.valueTypeCode)$, $type.maxsize$)$elseif(type.isStringType)$getStringIdentifier($type.maxsize$, false)$elseif(type.isWStringType)$getStringIdentifier($type.maxsize$, true)$else$m_Identifiers["$type.cppTypename$"]$endif$>>
 
 union_type(ctx, parent, union) ::= <<
 TypeIdentifier* $union.scopedname$::get$union.name$Identifier()
@@ -724,7 +809,7 @@ TypeObject* $union.scopedname$::get$union.name$Object()
     type_object->minimal().union_type().discriminator().common().member_flags().IS_KEY(false);
     type_object->minimal().union_type().discriminator().common().member_flags().IS_DEFAULT(false);
 
-    type_object->minimal().union_type().discriminator().common().type_id(m_Identifiers["$union.discriminator.typeIdentifier$"]);
+    type_object->minimal().union_type().discriminator().common().type_id($get_type_identifier_recursive(ctx=ctx, type=union.discriminator)$);
 
     $union.members:{ member | $union_member_object_type(ctx=ctx, object=member)$}; separator="\n"$
 
@@ -746,7 +831,12 @@ mst_$object.name$.common().member_flags().IS_OPTIONAL(false);
 mst_$object.name$.common().member_flags().IS_MUST_UNDERSTAND(false);
 mst_$object.name$.common().member_flags().IS_KEY(false);
 mst_$object.name$.common().member_flags().IS_DEFAULT(false);
-mst_$object.name$.common().type_id(m_Identifiers["$object.typecode.typeIdentifier$"]);
+$if(object.typecode.plainType)$
+mst_$object.name$.common().type_id($get_type_identifier_recursive(ctx=ctx, type=object.typecode)$);
+$else$
+mst_$object.name$.common().type_id(m_Identifiers["$object.typecode.cppTypename$"]);
+$endif$
+
 $if(object.labels)$
 $object.labels:{ label | mst_$object.name$.common().label_seq().emplace_back($label$);}; separator="\n"$
 $endif$

@@ -57,15 +57,18 @@ public:
     $ctx.filename$TypeFactory();
     ~$ctx.filename$TypeFactory();
 
-    eProsima_user_DllExport TypeIdentifier getBasicIdentifier(std::string &basic_type_name);
+    eProsima_user_DllExport TypeIdentifier* getBasicIdentifier(std::string &basic_type_name);
 
-    eProsima_user_DllExport TypeIdentifier getStringIdentifier(uint32_t bound, bool wide = false);
+    eProsima_user_DllExport TypeIdentifier* getStringIdentifier(uint32_t bound, bool wide = false);
 
-    eProsima_user_DllExport TypeIdentifier getSequenceIdentifier(TypeIdentifier *type, uint32_t bound);
+    eProsima_user_DllExport TypeIdentifier* getSequenceIdentifier(TypeIdentifier *type, uint32_t bound);
 
-    eProsima_user_DllExport TypeIdentifier getArrayIdentifier(TypeIdentifier *type, std::vector<uint32_t> &bound);
+    eProsima_user_DllExport TypeIdentifier* getArrayIdentifier(TypeIdentifier *type, std::vector<uint32_t> &bound);
 
-    eProsima_user_DllExport TypeIdentifier getMapIdentifier(TypeIdentifier *keyType,
+    /** Dimensions must be separated by a single space */
+    eProsima_user_DllExport TypeIdentifier* getArrayIdentifier(TypeIdentifier *type, std::string &bound);
+
+    eProsima_user_DllExport TypeIdentifier* getMapIdentifier(TypeIdentifier *keyType,
         TypeIdentifier *valueType, uint32_t bound);
 
     $definitions; separator="\n"$

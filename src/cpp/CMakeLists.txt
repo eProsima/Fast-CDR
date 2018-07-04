@@ -75,7 +75,7 @@ elseif(NOT EPROSIMA_INSTALLER)
 
         # For installing purpose.
         if(EPROSIMA_INSTALLER_MINION)
-            set(MSVARCH_EXTENSION "_${MSVC_ARCH}")
+            set(MSVCARCH_EXTENSION "_${MSVC_ARCH}")
             set(MSVCARCH_DIR_EXTENSION "/${MSVC_ARCH}")
             set(MSVCARCH_DIR_EXTENSION_EXT "/${MSVC_ARCH}")
             if(NOT TARGET_TYPE STREQUAL "SHARED_LIBRARY")

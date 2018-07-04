@@ -83,7 +83,7 @@ END
 #define VER_PRODUCTNAME_STR "FastCDR"
 
 #ifdef _WIN32
-#if defined(FASTCDR_SOURCE) && defined(FASTCDR_DYN_LINK)
+#if defined(fastcdr_EXPORTS)
 
 #ifndef _DEBUG
 #define VER_DEBUG 0

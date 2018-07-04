@@ -39,7 +39,7 @@
 
 #if defined(_WIN32)
 #if defined(EPROSIMA_ALL_DYN_LINK) || defined(FASTCDR_DYN_LINK)
-#if defined(FASTCDR_SOURCE)
+#if defined(fastcdr_EXPORTS)
 #define Cdr_DllAPI __declspec( dllexport )
 #else
 #define Cdr_DllAPI __declspec( dllimport )

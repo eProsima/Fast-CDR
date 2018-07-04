@@ -29,10 +29,6 @@ set_sources(
 configure_file(${PROJECT_SOURCE_DIR}/include/${PROJECT_NAME}/config.h.in
     ${PROJECT_BINARY_DIR}/include/${PROJECT_NAME}/config.h)
 
-# Definitions
-# If Windows, set define for export dll functions
-add_definitions(-D${PROJECT_NAME_UPPER}_SOURCE)
-
 if(APPLE)
     set(CMAKE_MACOSX_RPATH ON)
     set(CMAKE_SKIP_BUILD_RPATH FALSE)
@@ -42,49 +38,51 @@ if(APPLE)
 endif()
 
 # Create libraries
-if(MSVC OR MSVC_IDE)
-    if(EPROSIMA_INSTALLER AND IS_TOP_LEVEL)
-        generate_msvc_libraries(i86Win32VS2013)
-        generate_msvc_libraries(x64Win64VS2013)
-        generate_msvc_libraries(i86Win32VS2015)
-        generate_msvc_libraries(x64Win64VS2015)
-    elseif(NOT EPROSIMA_INSTALLER)
-        add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SOURCES})
-
-        add_library(${PROJECT_NAME}_static STATIC ${${PROJECT_NAME}_SOURCES})
-        # Rename the library to have a "lib" before.
-        set_target_properties(${PROJECT_NAME}_static PROPERTIES OUTPUT_NAME lib${PROJECT_NAME})
-
-        set_target_properties(${PROJECT_NAME} ${PROJECT_NAME}_static PROPERTIES RELEASE_POSTFIX -${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
-        set_target_properties(${PROJECT_NAME} ${PROJECT_NAME}_static PROPERTIES RELWITHDEBINFO_POSTFIX -${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
-        set_target_properties(${PROJECT_NAME} ${PROJECT_NAME}_static PROPERTIES DEBUG_POSTFIX d-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
-
-        # Export symbols in DLL libraries
-        target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_NAME_UPPER}_DYN_LINK)
-
-        # Define public headers
-        target_include_directories(${PROJECT_NAME} PUBLIC
-            $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
-            $<INSTALL_INTERFACE:include>
-            )
-
-        # Define public headers for static library
-        target_include_directories(${PROJECT_NAME}_static PUBLIC
-            $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
-            $<INSTALL_INTERFACE:include>
-            )
-    endif()
-else()
-    #Create library
+if(MSVC OR MSVC_IDE AND EPROSIMA_INSTALLER AND IS_TOP_LEVEL)
+    generate_msvc_libraries(i86Win32VS2013)
+    generate_msvc_libraries(x64Win64VS2013)
+    generate_msvc_libraries(i86Win32VS2015)
+    generate_msvc_libraries(x64Win64VS2015)
+    generate_msvc_libraries(i86Win32VS2017)
+    generate_msvc_libraries(x64Win64VS2017)
+elseif(NOT EPROSIMA_INSTALLER)
+    # Create library
     add_library(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCES})
     set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
     set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION})
+
+    target_compile_definitions(${PROJECT_NAME} PRIVATE -D${PROJECT_NAME_UPPER}_SOURCE)
 
     # Define public headers
     target_include_directories(${PROJECT_NAME} PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
         $<INSTALL_INTERFACE:include>
         )
+
+    if(MSVC OR MSVC_IDE)
+        set_target_properties(${PROJECT_NAME} PROPERTIES RELEASE_POSTFIX -${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
+        set_target_properties(${PROJECT_NAME} PROPERTIES RELWITHDEBINFO_POSTFIX -${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
+        set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX d-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
+
+        get_target_property(TARGET_TYPE ${PROJECT_NAME} TYPE)
+        if(TARGET_TYPE STREQUAL "SHARED_LIBRARY")
+            # Export symbols in DLL library
+            target_compile_definitions(${PROJECT_NAME} PUBLIC -D${PROJECT_NAME_UPPER}_DYN_LINK)
+        else()
+            # Rename the library to have a "lib" before.
+            set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME lib${PROJECT_NAME})
+        endif()
+
+        # For installing purpose.
+        if(EPROSIMA_INSTALLER_MINION)
+            set(MSVARCH_EXTENSION "_${MSVC_ARCH}")
+            set(MSVCARCH_DIR_EXTENSION "/${MSVC_ARCH}")
+            set(MSVCARCH_DIR_EXTENSION_EXT "/${MSVC_ARCH}")
+            if(NOT TARGET_TYPE STREQUAL "SHARED_LIBRARY")
+                set(MSVCARCH_DIR_EXTENSION_EXT "${MSVCARCH_DIR_EXTENSION_EXT}_static")
+            endif()
+        endif()
+    endif()
 endif()
 
 ###############################################################################
@@ -127,71 +125,79 @@ if(UNIX AND EPROSIMA_INSTALLER)
 endif()
 
 # Install libraries
-if(MSVC OR MSVC_IDE)
-    if(EPROSIMA_INSTALLER AND IS_TOP_LEVEL)
-        install_msvc_libraries(i86Win32VS2013)
-        install_msvc_libraries(x64Win64VS2013)
-        install_msvc_libraries(i86Win32VS2015)
-        install_msvc_libraries(x64Win64VS2015)
-    elseif(NOT EPROSIMA_INSTALLER)
-        set(DIR_EXTENSION "")
-        if(EPROSIMA_INSTALLER_MINION)
-            set(DIR_EXTENSION "/${MSVC_ARCH}")
-        endif()
+if(MSVC OR MSVC_IDE AND EPROSIMA_INSTALLER AND IS_TOP_LEVEL)
+    install_msvc_libraries(i86Win32VS2013)
+    install_msvc_libraries(x64Win64VS2013)
+    install_msvc_libraries(i86Win32VS2015)
+    install_msvc_libraries(x64Win64VS2015)
+    install_msvc_libraries(i86Win32VS2017)
+    install_msvc_libraries(x64Win64VS2017)
 
-        install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_static
-            EXPORT ${PROJECT_NAME}Targets
-            RUNTIME DESTINATION ${BIN_INSTALL_DIR}${DIR_EXTENSION}
-            LIBRARY DESTINATION ${LIB_INSTALL_DIR}${DIR_EXTENSION}
-            ARCHIVE DESTINATION ${LIB_INSTALL_DIR}${DIR_EXTENSION}
-            COMPONENT libraries_${MSVC_ARCH}
-            )
+    install(FILES ${PROJECT_SOURCE_DIR}/cmake/packaging/windows/${PROJECT_NAME}-config.cmake
+        DESTINATION ${DATA_INSTALL_DIR}/${PROJECT_NAME}/cmake
+        COMPONENT cmake
+        )
+elseif(NOT EPROSIMA_INSTALLER)
+    install(TARGETS ${PROJECT_NAME}
+        EXPORT ${PROJECT_NAME}-targets
+        RUNTIME DESTINATION ${BIN_INSTALL_DIR}${MSVCARCH_DIR_EXTENSION}
+        LIBRARY DESTINATION ${LIB_INSTALL_DIR}${MSVCARCH_DIR_EXTENSION}
+        ARCHIVE DESTINATION ${LIB_INSTALL_DIR}${MSVCARCH_DIR_EXTENSION}
+        COMPONENT libraries${MSVCARCH_EXTENSION}
+        )
 
-        export(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_static FILE ${PROJECT_BINARY_DIR}/cmake/config/${PROJECT_NAME}Targets.cmake)
-        install(EXPORT ${PROJECT_NAME}Targets
-            DESTINATION ${LIB_INSTALL_DIR}${DIR_EXTENSION}/${PROJECT_NAME}/cmake
-            COMPONENT cmake
-            )
+    export(TARGETS ${PROJECT_NAME} FILE ${PROJECT_BINARY_DIR}/cmake/config/${PROJECT_NAME}-targets.cmake)
+    install(EXPORT ${PROJECT_NAME}-targets
+        DESTINATION ${DATA_INSTALL_DIR}/${PROJECT_NAME}/cmake${MSVCARCH_DIR_EXTENSION_EXT}
+        COMPONENT cmake
+        )
 
-        # Install pdb files
-        install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Debug/
-            DESTINATION ${LIB_INSTALL_DIR}${DIR_EXTENSION}
-            COMPONENT libraries_${MSVC_ARCH}
-            CONFIGURATIONS Debug
-            FILES_MATCHING
-            PATTERN "*.pdb"
-            )
-
-        if(NOT (("${MSVC_ARCH}" STREQUAL "i86Win32VS2013") OR ("${MSVC_ARCH}" STREQUAL "x64Win64VS2013")))
-            install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_static.dir/Debug/${PROJECT_NAME}_static.pdb
-                DESTINATION ${LIB_INSTALL_DIR}${DIR_EXTENSION}
-                COMPONENT libraries_${MSVC_ARCH}
+    if(MSVC OR MSVC_IDE)
+        if(TARGET_TYPE STREQUAL "SHARED_LIBRARY")
+            # Install pdb files
+            install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Debug/
+                DESTINATION ${LIB_INSTALL_DIR}${MSVCARCH_DIR_EXTENSION}
+                COMPONENT libraries${MSVCARCH_EXTENSION}
+                CONFIGURATIONS Debug
+                FILES_MATCHING
+                PATTERN "*.pdb"
+                )
+        elseif(NOT (("${MSVC_ARCH}" STREQUAL "i86Win32VS2013") OR ("${MSVC_ARCH}" STREQUAL "x64Win64VS2013")))
+            install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.dir/Debug/${PROJECT_NAME}.pdb
+                DESTINATION ${LIB_INSTALL_DIR}${MSVCARCH_DIR_EXTENSION}
+                COMPONENT libraries${MSVCARCH_EXTENSION}
                 CONFIGURATIONS Debug
                 )
         endif()
+    endif()
 
+    ###############################################################################
+    # Create CMake package config file
+    ###############################################################################
+    include(CMakePackageConfigHelpers)
+    configure_package_config_file(${PROJECT_SOURCE_DIR}/cmake/packaging/Config.cmake.in
+        ${PROJECT_BINARY_DIR}/cmake/config/${PROJECT_NAME}-config.cmake
+        INSTALL_DESTINATION ${DATA_INSTALL_DIR}$/${PROJECT_NAME}/cmake${MSVCARCH_DIR_EXTENSION_EXT}
+        PATH_VARS BIN_INSTALL_DIR INCLUDE_INSTALL_DIR LIB_INSTALL_DIR
+        )
+    write_basic_package_version_file(${PROJECT_BINARY_DIR}/cmake/config/${PROJECT_NAME}-config-version.cmake
+        VERSION ${PROJECT_VERSION}
+        COMPATIBILITY SameMajorVersion
+        )
+    install(FILES ${PROJECT_BINARY_DIR}/cmake/config/${PROJECT_NAME}-config.cmake
+        ${PROJECT_BINARY_DIR}/cmake/config/${PROJECT_NAME}-config-version.cmake
+        DESTINATION ${DATA_INSTALL_DIR}/${PROJECT_NAME}/cmake${MSVCARCH_DIR_EXTENSION_EXT}
+        COMPONENT cmake
+        )
+
+    if(MSVCARCH_EXTENSION)
         string(TOUPPER "${MSVC_ARCH}" MSVC_ARCH_UPPER)
         set(CPACK_COMPONENT_LIBRARIES_${MSVC_ARCH_UPPER}_DISPLAY_NAME "${MSVC_ARCH}" PARENT_SCOPE)
         set(CPACK_COMPONENT_LIBRARIES_${MSVC_ARCH_UPPER}_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} libraries for platform ${MSVC_ARCH}" PARENT_SCOPE)
         set(CPACK_COMPONENT_LIBRARIES_${MSVC_ARCH_UPPER}_GROUP "Libraries" PARENT_SCOPE)
+        set(CPACK_COMPONENT_GROUP_LIBRARIES_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} libraries" PARENT_SCOPE)
+    else()
+        set(CPACK_COMPONENT_LIBRARIES_DISPLAY_NAME "Libraries" PARENT_SCOPE)
+        set(CPACK_COMPONENT_LIBRARIES_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} libraries" PARENT_SCOPE)
     endif()
-
-    set(CPACK_COMPONENT_GROUP_LIBRARIES_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} libraries" PARENT_SCOPE)
-else()
-    install(TARGETS ${PROJECT_NAME}
-        EXPORT ${PROJECT_NAME}Targets
-        RUNTIME DESTINATION ${BIN_INSTALL_DIR}
-        LIBRARY DESTINATION ${LIB_INSTALL_DIR}
-        ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
-        COMPONENT libraries
-        )
-
-    export(TARGETS ${PROJECT_NAME} FILE ${PROJECT_BINARY_DIR}/cmake/config/${PROJECT_NAME}Targets.cmake)
-    install(EXPORT ${PROJECT_NAME}Targets
-        DESTINATION ${LIB_INSTALL_DIR}/${PROJECT_NAME}/cmake
-        COMPONENT cmake
-        )
-
-    set(CPACK_COMPONENT_LIBRARIES_DISPLAY_NAME "Libraries" PARENT_SCOPE)
-    set(CPACK_COMPONENT_LIBRARIES_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} libraries" PARENT_SCOPE)
 endif()

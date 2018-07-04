@@ -16,12 +16,6 @@ include(${PROJECT_SOURCE_DIR}/cmake/common/gtest.cmake)
 check_gtest()
 
 if(GTEST_FOUND)
-    # If Windows, link against export dll functions
-    if(WIN32)
-        add_definitions(-DFASTCDR_DYN_LINK)
-    endif()
-
-
     ###############################################################################
     # Unit tests
     ###############################################################################

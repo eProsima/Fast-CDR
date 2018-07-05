@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include <map>
 
 #if !__APPLE__
 #include <malloc.h>
@@ -358,6 +359,15 @@ namespace eprosima
                 template<class _T>
                     inline Cdr& operator<<(const std::vector<_T> &vector_t){return serialize<_T>(vector_t);}
 
+                /*!
+                 * @brief This operator template is used to serialize maps.
+                 * @param map_t The map that will be serialized in the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
+                template<class _K, class _T>
+                    inline Cdr& operator<<(const std::map<_K, _T> &map_t){return serialize<_K, _T>(map_t);}
+
                 // TODO
                 template<class _T>
                     inline Cdr& operator<<(const _T &type_t)
@@ -512,6 +522,15 @@ namespace eprosima
                  */
                 template<class _T>
                     inline Cdr& operator>>(std::vector<_T> &vector_t){return deserialize<_T>(vector_t);}
+
+                /*!
+                 * @brief This operator template is used to deserialize maps.
+                 * @param map_t The variable that will store the map read from the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                template<class _K, class _T>
+                    inline Cdr& operator>>(std::map<_K, _T> &map_t){return deserialize<_K, _T>(map_t);}
 
                 // TODO
                 template<class _T>
@@ -908,6 +927,37 @@ namespace eprosima
                         catch(eprosima::fastcdr::exception::Exception &ex)
                         {
                             setState(state_before_error);
+                            ex.raise();
+                        }
+
+                        return *this;
+                    }
+
+                /*!
+                 * @brief This function template serializes a map.
+                 * @param map_t The map that will be serialized in the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
+                template<class _K, class _T>
+                    Cdr& serialize(const std::map<_K, _T> &map_t)
+                    {
+                        state state(*this);
+
+                        *this << (int32_t)map_t.size();
+
+                        try
+                        {
+                            for (auto it_pair = map_t.begin(); it_pair != map_t.end(); ++it_pair)
+                            {
+                                *this << it_pair->first;
+                                *this << it_pair->second;
+                            }
+                            //return serializeArray(map_t.data(), map_t.size());
+                        }
+                        catch(eprosima::fastcdr::exception::Exception &ex)
+                        {
+                            setState(state);
                             ex.raise();
                         }
 
@@ -1831,6 +1881,42 @@ namespace eprosima
                         catch(eprosima::fastcdr::exception::Exception &ex)
                         {
                             setState(state_before_error);
+                            ex.raise();
+                        }
+
+                        return *this;
+                    }
+
+                /*!
+                 * @brief This function template deserializes a map.
+                 * @param map_t The variable that will store the map read from the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                template<class _K, class _T>
+                    Cdr& deserialize(std::map<_K, _T> &map_t)
+                    {
+                        uint32_t seqLength = 0;
+                        state state(*this);
+
+                        *this >> seqLength;
+
+                        try
+                        {
+                            //map_t.resize(seqLength);
+                            _K key;
+                            _T value;
+                            for (uint32_t i = 0; i < seqLength; ++i)
+                            {
+                                *this >> key;
+                                *this >> value;
+                                map_t.emplace(std::pair<_K, _T>(key, value));
+                            }
+                            //return deserializeArray(vector_t.data(), vector_t.size());
+                        }
+                        catch(eprosima::fastcdr::exception::Exception &ex)
+                        {
+                            setState(state);
                             ex.raise();
                         }
 

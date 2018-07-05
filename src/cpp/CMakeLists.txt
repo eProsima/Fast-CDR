@@ -51,7 +51,7 @@ elseif(NOT EPROSIMA_INSTALLER)
     set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
     set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION})
 
-    target_compile_definitions(${PROJECT_NAME} PRIVATE -D${PROJECT_NAME_UPPER}_SOURCE)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE ${PROJECT_NAME_UPPER}_SOURCE)
 
     # Define public headers
     target_include_directories(${PROJECT_NAME} PUBLIC
@@ -67,7 +67,7 @@ elseif(NOT EPROSIMA_INSTALLER)
         get_target_property(TARGET_TYPE ${PROJECT_NAME} TYPE)
         if(TARGET_TYPE STREQUAL "SHARED_LIBRARY")
             # Export symbols in DLL library
-            target_compile_definitions(${PROJECT_NAME} PUBLIC -D${PROJECT_NAME_UPPER}_DYN_LINK)
+            target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_NAME_UPPER}_DYN_LINK)
         else()
             # Rename the library to have a "lib" before.
             set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME lib${PROJECT_NAME})

@@ -249,6 +249,72 @@ EquivalenceKind $ctx.filename$TypeFactory::getEquivalenceKind(const std::string 
     }
 }
 
+TypeIdentifier* $ctx.filename$TypeFactory::tryCreateTypeIdentifier(const std::string &type_name)
+{
+    // Try users types.
+    $ctx.definitions: { def | $try_create(ctx=ctx, object=def, param="type_name")$}; separator="\n"$
+
+    switch (getEquivalenceKind(type_name))
+    {
+        // Primitive types, already defined (never will be asked, but ok)
+        case TK_BOOLEAN:
+        case TK_INT16:
+        case TK_INT32:
+        case TK_UINT16:
+        case TK_UINT32:
+        case TK_FLOAT32:
+        case TK_FLOAT64:
+        case TK_CHAR8:
+        case TK_BYTE:
+        case TK_INT64:
+        case TK_UINT64:
+        case TK_FLOAT128:
+        case TK_CHAR16:
+            return m_Identifiers.at(type_name);
+            break;
+
+        // TODO. Maybe, for users commodity, we want to create dinamycally this types.
+        // To do it, type_name must be parsed and call recursively this method.
+        //else if (type_name.find("std::strings_") == 0)
+        case TI_STRING8_SMALL:
+            break;
+        //else if (type_name.find("std::stringl_") == 0)
+        case TI_STRING8_LARGE:
+            break;
+        //else if (type_name.find("arrays_") == 0)
+        case TI_PLAIN_ARRAY_SMALL:
+            break;
+        //else if (type_name.find("arrayl_") == 0)
+        case TI_PLAIN_ARRAY_LARGE:
+            break;
+        //else if (type_name.find("std::wstrings_") == 0)
+        case TI_STRING16_SMALL:
+            break;
+        //else if (type_name.find("std::wstringl_") == 0)
+        case TI_STRING16_LARGE:
+            break;
+        //else if (type_name.find("sequences_") == 0)
+        case TI_PLAIN_SEQUENCE_SMALL:
+            break;
+        //else if (type_name.find("sequencel_") == 0)
+        case TI_PLAIN_SEQUENCE_LARGE:
+            break;
+        //else if (type_name.find("maps_") == 0)
+        case TI_PLAIN_MAP_SMALL:
+            break;
+        //else if (type_name.find("mapl_") == 0)
+        case TI_PLAIN_MAP_LARGE:
+            break;
+        //else if (getTypeIdentifier(type_name) != nullptr)
+        case EK_MINIMAL:
+            break;
+        //else
+        case TK_NONE:
+            break;
+    }
+    return m_Identifiers.at(type_name);
+}
+
 static size_t split(const std::string &txt, std::vector<uint32_t> &strs, char ch)
 {
     size_t pos = txt.find( ch );
@@ -395,6 +461,11 @@ TypeIdentifier* $ctx.filename$TypeFactory::getSequenceIdentifier(const std::stri
     else
     {
         TypeIdentifier* innerIdent = getTypeIdentifier(type_name);
+        if (innerIdent == nullptr)
+        {
+            innerIdent = tryCreateTypeIdentifier(type_name);
+        }
+
         auxIdent = new TypeIdentifier;
         if (bound < 256)
         {
@@ -444,6 +515,11 @@ TypeIdentifier* $ctx.filename$TypeFactory::getArrayIdentifier(const std::string 
     else
     {
         TypeIdentifier* innerIdent = getTypeIdentifier(type_name);
+        if (innerIdent == nullptr)
+        {
+            innerIdent = tryCreateTypeIdentifier(type_name);
+        }
+
         auxIdent = new TypeIdentifier;
         if (size < 256)
         {
@@ -507,6 +583,17 @@ TypeIdentifier* $ctx.filename$TypeFactory::getMapIdentifier(const std::string &k
     {
         TypeIdentifier* keyIdent = getTypeIdentifier(key_type_name);
         TypeIdentifier* valIdent = getTypeIdentifier(value_type_name);
+
+        if (keyIdent == nullptr)
+        {
+            keyIdent = tryCreateTypeIdentifier(key_type_name);
+        }
+
+        if (valIdent == nullptr)
+        {
+            valIdent = tryCreateTypeIdentifier(value_type_name);
+        }
+
         auxIdent = new TypeIdentifier;
         if (bound < 256)
         {
@@ -559,6 +646,11 @@ TypeIdentifier* $ctx.filename$TypeFactory::getMapIdentifier(const std::string &k
 }
 
 $definitions; separator="\n"$
+>>
+
+
+try_create(ctx, object, param) ::= <<
+if ($param$ == "$object.name$") return get$object.name$Identifier();
 >>
 
 module(ctx, parent, module, definition_list) ::= <<

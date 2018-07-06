@@ -59,6 +59,8 @@ public:
 
     eProsima_user_DllExport EquivalenceKind getEquivalenceKind(const std::string &type_name) const;
 
+    eProsima_user_DllExport TypeIdentifier* tryCreateTypeIdentifier(const std::string &type_name);
+
     eProsima_user_DllExport TypeIdentifier* getTypeIdentifier(const std::string &basic_type_name) const;
 
     eProsima_user_DllExport TypeIdentifier* getStringIdentifier(uint32_t bound, bool wide = false);

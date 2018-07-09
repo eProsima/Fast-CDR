@@ -57,6 +57,8 @@ public:
     $ctx.filename$TypeFactory();
     ~$ctx.filename$TypeFactory();
 
+    eProsima_user_DllExport void registerTypes();
+
     eProsima_user_DllExport EquivalenceKind getEquivalenceKind(const std::string &type_name) const;
 
     eProsima_user_DllExport TypeIdentifier* tryCreateTypeIdentifier(const std::string &type_name);

@@ -28,6 +28,7 @@ namespace { char dummy; }
 #include <sstream>
 #include <fastrtps/rtps/common/SerializedPayload.h>
 #include <fastrtps/utils/md5.h>
+#include <fastrtps/types/TypeObjectFactory.h>
 #include <fastcdr/FastBuffer.h>
 $if(ctx.cdr)$
 #include <fastcdr/Cdr.h>
@@ -135,6 +136,12 @@ $ctx.filename$TypeFactory::~$ctx.filename$TypeFactory()
         ++obj_it;
     }
     m_Objects.clear();
+}
+
+void $ctx.filename$TypeFactory::registerTypes()
+{
+    TypeObjectFactory *factory = TypeObjectFactory::GetInstance();
+    $ctx.definitions: { def | $register_type(ctx=ctx, object=def, param="type_name")$}; separator="\n"$
 }
 
 EquivalenceKind $ctx.filename$TypeFactory::getEquivalenceKind(const std::string &type_name) const
@@ -651,6 +658,10 @@ $definitions; separator="\n"$
 
 try_create(ctx, object, param) ::= <<
 if ($param$ == "$object.name$") return get$object.name$Identifier();
+>>
+
+register_type(ctx, object, param) ::= <<
+factory->AddTypeObject("$object.name$", get$object.name$Identifier(), get$object.name$Object());
 >>
 
 module(ctx, parent, module, definition_list) ::= <<

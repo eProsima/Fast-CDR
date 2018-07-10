@@ -23,6 +23,7 @@ namespace { char dummy; }
 #endif
 
 #include "$ctx.filename$.h"
+#include "$ctx.filename$TypeObject.h"
 
 $if(ctx.cdr)$
 #include <fastcdr/Cdr.h>
@@ -107,7 +108,7 @@ $if(ctx.anyCdr)$
 size_t $exception.scopedname$::getMaxCdrSerializedSize(size_t current_alignment)
 {
     size_t initial_alignment = current_alignment;
-            
+
     $exception.members : { member |$max_serialized_size(ctx=ctx, typecode=member.typecode, var="current_alignment")$}; separator="\n"$
 
     return current_alignment - initial_alignment;
@@ -179,6 +180,9 @@ struct_type(ctx, parent, struct, extensions) ::= <<
 $struct.scopedname$::$struct.name$()
 {
     $struct.members:{ member |$member_default_init(member=member)$}; separator="\n"$
+
+    // Just to register all known types
+    $ctx.filename$TypeFactory factory;
 }
 
 $struct.scopedname$::~$struct.name$()
@@ -198,14 +202,14 @@ $struct.scopedname$::$struct.name$($struct.name$ &&x)
 $struct.scopedname$& $struct.scopedname$::operator=(const $struct.name$ &x)
 {
     $struct.members:{m_$it.name$ = x.m_$it.name$;}; separator="\n"$
-    
+
     return *this;
 }
 
 $struct.scopedname$& $struct.scopedname$::operator=($struct.name$ &&x)
 {
     $struct.members:{$member_move(it)$}; separator="\n"$
-    
+
     return *this;
 }
 
@@ -213,7 +217,7 @@ $if(ctx.anyCdr)$
 size_t $struct.scopedname$::getMaxCdrSerializedSize(size_t current_alignment)
 {
     size_t initial_alignment = current_alignment;
-            
+
     $struct.members : { member |$max_serialized_size(ctx=ctx, typecode=member.typecode, var="current_alignment")$}; separator="\n"$
 
     return current_alignment - initial_alignment;
@@ -278,7 +282,7 @@ $union.scopedname$::~$union.name$()
 $union.scopedname$::$union.name$(const $union.name$ &x)
 {
     m__d = x.m__d;
-    
+
     switch(m__d)
     {
         $union.members:{$unionmember_copy(it)$}; separator="\n"$
@@ -289,7 +293,7 @@ $union.scopedname$::$union.name$(const $union.name$ &x)
 $union.scopedname$::$union.name$($union.name$ &&x)
 {
     m__d = x.m__d;
-    
+
     switch(m__d)
     {
         $union.members:{$unionmember_move(it)$}; separator="\n"$
@@ -300,40 +304,40 @@ $union.scopedname$::$union.name$($union.name$ &&x)
 $union.scopedname$& $union.scopedname$::operator=(const $union.name$ &x)
 {
     m__d = x.m__d;
-    
+
     switch(m__d)
     {
         $union.members:{$unionmember_copy(it)$}; separator="\n"$
         $unionmemberdefault_copy(union.defaultMember)$
     }
-    
+
     return *this;
 }
 
 $union.scopedname$& $union.scopedname$::operator=($union.name$ &&x)
 {
     m__d = x.m__d;
-    
+
     switch(m__d)
     {
         $union.members:{$unionmember_move(it)$}; separator="\n"$
         $unionmemberdefault_move(union.defaultMember)$
     }
-    
+
     return *this;
 }
 
 void $union.scopedname$::_d($union.discriminator.cppTypename$ __d)
 {
     bool b = false;
-    
+
     switch(m__d)
     {
         $union.members:{$unionmember_discriminator_case(member=it, totallabels=union.totallabels)$}; separator="\n"$
     }
-    
+
     if(!b) throw BadParamException("Discriminator doesn't correspond with the selected union member");
-    
+
     m__d = __d;
 }
 
@@ -457,14 +461,14 @@ void $class$::$member.name$($member.typecode.cppTypename$ _$member.name$)
 $member.typecode.cppTypename$ $class$::$member.name$() const
 {
     $unionmember_check_case_list(member=member, totallabels=totallabels)$
-    
+
     return m_$member.name$;
 }
 
 $member.typecode.cppTypename$& $class$::$member.name$()
 {
     $unionmember_check_case_list(member=member, totallabels=totallabels)$
-    
+
     return m_$member.name$;
 }
 $else$
@@ -483,14 +487,14 @@ void $class$::$member.name$($member.typecode.cppTypename$ &&_$member.name$)
 const $member.typecode.cppTypename$& $class$::$member.name$() const
 {
     $unionmember_check_case_list(member=member, totallabels=totallabels)$
-    
+
     return m_$member.name$;
 }
 
 $member.typecode.cppTypename$& $class$::$member.name$()
 {
     $unionmember_check_case_list(member=member, totallabels=totallabels)$
-    
+
     return m_$member.name$;
 }
 $endif$
@@ -590,7 +594,7 @@ $endif$
 unionmember_check_case_list(member, totallabels) ::= <<
 $if(member.default)$
 bool b = true;
-    
+
 switch(m__d)
 {
     $totallabels:{case $it$:}; separator="\n"$
@@ -601,7 +605,7 @@ switch(m__d)
 }
 $else$
 bool b = false;
-    
+
 switch(m__d)
 {
     $member.labels:{case $it$:}; separator="\n"$
@@ -611,7 +615,7 @@ switch(m__d)
     break;
 }
 $endif$
-    
+
 if(!b) throw BadParamException("This member is not been selected");
 >>
 

@@ -117,6 +117,8 @@ $ctx.filename$TypeFactory::$ctx.filename$TypeFactory()
     //auxIdent = new TypeIdentifier;
     //auxIdent->_d(TI_STRING16_LARGE);
     //m_Identifiers.insert(std::pair<std::string, TypeIdentifier*>("std::wstring", auxIdent));
+
+    registerTypes();
 }
 
 $ctx.filename$TypeFactory::~$ctx.filename$TypeFactory()

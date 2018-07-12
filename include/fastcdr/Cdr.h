@@ -1585,7 +1585,7 @@ namespace eprosima
                 inline
                     Cdr& deserialize(wchar_t &wchar)
                     {
-                        uint32_t ret;
+                        uint16_t ret;
                         deserialize(ret);
                         wchar = static_cast<wchar_t>(ret);
                         return *this;
@@ -1594,7 +1594,7 @@ namespace eprosima
                 inline
                     Cdr& deserialize(wchar_t &wchar, Endianness endianness)
                     {
-                        uint32_t ret;
+                        uint16_t ret;
                         deserialize(ret, endianness);
                         wchar = static_cast<wchar_t>(ret);
                         return *this;

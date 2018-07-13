@@ -648,7 +648,7 @@ Cdr& Cdr::serialize(const wchar_t *string_t)
     uint32_t length = 0;
 
     if (string_t != nullptr)
-        length = ((uint32_t)wcslen(string_t) + 1) * 2;
+        length = ((uint32_t)wcslen(string_t) + 1) * 4;
 
     if(length > 0)
     {
@@ -1636,7 +1636,7 @@ const wchar_t* Cdr::readWString(uint32_t &length)
 
     *this >> length;
 
-    length /= 2;
+    length /= 4;
     if(length == 0)
     {
         return '\0';

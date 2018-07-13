@@ -250,6 +250,7 @@ $var$ += ($data$.size() * $typecodeMap.valueTypeCode.size$)$if(ctx.cdr)$ + epros
 $else$
 for(auto $loopvar$ : $data$)
 {
+    (void)$loopvar$;
 $if(typecodeMap.valueTypeCode.isType_d)$
     $var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$ + $loopvar$.second.size() + 1;
 $elseif(typecodeMap.valueTypeCode.isMapType)$

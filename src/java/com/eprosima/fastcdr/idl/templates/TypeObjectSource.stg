@@ -159,10 +159,15 @@ $ctx.filename$TypeFactory::~$ctx.filename$TypeFactory()
     m_Objects.clear();
 }
 
+static bool g_AlreadyRegistered = false;
 void $ctx.filename$TypeFactory::registerTypes()
 {
+    if (g_AlreadyRegistered) return;
+
     TypeObjectFactory *factory = TypeObjectFactory::GetInstance();
     $ctx.definitions: { def | $register_type(ctx=ctx, object=def, param="type_name")$}; separator="\n"$
+
+    g_AlreadyRegistered = true;
 }
 
 EquivalenceKind $ctx.filename$TypeFactory::getEquivalenceKind(const std::string &type_name) const

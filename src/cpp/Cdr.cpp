@@ -658,7 +658,7 @@ Cdr& Cdr::serialize(const wchar_t *string_t)
         if(((m_lastPosition - m_currentPosition) >= length) || resize(length))
         {
             // Save last datasize.
-            m_lastDataSize = sizeof(uint16_t);
+            m_lastDataSize = sizeof(uint32_t);
 
             m_currentPosition.memcopy(string_t, length);
             m_currentPosition += length;

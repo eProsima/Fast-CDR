@@ -116,11 +116,11 @@ $ctx.filename$TypeFactory::$ctx.filename$TypeFactory()
         m_Identifiers.insert(std::pair<std::string, TypeIdentifier*>("double", auxIdent));
     }
     // TK_FLOAT128:
-    if (m_Identifiers.find("long double") == m_Identifiers.end())
+    if (m_Identifiers.find("longdouble") == m_Identifiers.end())
     {
         auxIdent = new TypeIdentifier;
         auxIdent->_d(TK_FLOAT128);
-        m_Identifiers.insert(std::pair<std::string, TypeIdentifier*>("long double", auxIdent));
+        m_Identifiers.insert(std::pair<std::string, TypeIdentifier*>("longdouble", auxIdent));
     }
     // TK_CHAR8:
     if (m_Identifiers.find("char") == m_Identifiers.end())
@@ -208,11 +208,11 @@ EquivalenceKind $ctx.filename$TypeFactory::getEquivalenceKind(const std::string 
     {
         return TK_BYTE;
     }
-    else if (type_name.find("std::strings_") == 0)
+    else if (type_name.find("strings_") == 0)
     {
         return TI_STRING8_SMALL;
     }
-    else if (type_name.find("std::stringl_") == 0)
+    else if (type_name.find("stringl_") == 0)
     {
         return TI_STRING8_LARGE;
     }
@@ -240,7 +240,7 @@ EquivalenceKind $ctx.filename$TypeFactory::getEquivalenceKind(const std::string 
     {
         return TK_UINT64;
     }
-    else if (type_name == "long double")
+    else if (type_name == "longdouble")
     {
         return TK_FLOAT128;
     }
@@ -248,11 +248,11 @@ EquivalenceKind $ctx.filename$TypeFactory::getEquivalenceKind(const std::string 
     {
         return TK_CHAR16;
     }
-    else if (type_name.find("std::wstrings_") == 0)
+    else if (type_name.find("wstrings_") == 0)
     {
         return TI_STRING16_SMALL;
     }
-    else if (type_name.find("std::wstringl_") == 0)
+    else if (type_name.find("wstringl_") == 0)
     {
         return TI_STRING16_LARGE;
     }
@@ -386,7 +386,7 @@ TypeIdentifier* $ctx.filename$TypeFactory::getTypeIdentifier(const std::string &
 std::string $ctx.filename$TypeFactory::getStringTypeName(uint32_t bound, bool wide, bool generate_identifier)
 {
     std::stringstream type;
-    type << ((wide) ? "std::string" : "std::wstring");
+    type << ((wide) ? "wstring" : "string");
     type << ((bound < 256) ? "s_" : "l_") << bound;
     if (generate_identifier) { getStringIdentifier(bound, wide); }
     return type.str();
@@ -898,6 +898,7 @@ TypeObject* $ctx.filename$TypeFactory::get$struct.name$Object()
     type_object->minimal().struct_type().struct_flags().IS_NESTED(false);
     type_object->minimal().struct_type().struct_flags().IS_AUTOID_HASH(false);
 
+    MemberId memberId = 0;
     $struct.members:{ member | $member_object_type(ctx=ctx, object=member)$}; separator="\n"$
 
     // Header
@@ -935,7 +936,7 @@ TypeObject* $ctx.filename$TypeFactory::get$struct.name$Object()
 
 member_object_type(ctx, object) ::= <<
 MinimalStructMember mst_$object.name$;
-mst_$object.name$.common().member_id(MEMBER_ID_INVALID);
+mst_$object.name$.common().member_id(memberId++);
 mst_$object.name$.common().member_flags().TRY_CONSTRUCT1(false);
 mst_$object.name$.common().member_flags().TRY_CONSTRUCT2(false);
 mst_$object.name$.common().member_flags().IS_EXTERNAL(false);
@@ -1037,6 +1038,7 @@ TypeObject* $ctx.filename$TypeFactory::get$union.name$Object()
 
     type_object->minimal().union_type().discriminator().common().type_id(*$get_type_identifier(ctx=ctx, type=union.discriminator)$);
 
+    MemberId memberId = 0;
     $union.members:{ member | $union_member_object_type(ctx=ctx, object=member, discriminator=union.discriminator)$}; separator="\n"$
 
     // Header
@@ -1050,7 +1052,7 @@ TypeObject* $ctx.filename$TypeFactory::get$union.name$Object()
 
 union_member_object_type(ctx, object, discriminator) ::= <<
 MinimalUnionMember mst_$object.name$;
-mst_$object.name$.common().member_id(MEMBER_ID_INVALID);
+mst_$object.name$.common().member_id(memberId++);
 mst_$object.name$.common().member_flags().TRY_CONSTRUCT1(false);
 mst_$object.name$.common().member_flags().TRY_CONSTRUCT2(false);
 mst_$object.name$.common().member_flags().IS_EXTERNAL(false);

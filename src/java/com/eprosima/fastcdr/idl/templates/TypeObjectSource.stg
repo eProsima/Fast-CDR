@@ -949,7 +949,14 @@ mst_$object.name$.common().member_type_id(*$get_type_identifier(ctx=ctx, type=ob
 $elseif(object.typecode.objectType)$
 mst_$object.name$.common().member_type_id(*get$object.typecode.cppTypename$Identifier());
 $else$
-mst_$object.name$.common().member_type_id(*m_Identifiers.at("$object.typecode.cppTypename$"));
+{
+    std::string cppType = "$object.typecode.cppTypename$";
+    if (cppType == "long double")
+    {
+        cppType = "longdouble";
+    }
+    mst_$object.name$.common().member_type_id(*m_Identifiers.at(cppType));
+}
 $endif$
 
 
@@ -1065,7 +1072,14 @@ mst_$object.name$.common().type_id(*$get_type_identifier(ctx=ctx, type=object.ty
 $elseif(object.typecode.objectType)$
 mst_$object.name$.common().type_id(*get$object.typecode.cppTypename$Identifier());
 $else$
-mst_$object.name$.common().type_id(*m_Identifiers.at("$object.typecode.cppTypename$"));
+{
+    std::string cppType = "$object.typecode.cppTypename$";
+    if (cppType == "long double")
+    {
+        cppType = "longdouble";
+    }
+    mst_$object.name$.common().type_id(*m_Identifiers.at(cppType));
+}
 $endif$
 
 

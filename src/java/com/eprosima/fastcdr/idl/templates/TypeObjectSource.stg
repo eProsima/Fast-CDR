@@ -167,7 +167,9 @@ const TypeObject* $ctx.filename$TypeFactory::Get$typedefs.name$Object()
     type_object->minimal().alias_type().body().common().related_flags().IS_DEFAULT(false);
 
     // Must be defined already, if don't, may be an recursive alias
-    const TypeIdentifier *relatedType = GetTypeIdentifier("$typedefs.typedefContentTypeCode.cppTypename$");
+    const TypeIdentifier *relatedType = GetTypeIdentifier($get_content_type(ctx=ctx, type=typedefs.typedefContentTypeCode)$);
+
+
     if (relatedType != nullptr)
     {
         type_object->minimal().alias_type().body().common().related_type() = *relatedType; // Make a copy
@@ -175,11 +177,12 @@ const TypeObject* $ctx.filename$TypeFactory::Get$typedefs.name$Object()
     else
     {
         // Cannot determine base type
+        delete type_object;
         return nullptr;
     }
 
     // Don't add our TypeIdentifier but our alias
-    m_Aliases.emplace(std::pair<std::string, std::string>("$typedefs.name$", "$typedefs.typedefContentTypeCode.cppTypename$"));
+    m_Aliases.emplace(std::pair<std::string, std::string>("$typedefs.name$", $get_content_type(ctx=ctx, type=typedefs.typedefContentTypeCode)$));
 
     TypeObjectFactory::GetInstance()->AddTypeObject("$typedefs.name$", relatedType, type_object);
     delete type_object;

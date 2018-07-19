@@ -75,6 +75,7 @@ const TypeIdentifier* $ctx.filename$TypeFactory::GetTypeIdentifier(const std::st
     {
         return type_id;
     }
+    return nullptr;
 }
 
 const TypeObject* $ctx.filename$TypeFactory::GetTypeObject(const std::string &type_name, bool complete)
@@ -635,7 +636,7 @@ cst_$object.name$.common().member_flags().IS_MUST_UNDERSTAND(false);
 cst_$object.name$.common().member_flags().IS_KEY(false);
 cst_$object.name$.common().member_flags().IS_DEFAULT(false);
 $if(object.typecode.plainType)$
-cst_$object.name$.common().member_type_id(*$get_type_identifier(ctx=ctx, type=object.typecode, ek="false")$);
+cst_$object.name$.common().member_type_id(*$get_type_identifier(ctx=ctx, type=object.typecode, ek="true")$);
 $elseif(object.typecode.objectType)$
 cst_$object.name$.common().member_type_id(*Get$object.typecode.cppTypename$Identifier(true));
 $else$

@@ -75,8 +75,6 @@ const TypeIdentifier* $ctx.filename$TypeFactory::GetTypeIdentifier(const std::st
     {
         return type_id;
     }
-
-    return nullptr;
 }
 
 const TypeObject* $ctx.filename$TypeFactory::GetTypeObject(const std::string &type_name, bool complete)
@@ -162,7 +160,6 @@ const TypeObject* $ctx.filename$TypeFactory::Get$typedefs.name$Object(bool compl
     {
         return GetMinimal$typedefs.name$Object();
     }
-    return GetTypeObject("$typedefs.name$", complete);
 }
 
 const TypeObject* $ctx.filename$TypeFactory::GetMinimal$typedefs.name$Object()
@@ -660,7 +657,7 @@ type_object->complete().struct_type().member_seq().emplace_back(cst_$object.name
 
 >>
 
-get_type_identifier(ctx, type, ek) ::= <<$if(type.isSequenceType)$TypeObjectFactory::GetInstance()->GetSequenceIdentifier($get_content_type(ctx=ctx, type=type.sequenceContentTypeCode)$, $type.maxsize$)$elseif(type.isArrayType)$TypeObjectFactory::GetInstance()->GetArrayIdentifier($get_content_type(ctx=ctx, type=type.arrayContentTypeCode)$, {$type.dimensions:{ dim |$dim$}; separator=", "$})$elseif(type.isSetType)$TypeObjectFactory::GetInstance()->GetSequenceIdentifier($get_content_type(ctx=ctx, type=type.setContentTypeCode)$, $type.maxsize$)$elseif(type.isMapType)$TypeObjectFactory::GetInstance()->GetMapIdentifier($get_content_type(ctx=ctx, type=type.keyTypeCode)$, $get_content_type(ctx=ctx, type=type.valueTypeCode)$, $type.maxsize$)$elseif(type.isStringType)$TypeObjectFactory::GetInstance()->GetStringIdentifier($type.maxsize$, false)$elseif(type.isWStringType)$TypeObjectFactory::GetInstance()->GetStringIdentifier($type.maxsize$, true)$elseif(type.objectType)$Get$type.cppTypename$Identifier($ek$)$elseif(type.plainType)$GetTypeIdentifier("$type.cppTypename$", false)$else$GetTypeIdentifier("$type.cppTypename$", false)$endif$>>
+get_type_identifier(ctx, type, ek) ::= <<$if(type.isSequenceType)$TypeObjectFactory::GetInstance()->GetSequenceIdentifier($get_content_type(ctx=ctx, type=type.sequenceContentTypeCode)$, $type.maxsize$, $ek$)$elseif(type.isArrayType)$TypeObjectFactory::GetInstance()->GetArrayIdentifier($get_content_type(ctx=ctx, type=type.arrayContentTypeCode)$, {$type.dimensions:{ dim |$dim$}; separator=", "$}, $ek$)$elseif(type.isSetType)$TypeObjectFactory::GetInstance()->GetSequenceIdentifier($get_content_type(ctx=ctx, type=type.setContentTypeCode)$, $type.maxsize$, $ek$)$elseif(type.isMapType)$TypeObjectFactory::GetInstance()->GetMapIdentifier($get_content_type(ctx=ctx, type=type.keyTypeCode)$, $get_content_type(ctx=ctx, type=type.valueTypeCode)$, $type.maxsize$, $ek$)$elseif(type.isStringType)$TypeObjectFactory::GetInstance()->GetStringIdentifier($type.maxsize$, false)$elseif(type.isWStringType)$TypeObjectFactory::GetInstance()->GetStringIdentifier($type.maxsize$, true)$elseif(type.objectType)$Get$type.cppTypename$Identifier($ek$)$elseif(type.plainType)$GetTypeIdentifier("$type.cppTypename$", false)$else$GetTypeIdentifier("$type.cppTypename$", false)$endif$>>
 
 get_content_type(ctx, type) ::= <<$if(type.plainType)$$if(type.isSequenceType)$TypeNamesGenerator::getSequenceTypeName($get_content_type(ctx=ctx, type=type.sequenceContentTypeCode)$, $type.maxsize$)$elseif(type.isArrayType)$TypeNamesGenerator::getArrayTypeName($get_content_type(ctx=ctx, type=type.arrayContentTypeCode)$, {$type.dimensions:{ dim |$dim$}; separator=", "$})$elseif(type.isSetType)$TypeNamesGenerator::getSequenceTypeName($get_content_type(ctx=ctx, type=type.setContentTypeCode)$, $type.maxsize$)$elseif(type.isMapType)$TypeNamesGenerator::getMapTypeName($get_content_type(ctx=ctx, type=type.keyTypeCode)$, $get_content_type(ctx=ctx, type=type.valueTypeCode)$, $type.maxsize$)$elseif(type.isStringType)$TypeNamesGenerator::getStringTypeName($type.maxsize$, false)$elseif(type.isWStringType)$TypeNamesGenerator::getStringTypeName($type.maxsize$, true)$else$"$type.cppTypename$"$endif$$else$"$type.cppTypename$"$endif$>>
 

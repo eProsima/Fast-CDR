@@ -60,14 +60,11 @@ void $ctx.filename$TypeFactory::registerTypes()
 const TypeIdentifier* $ctx.filename$TypeFactory::GetTypeIdentifier(const std::string &type_name, bool complete)
 {
     // Try general factory
-    const TypeIdentifier *type_id = TypeObjectFactory::GetInstance()->GetTypeIdentifier(type_name, complete);
+    const TypeIdentifier *type_id = (complete)
+            ? TypeObjectFactory::GetInstance()->GetTypeIdentifierTryingComplete(type_name)
+            : TypeObjectFactory::GetInstance()->GetTypeIdentifier(type_name, false);
     if (type_id == nullptr) // For basic types, it's ok to accept non-complete
     {
-        if (m_Aliases.find(type_name) != m_Aliases.end())
-        {
-            return GetTypeIdentifier(m_Aliases.at(type_name), complete);
-        }
-
         // Try users types.
         $ctx.definitions: { def | $try_create(ctx=ctx, object=def, param="type_name")$}; separator="\n"$
     }
@@ -84,11 +81,6 @@ const TypeObject* $ctx.filename$TypeFactory::GetTypeObject(const std::string &ty
     const TypeObject *type_id = TypeObjectFactory::GetInstance()->GetTypeObject(type_name, complete);
     if (type_id == nullptr || (complete && type_id->_d() == EK_MINIMAL))
     {
-        if (m_Aliases.find(type_name) != m_Aliases.end())
-        {
-            return GetTypeObject(m_Aliases.at(type_name), complete);
-        }
-
         // Try users types.
         $ctx.definitions: { def | $try_object(ctx=ctx, object=def, param="type_name")$}; separator="\n"$
     }
@@ -113,8 +105,8 @@ if ($param$ == "$object.name$")
 >>
 
 register_type(ctx, object, param) ::= <<
-factory->AddTypeObject("$object.name$", Get$object.name$Identifier(false), Get$object.name$Object(false));
 factory->AddTypeObject("$object.name$", Get$object.name$Identifier(true), Get$object.name$Object(true));
+factory->AddTypeObject("$object.name$", Get$object.name$Identifier(false), Get$object.name$Object(false));
 >>
 
 module(ctx, parent, module, definition_list) ::= <<
@@ -136,14 +128,14 @@ const_decl(ctx, parent, const) ::= <<>>
 typedef_decl(ctx, parent, typedefs) ::= <<
 const TypeIdentifier* $ctx.filename$TypeFactory::Get$typedefs.name$Identifier(bool complete)
 {
-    if (complete)
+    const TypeIdentifier* c_identifier = GetTypeIdentifier("$typedefs.name$", complete);
+    if (c_identifier != nullptr && (!complete || c_identifier->_d() == EK_COMPLETE))
     {
-        return $get_type_identifier(ctx=ctx, type=typedefs.typedefContentTypeCode, ek="true")$;
+        return c_identifier;
     }
-    else
-    {
-        return $get_type_identifier(ctx=ctx, type=typedefs.typedefContentTypeCode, ek="false")$;
-    }
+
+    Get$typedefs.name$Object(complete); // Generated inside
+    return GetTypeIdentifier("$typedefs.name$", complete);
 }
 
 const TypeObject* $ctx.filename$TypeFactory::Get$typedefs.name$Object(bool complete)
@@ -205,10 +197,32 @@ const TypeObject* $ctx.filename$TypeFactory::GetMinimal$typedefs.name$Object()
         return nullptr;
     }
 
-    // Don't add our TypeIdentifier but our alias
-    m_Aliases.emplace(std::pair<std::string, std::string>("$typedefs.name$", $get_content_type(ctx=ctx, type=typedefs.typedefContentTypeCode)$));
+    TypeIdentifier identifier;
+    identifier._d(EK_MINIMAL);
 
-    TypeObjectFactory::GetInstance()->AddTypeObject("$typedefs.name$", relatedType, type_object);
+    SerializedPayload_t payload(static_cast<uint32_t>(
+        MinimalAliasType::getCdrSerializedSize(type_object->minimal().alias_type()) + 4));
+    eprosima::fastcdr::FastBuffer fastbuffer((char*) payload.data, payload.max_size);
+    // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
+    eprosima::fastcdr::Cdr ser(
+        fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIANNESS,
+        eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
+    payload.encapsulation = CDR_LE;
+
+    type_object->serialize(ser);
+    payload.length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
+    MD5 objectHash;
+    objectHash.update((char*)payload.data, payload.length);
+    objectHash.finalize();
+    for(int i = 0; i < 14; ++i)
+    {
+        identifier.equivalence_hash()[i] = objectHash.digest[i];
+    }
+
+    // Don't add our TypeIdentifier but our alias
+    TypeObjectFactory::GetInstance()->AddAlias("$typedefs.name$", $get_content_type(ctx=ctx, type=typedefs.typedefContentTypeCode)$);
+
+    TypeObjectFactory::GetInstance()->AddTypeObject("$typedefs.name$", &identifier, type_object);
     delete type_object;
     return GetTypeObject("$typedefs.name$", false);
 }
@@ -262,12 +276,34 @@ const TypeObject* $ctx.filename$TypeFactory::GetComplete$typedefs.name$Object()
         return nullptr;
     }
 
-    // Don't add our TypeIdentifier but our alias
-    m_Aliases.emplace(std::pair<std::string, std::string>("$typedefs.name$", $get_content_type(ctx=ctx, type=typedefs.typedefContentTypeCode)$));
+    TypeIdentifier identifier;
+    identifier._d(EK_COMPLETE);
 
-    TypeObjectFactory::GetInstance()->AddTypeObject("$typedefs.name$", relatedType, type_object);
+    SerializedPayload_t payload(static_cast<uint32_t>(
+        CompleteAliasType::getCdrSerializedSize(type_object->complete().alias_type()) + 4));
+    eprosima::fastcdr::FastBuffer fastbuffer((char*) payload.data, payload.max_size);
+    // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
+    eprosima::fastcdr::Cdr ser(
+        fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIANNESS,
+        eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
+    payload.encapsulation = CDR_LE;
+
+    type_object->serialize(ser);
+    payload.length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
+    MD5 objectHash;
+    objectHash.update((char*)payload.data, payload.length);
+    objectHash.finalize();
+    for(int i = 0; i < 14; ++i)
+    {
+        identifier.equivalence_hash()[i] = objectHash.digest[i];
+    }
+
+    // Don't add our TypeIdentifier but our alias
+    TypeObjectFactory::GetInstance()->AddAlias("$typedefs.name$", $get_content_type(ctx=ctx, type=typedefs.typedefContentTypeCode)$);
+
+    TypeObjectFactory::GetInstance()->AddTypeObject("$typedefs.name$", &identifier, type_object);
     delete type_object;
-    return GetTypeObject("$typedefs.name$", false);
+    return GetTypeObject("$typedefs.name$", true);
 }
 
 >>
@@ -326,8 +362,8 @@ const TypeObject* $ctx.filename$TypeFactory::GetMinimal$enum.name$Object()
     uint32_t value = 0;
     $enum.members:{ member | $minimal_enumerated_literal(ctx=ctx, object=member)$}; separator="\n"$
 
-    TypeIdentifier* identifier = new TypeIdentifier();
-    identifier->_d(EK_MINIMAL);
+    TypeIdentifier identifier;
+    identifier._d(EK_MINIMAL);
 
     SerializedPayload_t payload(static_cast<uint32_t>(
         MinimalEnumeratedType::getCdrSerializedSize(type_object->minimal().enumerated_type()) + 4));
@@ -345,12 +381,11 @@ const TypeObject* $ctx.filename$TypeFactory::GetMinimal$enum.name$Object()
     objectHash.finalize();
     for(int i = 0; i < 14; ++i)
     {
-        identifier->equivalence_hash()[i] = objectHash.digest[i];
+        identifier.equivalence_hash()[i] = objectHash.digest[i];
     }
 
-    TypeObjectFactory::GetInstance()->AddTypeObject("$enum.name$", identifier, type_object);
+    TypeObjectFactory::GetInstance()->AddTypeObject("$enum.name$", &identifier, type_object);
     delete type_object;
-    delete identifier;
     return GetTypeObject("$enum.name$", false);
 }
 
@@ -380,8 +415,8 @@ const TypeObject* $ctx.filename$TypeFactory::GetComplete$enum.name$Object()
     uint32_t value = 0;
     $enum.members:{ member | $complete_enumerated_literal(ctx=ctx, object=member)$}; separator="\n"$
 
-    TypeIdentifier* identifier = new TypeIdentifier();
-    identifier->_d(EK_COMPLETE);
+    TypeIdentifier identifier;
+    identifier._d(EK_COMPLETE);
 
     SerializedPayload_t payload(static_cast<uint32_t>(
         CompleteEnumeratedType::getCdrSerializedSize(type_object->complete().enumerated_type()) + 4));
@@ -399,12 +434,11 @@ const TypeObject* $ctx.filename$TypeFactory::GetComplete$enum.name$Object()
     objectHash.finalize();
     for(int i = 0; i < 14; ++i)
     {
-        identifier->equivalence_hash()[i] = objectHash.digest[i];
+        identifier.equivalence_hash()[i] = objectHash.digest[i];
     }
 
-    TypeObjectFactory::GetInstance()->AddTypeObject("$enum.name$", identifier, type_object);
+    TypeObjectFactory::GetInstance()->AddTypeObject("$enum.name$", &identifier, type_object);
     delete type_object;
-    delete identifier;
     return GetTypeObject("$enum.name$", true);
 }
 

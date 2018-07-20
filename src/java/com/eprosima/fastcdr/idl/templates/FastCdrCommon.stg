@@ -77,7 +77,7 @@ $endif$
 $if(typecode.isWCharType)$
 $var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$; // 32 bits
 $elseif(typecode.isType_13)$
-$var$ += 128$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 128)$endif$; // 128 bits
+$var$ += 16$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 16)$endif$; // 128 bits
 $elseif(typecode.primitive)$
 $var$ += $typecode.size$$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $typecode.size$)$endif$;
 
@@ -104,7 +104,7 @@ serialized_size_type(ctx, typecode, var) ::= <<
 $if(typecode.isWCharType)$
 $var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$; // 32 bits
 $elseif(typecode.isType_13)$
-$var$ += 128$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 128)$endif$; // 128 bits
+$var$ += 16$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 16)$endif$; // 128 bits
 $elseif(typecode.primitive)$
 $var$ += $typecode.size$$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $typecode.size$)$endif$;
 
@@ -121,7 +121,7 @@ $endif$
 $if(object.typecode.isWCharType)$
 $var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$; // 32 bits
 $elseif(object.typecode.isType_13)$
-$var$ += 128$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 128)$endif$; // 128 bits
+$var$ += 16$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 16)$endif$; // 128 bits
 $elseif(object.typecode.primitive)$
 $var$ += $object.typecode.size$$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $object.typecode.size$)$endif$;
 

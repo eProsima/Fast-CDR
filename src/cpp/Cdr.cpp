@@ -1628,7 +1628,10 @@ const char* Cdr::readString(uint32_t &length)
 
         returnedValue = &m_currentPosition;
         m_currentPosition += length;
-        if(returnedValue[length-1] == '\0') --length;
+        if (returnedValue[length - 1] == '\0')
+        {
+            --length;
+        }
         return returnedValue;
     }
 
@@ -1653,9 +1656,14 @@ std::wstring Cdr::readWString(uint32_t &bytesLength)
         m_lastDataSize = sizeof(uint32_t);
 
 #if defined(_WIN32)
-        wchar_t* wValue = new wchar_t[bytesLength / 4];
-        deserializeArray(wValue, bytesLength / 4);
-        returnedValue = std::wstring(wValue, (bytesLength / 4));
+        uint32_t length(bytesLength / 4);
+        wchar_t* wValue = new wchar_t[length];
+        deserializeArray(wValue, length);
+        if (wValue[length - 1] == L'\0')
+        {
+            --length;
+        }
+        returnedValue = std::wstring(wValue, length);
         delete [] wValue;
 #else
         const wchar_t* wValue = '\0';

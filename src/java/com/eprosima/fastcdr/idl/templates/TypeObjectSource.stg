@@ -332,11 +332,8 @@ const TypeObject* $ctx.filename$TypeFactory::Get$enum.name$Object(bool complete)
     {
         return GetComplete$enum.name$Object();
     }
-    else
-    {
-        return GetMinimal$enum.name$Object();
-    }
-    return GetTypeObject("$enum.name$", complete);
+    // else
+    return GetMinimal$enum.name$Object();
 }
 
 const TypeObject* $ctx.filename$TypeFactory::GetMinimal$enum.name$Object()
@@ -506,11 +503,8 @@ const TypeObject* $ctx.filename$TypeFactory::Get$struct.name$Object(bool complet
     {
         return GetComplete$struct.name$Object();
     }
-    else
-    {
-        return GetMinimal$struct.name$Object();
-    }
-    return GetTypeObject("$struct.name$", complete);
+    //else
+    return GetMinimal$struct.name$Object();
 }
 
 const TypeObject* $ctx.filename$TypeFactory::GetMinimal$struct.name$Object()
@@ -720,11 +714,8 @@ const TypeObject* $ctx.filename$TypeFactory::Get$union.name$Object(bool complete
     {
         return GetComplete$union.name$Object();
     }
-    else
-    {
-        return GetMinimal$union.name$Object();
-    }
-    return GetTypeObject("$union.name$", complete);
+    // else
+    return GetMinimal$union.name$Object();
 }
 
 const TypeObject* $ctx.filename$TypeFactory::GetMinimal$union.name$Object()

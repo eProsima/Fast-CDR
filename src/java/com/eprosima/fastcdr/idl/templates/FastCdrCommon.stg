@@ -68,9 +68,11 @@ $endif$
 
 // TODO Todos los tipos. MEJORAR. size of 1 no deberia generar alignment.
 max_serialized_size(ctx, typecode, var) ::= <<
-/* BEGIN $typecode.cppTypename$ */
+/* $typecode.cppTypename$ */
 $if(typecode.primitive)$
 $var$ += $typecode.size$$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $typecode.size$)$endif$;
+$elseif(typecode.isWStringType)$
+$var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$ + ($typecode.maxsize$ + 1) * 4; // 32 bits
 $elseif(typecode.isType_d)$
 $var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$ + $typecode.maxsize$ + 1;
 $elseif(typecode.isMapType)$
@@ -84,18 +86,21 @@ $else$
 $var$ += $typecode.scopedname$::getMaxCdrSerializedSize($var$);
 $endif$
 
-/* END $typecode.cppTypename$ */
 >>
 
 serialized_size_type(ctx, typecode, var) ::= <<
+/* $typecode.cppTypename$ */
 $if(typecode.primitive)$
 $var$ += $typecode.size$$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $typecode.size$)$endif$;
 $endif$
 >>
 
 serialized_size(ctx, object, data, var) ::= <<
+/* $object.typecode.cppTypename$ $object.name$ */
 $if(object.typecode.primitive)$
 $var$ += $object.typecode.size$$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $object.typecode.size$)$endif$;
+$elseif(object.typecode.isWStringType)$
+$var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$ + ($data$.$object.name$().size() + 1) * 4; // 32 bits
 $elseif(object.typecode.isType_d)$
 $var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$ + $data$.$object.name$().size() + 1;
 $elseif(object.typecode.isMapType)$
@@ -108,6 +113,7 @@ $array_serialized_size(ctx=ctx, typecodeArr=object.typecode, data=[data, ".", ob
 $else$
 $var$ += $object.typecode.scopedname$::getCdrSerializedSize($data$.$object.name$(), $var$);
 $endif$
+
 >>
 
 sequence_max_serialized_size(ctx, typecodeSeq, var, loopvar) ::= <<

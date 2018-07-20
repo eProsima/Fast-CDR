@@ -533,7 +533,7 @@ Cdr& Cdr::serialize(const long double ldouble_t)
     if(((m_lastPosition - m_currentPosition) >= sizeAligned) || resize(sizeAligned))
     {
         // Save last datasize.
-        m_lastDataSize = sizeof(ldouble_t);
+        m_lastDataSize = 16; // sizeof(ldouble_t);
 
         // Align.
         makeAlign(align);
@@ -562,7 +562,7 @@ Cdr& Cdr::serialize(const long double ldouble_t)
         else
         {
             m_currentPosition << ldouble_t;
-            m_currentPosition += sizeof(ldouble_t);
+            m_currentPosition += 16; // sizeof(ldouble_t);
         }
 
         return *this;
@@ -645,23 +645,29 @@ Cdr& Cdr::serialize(const char *string_t)
 
 Cdr& Cdr::serialize(const wchar_t *string_t)
 {
-    uint32_t length = 0;
+    uint32_t bytesLength = 0;
 
     if (string_t != nullptr)
-        length = ((uint32_t)wcslen(string_t) + 1) * 4;
+    {
+        bytesLength = ((uint32_t)wcslen(string_t) + 1) * 4;
+    }
 
-    if(length > 0)
+    if(bytesLength > 0)
     {
         Cdr::state state(*this);
-        serialize(length);
+        serialize(bytesLength);
 
-        if(((m_lastPosition - m_currentPosition) >= length) || resize(length))
+        if(((m_lastPosition - m_currentPosition) >= bytesLength) || resize(bytesLength))
         {
             // Save last datasize.
             m_lastDataSize = sizeof(uint32_t);
 
-            m_currentPosition.memcopy(string_t, length);
-            m_currentPosition += length;
+#if defined(_WIN32)
+            serializeArray(string_t, bytesLength / 4);
+#else
+            m_currentPosition.memcopy(string_t, bytesLength);
+            m_currentPosition += length * 4; // size on bytes
+#endif
         }
         else
         {
@@ -670,7 +676,7 @@ Cdr& Cdr::serialize(const wchar_t *string_t)
         }
     }
     else
-        serialize(length);
+        serialize(bytesLength);
 
     return *this;
 }
@@ -1480,7 +1486,7 @@ Cdr& Cdr::deserialize(long double &ldouble_t)
     if((m_lastPosition - m_currentPosition) >= sizeAligned)
     {
         // Save last datasize.
-        m_lastDataSize = sizeof(ldouble_t);
+        m_lastDataSize = 16; // sizeof(ldouble_t);
 
         // Align.
         makeAlign(align);
@@ -1501,7 +1507,7 @@ Cdr& Cdr::deserialize(long double &ldouble_t)
         else
         {
             m_currentPosition >> ldouble_t;
-            m_currentPosition += sizeof(ldouble_t);
+            m_currentPosition += 16; // sizeof(ldouble_t);
         }
 
         return *this;
@@ -1630,26 +1636,37 @@ const char* Cdr::readString(uint32_t &length)
     throw eprosima::fastcdr::exception::NotEnoughMemoryException(eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-const wchar_t* Cdr::readWString(uint32_t &length)
+std::wstring Cdr::readWString(uint32_t &bytesLength)
 {
+    std::wstring returnedValue = L"";
     state state(*this);
 
-    *this >> length;
+    *this >> bytesLength;
 
-    length /= 4;
-    if(length == 0)
+    if(bytesLength == 0)
     {
-        return '\0';
+        return returnedValue;
     }
-    else if((m_lastPosition - m_currentPosition) >= length)
+    else if((m_lastPosition - m_currentPosition) >= bytesLength)
     {
-        const wchar_t* returnedValue = '\0';
         // Save last datasize.
-        m_lastDataSize = sizeof(uint16_t);
+        m_lastDataSize = sizeof(uint32_t);
 
-        returnedValue = reinterpret_cast<wchar_t*>(&m_currentPosition);
-        m_currentPosition += length;
-        if(returnedValue[length-1] == '\0') --length;
+#if defined(_WIN32)
+        wchar_t* wValue = new wchar_t[bytesLength / 4];
+        deserializeArray(wValue, bytesLength / 4);
+        returnedValue = std::wstring(wValue, (bytesLength / 4));
+        delete [] wValue;
+#else
+        const wchar_t* wValue = '\0';
+        wValue = reinterpret_cast<wchar_t*>(&m_currentPosition);
+        m_currentPosition += bytesLength;
+        if (wValue[(bytesLength / 4) - 1] == '\0')
+        {
+            --length;
+        }
+        returnedValue = std::wstring(wValue, (bytesLength / 4));
+#endif
         return returnedValue;
     }
 

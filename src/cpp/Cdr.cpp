@@ -541,6 +541,18 @@ Cdr& Cdr::serialize(const long double ldouble_t)
         if(m_swapBytes)
         {
             const char *dst = reinterpret_cast<const char*>(&ldouble_t);
+#if defined(_WIN32)
+            m_currentPosition += 8;
+
+            m_currentPosition++ << dst[7];
+            m_currentPosition++ << dst[6];
+            m_currentPosition++ << dst[5];
+            m_currentPosition++ << dst[4];
+            m_currentPosition++ << dst[3];
+            m_currentPosition++ << dst[2];
+            m_currentPosition++ << dst[1];
+            m_currentPosition++ << dst[0];
+#else
 
             m_currentPosition++ << dst[15];
             m_currentPosition++ << dst[14];
@@ -558,11 +570,16 @@ Cdr& Cdr::serialize(const long double ldouble_t)
             m_currentPosition++ << dst[2];
             m_currentPosition++ << dst[1];
             m_currentPosition++ << dst[0];
+#endif
         }
         else
         {
             m_currentPosition << ldouble_t;
-            m_currentPosition += 16; // sizeof(ldouble_t);
+#if defined(_WIN32)
+            m_currentPosition += sizeof(ldouble_t);
+            m_currentPosition << ldouble_t;
+#endif
+            m_currentPosition += sizeof(ldouble_t);
         }
 
         return *this;
@@ -1125,7 +1142,8 @@ Cdr& Cdr::serializeArray(const long double *ldouble_t, size_t numElements)
     }
 
     size_t align = alignment(ALIGNMENT_LONG_DOUBLE);
-    size_t totalSize = sizeof(*ldouble_t) * numElements;
+    // Fix for Windows ( long doubles only store 8 bytes )
+    size_t totalSize = 16 * numElements; // sizeof(*ldouble_t)
     size_t sizeAligned = totalSize + align;
 
     if(((m_lastPosition - m_currentPosition) >= sizeAligned) || resize(sizeAligned))
@@ -1144,6 +1162,18 @@ Cdr& Cdr::serializeArray(const long double *ldouble_t, size_t numElements)
 
             for(; dst < end; dst += sizeof(*ldouble_t))
             {
+#if defined(_WIN32)
+                m_currentPosition += 8;
+
+                m_currentPosition++ << dst[7];
+                m_currentPosition++ << dst[6];
+                m_currentPosition++ << dst[5];
+                m_currentPosition++ << dst[4];
+                m_currentPosition++ << dst[3];
+                m_currentPosition++ << dst[2];
+                m_currentPosition++ << dst[1];
+                m_currentPosition++ << dst[0];
+#else
                 m_currentPosition++ << dst[15];
                 m_currentPosition++ << dst[14];
                 m_currentPosition++ << dst[13];
@@ -1160,12 +1190,22 @@ Cdr& Cdr::serializeArray(const long double *ldouble_t, size_t numElements)
                 m_currentPosition++ << dst[2];
                 m_currentPosition++ << dst[1];
                 m_currentPosition++ << dst[0];
+#endif
             }
         }
         else
         {
+#if defined(_WIN32)
+            for (size_t i = 0; i < numElements; ++i)
+            {
+                m_currentPosition << ldouble_t[i];
+                m_currentPosition << ldouble_t[i];
+                m_currentPosition += 16;
+            }
+#else
             m_currentPosition.memcopy(ldouble_t, totalSize);
             m_currentPosition += totalSize;
+#endif
         }
 
         return *this;
@@ -1495,6 +1535,9 @@ Cdr& Cdr::deserialize(long double &ldouble_t)
         {
             char *dst = reinterpret_cast<char*>(&ldouble_t);
 
+#if defined(_WIN32)
+            m_currentPosition += 8;
+
             m_currentPosition++ >> dst[7];
             m_currentPosition++ >> dst[6];
             m_currentPosition++ >> dst[5];
@@ -1503,6 +1546,24 @@ Cdr& Cdr::deserialize(long double &ldouble_t)
             m_currentPosition++ >> dst[2];
             m_currentPosition++ >> dst[1];
             m_currentPosition++ >> dst[0];
+#else
+            m_currentPosition++ >> dst[15];
+            m_currentPosition++ >> dst[14];
+            m_currentPosition++ >> dst[13];
+            m_currentPosition++ >> dst[12];
+            m_currentPosition++ >> dst[11];
+            m_currentPosition++ >> dst[10];
+            m_currentPosition++ >> dst[9];
+            m_currentPosition++ >> dst[8];
+            m_currentPosition++ >> dst[7];
+            m_currentPosition++ >> dst[6];
+            m_currentPosition++ >> dst[5];
+            m_currentPosition++ >> dst[4];
+            m_currentPosition++ >> dst[3];
+            m_currentPosition++ >> dst[2];
+            m_currentPosition++ >> dst[1];
+            m_currentPosition++ >> dst[0];
+#endif
         }
         else
         {
@@ -2098,7 +2159,8 @@ Cdr& Cdr::deserializeArray(long double *ldouble_t, size_t numElements)
     }
 
     size_t align = alignment(ALIGNMENT_LONG_DOUBLE);
-    size_t totalSize = sizeof(*ldouble_t) * numElements;
+    // Fix for Windows ( long doubles only store 8 bytes )
+    size_t totalSize = 16 * numElements;
     size_t sizeAligned = totalSize + align;
 
     if((m_lastPosition - m_currentPosition) >= sizeAligned)
@@ -2117,6 +2179,9 @@ Cdr& Cdr::deserializeArray(long double *ldouble_t, size_t numElements)
 
             for(; dst < end; dst += sizeof(*ldouble_t))
             {
+#if defined(_WIN32)
+                m_currentPosition += 8;
+
                 m_currentPosition++ >> dst[7];
                 m_currentPosition++ >> dst[6];
                 m_currentPosition++ >> dst[5];
@@ -2125,12 +2190,37 @@ Cdr& Cdr::deserializeArray(long double *ldouble_t, size_t numElements)
                 m_currentPosition++ >> dst[2];
                 m_currentPosition++ >> dst[1];
                 m_currentPosition++ >> dst[0];
+#else
+                m_currentPosition++ >> dst[15];
+                m_currentPosition++ >> dst[14];
+                m_currentPosition++ >> dst[13];
+                m_currentPosition++ >> dst[12];
+                m_currentPosition++ >> dst[11];
+                m_currentPosition++ >> dst[10];
+                m_currentPosition++ >> dst[9];
+                m_currentPosition++ >> dst[8];
+                m_currentPosition++ >> dst[7];
+                m_currentPosition++ >> dst[6];
+                m_currentPosition++ >> dst[5];
+                m_currentPosition++ >> dst[4];
+                m_currentPosition++ >> dst[3];
+                m_currentPosition++ >> dst[2];
+                m_currentPosition++ >> dst[1];
+                m_currentPosition++ >> dst[0];
+#endif
             }
         }
         else
         {
+#if defined(_WIN32)
+            for (size_t i = 0; i < numElements; ++i)
+            {
+                m_currentPosition >> ldouble_t[i];
+            }
+#else
             m_currentPosition.rmemcopy(ldouble_t, totalSize);
             m_currentPosition += totalSize;
+#endif
         }
 
         return *this;

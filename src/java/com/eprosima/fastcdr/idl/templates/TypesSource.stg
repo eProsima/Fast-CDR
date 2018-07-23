@@ -336,7 +336,10 @@ void $union.scopedname$::_d($union.discriminator.cppTypename$ __d)
         $union.members:{$unionmember_discriminator_case(member=it, totallabels=union.totallabels)$}; separator="\n"$
     }
 
-    if(!b) throw BadParamException("Discriminator doesn't correspond with the selected union member");
+    if(!b)
+    {
+        throw BadParamException("Discriminator doesn't correspond with the selected union member");
+    }
 
     m__d = __d;
 }
@@ -616,7 +619,10 @@ switch(m__d)
 }
 $endif$
 
-if(!b) throw BadParamException("This member is not been selected");
+if(!b)
+{
+    throw BadParamException("This member is not been selected");
+}
 >>
 
 unionmember_case_selection_se(ctx, member) ::= <<

@@ -82,7 +82,7 @@ $elseif(typecode.primitive)$
 $var$ += $typecode.size$$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $typecode.size$)$endif$;
 
 $elseif(typecode.isWStringType)$
-$var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$ + ($typecode.maxsize$ + 1) * 4; // 32 bits
+$var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$ + ($typecode.maxsize$) * 4; // 32 bits
 $elseif(typecode.isType_d)$
 $var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$ + $typecode.maxsize$ + 1;
 $elseif(typecode.isMapType)$
@@ -128,7 +128,7 @@ $elseif(object.typecode.primitive)$
 $var$ += $object.typecode.size$$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $object.typecode.size$)$endif$;
 
 $elseif(object.typecode.isWStringType)$
-$var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$ + ($data$.$object.name$().size() + 1) * 4; // 32 bits
+$var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$ + ($data$.$object.name$().size()) * 4; // 32 bits
 $elseif(object.typecode.isType_d)$
 $var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$ + $data$.$object.name$().size() + 1;
 $elseif(object.typecode.isMapType)$
@@ -271,59 +271,47 @@ $endif$
 >>
 
 map_max_serialized_size(ctx, typecodeMap, var, loopvar) ::= <<
-$if(typecodeMap.keyTypeCode.primitive)$
-$var$ += ($typecodeMap.maxsize$ * $typecodeMap.keyTypeCode.size$)$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $typecodeMap.keyTypeCode.size$)$endif$;
-
-$endif$
-$if(typecodeMap.valueTypeCode.primitive)$
-$var$ += ($typecodeMap.maxsize$ * $typecodeMap.valueTypeCode.size$)$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $typecodeMap.valueTypeCode.size$)$endif$;
-
-$elseif(typecodeMap.valueTypeCode.isType_d)$
-
 for(size_t $loopvar$ = 0; $loopvar$ < $typecodeMap.maxsize$; ++$loopvar$)
 {
+    $var$ += $typecodeMap.keyTypeCode.size$$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $typecodeMap.keyTypeCode.size$)$endif$;
+
+    $if(typecodeMap.valueTypeCode.primitive)$
+    $var$ += $typecodeMap.valueTypeCode.size$$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $typecodeMap.valueTypeCode.size$)$endif$;
+
+    $elseif(typecodeMap.valueTypeCode.isType_d)$
     $var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$ + $typecodeMap.valueTypeCode.maxsize$ + 1;
-}
-$else$
 
-for(size_t $loopvar$ = 0; $loopvar$ < $typecodeMap.maxsize$; ++$loopvar$)
-{
-    $if(typecodeMap.valueTypeCode.isMapType)$
-        $var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$;
+    $elseif(typecodeMap.valueTypeCode.isMapType)$
+    $var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$;
 
-        $map_max_serialized_size(ctx=ctx, typecodeMap=typecodeMap.valueTypeCode, var=var, loopvar=ctx.nextLoopVarName)$
+    $map_max_serialized_size(ctx=ctx, typecodeMap=typecodeMap.valueTypeCode, var=var, loopvar=ctx.nextLoopVarName)$
     $elseif(typecodeMap.valueTypeCode.isType_e)$
-        $var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$;
+    $var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$;
 
-        $sequence_max_serialized_size(ctx=ctx, typecodeSeq=typecodeMap.valueTypeCode, var=var, loopvar=ctx.nextLoopVarName)$
+    $sequence_max_serialized_size(ctx=ctx, typecodeSeq=typecodeMap.valueTypeCode, var=var, loopvar=ctx.nextLoopVarName)$
     $elseif(typecodeMap.valueTypeCode.isType_f)$
-        $array_max_serialized_size(ctx=ctx, typecodeArr=typecodeMap.valueTypeCode, var=var, loopvar=ctx.nextLoopVarName)$
+    $array_max_serialized_size(ctx=ctx, typecodeArr=typecodeMap.valueTypeCode, var=var, loopvar=ctx.nextLoopVarName)$
     $else$
-        $var$ += $typecodeMap.valueTypeCode.scopedname$::getMaxCdrSerializedSize($var$);
+    $var$ += $typecodeMap.valueTypeCode.scopedname$::getMaxCdrSerializedSize($var$);
     $endif$
 }
 $endif$
 >>
 
 map_serialized_size(ctx, typecodeMap, data, var, loopvar) ::= <<
-$if(typecodeMap.keyTypeCode.primitive)$
-$var$ += ($data$.size() * $typecodeMap.keyTypeCode.size$)$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $typecodeMap.keyTypeCode.size$)$endif$;
-$else$
-// KEY TYPE ISN'T PRIMITIVE $typecodeMap.keyTypeCode.cppTypename$
-$endif$
-
-$if(typecodeMap.valueTypeCode.primitive)$
-$var$ += ($data$.size() * $typecodeMap.valueTypeCode.size$)$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $typecodeMap.valueTypeCode.size$)$endif$;
-$else$
-// VALUE TYPE ISN'T PRIMITIVE $typecodeMap.valueTypeCode.cppTypename$
-$endif$
-
-$else$
-
 for(auto $loopvar$ : $data$)
 {
     (void)$loopvar$;
-$if(typecodeMap.valueTypeCode.isType_d)$
+$if(typecodeMap.keyTypeCode.primitive)$
+    $var$ += $typecodeMap.keyTypeCode.size$$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $typecodeMap.keyTypeCode.size$)$endif$;
+$else$
+    // KEY TYPE ISN'T PRIMITIVE $typecodeMap.keyTypeCode.cppTypename$
+$endif$
+
+$if(typecodeMap.valueTypeCode.primitive)$
+    $var$ += $typecodeMap.valueTypeCode.size$$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, $typecodeMap.valueTypeCode.size$)$endif$;
+
+$elseif(typecodeMap.valueTypeCode.isType_d)$
     $var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$ + $loopvar$.second.size() + 1;
 $elseif(typecodeMap.valueTypeCode.isMapType)$
     $var$ += 4$if(ctx.cdr)$ + eprosima::fastcdr::Cdr::alignment($var$, 4)$endif$;

@@ -683,7 +683,7 @@ Cdr& Cdr::serialize(const wchar_t *string_t)
             serializeArray(string_t, bytesLength / 4);
 #else
             m_currentPosition.memcopy(string_t, bytesLength);
-            m_currentPosition += length * 4; // size on bytes
+            m_currentPosition += bytesLength; // size on bytes
 #endif
         }
         else
@@ -1715,26 +1715,23 @@ std::wstring Cdr::readWString(uint32_t &bytesLength)
     {
         // Save last datasize.
         m_lastDataSize = sizeof(uint32_t);
+        uint32_t length(bytesLength / 4);
 
 #if defined(_WIN32)
-        uint32_t length(bytesLength / 4);
         wchar_t* wValue = new wchar_t[length];
         deserializeArray(wValue, length);
-        if (wValue[length - 1] == L'\0')
-        {
-            --length;
-        }
-        returnedValue = std::wstring(wValue, length);
-        delete [] wValue;
 #else
         const wchar_t* wValue = '\0';
         wValue = reinterpret_cast<wchar_t*>(&m_currentPosition);
         m_currentPosition += bytesLength;
-        if (wValue[(bytesLength / 4) - 1] == '\0')
+#endif
+        if (wValue[length - 1] == '\0')
         {
             --length;
         }
-        returnedValue = std::wstring(wValue, (bytesLength / 4));
+        returnedValue = std::wstring(wValue, length);
+#if defined(_WIN32)
+        delete [] wValue;
 #endif
         return returnedValue;
     }

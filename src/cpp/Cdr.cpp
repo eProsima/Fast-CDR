@@ -666,7 +666,7 @@ Cdr& Cdr::serialize(const wchar_t *string_t)
 
     if (string_t != nullptr)
     {
-        bytesLength = ((uint32_t)wcslen(string_t) + 1) * 4;
+        bytesLength = (uint32_t)(wcslen(string_t) * 4);
     }
 
     if(bytesLength > 0)

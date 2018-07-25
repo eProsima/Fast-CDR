@@ -401,7 +401,7 @@ void $union.scopedname$::serialize(eprosima::fastcdr::Cdr &scdr) const
 
 void $union.scopedname$::deserialize(eprosima::fastcdr::Cdr &dcdr)
 {
-    dcdr \>> $deserializeCasting(typecode=union.discriminator)$m__d;
+    $deserializePossibleEnum(typecode=union.discriminator, name="m__d")$
 
     switch(m__d)
     {
@@ -426,7 +426,7 @@ void $union.scopedname$::serialize(eprosima::fastcdr::FastCdr &scdr) const
 
 void $union.scopedname$::deserialize(eprosima::fastcdr::FastCdr &dcdr)
 {
-    dcdr \>> $deserializeCasting(typecode=union.discriminator)$m__d;
+    $deserializePossibleEnum(typecode=union.discriminator, name="m__d")$
 
     switch(m__d)
     {

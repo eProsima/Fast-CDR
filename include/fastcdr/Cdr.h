@@ -163,7 +163,7 @@ namespace eprosima
                  * @brief This function returns the current endianness used by the CDR type.
                  * @return The endianness.
                  */
-                Endianness endianness() { return (Endianness)m_endianness; }
+                Endianness endianness() { return static_cast<Endianness>(m_endianness); }
 
                 /*!
                  * @brief This function skips a number of bytes in the CDR stream buffer.
@@ -521,7 +521,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint8_t octet_t)
                     {
-                        return serialize((const char)octet_t);
+                        return serialize(static_cast<const char>(octet_t));
                     }
 
                 /*!
@@ -534,7 +534,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint8_t octet_t, Endianness endianness)
                     {
-                        return serialize((const char)octet_t, endianness);
+                        return serialize(static_cast<const char>(octet_t), endianness);
                     }
 
                 /*!
@@ -567,7 +567,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const int8_t int8)
                     {
-                        return serialize((const char)int8);
+                        return serialize(static_cast<const char>(int8));
                     }
 
                 /*!
@@ -580,7 +580,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const int8_t int8, Endianness endianness)
                     {
-                        return serialize((const char)int8, endianness);
+                        return serialize(static_cast<const char>(int8), endianness);
                     }
 
                 /*!
@@ -592,7 +592,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint16_t ushort_t)
                     {
-                        return serialize((const int16_t)ushort_t);
+                        return serialize(static_cast<const int16_t>(ushort_t));
                     }
 
                 /*!
@@ -605,7 +605,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint16_t ushort_t, Endianness endianness)
                     {
-                        return serialize((const int16_t)ushort_t, endianness);
+                        return serialize(static_cast<const int16_t>(ushort_t), endianness);
                     }
 
                 /*!
@@ -634,7 +634,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint32_t ulong_t)
                     {
-                        return serialize((const int32_t)ulong_t);
+                        return serialize(static_cast<const int32_t>(ulong_t));
                     }
 
                 /*!
@@ -647,7 +647,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint32_t ulong_t, Endianness endianness)
                     {
-                        return serialize((const int32_t)ulong_t, endianness);
+                        return serialize(static_cast<const int32_t>(ulong_t), endianness);
                     }
 
                 /*!
@@ -670,13 +670,13 @@ namespace eprosima
                 inline
                     Cdr& serialize(const wchar_t wchar)
                     {
-                        return serialize((const uint32_t)wchar);
+                        return serialize(static_cast<const uint32_t>(wchar));
                     }
 
                 inline
                     Cdr& serialize(const wchar_t wchar, Endianness endianness)
                     {
-                        return serialize((const uint32_t)wchar, endianness);
+                        return serialize(static_cast<const uint32_t>(wchar), endianness);
                     }
 
                 /*!
@@ -688,7 +688,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint64_t ulonglong_t)
                     {
-                        return serialize((const int64_t)ulonglong_t);
+                        return serialize(static_cast<const int64_t>(ulonglong_t));
                     }
 
                 /*!
@@ -701,7 +701,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint64_t ulonglong_t, Endianness endianness)
                     {
-                        return serialize((const int64_t)ulonglong_t, endianness);
+                        return serialize(static_cast<const int64_t>(ulonglong_t), endianness);
                     }
 
                 /*!
@@ -812,10 +812,10 @@ namespace eprosima
                 Cdr& serialize(const char *string_t, Endianness endianness);
 
                 //TODO
-                inline Cdr& serialize(char *string_t) {return serialize((const char*)string_t);}
+                inline Cdr& serialize(char *string_t) {return serialize(static_cast<const char*>(string_t));}
 
                 //TODO
-                inline Cdr& serialize(char *string_t, Endianness endianness) {return serialize((const char*)string_t, endianness);}
+                inline Cdr& serialize(char *string_t, Endianness endianness) {return serialize(static_cast<const char*>(string_t), endianness);}
 
                 /*!
                  * @brief This function serializes a std::string.
@@ -882,9 +882,9 @@ namespace eprosima
                 template<class _T>
                     Cdr& serialize(const std::vector<_T> &vector_t)
                     {
-                        state state(*this);
+                        state state_before_error(*this);
 
-                        *this << (int32_t)vector_t.size();
+                        *this << static_cast<int32_t>(vector_t.size());
 
                         try
                         {
@@ -892,7 +892,7 @@ namespace eprosima
                         }
                         catch(eprosima::fastcdr::exception::Exception &ex)
                         {
-                            setState(state);
+                            setState(state_before_error);
                             ex.raise();
                         }
 
@@ -1318,9 +1318,9 @@ namespace eprosima
                 template<class _T>
                     Cdr& serializeSequence(const _T *sequence_t, size_t numElements)
                     {
-                        state state(*this);
+                        state state_before_error(*this);
 
-                        serialize((int32_t)numElements);
+                        serialize(static_cast<int32_t>(numElements));
 
                         try
                         {
@@ -1328,7 +1328,7 @@ namespace eprosima
                         }
                         catch(eprosima::fastcdr::exception::Exception &ex)
                         {
-                            setState(state);
+                            setState(state_before_error);
                             ex.raise();
                         }
 
@@ -1762,7 +1762,7 @@ namespace eprosima
                     Cdr& deserialize(std::vector<_T> &vector_t)
                     {
                         uint32_t seqLength = 0;
-                        state state(*this);
+                        state state_before_error(*this);
 
                         *this >> seqLength;
 
@@ -1773,7 +1773,7 @@ namespace eprosima
                         }
                         catch(eprosima::fastcdr::exception::Exception &ex)
                         {
-                            setState(state);
+                            setState(state_before_error);
                             ex.raise();
                         }
 
@@ -2210,20 +2210,20 @@ namespace eprosima
                     Cdr& deserializeSequence(_T *&sequence_t, size_t &numElements)
                     {
                         uint32_t seqLength = 0;
-                        state state(*this);
+                        state state_before_error(*this);
 
                         deserialize(seqLength);
 
                         try
                         {
-                            sequence_t = (_T*)calloc(seqLength, sizeof(_T));
+                            sequence_t = reinterpret_cast<_T*>(calloc(seqLength, sizeof(_T)));
                             deserializeArray(sequence_t, seqLength);
                         }
                         catch(eprosima::fastcdr::exception::Exception &ex)
                         {
                             free(sequence_t);
                             sequence_t = NULL;
-                            setState(state);
+                            setState(state_before_error);
                             ex.raise();
                         }
 

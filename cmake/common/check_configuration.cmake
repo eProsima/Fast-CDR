@@ -111,3 +111,29 @@ macro(check_msvc_arch)
         endif()
     endif()
 endmacro()
+
+function(set_common_compile_options target)
+    if(MSVC OR MSVC_IDE)
+        target_compile_options(${target} PRIVATE /W4)
+    else()
+        target_compile_options(${target} PRIVATE -Wall
+            -Wextra
+            -Wshadow
+            -Wnon-virtual-dtor
+            -pedantic
+            -Wcast-align
+            -Wunused
+            -Woverloaded-virtual
+            -Wconversion
+            -Wsign-conversion
+            -Wlogical-op
+            -Wuseless-cast
+            -Wdouble-promotion
+            -Wold-style-cast
+            $<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_GREATER_EQUAL:$<CXX_COMPILER_VERSION>,6.0.0>>:-Wnull-dereference>
+            $<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_GREATER_EQUAL:$<CXX_COMPILER_VERSION>,7.0.0>>:-Wduplicated-branches>
+            $<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_GREATER_EQUAL:$<CXX_COMPILER_VERSION>,6.0.0>>:-Wduplicated-cond>
+            $<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_GREATER_EQUAL:$<CXX_COMPILER_VERSION>,7.0.0>>:-Wrestrict>
+            )
+    endif()
+endfunction()

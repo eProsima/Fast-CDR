@@ -21,7 +21,7 @@ using namespace ::exception;
 
 FastCdr::state::state(const FastCdr &fastcdr) : m_currentPosition(fastcdr.m_currentPosition) {}
 
-FastCdr::state::state(const state &state) : m_currentPosition(state.m_currentPosition) {}
+FastCdr::state::state(const state &current_state) : m_currentPosition(current_state.m_currentPosition) {}
 
 FastCdr::FastCdr(FastBuffer &cdrBuffer) : m_cdrBuffer(cdrBuffer), m_currentPosition(cdrBuffer.begin()), m_lastPosition(cdrBuffer.end())
 {
@@ -50,9 +50,9 @@ FastCdr::state FastCdr::getState()
     return FastCdr::state(*this);
 }
 
-void FastCdr::setState(FastCdr::state &state)
+void FastCdr::setState(FastCdr::state &current_state)
 {
-    m_currentPosition >> state.m_currentPosition;
+    m_currentPosition >> current_state.m_currentPosition;
 }
 
 void FastCdr::reset()
@@ -68,7 +68,7 @@ bool FastCdr::resize(size_t minSizeInc)
         m_lastPosition = m_cdrBuffer.end();
         return true;
     }
-    
+
     return false;
 }
 
@@ -91,14 +91,16 @@ FastCdr& FastCdr::serialize(const bool bool_t)
 FastCdr& FastCdr::serialize(const char *string_t)
 {
     uint32_t length = 0;
-    
+
     if(string_t != nullptr)
-        length = (uint32_t)strlen(string_t) + 1;
+    {
+        length = static_cast<uint32_t>(strlen(string_t)) + 1;
+    }
 
     if(length > 0)
     {
-        FastCdr::state state(*this);
-		serialize(length);
+        FastCdr::state state_before_error(*this);
+        serialize(length);
 
         if(((m_lastPosition - m_currentPosition) >= length) || resize(length))
         {
@@ -107,12 +109,14 @@ FastCdr& FastCdr::serialize(const char *string_t)
         }
         else
         {
-            setState(state);
+            setState(state_before_error);
             throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
     }
-	else
-		serialize(length);
+    else
+    {
+        serialize(length);
+    }
 
     return *this;
 }
@@ -277,7 +281,7 @@ FastCdr& FastCdr::deserialize(bool &bool_t)
 FastCdr& FastCdr::deserialize(char *&string_t)
 {
     uint32_t length = 0;
-    FastCdr::state state(*this);
+    FastCdr::state state_before_error(*this);
 
     deserialize(length);
 
@@ -289,37 +293,37 @@ FastCdr& FastCdr::deserialize(char *&string_t)
     else if((m_lastPosition - m_currentPosition) >= length)
     {
         // Allocate memory.
-        string_t = (char*)calloc(length + ((&m_currentPosition)[length-1] == '\0' ? 0 : 1), sizeof(char));
+        string_t = reinterpret_cast<char*>(calloc(length + ((&m_currentPosition)[length-1] == '\0' ? 0 : 1), sizeof(char)));
         memcpy(string_t, &m_currentPosition, length);
         m_currentPosition += length;
         return *this;
     }
 
-    setState(state);
+    setState(state_before_error);
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 const char* FastCdr::readString(uint32_t &length)
 {
-	const char* returnedValue = "";
-	state state(*this);
+    const char* returnedValue = "";
+    state state_before_error(*this);
 
-	*this >> length;
+    *this >> length;
 
-	if(length == 0)
-	{
-		return returnedValue;
-	}
-	else if((m_lastPosition - m_currentPosition) >= length)
-	{
-		returnedValue = &m_currentPosition;
-		m_currentPosition += length;
-		if(returnedValue[length-1] == '\0') --length;
-		return returnedValue;
-	}
+    if(length == 0)
+    {
+        return returnedValue;
+    }
+    else if((m_lastPosition - m_currentPosition) >= length)
+    {
+        returnedValue = &m_currentPosition;
+        m_currentPosition += length;
+        if(returnedValue[length-1] == '\0') --length;
+        return returnedValue;
+    }
 
-	setState(state);
-	throw eprosima::fastcdr::exception::NotEnoughMemoryException(eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    setState(state_before_error);
+    throw eprosima::fastcdr::exception::NotEnoughMemoryException(eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 FastCdr& FastCdr::deserializeArray(bool *bool_t, size_t numElements)
@@ -399,7 +403,7 @@ FastCdr& FastCdr::deserializeArray(wchar_t *wchar, size_t numElements)
     for(size_t count = 0; count < numElements; ++count)
     {
         deserialize(value);
-        wchar[count] = (wchar_t)value;
+        wchar[count] = static_cast<wchar_t>(value);
     }
     return *this;
 }
@@ -466,9 +470,9 @@ FastCdr& FastCdr::deserializeArray(long double *ldouble_t, size_t numElements)
 
 FastCdr& FastCdr::serializeBoolSequence(const std::vector<bool> &vector_t)
 {
-    state state(*this);
+    state state_before_error(*this);
 
-    *this << (int32_t)vector_t.size();
+    *this << static_cast<int32_t>(vector_t.size());
 
     size_t totalSize = vector_t.size()*sizeof(bool);
 
@@ -486,7 +490,7 @@ FastCdr& FastCdr::serializeBoolSequence(const std::vector<bool> &vector_t)
     }
     else
     {
-        setState(state);
+        setState(state_before_error);
         throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
@@ -496,7 +500,7 @@ FastCdr& FastCdr::serializeBoolSequence(const std::vector<bool> &vector_t)
 FastCdr& FastCdr::deserializeBoolSequence(std::vector<bool> &vector_t)
 {
     uint32_t seqLength = 0;
-    state state(*this);
+    state state_before_error(*this);
 
     *this >> seqLength;
 
@@ -522,7 +526,7 @@ FastCdr& FastCdr::deserializeBoolSequence(std::vector<bool> &vector_t)
     }
     else
     {
-        setState(state);
+        setState(state_before_error);
         throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
@@ -532,13 +536,13 @@ FastCdr& FastCdr::deserializeBoolSequence(std::vector<bool> &vector_t)
 FastCdr& FastCdr::deserializeStringSequence(std::string *&sequence_t, size_t &numElements)
 {
     uint32_t seqLength = 0;
-    state state(*this);
+    state state_before_error(*this);
 
     deserialize(seqLength);
 
     try
     {
-        sequence_t = (std::string*)calloc(seqLength, sizeof(std::string));
+        sequence_t = reinterpret_cast<std::string*>(calloc(seqLength, sizeof(std::string)));
         for(uint32_t count = 0; count < seqLength; ++count)
             new(&sequence_t[count]) std::string;
         deserializeArray(sequence_t, seqLength);
@@ -547,7 +551,7 @@ FastCdr& FastCdr::deserializeStringSequence(std::string *&sequence_t, size_t &nu
     {
         free(sequence_t);
         sequence_t = NULL;
-        setState(state);
+        setState(state_before_error);
         ex.raise();
     }
 

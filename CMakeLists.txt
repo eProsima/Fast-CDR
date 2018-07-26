@@ -100,19 +100,6 @@ message(STATUS "To change de version modify the file configure.ac")
 option(EPROSIMA_INSTALLER "Activate the creation of a build to create windows installers" OFF)
 
 ###############################################################################
-# Warning level
-###############################################################################
-if(MSVC OR MSVC_IDE)
-    if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
-        string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-    else()
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
-    endif()
-else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
-endif()
-
-###############################################################################
 # GCC colors if using CCache
 ###############################################################################
 if("${CMAKE_CXX_COMPILER_LAUNCHER}" STREQUAL "ccache" AND

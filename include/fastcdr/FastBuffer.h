@@ -82,7 +82,7 @@ namespace eprosima
                     inline
                     void operator<<(const _T &data)
                     {
-                        *((_T*)m_currentPosition) = data;
+                        *(reinterpret_cast<_T*>(m_currentPosition)) = data;
                     }
 
                 /*!
@@ -94,7 +94,7 @@ namespace eprosima
                     inline
                     void operator>>(_T &data)
                     {
-                        data = *((_T*)m_currentPosition);
+                        data = *(reinterpret_cast<_T*>(m_currentPosition));
                     }
 
                 /*!
@@ -137,7 +137,7 @@ namespace eprosima
                 inline
                     size_t operator-(const _FastBuffer_iterator &it) const
                     {
-                        return m_currentPosition - it.m_currentPosition;
+                        return static_cast<size_t>(m_currentPosition - it.m_currentPosition);
                     }
 
                 /*!

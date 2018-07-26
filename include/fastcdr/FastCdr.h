@@ -419,7 +419,7 @@ namespace eprosima
                 inline
                     FastCdr& serialize(const uint8_t octet_t)
                     {
-                        return serialize((const char)octet_t);
+                        return serialize(static_cast<const char>(octet_t));
                     }
 
                 /*!
@@ -449,7 +449,7 @@ namespace eprosima
                 inline
                     FastCdr& serialize(const int8_t int8)
                     {
-                        return serialize((const char)int8);
+                        return serialize(static_cast<const char>(int8));
                     }
 
                 /*!
@@ -461,7 +461,7 @@ namespace eprosima
                 inline
                     FastCdr& serialize(const uint16_t ushort_t)
                     {
-                        return serialize((const int16_t)ushort_t);
+                        return serialize(static_cast<const int16_t>(ushort_t));
                     }
 
                 /*!
@@ -493,7 +493,7 @@ namespace eprosima
                 inline
                     FastCdr& serialize(const uint32_t ulong_t)
                     {
-                        return serialize((const int32_t)ulong_t);
+                        return serialize(static_cast<const int32_t>(ulong_t));
                     }
 
                 /*!
@@ -520,7 +520,7 @@ namespace eprosima
                 inline
                     FastCdr& serialize(const wchar_t wchar)
                     {
-                        return serialize((const uint32_t)wchar);
+                        return serialize(static_cast<const uint32_t>(wchar));
                     }
 
                 /*!
@@ -532,7 +532,7 @@ namespace eprosima
                 inline
                     FastCdr& serialize(const uint64_t ulonglong_t)
                     {
-                        return serialize((const int64_t)ulonglong_t);
+                        return serialize(static_cast<const int64_t>(ulonglong_t));
                     }
 
                 /*!
@@ -632,7 +632,7 @@ namespace eprosima
                 FastCdr& serialize(const char *string_t);
 
                 //TODO
-                inline FastCdr& serialize(char *string_t) {return serialize((const char*)string_t);}
+                inline FastCdr& serialize(char *string_t) {return serialize(static_cast<const char*>(string_t));}
 
                 /*!
                  * @brief This function serializes a std::string.
@@ -678,9 +678,9 @@ namespace eprosima
                 template<class _T>
                     FastCdr& serialize(const std::vector<_T> &vector_t)
                     {
-                        state state(*this);
+                        state state_before_error(*this);
 
-                        *this << (int32_t)vector_t.size();
+                        *this << static_cast<int32_t>(vector_t.size());
 
                         try
                         {
@@ -688,7 +688,7 @@ namespace eprosima
                         }
                         catch(eprosima::fastcdr::exception::Exception &ex)
                         {
-                            setState(state);
+                            setState(state_before_error);
                             ex.raise();
                         }
 
@@ -887,9 +887,9 @@ namespace eprosima
                 template<class _T>
                     FastCdr& serializeSequence(const _T *sequence_t, size_t numElements)
                     {
-                        state state(*this);
+                        state state_before_error(*this);
 
-                        serialize((int32_t)numElements);
+                        serialize(static_cast<int32_t>(numElements));
 
                         try
                         {
@@ -897,7 +897,7 @@ namespace eprosima
                         }
                         catch(eprosima::fastcdr::exception::Exception &ex)
                         {
-                            setState(state);
+                            setState(state_before_error);
                             ex.raise();
                         }
 
@@ -1015,7 +1015,7 @@ namespace eprosima
                     {
                         uint32_t ret;
                         deserialize(ret);
-                        wchar = (wchar_t)ret;
+                        wchar = static_cast<wchar_t>(ret);
                         return *this;
                     }
 
@@ -1182,7 +1182,7 @@ namespace eprosima
                     FastCdr& deserialize(std::vector<_T> &vector_t)
                     {
                         uint32_t seqLength = 0;
-                        state state(*this);
+                        state state_before_error(*this);
 
                         *this >> seqLength;
 
@@ -1193,7 +1193,7 @@ namespace eprosima
                         }
                         catch(eprosima::fastcdr::exception::Exception &ex)
                         {
-                            setState(state);
+                            setState(state_before_error);
                             ex.raise();
                         }
 
@@ -1403,20 +1403,20 @@ namespace eprosima
                     FastCdr& deserializeSequence(_T *&sequence_t, size_t &numElements)
                     {
                         uint32_t seqLength = 0;
-                        state state(*this);
+                        state state_before_error(*this);
 
                         deserialize(seqLength);
 
                         try
                         {
-                            sequence_t = (_T*)calloc(seqLength, sizeof(_T));
+                            sequence_t = reinterpret_cast<_T*>(calloc(seqLength, sizeof(_T)));
                             deserializeArray(sequence_t, seqLength);
                         }
                         catch(eprosima::fastcdr::exception::Exception &ex)
                         {
                             free(sequence_t);
                             sequence_t = NULL;
-                            setState(state);
+                            setState(state_before_error);
                             ex.raise();
                         }
 

@@ -46,7 +46,7 @@ bool FastBuffer::reserve(size_t size)
 {
     if (m_internalBuffer && m_buffer == NULL)
     {
-        m_buffer = (char *)malloc(size);
+        m_buffer = reinterpret_cast<char*>(malloc(size));
         if (m_buffer) {
           m_bufferSize = size;
           return true;
@@ -70,7 +70,7 @@ bool FastBuffer::resize(size_t minSizeInc)
         {
             m_bufferSize = incBufferSize;
 
-            m_buffer = (char*)malloc(m_bufferSize);
+            m_buffer = reinterpret_cast<char*>(malloc(m_bufferSize));
 
             if(m_buffer != NULL)
             {
@@ -81,7 +81,7 @@ bool FastBuffer::resize(size_t minSizeInc)
         {
             m_bufferSize += incBufferSize;
 
-            m_buffer = (char*)realloc(m_buffer, m_bufferSize);
+            m_buffer = reinterpret_cast<char*>(realloc(m_buffer, m_bufferSize));
 
             if(m_buffer != NULL)
             {

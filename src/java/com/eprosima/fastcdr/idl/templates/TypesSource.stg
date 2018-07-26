@@ -115,6 +115,7 @@ size_t $exception.scopedname$::getMaxCdrSerializedSize(size_t current_alignment)
 
 size_t $exception.scopedname$::getCdrSerializedSize(const $exception.scopedname$& data, size_t current_alignment)
 {
+    (void)data;
     size_t initial_alignment = current_alignment;
 
     $exception.members : { member |$serialized_size(ctx=ctx, object=member, data="data", var="current_alignment")$}; separator="\n"$
@@ -220,8 +221,9 @@ size_t $struct.scopedname$::getMaxCdrSerializedSize(size_t current_alignment)
 
 size_t $struct.scopedname$::getCdrSerializedSize(const $struct.scopedname$& data, size_t current_alignment)
 {
+    (void)data;
     size_t initial_alignment = current_alignment;
-            
+
     $struct.members : { member |$serialized_size(ctx=ctx, object=member, data="data", var="current_alignment")$}; separator="\n"$
 
     return current_alignment - initial_alignment;
@@ -372,6 +374,7 @@ size_t $union.scopedname$::getMaxCdrSerializedSize(size_t current_alignment)
 // TODO(Ricardo) Review
 size_t $union.scopedname$::getCdrSerializedSize(const $union.scopedname$& data, size_t current_alignment)
 {
+    (void)data;
     size_t initial_alignment = current_alignment;
 
     $serialized_size_type(ctx=ctx, typecode=union.discriminator, var="current_alignment")$

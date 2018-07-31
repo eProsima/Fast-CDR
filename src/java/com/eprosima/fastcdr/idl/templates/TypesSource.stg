@@ -182,7 +182,7 @@ $struct.scopedname$::$struct.name$()
     $struct.members:{ member |$member_default_init(member=member)$}; separator="\n"$
 
     // Just to register all known types
-    $ctx.filename$TypeFactory factory;
+    register$ctx.filename$Types();
 }
 
 $struct.scopedname$::~$struct.name$()

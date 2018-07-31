@@ -20,7 +20,7 @@ $fileHeader(file=[ctx.filename, "TypeObject.h"], description=["This header file 
 #ifndef _$ctx.headerGuardName$_TYPE_OBJECT_H_
 #define _$ctx.headerGuardName$_TYPE_OBJECT_H_
 
-$ctx.directIncludeDependencies : {include | #include "$include$.h"}; separator="\n"$
+$ctx.directIncludeDependencies : {include | #include "$include$TypeObject.h"}; separator="\n"$
 
 #include <fastrtps/types/TypeObject.h>
 #include <map>
@@ -51,21 +51,9 @@ $ctx.directIncludeDependencies : {include | #include "$include$.h"}; separator="
 
 using namespace eprosima::fastrtps::types;
 
-class $ctx.filename$TypeFactory
-{
-public:
-    $ctx.filename$TypeFactory();
-    ~$ctx.filename$TypeFactory();
+eProsima_user_DllExport void register$ctx.filename$Types();
 
-    eProsima_user_DllExport void registerTypes();
-
-    eProsima_user_DllExport const TypeIdentifier* GetTypeIdentifier(const std::string &basic_type_name, bool complete = false);
-    eProsima_user_DllExport const TypeObject* GetTypeObject(const std::string &basic_type_name, bool complete = false);
-
-    $definitions; separator="\n"$
-
-private:
-};
+$definitions; separator="\n"$
 
 #endif // _$ctx.headerGuardName$_TYPE_OBJECT_H_
 >>

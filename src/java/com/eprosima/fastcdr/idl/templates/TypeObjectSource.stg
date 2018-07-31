@@ -42,50 +42,10 @@ $endif$
 
 using namespace eprosima::fastrtps::rtps;
 
-$ctx.filename$TypeFactory::$ctx.filename$TypeFactory()
-{
-    registerTypes();
-}
-
-$ctx.filename$TypeFactory::~$ctx.filename$TypeFactory()
-{
-}
-
-void $ctx.filename$TypeFactory::registerTypes()
+void register$ctx.filename$Types()
 {
     TypeObjectFactory *factory = TypeObjectFactory::GetInstance();
     $ctx.definitions: { def | $register_type(ctx=ctx, object=def, param="type_name")$}; separator="\n"$
-}
-
-const TypeIdentifier* $ctx.filename$TypeFactory::GetTypeIdentifier(const std::string &type_name, bool complete)
-{
-    // Try general factory
-    const TypeIdentifier *type_id = (complete)
-            ? TypeObjectFactory::GetInstance()->GetTypeIdentifierTryingComplete(type_name)
-            : TypeObjectFactory::GetInstance()->GetTypeIdentifier(type_name, false);
-    if (type_id == nullptr) // For basic types, it's ok to accept non-complete
-    {
-        // Try users types.
-        $ctx.definitions: { def | $try_create(ctx=ctx, object=def, param="type_name")$}; separator="\n"$
-    }
-    else
-    {
-        return type_id;
-    }
-    return nullptr;
-}
-
-const TypeObject* $ctx.filename$TypeFactory::GetTypeObject(const std::string &type_name, bool complete)
-{
-    // Try general factory
-    const TypeObject *type_id = TypeObjectFactory::GetInstance()->GetTypeObject(type_name, complete);
-    if (type_id == nullptr || (complete && type_id->_d() == EK_MINIMAL))
-    {
-        // Try users types.
-        $ctx.definitions: { def | $try_object(ctx=ctx, object=def, param="type_name")$}; separator="\n"$
-    }
-
-    return type_id;
 }
 
 $definitions; separator="\n"$
@@ -100,7 +60,7 @@ try_object(ctx, object, param) ::= <<
 if ($param$ == "$object.name$")
 {
     Get$object.name$Identifier(complete);
-    return GetTypeObject("$object.name$", complete);
+    return TypeObjectFactory::GetInstance()->GetTypeObject("$object.name$", complete);
 }
 >>
 
@@ -126,19 +86,19 @@ export_list(exports) ::= <<>>
 const_decl(ctx, parent, const) ::= <<>>
 
 typedef_decl(ctx, parent, typedefs) ::= <<
-const TypeIdentifier* $ctx.filename$TypeFactory::Get$typedefs.name$Identifier(bool complete)
+const TypeIdentifier* Get$typedefs.name$Identifier(bool complete)
 {
-    const TypeIdentifier* c_identifier = GetTypeIdentifier("$typedefs.name$", complete);
+    const TypeIdentifier* c_identifier = TypeObjectFactory::GetInstance()->GetTypeIdentifier("$typedefs.name$", complete);
     if (c_identifier != nullptr && (!complete || c_identifier->_d() == EK_COMPLETE))
     {
         return c_identifier;
     }
 
     Get$typedefs.name$Object(complete); // Generated inside
-    return GetTypeIdentifier("$typedefs.name$", complete);
+    return TypeObjectFactory::GetInstance()->GetTypeIdentifier("$typedefs.name$", complete);
 }
 
-const TypeObject* $ctx.filename$TypeFactory::Get$typedefs.name$Object(bool complete)
+const TypeObject* Get$typedefs.name$Object(bool complete)
 {
     const TypeObject* c_type_object = TypeObjectFactory::GetInstance()->GetTypeObject("$typedefs.name$", complete);
     if (c_type_object != nullptr)
@@ -155,7 +115,7 @@ const TypeObject* $ctx.filename$TypeFactory::Get$typedefs.name$Object(bool compl
     }
 }
 
-const TypeObject* $ctx.filename$TypeFactory::GetMinimal$typedefs.name$Object()
+const TypeObject* GetMinimal$typedefs.name$Object()
 {
     const TypeObject* c_type_object = TypeObjectFactory::GetInstance()->GetTypeObject("$typedefs.name$", false);
     if (c_type_object != nullptr)
@@ -183,7 +143,7 @@ const TypeObject* $ctx.filename$TypeFactory::GetMinimal$typedefs.name$Object()
     type_object->minimal().alias_type().body().common().related_flags().IS_DEFAULT(false);
 
     // Must be defined already, if don't, may be an recursive alias
-    const TypeIdentifier *relatedType = GetTypeIdentifier($get_content_type(ctx=ctx, type=typedefs.typedefContentTypeCode)$, false);
+    const TypeIdentifier *relatedType = TypeObjectFactory::GetInstance()->GetTypeIdentifier($get_content_type(ctx=ctx, type=typedefs.typedefContentTypeCode)$, false);
 
 
     if (relatedType != nullptr)
@@ -224,10 +184,10 @@ const TypeObject* $ctx.filename$TypeFactory::GetMinimal$typedefs.name$Object()
 
     TypeObjectFactory::GetInstance()->AddTypeObject("$typedefs.name$", &identifier, type_object);
     delete type_object;
-    return GetTypeObject("$typedefs.name$", false);
+    return TypeObjectFactory::GetInstance()->GetTypeObject("$typedefs.name$", false);
 }
 
-const TypeObject* $ctx.filename$TypeFactory::GetComplete$typedefs.name$Object()
+const TypeObject* GetComplete$typedefs.name$Object()
 {
     const TypeObject* c_type_object = TypeObjectFactory::GetInstance()->GetTypeObject("$typedefs.name$", true);
     if (c_type_object != nullptr && c_type_object->_d() == EK_COMPLETE)
@@ -262,7 +222,7 @@ const TypeObject* $ctx.filename$TypeFactory::GetComplete$typedefs.name$Object()
     //type_object->complete().alias_type().body().common().ann_custom()
 
     // Must be defined already, if don't, may be an recursive alias
-    const TypeIdentifier *relatedType = GetTypeIdentifier($get_content_type(ctx=ctx, type=typedefs.typedefContentTypeCode)$, true);
+    const TypeIdentifier *relatedType = TypeObjectFactory::GetInstance()->GetTypeIdentifier($get_content_type(ctx=ctx, type=typedefs.typedefContentTypeCode)$, true);
 
 
     if (relatedType != nullptr)
@@ -303,25 +263,25 @@ const TypeObject* $ctx.filename$TypeFactory::GetComplete$typedefs.name$Object()
 
     TypeObjectFactory::GetInstance()->AddTypeObject("$typedefs.name$", &identifier, type_object);
     delete type_object;
-    return GetTypeObject("$typedefs.name$", true);
+    return TypeObjectFactory::GetInstance()->GetTypeObject("$typedefs.name$", true);
 }
 
 >>
 
 enum_type(ctx, parent, enum) ::= <<
-const TypeIdentifier* $ctx.filename$TypeFactory::Get$enum.name$Identifier(bool complete)
+const TypeIdentifier* Get$enum.name$Identifier(bool complete)
 {
-    const TypeIdentifier* c_identifier = GetTypeIdentifier("$enum.name$", complete);
+    const TypeIdentifier* c_identifier = TypeObjectFactory::GetInstance()->GetTypeIdentifier("$enum.name$", complete);
     if (c_identifier != nullptr && (!complete || c_identifier->_d() == EK_COMPLETE))
     {
         return c_identifier;
     }
 
     Get$enum.name$Object(complete); // Generated inside
-    return GetTypeIdentifier("$enum.name$", complete);
+    return TypeObjectFactory::GetInstance()->GetTypeIdentifier("$enum.name$", complete);
 }
 
-const TypeObject* $ctx.filename$TypeFactory::Get$enum.name$Object(bool complete)
+const TypeObject* Get$enum.name$Object(bool complete)
 {
     const TypeObject* c_type_object = TypeObjectFactory::GetInstance()->GetTypeObject("$enum.name$", complete);
     if (c_type_object != nullptr)
@@ -336,7 +296,7 @@ const TypeObject* $ctx.filename$TypeFactory::Get$enum.name$Object(bool complete)
     return GetMinimal$enum.name$Object();
 }
 
-const TypeObject* $ctx.filename$TypeFactory::GetMinimal$enum.name$Object()
+const TypeObject* GetMinimal$enum.name$Object()
 {
     const TypeObject* c_type_object = TypeObjectFactory::GetInstance()->GetTypeObject("$enum.name$", false);
     if (c_type_object != nullptr)
@@ -383,10 +343,10 @@ const TypeObject* $ctx.filename$TypeFactory::GetMinimal$enum.name$Object()
 
     TypeObjectFactory::GetInstance()->AddTypeObject("$enum.name$", &identifier, type_object);
     delete type_object;
-    return GetTypeObject("$enum.name$", false);
+    return TypeObjectFactory::GetInstance()->GetTypeObject("$enum.name$", false);
 }
 
-const TypeObject* $ctx.filename$TypeFactory::GetComplete$enum.name$Object()
+const TypeObject* GetComplete$enum.name$Object()
 {
     const TypeObject* c_type_object = TypeObjectFactory::GetInstance()->GetTypeObject("$enum.name$", true);
     if (c_type_object != nullptr && c_type_object->_d() == EK_COMPLETE)
@@ -436,7 +396,7 @@ const TypeObject* $ctx.filename$TypeFactory::GetComplete$enum.name$Object()
 
     TypeObjectFactory::GetInstance()->AddTypeObject("$enum.name$", &identifier, type_object);
     delete type_object;
-    return GetTypeObject("$enum.name$", true);
+    return TypeObjectFactory::GetInstance()->GetTypeObject("$enum.name$", true);
 }
 
 >>
@@ -480,19 +440,19 @@ type_object->complete().enumerated_type().literal_seq().emplace_back(cel_$object
 >>
 
 struct_type(ctx, parent, struct, extensions) ::= <<
-const TypeIdentifier* $ctx.filename$TypeFactory::Get$struct.name$Identifier(bool complete)
+const TypeIdentifier* Get$struct.name$Identifier(bool complete)
 {
-    const TypeIdentifier * c_identifier = GetTypeIdentifier("$struct.name$", complete);
+    const TypeIdentifier * c_identifier = TypeObjectFactory::GetInstance()->GetTypeIdentifier("$struct.name$", complete);
     if (c_identifier != nullptr && (!complete || c_identifier->_d() == EK_COMPLETE))
     {
         return c_identifier;
     }
 
     Get$struct.name$Object(complete); // Generated inside
-    return GetTypeIdentifier("$struct.name$", complete);
+    return TypeObjectFactory::GetInstance()->GetTypeIdentifier("$struct.name$", complete);
 }
 
-const TypeObject* $ctx.filename$TypeFactory::Get$struct.name$Object(bool complete)
+const TypeObject* Get$struct.name$Object(bool complete)
 {
     const TypeObject* c_type_object = TypeObjectFactory::GetInstance()->GetTypeObject("$struct.name$", complete);
     if (c_type_object != nullptr)
@@ -507,7 +467,7 @@ const TypeObject* $ctx.filename$TypeFactory::Get$struct.name$Object(bool complet
     return GetMinimal$struct.name$Object();
 }
 
-const TypeObject* $ctx.filename$TypeFactory::GetMinimal$struct.name$Object()
+const TypeObject* GetMinimal$struct.name$Object()
 {
     const TypeObject* c_type_object = TypeObjectFactory::GetInstance()->GetTypeObject("$struct.name$", false);
     if (c_type_object != nullptr)
@@ -557,10 +517,10 @@ const TypeObject* $ctx.filename$TypeFactory::GetMinimal$struct.name$Object()
 
     TypeObjectFactory::GetInstance()->AddTypeObject("$struct.name$", &identifier, type_object);
     delete type_object;
-    return GetTypeObject("$struct.name$", false);
+    return TypeObjectFactory::GetInstance()->GetTypeObject("$struct.name$", false);
 }
 
-const TypeObject* $ctx.filename$TypeFactory::GetComplete$struct.name$Object()
+const TypeObject* GetComplete$struct.name$Object()
 {
     const TypeObject* c_type_object = TypeObjectFactory::GetInstance()->GetTypeObject("$struct.name$", true);
     if (c_type_object != nullptr && c_type_object->_d() == EK_COMPLETE)
@@ -613,7 +573,7 @@ const TypeObject* $ctx.filename$TypeFactory::GetComplete$struct.name$Object()
 
     TypeObjectFactory::GetInstance()->AddTypeObject("$struct.name$", &identifier, type_object);
     delete type_object;
-    return GetTypeObject("$struct.name$", true);
+    return TypeObjectFactory::GetInstance()->GetTypeObject("$struct.name$", true);
 }
 
 >>
@@ -639,7 +599,7 @@ $else$
     {
         cppType = "longdouble";
     }
-    mst_$object.name$.common().member_type_id(*GetTypeIdentifier(cppType, false));
+    mst_$object.name$.common().member_type_id(*TypeObjectFactory::GetInstance()->GetTypeIdentifier(cppType, false));
 }
 $endif$
 
@@ -674,7 +634,7 @@ $else$
     {
         cppType = "longdouble";
     }
-    cst_$object.name$.common().member_type_id(*GetTypeIdentifier(cppType, false));
+    cst_$object.name$.common().member_type_id(*TypeObjectFactory::GetInstance()->GetTypeIdentifier(cppType, false));
 }
 $endif$
 
@@ -686,24 +646,24 @@ type_object->complete().struct_type().member_seq().emplace_back(cst_$object.name
 
 >>
 
-get_type_identifier(ctx, type, ek) ::= <<$if(type.isSequenceType)$TypeObjectFactory::GetInstance()->GetSequenceIdentifier($get_content_type(ctx=ctx, type=type.sequenceContentTypeCode)$, $type.maxsize$, $ek$)$elseif(type.isArrayType)$TypeObjectFactory::GetInstance()->GetArrayIdentifier($get_content_type(ctx=ctx, type=type.arrayContentTypeCode)$, {$type.dimensions:{ dim |$dim$}; separator=", "$}, $ek$)$elseif(type.isSetType)$TypeObjectFactory::GetInstance()->GetSequenceIdentifier($get_content_type(ctx=ctx, type=type.setContentTypeCode)$, $type.maxsize$, $ek$)$elseif(type.isMapType)$TypeObjectFactory::GetInstance()->GetMapIdentifier($get_content_type(ctx=ctx, type=type.keyTypeCode)$, $get_content_type(ctx=ctx, type=type.valueTypeCode)$, $type.maxsize$, $ek$)$elseif(type.isStringType)$TypeObjectFactory::GetInstance()->GetStringIdentifier($type.maxsize$, false)$elseif(type.isWStringType)$TypeObjectFactory::GetInstance()->GetStringIdentifier($type.maxsize$, true)$elseif(type.objectType)$Get$type.cppTypename$Identifier($ek$)$elseif(type.plainType)$GetTypeIdentifier("$type.cppTypename$", false)$else$GetTypeIdentifier("$type.cppTypename$", false)$endif$>>
+get_type_identifier(ctx, type, ek) ::= <<$if(type.isSequenceType)$TypeObjectFactory::GetInstance()->GetSequenceIdentifier($get_content_type(ctx=ctx, type=type.sequenceContentTypeCode)$, $type.maxsize$, $ek$)$elseif(type.isArrayType)$TypeObjectFactory::GetInstance()->GetArrayIdentifier($get_content_type(ctx=ctx, type=type.arrayContentTypeCode)$, {$type.dimensions:{ dim |$dim$}; separator=", "$}, $ek$)$elseif(type.isSetType)$TypeObjectFactory::GetInstance()->GetSequenceIdentifier($get_content_type(ctx=ctx, type=type.setContentTypeCode)$, $type.maxsize$, $ek$)$elseif(type.isMapType)$TypeObjectFactory::GetInstance()->GetMapIdentifier($get_content_type(ctx=ctx, type=type.keyTypeCode)$, $get_content_type(ctx=ctx, type=type.valueTypeCode)$, $type.maxsize$, $ek$)$elseif(type.isStringType)$TypeObjectFactory::GetInstance()->GetStringIdentifier($type.maxsize$, false)$elseif(type.isWStringType)$TypeObjectFactory::GetInstance()->GetStringIdentifier($type.maxsize$, true)$elseif(type.objectType)$Get$type.cppTypename$Identifier($ek$)$elseif(type.plainType)$TypeObjectFactory::GetInstance()->GetTypeIdentifier("$type.cppTypename$", false)$else$TypeObjectFactory::GetInstance()->GetTypeIdentifier("$type.cppTypename$", false)$endif$>>
 
 get_content_type(ctx, type) ::= <<$if(type.plainType)$$if(type.isSequenceType)$TypeNamesGenerator::getSequenceTypeName($get_content_type(ctx=ctx, type=type.sequenceContentTypeCode)$, $type.maxsize$)$elseif(type.isArrayType)$TypeNamesGenerator::getArrayTypeName($get_content_type(ctx=ctx, type=type.arrayContentTypeCode)$, {$type.dimensions:{ dim |$dim$}; separator=", "$})$elseif(type.isSetType)$TypeNamesGenerator::getSequenceTypeName($get_content_type(ctx=ctx, type=type.setContentTypeCode)$, $type.maxsize$)$elseif(type.isMapType)$TypeNamesGenerator::getMapTypeName($get_content_type(ctx=ctx, type=type.keyTypeCode)$, $get_content_type(ctx=ctx, type=type.valueTypeCode)$, $type.maxsize$)$elseif(type.isStringType)$TypeNamesGenerator::getStringTypeName($type.maxsize$, false)$elseif(type.isWStringType)$TypeNamesGenerator::getStringTypeName($type.maxsize$, true)$else$"$type.cppTypename$"$endif$$else$"$type.cppTypename$"$endif$>>
 
 union_type(ctx, parent, union) ::= <<
-const TypeIdentifier* $ctx.filename$TypeFactory::Get$union.name$Identifier(bool complete)
+const TypeIdentifier* Get$union.name$Identifier(bool complete)
 {
-    const TypeIdentifier * c_identifier = GetTypeIdentifier("$union.name$", complete);
+    const TypeIdentifier * c_identifier = TypeObjectFactory::GetInstance()->GetTypeIdentifier("$union.name$", complete);
     if (c_identifier != nullptr && (!complete || c_identifier->_d() == EK_COMPLETE))
     {
         return c_identifier;
     }
 
     Get$union.name$Object(complete);
-    return GetTypeIdentifier("$union.name$", complete);
+    return TypeObjectFactory::GetInstance()->GetTypeIdentifier("$union.name$", complete);
 }
 
-const TypeObject* $ctx.filename$TypeFactory::Get$union.name$Object(bool complete)
+const TypeObject* Get$union.name$Object(bool complete)
 {
     const TypeObject* c_type_object = TypeObjectFactory::GetInstance()->GetTypeObject("$union.name$", complete);
     if (c_type_object != nullptr)
@@ -718,7 +678,7 @@ const TypeObject* $ctx.filename$TypeFactory::Get$union.name$Object(bool complete
     return GetMinimal$union.name$Object();
 }
 
-const TypeObject* $ctx.filename$TypeFactory::GetMinimal$union.name$Object()
+const TypeObject* GetMinimal$union.name$Object()
 {
     const TypeObject* c_type_object = TypeObjectFactory::GetInstance()->GetTypeObject("$union.name$", false);
     if (c_type_object != nullptr)
@@ -777,10 +737,10 @@ const TypeObject* $ctx.filename$TypeFactory::GetMinimal$union.name$Object()
     TypeObjectFactory::GetInstance()->AddTypeObject("$union.name$", identifier, type_object);
     delete type_object;
     delete identifier;
-    return GetTypeObject("$union.name$", false);
+    return TypeObjectFactory::GetInstance()->GetTypeObject("$union.name$", false);
 }
 
-const TypeObject* $ctx.filename$TypeFactory::GetComplete$union.name$Object()
+const TypeObject* GetComplete$union.name$Object()
 {
     const TypeObject* c_type_object = TypeObjectFactory::GetInstance()->GetTypeObject("$union.name$", true);
     if (c_type_object != nullptr && c_type_object->_d() == EK_COMPLETE)
@@ -844,7 +804,7 @@ const TypeObject* $ctx.filename$TypeFactory::GetComplete$union.name$Object()
     TypeObjectFactory::GetInstance()->AddTypeObject("$union.name$", identifier, type_object);
     delete type_object;
     delete identifier;
-    return GetTypeObject("$union.name$", true);
+    return TypeObjectFactory::GetInstance()->GetTypeObject("$union.name$", true);
 }
 
 >>
@@ -870,7 +830,7 @@ $else$
     {
         cppType = "longdouble";
     }
-    mst_$object.name$.common().type_id(*GetTypeIdentifier(cppType, false));
+    mst_$object.name$.common().type_id(*TypeObjectFactory::GetInstance()->GetTypeIdentifier(cppType, false));
 }
 $endif$
 
@@ -909,7 +869,7 @@ $else$
     {
         cppType = "longdouble";
     }
-    cst_$object.name$.common().type_id(*GetTypeIdentifier(cppType, false));
+    cst_$object.name$.common().type_id(*TypeObjectFactory::GetInstance()->GetTypeIdentifier(cppType, false));
 }
 $endif$
 

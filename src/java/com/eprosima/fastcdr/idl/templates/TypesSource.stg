@@ -23,7 +23,9 @@ namespace { char dummy; }
 #endif
 
 #include "$ctx.filename$.h"
+$if(ctx.generateTypeObject)$
 #include "$ctx.filename$TypeObject.h"
+$endif$
 
 $if(ctx.cdr)$
 #include <fastcdr/Cdr.h>
@@ -181,8 +183,10 @@ $struct.scopedname$::$struct.name$()
 {
     $struct.members:{ member |$member_default_init(member=member)$}; separator="\n"$
 
+    $if(ctx.generateTypeObject)$
     // Just to register all known types
     register$ctx.filename$Types();
+    $endif$
 }
 
 $struct.scopedname$::~$struct.name$()

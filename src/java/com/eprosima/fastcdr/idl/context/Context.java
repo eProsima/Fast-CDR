@@ -36,8 +36,10 @@ public interface Context
     public String getProduct();
 
     public String getNamespace();
-    
+
     public String getHeaderGuardName ();
+
+    public boolean isGenerateTypeObject();
 
     public boolean isCdr();
 

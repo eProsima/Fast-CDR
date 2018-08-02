@@ -362,7 +362,7 @@ namespace eprosima
                  */
                 inline FastCdr& operator>>(long double &ldouble_t){return deserialize(ldouble_t);}
 
-                /*! 
+                /*!
                  * @brief This operator deserializes a boolean.
                  * @param bool_t The variable that will store the boolean read from the buffer.
                  * @return Reference to the eprosima::fastcdr::FastCdr object.
@@ -419,7 +419,7 @@ namespace eprosima
                 inline
                     FastCdr& serialize(const uint8_t octet_t)
                     {
-                        return serialize(static_cast<const char>(octet_t));
+                        return serialize(static_cast<char>(octet_t));
                     }
 
                 /*!
@@ -449,7 +449,7 @@ namespace eprosima
                 inline
                     FastCdr& serialize(const int8_t int8)
                     {
-                        return serialize(static_cast<const char>(int8));
+                        return serialize(static_cast<char>(int8));
                     }
 
                 /*!
@@ -461,7 +461,7 @@ namespace eprosima
                 inline
                     FastCdr& serialize(const uint16_t ushort_t)
                     {
-                        return serialize(static_cast<const int16_t>(ushort_t));
+                        return serialize(static_cast<int16_t>(ushort_t));
                     }
 
                 /*!
@@ -493,7 +493,7 @@ namespace eprosima
                 inline
                     FastCdr& serialize(const uint32_t ulong_t)
                     {
-                        return serialize(static_cast<const int32_t>(ulong_t));
+                        return serialize(static_cast<int32_t>(ulong_t));
                     }
 
                 /*!
@@ -520,7 +520,7 @@ namespace eprosima
                 inline
                     FastCdr& serialize(const wchar_t wchar)
                     {
-                        return serialize(static_cast<const uint32_t>(wchar));
+                        return serialize(static_cast<uint32_t>(wchar));
                     }
 
                 /*!
@@ -532,7 +532,7 @@ namespace eprosima
                 inline
                     FastCdr& serialize(const uint64_t ulonglong_t)
                     {
-                        return serialize(static_cast<const int64_t>(ulonglong_t));
+                        return serialize(static_cast<int64_t>(ulonglong_t));
                     }
 
                 /*!
@@ -1120,7 +1120,7 @@ namespace eprosima
                  */
                 FastCdr& deserialize(bool &bool_t);
 
-                /*! 
+                /*!
                  * @brief This function deserializes a string.
                  * This function allocates memory to store the string. The user pointer will be set to point this allocated memory.
                  * The user will have to free this allocated memory using free()
@@ -1393,7 +1393,7 @@ namespace eprosima
                 /*!
                  * @brief This function template deserializes a raw sequence.
                  * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
-                 * The user will have to free this allocated memory using free() 
+                 * The user will have to free this allocated memory using free()
                  * @param sequence_t The pointer that will store the sequence read from the buffer.
                  * @param numElements This variable return the number of elements of the sequence.
                  * @return Reference to the eprosima::fastcdr::FastCdr object.

@@ -549,7 +549,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint8_t octet_t)
                     {
-                        return serialize(static_cast<const char>(octet_t));
+                        return serialize(static_cast<char>(octet_t));
                     }
 
                 /*!
@@ -562,7 +562,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint8_t octet_t, Endianness endianness)
                     {
-                        return serialize(static_cast<const char>(octet_t), endianness);
+                        return serialize(static_cast<char>(octet_t), endianness);
                     }
 
                 /*!
@@ -595,7 +595,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const int8_t int8)
                     {
-                        return serialize(static_cast<const char>(int8));
+                        return serialize(static_cast<char>(int8));
                     }
 
                 /*!
@@ -608,7 +608,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const int8_t int8, Endianness endianness)
                     {
-                        return serialize(static_cast<const char>(int8), endianness);
+                        return serialize(static_cast<char>(int8), endianness);
                     }
 
                 /*!
@@ -620,7 +620,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint16_t ushort_t)
                     {
-                        return serialize(static_cast<const int16_t>(ushort_t));
+                        return serialize(static_cast<int16_t>(ushort_t));
                     }
 
                 /*!
@@ -633,7 +633,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint16_t ushort_t, Endianness endianness)
                     {
-                        return serialize(static_cast<const int16_t>(ushort_t), endianness);
+                        return serialize(static_cast<int16_t>(ushort_t), endianness);
                     }
 
                 /*!
@@ -662,7 +662,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint32_t ulong_t)
                     {
-                        return serialize(static_cast<const int32_t>(ulong_t));
+                        return serialize(static_cast<int32_t>(ulong_t));
                     }
 
                 /*!
@@ -675,7 +675,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint32_t ulong_t, Endianness endianness)
                     {
-                        return serialize(static_cast<const int32_t>(ulong_t), endianness);
+                        return serialize(static_cast<int32_t>(ulong_t), endianness);
                     }
 
                 /*!
@@ -698,13 +698,13 @@ namespace eprosima
                 inline
                     Cdr& serialize(const wchar_t wchar)
                     {
-                        return serialize(static_cast<const uint32_t>(wchar));
+                        return serialize(static_cast<uint32_t>(wchar));
                     }
 
                 inline
                     Cdr& serialize(const wchar_t wchar, Endianness endianness)
                     {
-                        return serialize(static_cast<const uint32_t>(wchar), endianness);
+                        return serialize(static_cast<uint32_t>(wchar), endianness);
                     }
 
                 /*!
@@ -716,7 +716,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint64_t ulonglong_t)
                     {
-                        return serialize(static_cast<const int64_t>(ulonglong_t));
+                        return serialize(static_cast<int64_t>(ulonglong_t));
                     }
 
                 /*!
@@ -729,7 +729,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint64_t ulonglong_t, Endianness endianness)
                     {
-                        return serialize(static_cast<const int64_t>(ulonglong_t), endianness);
+                        return serialize(static_cast<int64_t>(ulonglong_t), endianness);
                     }
 
                 /*!
@@ -942,9 +942,9 @@ namespace eprosima
                 template<class _K, class _T>
                     Cdr& serialize(const std::map<_K, _T> &map_t)
                     {
-                        state state(*this);
+                        state state_(*this);
 
-                        *this << (int32_t)map_t.size();
+                        *this << static_cast<int32_t>(map_t.size());
 
                         try
                         {
@@ -957,7 +957,7 @@ namespace eprosima
                         }
                         catch(eprosima::fastcdr::exception::Exception &ex)
                         {
-                            setState(state);
+                            setState(state_);
                             ex.raise();
                         }
 
@@ -1896,7 +1896,7 @@ namespace eprosima
                     Cdr& deserialize(std::map<_K, _T> &map_t)
                     {
                         uint32_t seqLength = 0;
-                        state state(*this);
+                        state state_(*this);
 
                         *this >> seqLength;
 
@@ -1915,7 +1915,7 @@ namespace eprosima
                         }
                         catch(eprosima::fastcdr::exception::Exception &ex)
                         {
-                            setState(state);
+                            setState(state_);
                             ex.raise();
                         }
 

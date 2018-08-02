@@ -666,12 +666,12 @@ Cdr& Cdr::serialize(const wchar_t *string_t)
 
     if (string_t != nullptr)
     {
-        bytesLength = (uint32_t)(wcslen(string_t) * 4);
+        bytesLength = static_cast<uint32_t>(wcslen(string_t) * 4);
     }
 
     if(bytesLength > 0)
     {
-        Cdr::state state(*this);
+        Cdr::state state_(*this);
         serialize(bytesLength);
 
         if(((m_lastPosition - m_currentPosition) >= bytesLength) || resize(bytesLength))
@@ -688,7 +688,7 @@ Cdr& Cdr::serialize(const wchar_t *string_t)
         }
         else
         {
-            setState(state);
+            setState(state_);
             throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
     }
@@ -1703,7 +1703,7 @@ const char* Cdr::readString(uint32_t &length)
 std::wstring Cdr::readWString(uint32_t &bytesLength)
 {
     std::wstring returnedValue = L"";
-    state state(*this);
+    state state_(*this);
 
     *this >> bytesLength;
 
@@ -1721,7 +1721,7 @@ std::wstring Cdr::readWString(uint32_t &bytesLength)
         wchar_t* wValue = new wchar_t[length];
         deserializeArray(wValue, length);
 #else
-        const wchar_t* wValue = '\0';
+        const wchar_t* wValue = L"";
         wValue = reinterpret_cast<wchar_t*>(&m_currentPosition);
         m_currentPosition += bytesLength;
 #endif
@@ -1736,7 +1736,7 @@ std::wstring Cdr::readWString(uint32_t &bytesLength)
         return returnedValue;
     }
 
-    setState(state);
+    setState(state_);
     throw eprosima::fastcdr::exception::NotEnoughMemoryException(eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 

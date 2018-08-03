@@ -222,7 +222,7 @@ const TypeObject* GetComplete$typedefs.name$Object()
     //type_object->complete().alias_type().body().common().ann_custom()
 
     // Must be defined already, if don't, may be an recursive alias
-    const TypeIdentifier *relatedType = TypeObjectFactory::GetInstance()->GetTypeIdentifier($get_content_type(ctx=ctx, type=typedefs.typedefContentTypeCode)$, true);
+    const TypeIdentifier *relatedType = TypeObjectFactory::GetInstance()->GetTypeIdentifierTryingComplete($get_content_type(ctx=ctx, type=typedefs.typedefContentTypeCode)$);
 
 
     if (relatedType != nullptr)

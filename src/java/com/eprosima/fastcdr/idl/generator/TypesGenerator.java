@@ -240,6 +240,18 @@ public class TypesGenerator
                 extensionst.setAttribute("enum", typedecl.getTypeCode());
             }
         }
+        else if(typedecl.getTypeCode().getKind() == TypeCode.KIND_BITSET)
+        {
+            typest = stg_.getInstanceOf("bitset_type");
+            typest.setAttribute("bitset", typedecl.getTypeCode());
+
+            // Get extension
+            if(extensions != null && (extensionname =  extensions.get("bitset_type")) != null)
+            {
+                extensionst = stg_.getInstanceOf(extensionname);
+                extensionst.setAttribute("bitset", typedecl.getTypeCode());
+            }
+        }
 
         if(typest != null)
         {

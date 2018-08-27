@@ -79,25 +79,63 @@ macro(check_endianness)
 endmacro()
 
 macro(check_msvc_arch)
-    if(MSVC11)
+    if(MSVC_VERSION EQUAL 1700)
         if(CMAKE_CL_64)
             set(MSVC_ARCH "x64Win64VS2012")
         else()
             set(MSVC_ARCH "i86Win32VS2012")
         endif()
-    elseif(MSVC12)
+    elseif(MSVC_VERSION EQUAL 1800)
         if(CMAKE_CL_64)
             set(MSVC_ARCH "x64Win64VS2013")
         else()
             set(MSVC_ARCH "i86Win32VS2013")
         endif()
-    elseif(MSVC14)
+    elseif(MSVC_VERSION EQUAL 1900)
         if(CMAKE_CL_64)
             set(MSVC_ARCH "x64Win64VS2015")
         else()
             set(MSVC_ARCH "i86Win32VS2015")
         endif()
+    elseif(MSVC_VERSION GREATER 1900)
+        if(CMAKE_CL_64)
+            set(MSVC_ARCH "x64Win64VS2017")
+        else()
+            set(MSVC_ARCH "i86Win32VS2017")
+        endif()
     else()
-        message(FATAL_ERROR "Not supported version of Visual Studio")
+        if(CMAKE_CL_64)
+            set(MSVC_ARCH "x64Win64VSUnknown")
+        else()
+            set(MSVC_ARCH "i86Win32VSUnknown")
+        endif()
     endif()
 endmacro()
+
+function(set_common_compile_options target)
+    enable_language(C)
+    enable_language(CXX)
+    if(MSVC OR MSVC_IDE)
+        target_compile_options(${target} PRIVATE /W4)
+    else()
+        target_compile_options(${target} PRIVATE -Wall
+            -Wextra
+            -Wshadow
+            $<$<COMPILE_LANGUAGE:CXX>:-Wnon-virtual-dtor>
+            -pedantic
+            -Wcast-align
+            -Wunused
+            $<$<COMPILE_LANGUAGE:CXX>:-Woverloaded-virtual>
+            -Wconversion
+            -Wsign-conversion
+            -Wlogical-op
+            $<$<COMPILE_LANGUAGE:CXX>:-Wuseless-cast>
+            -Wdouble-promotion
+            $<$<COMPILE_LANGUAGE:CXX>:-Wold-style-cast>
+            $<$<OR:$<AND:$<CXX_COMPILER_ID:GNU>,$<NOT:$<VERSION_LESS:$<CXX_COMPILER_VERSION>,6.0.0>>>,$<AND:$<C_COMPILER_ID:GNU>,$<NOT:$<VERSION_LESS:$<C_COMPILER_VERSION>,6.0.0>>>>:-Wnull-dereference>
+            $<$<OR:$<AND:$<CXX_COMPILER_ID:GNU>,$<NOT:$<VERSION_LESS:$<CXX_COMPILER_VERSION>,7.0.0>>>,$<AND:$<C_COMPILER_ID:GNU>,$<NOT:$<VERSION_LESS:$<C_COMPILER_VERSION>,7.0.0>>>>:-Wduplicated-branches>
+            $<$<OR:$<AND:$<CXX_COMPILER_ID:GNU>,$<NOT:$<VERSION_LESS:$<CXX_COMPILER_VERSION>,6.0.0>>>,$<AND:$<C_COMPILER_ID:GNU>,$<NOT:$<VERSION_LESS:$<C_COMPILER_VERSION>,6.0.0>>>>:-Wduplicated-cond>
+            $<$<OR:$<AND:$<CXX_COMPILER_ID:GNU>,$<NOT:$<VERSION_LESS:$<CXX_COMPILER_VERSION>,7.0.0>>>,$<AND:$<C_COMPILER_ID:GNU>,$<NOT:$<VERSION_LESS:$<C_COMPILER_VERSION>,7.0.0>>>>:-Wrestrict>
+            )
+    endif()
+endfunction()

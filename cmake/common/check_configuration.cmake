@@ -113,27 +113,29 @@ macro(check_msvc_arch)
 endmacro()
 
 function(set_common_compile_options target)
+    enable_language(C)
+    enable_language(CXX)
     if(MSVC OR MSVC_IDE)
         target_compile_options(${target} PRIVATE /W4)
     else()
         target_compile_options(${target} PRIVATE -Wall
             -Wextra
             -Wshadow
-            -Wnon-virtual-dtor
+            $<$<COMPILE_LANGUAGE:CXX>:-Wnon-virtual-dtor>
             -pedantic
             -Wcast-align
             -Wunused
-            -Woverloaded-virtual
+            $<$<COMPILE_LANGUAGE:CXX>:-Woverloaded-virtual>
             -Wconversion
             -Wsign-conversion
             -Wlogical-op
-            -Wuseless-cast
+            $<$<COMPILE_LANGUAGE:CXX>:-Wuseless-cast>
             -Wdouble-promotion
-            -Wold-style-cast
-            $<$<AND:$<CXX_COMPILER_ID:GNU>,$<NOT:$<VERSION_LESS:$<CXX_COMPILER_VERSION>,6.0.0>>>:-Wnull-dereference>
-            $<$<AND:$<CXX_COMPILER_ID:GNU>,$<NOT:$<VERSION_LESS:$<CXX_COMPILER_VERSION>,7.0.0>>>:-Wduplicated-branches>
-            $<$<AND:$<CXX_COMPILER_ID:GNU>,$<NOT:$<VERSION_LESS:$<CXX_COMPILER_VERSION>,6.0.0>>>:-Wduplicated-cond>
-            $<$<AND:$<CXX_COMPILER_ID:GNU>,$<NOT:$<VERSION_LESS:$<CXX_COMPILER_VERSION>,7.0.0>>>:-Wrestrict>
+            $<$<COMPILE_LANGUAGE:CXX>:-Wold-style-cast>
+            $<$<OR:$<AND:$<CXX_COMPILER_ID:GNU>,$<NOT:$<VERSION_LESS:$<CXX_COMPILER_VERSION>,6.0.0>>>,$<AND:$<C_COMPILER_ID:GNU>,$<NOT:$<VERSION_LESS:$<C_COMPILER_VERSION>,6.0.0>>>>:-Wnull-dereference>
+            $<$<OR:$<AND:$<CXX_COMPILER_ID:GNU>,$<NOT:$<VERSION_LESS:$<CXX_COMPILER_VERSION>,7.0.0>>>,$<AND:$<C_COMPILER_ID:GNU>,$<NOT:$<VERSION_LESS:$<C_COMPILER_VERSION>,7.0.0>>>>:-Wduplicated-branches>
+            $<$<OR:$<AND:$<CXX_COMPILER_ID:GNU>,$<NOT:$<VERSION_LESS:$<CXX_COMPILER_VERSION>,6.0.0>>>,$<AND:$<C_COMPILER_ID:GNU>,$<NOT:$<VERSION_LESS:$<C_COMPILER_VERSION>,6.0.0>>>>:-Wduplicated-cond>
+            $<$<OR:$<AND:$<CXX_COMPILER_ID:GNU>,$<NOT:$<VERSION_LESS:$<CXX_COMPILER_VERSION>,7.0.0>>>,$<AND:$<C_COMPILER_ID:GNU>,$<NOT:$<VERSION_LESS:$<C_COMPILER_VERSION>,7.0.0>>>>:-Wrestrict>
             )
     endif()
 endfunction()

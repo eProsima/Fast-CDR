@@ -671,16 +671,18 @@ Cdr& Cdr::serialize(const char *string_t)
 Cdr& Cdr::serialize(const wchar_t *string_t)
 {
     uint32_t bytesLength = 0;
+    size_t wstrlen = 0;
 
     if (string_t != nullptr)
     {
-        bytesLength = static_cast<uint32_t>(wcslen(string_t) * 4);
+        wstrlen = wcslen(string_t);
+        bytesLength = static_cast<uint32_t>(wstrlen * 4);
     }
 
     if(bytesLength > 0)
     {
         Cdr::state state_(*this);
-        serialize(static_cast<uint32_t>(wcslen(string_t)));
+        serialize(static_cast<uint32_t>(wstrlen));
 
         if(((m_lastPosition - m_currentPosition) >= bytesLength) || resize(bytesLength))
         {
@@ -688,7 +690,7 @@ Cdr& Cdr::serialize(const wchar_t *string_t)
             m_lastDataSize = sizeof(uint32_t);
 
 #if defined(_WIN32)
-            serializeArray(string_t, bytesLength / 4);
+            serializeArray(string_t, wstrlen);
 #else
             m_currentPosition.memcopy(string_t, bytesLength);
             m_currentPosition += bytesLength; // size on bytes
@@ -1660,7 +1662,54 @@ Cdr& Cdr::deserialize(char *&string_t)
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
+Cdr& Cdr::deserialize(wchar_t *&string_t)
+{
+    uint32_t length = 0;
+    Cdr::state state_before_error(*this);
+
+    deserialize(length);
+
+    if(length == 0)
+    {
+        string_t = NULL;
+        return *this;
+    }
+    else if((m_lastPosition - m_currentPosition) >= length)
+    {
+        // Save last datasize.
+        m_lastDataSize = sizeof(wchar_t);
+
+        // Allocate memory.
+        string_t = reinterpret_cast<wchar_t*>(calloc(length + ((&m_currentPosition)[length-1] == '\0' ? 0 : 1), sizeof(wchar_t)));
+        memcpy(string_t, &m_currentPosition, length * sizeof(wchar_t));
+        m_currentPosition += length * sizeof(wchar_t);
+        return *this;
+    }
+
+    setState(state_before_error);
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+}
+
 Cdr& Cdr::deserialize(char *&string_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        deserialize(string_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::deserialize(wchar_t *&string_t, Endianness endianness)
 {
     bool auxSwap = m_swapBytes;
     m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));

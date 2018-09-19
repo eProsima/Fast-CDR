@@ -1173,8 +1173,14 @@ Cdr& Cdr::serializeArray(const long double *ldouble_t, size_t numElements)
             for(; dst < end; dst += sizeof(*ldouble_t))
             {
 #if defined(_WIN32)
-                m_currentPosition += 8;
-
+                m_currentPosition++ << static_cast<char>(0);
+                m_currentPosition++ << static_cast<char>(0);
+                m_currentPosition++ << static_cast<char>(0);
+                m_currentPosition++ << static_cast<char>(0);
+                m_currentPosition++ << static_cast<char>(0);
+                m_currentPosition++ << static_cast<char>(0);
+                m_currentPosition++ << static_cast<char>(0);
+                m_currentPosition++ << static_cast<char>(0);
                 m_currentPosition++ << dst[7];
                 m_currentPosition++ << dst[6];
                 m_currentPosition++ << dst[5];

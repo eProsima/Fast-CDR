@@ -1,0 +1,473 @@
+// Copyright 2016 Proyectos y Sistemas de Mantenimiento SL (eProsima).
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+group TypeObjectSource;
+
+main(ctx, definitions) ::= <<
+$fileHeader(file=[ctx.filename, "TypeObject.cpp"], description=["This source file contains the definition of the described types in the IDL file."])$
+
+#ifdef _WIN32
+// Remove linker warning LNK4221 on Visual Studio
+namespace { char dummy; }
+#endif
+
+#include "$ctx.filename$TypeObject.h"
+#include <utility>
+$if(ctx.cdr)$
+#include <fastcdr/Cdr.h>
+
+$endif$
+$if(ctx.fastcdr)$
+#include <fastcdr/FastCdr.h>
+
+$endif$
+
+$ctx.filename$TypeFactory::$ctx.filename$TypeFactory()
+{
+    // Generate basic TypeIdentifiers
+    TypeIdentifier *auxIdent;
+    // TK_BOOLEAN:
+    auxIdent = new TypeIdentifier;
+    auxIdent->_d(TK_BOOLEAN);
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("bool", auxIdent));
+    // TK_BYTE_TYPE:
+    auxIdent = new TypeIdentifier;
+    auxIdent->_d(TK_BYTE_TYPE);
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("byte", auxIdent));
+    // TK_INT16_TYPE:
+    auxIdent = new TypeIdentifier;
+    auxIdent->_d(TK_INT16_TYPE);
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("int16", auxIdent));
+    // TK_INT32_TYPE:
+    auxIdent = new TypeIdentifier;
+    auxIdent->_d(TK_INT32_TYPE);
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("int32", auxIdent));
+    // TK_INT64_TYPE:
+    auxIdent = new TypeIdentifier;
+    auxIdent->_d(TK_INT64_TYPE);
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("int64", auxIdent));
+    // TK_UINT16_TYPE:
+    auxIdent = new TypeIdentifier;
+    auxIdent->_d(TK_UINT16_TYPE);
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("uint16", auxIdent));
+    // TK_UINT32_TYPE:
+    auxIdent = new TypeIdentifier;
+    auxIdent->_d(TK_UINT32_TYPE);
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("uint32", auxIdent));
+    // TK_UINT64_TYPE:
+    auxIdent = new TypeIdentifier;
+    auxIdent->_d(TK_UINT64_TYPE);
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("uint64", auxIdent));
+    // TK_FLOAT32_TYPE:
+    auxIdent = new TypeIdentifier;
+    auxIdent->_d(TK_FLOAT32_TYPE);
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("float32", auxIdent));
+    // TK_FLOAT64_TYPE:
+    auxIdent = new TypeIdentifier;
+    auxIdent->_d(TK_FLOAT64_TYPE);
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("float64", auxIdent));
+    // TK_FLOAT128_TYPE:
+    auxIdent = new TypeIdentifier;
+    auxIdent->_d(TK_FLOAT128_TYPE);
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("float128", auxIdent));
+    // TK_CHAR8_TYPE:
+    auxIdent = new TypeIdentifier;
+    auxIdent->_d(TK_CHAR8_TYPE);
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("char8", auxIdent));
+    // TK_CHAR16_TYPE:
+    auxIdent = new TypeIdentifier;
+    auxIdent->_d(TK_CHAR16_TYPE);
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("char16", auxIdent));
+
+    // Not basic, but "standard"
+    // TI_STRING8_SMALL:
+    auxIdent = new TypeIdentifier;
+    auxIdent->_d(TI_STRING8_SMALL);
+    auxIdent->string_sdefn.bound() = 255;
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("string", auxIdent));
+    // TI_STRING16_SMALL:
+    auxIdent = new TypeIdentifier;
+    auxIdent->_d(TI_STRING16_SMALL);
+    auxIdent->string_sdefn.bound() = 255;
+    m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("wstring", auxIdent));
+    // TI_STRING8_LARGE:
+    //auxIdent = new TypeIdentifier;
+    //auxIdent->_d(TI_STRING8_LARGE);
+    //m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("string", auxIdent));
+    // TI_STRING16_LARGE:
+    //auxIdent = new TypeIdentifier;
+    //auxIdent->_d(TI_STRING16_LARGE);
+    //m_Identifiers.insert(std::pair<std::string, TypeIdentifier>("wstring", auxIdent));
+}
+
+$ctx.filename$TypeFactory::~$ctx.filename$TypeFactory()
+{
+    // TODO Free all pointers
+}
+
+$definitions; separator="\n"$
+>>
+
+module(ctx, parent, module, definition_list) ::= <<
+$definition_list$
+>>
+
+definition_list(definitions) ::= <<
+$definitions; separator="\n"$
+>>
+
+annotation(ctx, annotation) ::= <<>>
+
+interface(ctx, parent, interface, export_list) ::= <<>>
+
+export_list(exports) ::= <<>>
+
+const_decl(ctx, parent, const) ::= <<>>
+
+typedef_decl(ctx, parent, typedefs) ::= <<
+TypeIdentifier* $typedefs.scopedname$::get$typedefs.name$Identifier()
+{
+    if (m_Identifiers.find("$typedef.typedefContentTypeCode.cppTypename$") != m_Identifiers.end())
+    {
+        return m_Identifiers["$typedef.typedefContentTypeCode.cppTypename$"];
+    }
+    return nullptr;
+}
+
+TypeIdentifier* $typedefs.scopedname$::get$typedefs.name$Object()
+{
+    if (m_Objects.find("$typedefs.name$") != m_Objects.end())
+    {
+        return m_Objects["$typedefs.name$"];
+    }
+
+    TypeObject* type_object = new TypeObject();
+    type_object->_d(EK_MINIMAL);
+    type_object->minimal()._d(TK_ALIAS);
+    type_object->minimal().alias_type().alias_flags().IS_FINAL(false);
+    type_object->minimal().alias_type().alias_flags().IS_APPENDABLE(false);
+    type_object->minimal().alias_type().alias_flags().IS_MUTABLE(false);
+    type_object->minimal().alias_type().alias_flags().IS_NESTED(false);
+    type_object->minimal().alias_type().alias_flags().IS_AUTOID_HASH(false);
+
+    // type_object->minimal().alias_type().header()... Is empty
+
+    type_object->minimal().alias_type().body().common().related_flags().TRY_CONSTRUCT1(false);
+    type_object->minimal().alias_type().body().common().related_flags().TRY_CONSTRUCT2(false);
+    type_object->minimal().alias_type().body().common().related_flags().IS_EXTERNAL(false);
+    type_object->minimal().alias_type().body().common().related_flags().IS_OPTIONAL(false);
+    type_object->minimal().alias_type().body().common().related_flags().IS_MUST_UNDERSTAND(false);
+    type_object->minimal().alias_type().body().common().related_flags().IS_KEY(false);
+    type_object->minimal().alias_type().body().common().related_flags().IS_DEFAULT(false);
+
+    // Must be defined already
+    type_object->minimal().alias_type().body().common().related_type() =
+        m_Identifiers["$typedef.typedefContentTypeCode.cppTypename$"];
+
+    // Don't add our TypeIdentifier
+
+    m_Objects["$typedefs.name$"] = type_object;
+}
+
+>>
+
+enum_type(ctx, parent, enum) ::= <<
+TypeIdentifier* $enum.scopedname$::get$enum.name$Identifier()
+{
+    if (m_Identifiers.find("$enum.name$") != m_Identifiers.end())
+    {
+        return m_Identifiers["$enum.name$"];
+    }
+
+    // Su TypeObject no lo proporciona, debemos calcularlo
+    TypeObject* type_object;
+    if (m_Objects.find("$enum.name$") != m_Objects.end())
+    {
+        type_object = m_Objects["$enum.name$"];
+    }
+    else
+    {
+        type_object = get$enum.name$Object();
+    }
+
+    TypeIdentifier* identifier = new TypeIdentifier();
+    identifier->_d(EK_MINIMAL);
+
+    SerializedPayload_t payload(MinimalEnumeratedType::getMaxCdrSerializedSize() + 4);
+    eprosima::fastcdr::FastBuffer fastbuffer((char*) payload->data, payload->max_size);
+    // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
+    eprosima::fastcdr::Cdr ser(
+        fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIAN,
+        eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
+    payload->encapsulation = CDR_LE;
+
+    ser.serialize_encapsulation();
+    type_object->serialize(ser);
+    payload->length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
+    MD5 objectHash();
+    objectHash.update(payload->data);
+    objectHash.finalize();
+    for(int i = 0; i < 14; ++i)
+    {
+        identifier->equivalence_hash[i] = objectHash.digest[i];
+    }
+
+    m_Identifiers["$enum.name$"] = identifier;
+}
+
+TypeIdentifier* $enum.scopedname$::get$enum.name$Object()
+{
+    if (m_Objects.find("$enum.name$") != m_Objects.end())
+    {
+        return m_Objects["$enum.name$"];
+    }
+
+    TypeObject* type_object = new TypeObject();
+    type_object->_d(EK_MINIMAL);
+    type_object->minimal()._d(TK_ENUM);
+    // Unused
+    //type_object->minimal().enumerated_type().enum_flags().IS_FINAL(false);
+    //type_object->minimal().enumerated_type().enum_flags().IS_APPENDABLE(false);
+    //type_object->minimal().enumerated_type().enum_flags().IS_MUTABLE(false);
+    //type_object->minimal().enumerated_type().enum_flags().IS_NESTED(false);
+    //type_object->minimal().enumerated_type().enum_flags().IS_AUTOID_HASH(false);
+
+    type_object->minimal().enumerated_type().header().common().bit_bound() = 32; // TODO fixed by IDL, isn't?
+
+    uint32_t value = 0;
+    $enum.members:{ member | $enumerated_literal(ctx=ctx, object=member)$}; separator="\n"$
+
+    // TODO, no proporciona un TypeIdentifier!?
+
+    m_Objects["$enum.name$"] = type_object;
+}
+
+>>
+
+enumerated_literal(ctx, object) ::= <<
+MinimalEnumeratedLiteral mel_$object.name$;
+mel_$object.name$.common().member_id() = MEMBER_ID_INVALID; // Es esto correcto?
+mel_$object.name$.common().flags().TRY_CONSTRUCT1(false);
+mel_$object.name$.common().flags().TRY_CONSTRUCT2(false);
+mel_$object.name$.common().flags().IS_EXTERNAL(false);
+mel_$object.name$.common().flags().IS_OPTIONAL(false);
+mel_$object.name$.common().flags().IS_MUST_UNDERSTAND(false);
+mel_$object.name$.common().flags().IS_KEY(false);
+mel_$object.name$.common().flags().IS_DEFAULT(false);
+mel_$object.name$.common().flags().IS_DEFAULT(false);
+mel_$object.name$.common().value() = value++;
+MD5 $object.name$_hash("$object.name$");
+for(int i = 0; i < 4; ++i)
+{
+    mel_$object.name$.detail().name_hash()[i] = $object.name$_hash.digest[i];
+}
+type_object->minimal().enumerated_type().literal_seq().emplace_back(mel_$object.name$);
+
+>>
+
+struct_type(ctx, parent, struct, extensions) ::= <<
+TypeIdentifier* $struct.scopedname$::get$struct.name$Identifier()
+{
+    // Su TypeObject lo proporciona, no debemos calcularlo
+    TypeObject* type_object;
+    if (m_Objects.find("$enum.name$") != m_Objects.end())
+    {
+        type_object = m_Objects["$enum.name$"];
+    }
+    else
+    {
+        type_object = get$enum.name$Object();
+    }
+
+    return &(type_object->minimal().struct_type().header().base_type());
+}
+
+TypeIdentifier* $struct.scopedname$::get$struct.name$Object()
+{
+    if (m_Objects.find("$struct.name$") != m_Objects.end())
+    {
+        return m_Objects["$struct.name$"];
+    }
+
+    TypeObject* type_object = new TypeObject();
+    type_object->_d(EK_MINIMAL);
+    type_object->minimal()._d(TK_STRUCTURE);
+
+    type_object->minimal().struct_type().struct_flags().IS_FINAL(false);
+    type_object->minimal().struct_type().struct_flags().IS_APPENDABLE(false);
+    type_object->minimal().struct_type().struct_flags().IS_MUTABLE(false);
+    type_object->minimal().struct_type().struct_flags().IS_NESTED(false);
+    type_object->minimal().struct_type().struct_flags().IS_AUTOID_HASH(false);
+
+    $struct.members:{ member | $member_object_type(ctx=ctx, object=member)$}; separator="\n"$
+
+    // Header
+    type_object->minimal().struct_type().header().base_type()._d(EK_MINIMAL);
+    //type_object->minimal().struct_type().header().base_type().equivalence_hash()[0..13];
+    // TODO De momento lo haremos sólo con miembros... ¿también con flags?
+    // Como no soportamos de momento tipos recursivos, esto debería bastar.
+    SerializedPayload_t payload(
+        type_object->minimal().struct_type().member_seq().size() * sizeof(MinimalStructMember) + 4);
+    eprosima::fastcdr::FastBuffer fastbuffer((char*) payload->data, payload->max_size); // Object that manages the raw buffer.
+
+    eprosima::fastcdr::Cdr ser(fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIAN,
+            eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
+    payload->encapsulation = CDR_LE;
+    // Serialize encapsulation
+    ser.serialize_encapsulation();
+    for (MinimalStructMember &st : type_object->minimal().struct_type().member_seq())
+    {
+        ser << st;
+    }
+    payload->length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
+    MD5 objectHash();
+    objectHash.update(payload->data);
+    objectHash.finalize();
+    for(int i = 0; i < 14; ++i)
+    {
+        type_object->minimal().struct_type().header().base_type().equivalence_hash()[i] = objectHash.digest[i];
+    }
+
+    m_Objects["$struct.name$"] = type_object;
+}
+
+>>
+
+member_object_type(ctx, object) ::= <<
+MinimalStructMember mst_$object.name$;
+mst_$object.name$.common().member_id() = MEMBER_ID_INVALID;
+mst_$object.name$.common().member_flags().TRY_CONSTRUCT1(false);
+mst_$object.name$.common().member_flags().TRY_CONSTRUCT2(false);
+mst_$object.name$.common().member_flags().IS_EXTERNAL(false);
+mst_$object.name$.common().member_flags().IS_OPTIONAL(false);
+mst_$object.name$.common().member_flags().IS_MUST_UNDERSTAND(false);
+mst_$object.name$.common().member_flags().IS_KEY(false);
+mst_$object.name$.common().member_flags().IS_DEFAULT(false);
+mst_$object.name$.common().member_type_id(m_Identifiers["$object.typecode.typeIdentifier$"]);
+MD5 $object.name$_hash("$object.name$");
+for(int i = 0; i < 4; ++i)
+{
+    mst_$object.name$.detail().name_hash()[i] = $object.name$_hash.digest[i];
+}
+type_object->minimal().struct_type().member_seq().emplace_back(mst_$object.name$);
+
+>>
+
+union_type(ctx, parent, union) ::= <<
+TypeIdentifier* $union.scopedname$::get$union.name$Identifier()
+{
+    if (m_Identifiers.find("$union.name$") != m_Identifiers.end())
+    {
+        return m_Identifiers["$union.name$"];
+    }
+
+    // Su TypeObject no lo proporciona, debemos calcularlo
+    TypeObject* type_object;
+    if (m_Objects.find("$union.name$") != m_Objects.end())
+    {
+        type_object = m_Objects["$union.name$"];
+    }
+    else
+    {
+        type_object = get$union.name$Object();
+    }
+
+    TypeIdentifier* identifier = new TypeIdentifier();
+    identifier->_d(EK_MINIMAL);
+
+    SerializedPayload_t payload(MinimalUnionType::getMaxCdrSerializedSize() + 4);
+    eprosima::fastcdr::FastBuffer fastbuffer((char*) payload->data, payload->max_size);
+    // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
+    eprosima::fastcdr::Cdr ser(
+        fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIAN,
+        eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
+    payload->encapsulation = CDR_LE;
+
+    ser.serialize_encapsulation();
+    type_object->serialize(ser);
+    payload->length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
+    MD5 objectHash();
+    objectHash.update(payload->data);
+    objectHash.finalize();
+    for(int i = 0; i < 14; ++i)
+    {
+        identifier->equivalence_hash[i] = objectHash.digest[i];
+    }
+
+    m_Identifiers["$union.name$"] = identifier;
+}
+
+TypeIdentifier* $union.scopedname$::get$union.name$Object()
+{
+    if (m_Objects.find("$union.name$") != m_Objects.end())
+    {
+        return m_Objects["$union.name$"];
+    }
+
+    TypeObject* type_object = new TypeObject();
+    type_object->_d(EK_MINIMAL);
+    type_object->minimal()._d(TK_STRUCTURE);
+
+    type_object->minimal().union_type().union_flags().IS_FINAL(false);
+    type_object->minimal().union_type().union_flags().IS_APPENDABLE(false);
+    type_object->minimal().union_type().union_flags().IS_MUTABLE(false);
+    type_object->minimal().union_type().union_flags().IS_NESTED(false);
+    type_object->minimal().union_type().union_flags().IS_AUTOID_HASH(false);
+
+    type_object->minimal().union_type().discriminator().common().member_flags().TRY_CONSTRUCT1(false);
+    type_object->minimal().union_type().discriminator().common().member_flags().TRY_CONSTRUCT2(false);
+    type_object->minimal().union_type().discriminator().common().member_flags().IS_EXTERNAL(false);
+    type_object->minimal().union_type().discriminator().common().member_flags().IS_OPTIONAL(false);
+    type_object->minimal().union_type().discriminator().common().member_flags().IS_MUST_UNDERSTAND(false);
+    type_object->minimal().union_type().discriminator().common().member_flags().IS_KEY(false);
+    type_object->minimal().union_type().discriminator().common().member_flags().IS_DEFAULT(false);
+
+    type_object->minimal().union_type().discriminator().common().type_id(m_Identifiers["$union.discriminator.typeIdentifier$"]);
+
+    $union.members:{ member | $union_member_object_type(ctx=ctx, object=member)$}; separator="\n"$
+
+    // Header
+    //type_object->minimal().union_type().header().detail()... // Empty
+
+    m_Objects["$union.name$"] = type_object;
+}
+
+>>
+
+union_member_object_type(ctx, object) ::= <<
+MinimalUnionMember mst_$object.name$;
+mst_$object.name$.common().member_id() = MEMBER_ID_INVALID;
+mst_$object.name$.common().member_flags().TRY_CONSTRUCT1(false);
+mst_$object.name$.common().member_flags().TRY_CONSTRUCT2(false);
+mst_$object.name$.common().member_flags().IS_EXTERNAL(false);
+mst_$object.name$.common().member_flags().IS_OPTIONAL(false);
+mst_$object.name$.common().member_flags().IS_MUST_UNDERSTAND(false);
+mst_$object.name$.common().member_flags().IS_KEY(false);
+mst_$object.name$.common().member_flags().IS_DEFAULT(false);
+mst_$object.name$.common().type_id(m_Identifiers["$object.typecode.typeIdentifier$"]);
+$if(object.labels)$
+$object.labels:{ label | mst_$object.name$.common().label_seq().emplace_back($label$);}; separator="\n"$
+$endif$
+
+MD5 $object.name$_hash("$object.name$");
+for(int i = 0; i < 4; ++i)
+{
+    mst_$object.name$.detail().name_hash()[i] = $object.name$_hash.digest[i];
+}
+type_object->minimal().union_type().member_seq().emplace_back(mst_$object.name$);
+
+>>
+
+/***** Utils *****/
+

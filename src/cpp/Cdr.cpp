@@ -643,7 +643,58 @@ Cdr& Cdr::serialize(const char *string_t)
     return *this;
 }
 
+Cdr& Cdr::serialize(const wchar_t *string_t)
+{
+    uint32_t length = 0;
+
+    if(string_t != nullptr)
+        length = (uint32_t)wcslen(string_t) + 1;
+
+    if(length > 0)
+    {
+        Cdr::state state(*this);
+        serialize(length);
+
+        if(((m_lastPosition - m_currentPosition) >= length) || resize(length))
+        {
+            // Save last datasize.
+            m_lastDataSize = sizeof(uint16_t);
+
+            m_currentPosition.memcopy(string_t, length);
+            m_currentPosition += length;
+        }
+        else
+        {
+            setState(state);
+            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        }
+    }
+    else
+        serialize(length);
+
+    return *this;
+}
+
 Cdr& Cdr::serialize(const char *string_t, Endianness endianness)
+{
+    bool auxSwap = m_swapBytes;
+    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+    try
+    {
+        serialize(string_t);
+        m_swapBytes = auxSwap;
+    }
+    catch(Exception &ex)
+    {
+        m_swapBytes = auxSwap;
+        ex.raise();
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::serialize(const wchar_t *string_t, Endianness endianness)
 {
     bool auxSwap = m_swapBytes;
     m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
@@ -1164,7 +1215,7 @@ Cdr& Cdr::deserialize(int16_t &short_t)
         makeAlign(align);
 
         if(m_swapBytes)
-        {    
+        {
             char *dst = reinterpret_cast<char*>(&short_t);
 
             m_currentPosition++ >> dst[1];
@@ -1576,6 +1627,32 @@ const char* Cdr::readString(uint32_t &length)
     }
 
     setState(state_before_error);
+    throw eprosima::fastcdr::exception::NotEnoughMemoryException(eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+}
+
+const wchar_t* Cdr::readWString(uint32_t &length)
+{
+    state state(*this);
+
+    *this >> length;
+
+    if(length == 0)
+    {
+        return '\0';
+    }
+    else if((m_lastPosition - m_currentPosition) >= length)
+    {
+        const wchar_t* returnedValue = '\0';
+        // Save last datasize.
+        m_lastDataSize = sizeof(uint16_t);
+
+        returnedValue = reinterpret_cast<wchar_t*>(&m_currentPosition);
+        m_currentPosition += length;
+        if(returnedValue[length-1] == '\0') --length;
+        return returnedValue;
+    }
+
+    setState(state);
     throw eprosima::fastcdr::exception::NotEnoughMemoryException(eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 

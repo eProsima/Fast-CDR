@@ -47,7 +47,7 @@ public class TypesGenerator
     public boolean generate(Context context, String packagDir, String packag, String libraryName, Map<String, String> extensions)
     {
         ArrayList<Definition> definitions = context.getDefinitions();
-        
+
         boolean returnedValue = processDefinitions(context, definitions, packagDir, packag, extensions);
 
         if(returnedValue)
@@ -89,7 +89,7 @@ public class TypesGenerator
                             return false;
                         }
                     }
-                    
+
                     if(!processDefinitions(context, module.getDefinitions(), outputDir + File.separator,
                             packag + "." + module.getName(), extensions))
                         return false;
@@ -114,7 +114,7 @@ public class TypesGenerator
                         extensionst.setAttribute("interface", ifc);
                         ifcst.setAttribute("extension", extensionst.toString());
                     }
-                    
+
                     if(processExports(context, ifc.getExports(), ifcst, extensions))
                     {
                         // Save file.
@@ -213,7 +213,7 @@ public class TypesGenerator
             if(extensions != null && (extensionname =  extensions.get("struct_type")) != null)
             {
                 extensionst = stg_.getInstanceOf(extensionname);
-                extensionst.setAttribute("struct", typedecl.getTypeCode()); 
+                extensionst.setAttribute("struct", typedecl.getTypeCode());
             }
         }
         else if(typedecl.getTypeCode().getKind() == TypeCode.KIND_UNION)
@@ -225,7 +225,7 @@ public class TypesGenerator
             if(extensions != null && (extensionname =  extensions.get("union_type")) != null)
             {
                 extensionst = stg_.getInstanceOf(extensionname);
-                extensionst.setAttribute("union", typedecl.getTypeCode()); 
+                extensionst.setAttribute("union", typedecl.getTypeCode());
             }
         }
         else if(typedecl.getTypeCode().getKind() == TypeCode.KIND_ENUM)
@@ -237,7 +237,7 @@ public class TypesGenerator
             if(extensions != null && (extensionname =  extensions.get("enum_type")) != null)
             {
                 extensionst = stg_.getInstanceOf(extensionname);
-                extensionst.setAttribute("enum", typedecl.getTypeCode()); 
+                extensionst.setAttribute("enum", typedecl.getTypeCode());
             }
         }
 
@@ -246,8 +246,8 @@ public class TypesGenerator
             // Generate extension
             if(extensionst != null)
             {
-                extensionst.setAttribute("ctx", context); 
-                extensionst.setAttribute("parent", typedecl.getParent()); 
+                extensionst.setAttribute("ctx", context);
+                extensionst.setAttribute("parent", typedecl.getParent());
                 typest.setAttribute("extension", extensionst.toString());
             }
 
@@ -262,11 +262,11 @@ public class TypesGenerator
     private boolean writeFile(String file, StringTemplate template)
     {
         boolean returnedValue = false;
-        
+
         try
         {
             File handle = new File(file);
-            
+
             if(!handle.exists() || replace_)
             {
                 FileWriter fw = new FileWriter(file);
@@ -284,7 +284,7 @@ public class TypesGenerator
         catch(IOException e)
         {
             e.printStackTrace();
-        }   
+        }
 
         return returnedValue;
     }

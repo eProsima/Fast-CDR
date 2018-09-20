@@ -1213,8 +1213,7 @@ namespace eprosima
                     FastCdr& deserialize(std::wstring &string_t)
                     {
                         uint32_t length = 0;
-                        const wchar_t *str = readWString(length);
-                        string_t = std::wstring(str, length);
+                        string_t = readWString(length);
                         return *this;
                     }
 
@@ -1557,7 +1556,7 @@ namespace eprosima
 
                 const char* readString(uint32_t &length);
 
-                const wchar_t* readWString(uint32_t &length);
+                std::wstring readWString(uint32_t &length);
 
                 //! @brief Reference to the buffer that will be serialized/deserialized.
                 FastBuffer &m_cdrBuffer;

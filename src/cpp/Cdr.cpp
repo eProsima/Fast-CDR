@@ -1798,7 +1798,7 @@ std::wstring Cdr::readWString(uint32_t &length)
         wchar_t* wValue = new wchar_t[length];
         deserializeArray(wValue, length);
 #else
-        const wchar_t* wValue = L"";
+        wchar_t* wValue;
         wValue = reinterpret_cast<wchar_t*>(&m_currentPosition);
         m_currentPosition += bytesLength;
 #endif

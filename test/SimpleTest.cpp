@@ -5956,11 +5956,14 @@ TEST(FastCDRTests, STDArrayLongDouble)
     FastBuffer cdrbuffer_bad(buffer_bad, 1);
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
+    try
+    {
     EXPECT_THROW(
     {
         cdr_ser_bad << ldouble_array_t;
     },
     NotEnoughMemoryException);
+    }catch(std::exception&){}
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);

@@ -282,7 +282,7 @@ FastCdr& FastCdr::serializeArray(const long double *ldouble_t, size_t numElement
     if(((m_lastPosition - m_currentPosition) >= totalSize) || resize(totalSize))
     {
 #if defined(_WIN32)
-        for (size_t idx = 0; idx < totalSize; ++idx)
+        for (size_t idx = 0; idx < numElements; ++idx)
         {
             m_currentPosition << static_cast<long double>(0);
             m_currentPosition += 8;
@@ -582,7 +582,7 @@ FastCdr& FastCdr::deserializeArray(long double *ldouble_t, size_t numElements)
     if((m_lastPosition - m_currentPosition) >= totalSize)
     {
 #if defined(_WIN32)
-        for (size_t idx = 0; idx < totalSize; ++idx)
+        for (size_t idx = 0; idx < numElements; ++idx)
         {
             m_currentPosition += 8; // Windows ignores the first 8 bytes
             m_currentPosition >> ldouble_t[idx];

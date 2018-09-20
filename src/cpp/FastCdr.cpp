@@ -139,8 +139,12 @@ FastCdr& FastCdr::serialize(const wchar_t *string_t)
 
         if(((m_lastPosition - m_currentPosition) >= bytesLength) || resize(bytesLength))
         {
+#if defined(_WIN32)
+            serializeArray(string_t, wstrlen);
+#else
             m_currentPosition.memcopy(string_t, bytesLength);
             m_currentPosition += bytesLength; // size on bytes
+#endif
         }
         else
         {
@@ -273,12 +277,22 @@ FastCdr& FastCdr::serializeArray(const double *double_t, size_t numElements)
 
 FastCdr& FastCdr::serializeArray(const long double *ldouble_t, size_t numElements)
 {
-    size_t totalSize = sizeof(*ldouble_t) * numElements;
+    size_t totalSize = 16 * numElements;
 
     if(((m_lastPosition - m_currentPosition) >= totalSize) || resize(totalSize))
     {
+#if defined(_WIN32)
+        for (size_t idx = 0; idx < totalSize; ++idx)
+        {
+            m_currentPosition << static_cast<long double>(0);
+            m_currentPosition += 8;
+            m_currentPosition << ldouble_t[idx];
+            m_currentPosition += 8;
+        }
+#else
         m_currentPosition.memcopy(ldouble_t, totalSize);
         m_currentPosition += totalSize;
+#endif
 
         return *this;
     }
@@ -351,9 +365,21 @@ FastCdr& FastCdr::deserialize(wchar_t *&string_t)
     else if((m_lastPosition - m_currentPosition) >= length)
     {
         // Allocate memory.
-        string_t = reinterpret_cast<wchar_t*>(calloc(length + ((&m_currentPosition)[length-1] == '\0' ? 0 : 1), sizeof(wchar_t)));
+        string_t = reinterpret_cast<wchar_t*>(calloc(length + 1, sizeof(wchar_t))); // WStrings never serialize terminating zero
+
+#if defined(_WIN32)
+        for (size_t idx = 0; idx < length; ++idx)
+        {
+            uint32_t temp;
+            m_currentPosition >> temp;
+            string_t[idx] = static_cast<wchar_t>(temp);
+            m_currentPosition += 4;
+        }
+#else
         memcpy(string_t, &m_currentPosition, length * sizeof(wchar_t));
         m_currentPosition += length * sizeof(wchar_t);
+#endif
+
         return *this;
     }
 
@@ -386,7 +412,7 @@ const char* FastCdr::readString(uint32_t &length)
 
 const wchar_t* FastCdr::readWString(uint32_t &length)
 {
-    const wchar_t* returnedValue = L"";
+    wchar_t* returnedValue;
     state state_(*this);
 
     *this >> length;
@@ -394,12 +420,18 @@ const wchar_t* FastCdr::readWString(uint32_t &length)
 
     if(bytesLength == 0)
     {
-        return returnedValue;
+        return L"";
     }
     else if((m_lastPosition - m_currentPosition) >= bytesLength)
     {
+#if defined(_WIN32)
+        returnedValue = new wchar_t[length];
+        deserializeArray(returnedValue, length);
+#else
         returnedValue = reinterpret_cast<wchar_t*>(&m_currentPosition);
         m_currentPosition += bytesLength;
+#endif
+
         if(returnedValue[length-1] == '\0') --length;
         return returnedValue;
     }
@@ -537,12 +569,21 @@ FastCdr& FastCdr::deserializeArray(double *double_t, size_t numElements)
 
 FastCdr& FastCdr::deserializeArray(long double *ldouble_t, size_t numElements)
 {
-    size_t totalSize = sizeof(*ldouble_t) * numElements;
+    size_t totalSize = 16 * numElements;
 
     if((m_lastPosition - m_currentPosition) >= totalSize)
     {
+#if defined(_WIN32)
+        for (size_t idx = 0; idx < totalSize; ++idx)
+        {
+            m_currentPosition += 8; // Windows ignores the first 8 bytes
+            m_currentPosition >> ldouble_t[idx];
+            m_currentPosition += 8;
+        }
+#else
         m_currentPosition.rmemcopy(ldouble_t, totalSize);
         m_currentPosition += totalSize;
+#endif
 
         return *this;
     }

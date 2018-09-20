@@ -542,7 +542,7 @@ Cdr& Cdr::serialize(const long double ldouble_t)
         {
             const char *dst = reinterpret_cast<const char*>(&ldouble_t);
 #if defined(_WIN32)
-            // Filled with 0's
+            // Filled with 0's.
             m_currentPosition++ << static_cast<char>(0);
             m_currentPosition++ << static_cast<char>(0);
             m_currentPosition++ << static_cast<char>(0);
@@ -551,7 +551,6 @@ Cdr& Cdr::serialize(const long double ldouble_t)
             m_currentPosition++ << static_cast<char>(0);
             m_currentPosition++ << static_cast<char>(0);
             m_currentPosition++ << static_cast<char>(0);
-
             m_currentPosition++ << dst[7];
             m_currentPosition++ << dst[6];
             m_currentPosition++ << dst[5];
@@ -582,11 +581,11 @@ Cdr& Cdr::serialize(const long double ldouble_t)
         }
         else
         {
-            m_currentPosition << ldouble_t;
 #if defined(_WIN32)
+            m_currentPosition << static_cast<long double>(0);
             m_currentPosition += sizeof(ldouble_t);
-            m_currentPosition << ldouble_t;
 #endif
+            m_currentPosition << ldouble_t;
             m_currentPosition += sizeof(ldouble_t);
         }
 
@@ -1159,7 +1158,7 @@ Cdr& Cdr::serializeArray(const long double *ldouble_t, size_t numElements)
     if(((m_lastPosition - m_currentPosition) >= sizeAligned) || resize(sizeAligned))
     {
         // Save last datasize.
-        m_lastDataSize = sizeof(*ldouble_t);
+        m_lastDataSize = 16;
 
         // Align if there are any elements
         if(numElements)
@@ -1173,6 +1172,7 @@ Cdr& Cdr::serializeArray(const long double *ldouble_t, size_t numElements)
             for(; dst < end; dst += sizeof(*ldouble_t))
             {
 #if defined(_WIN32)
+                // Filled with 0's.
                 m_currentPosition++ << static_cast<char>(0);
                 m_currentPosition++ << static_cast<char>(0);
                 m_currentPosition++ << static_cast<char>(0);
@@ -1214,9 +1214,10 @@ Cdr& Cdr::serializeArray(const long double *ldouble_t, size_t numElements)
 #if defined(_WIN32)
             for (size_t i = 0; i < numElements; ++i)
             {
+                m_currentPosition << static_cast<long double>(0);
+                m_currentPosition += 8;
                 m_currentPosition << ldouble_t[i];
-                m_currentPosition << ldouble_t[i];
-                m_currentPosition += 16;
+                m_currentPosition += 8;
             }
 #else
             m_currentPosition.memcopy(ldouble_t, totalSize);
@@ -1553,7 +1554,6 @@ Cdr& Cdr::deserialize(long double &ldouble_t)
 
 #if defined(_WIN32)
             m_currentPosition += 8;
-
             m_currentPosition++ >> dst[7];
             m_currentPosition++ >> dst[6];
             m_currentPosition++ >> dst[5];
@@ -1583,8 +1583,12 @@ Cdr& Cdr::deserialize(long double &ldouble_t)
         }
         else
         {
+#if defined(_WIN32)
+            // Windows case, just deserializes the last 8 bytes, and ignores the first 8
+            m_currentPosition += 8; // sizeof(ldouble_t);
+#endif
             m_currentPosition >> ldouble_t;
-            m_currentPosition += 16; // sizeof(ldouble_t);
+            m_currentPosition += sizeof(ldouble_t);
         }
 
         return *this;
@@ -1683,12 +1687,22 @@ Cdr& Cdr::deserialize(wchar_t *&string_t)
     else if((m_lastPosition - m_currentPosition) >= length)
     {
         // Save last datasize.
-        m_lastDataSize = sizeof(wchar_t);
-
+        m_lastDataSize = 4;
         // Allocate memory.
-        string_t = reinterpret_cast<wchar_t*>(calloc(length + ((&m_currentPosition)[length-1] == '\0' ? 0 : 1), sizeof(wchar_t)));
+        string_t = reinterpret_cast<wchar_t*>(calloc(length + 1, sizeof(wchar_t))); // WStrings never serialize terminating zero
+
+#if defined(_WIN32)
+        for (size_t idx = 0; idx < length; ++idx)
+        {
+            uint32_t temp;
+            m_currentPosition >> temp;
+            string_t[idx] = static_cast<wchar_t>(temp);
+            m_currentPosition += 4;
+        }
+#else
         memcpy(string_t, &m_currentPosition, length * sizeof(wchar_t));
         m_currentPosition += length * sizeof(wchar_t);
+#endif
         return *this;
     }
 
@@ -2226,7 +2240,7 @@ Cdr& Cdr::deserializeArray(long double *ldouble_t, size_t numElements)
     if((m_lastPosition - m_currentPosition) >= sizeAligned)
     {
         // Save last datasize.
-        m_lastDataSize = sizeof(*ldouble_t);
+        m_lastDataSize = 16;
 
         // Align if there are any elements
         if(numElements)
@@ -2241,7 +2255,6 @@ Cdr& Cdr::deserializeArray(long double *ldouble_t, size_t numElements)
             {
 #if defined(_WIN32)
                 m_currentPosition += 8;
-
                 m_currentPosition++ >> dst[7];
                 m_currentPosition++ >> dst[6];
                 m_currentPosition++ >> dst[5];
@@ -2275,7 +2288,9 @@ Cdr& Cdr::deserializeArray(long double *ldouble_t, size_t numElements)
 #if defined(_WIN32)
             for (size_t i = 0; i < numElements; ++i)
             {
+                m_currentPosition += 8;   // Ignore first 8 bytes
                 m_currentPosition >> ldouble_t[i];
+                m_currentPosition += 8;    
             }
 #else
             m_currentPosition.rmemcopy(ldouble_t, totalSize);

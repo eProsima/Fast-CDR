@@ -3382,7 +3382,7 @@ TEST(CDRTests, SequenceOctet)
         cdr_des.deserializeSequence(octet_seq_value, octet_seq_len);
     });
 
-    EXPECT_EQ(octet_seq_len, 5);
+    EXPECT_EQ(octet_seq_len, 5u);
     EXPECT_ARRAY_EQ(octet_seq_value, octet_seq_t, octet_seq_len);
 
     free(octet_seq_value);
@@ -3434,7 +3434,7 @@ TEST(CDRTests, SequenceChar)
         cdr_des.deserializeSequence(char_seq_value, char_seq_len);
     });
 
-    EXPECT_EQ(char_seq_len, 5);
+    EXPECT_EQ(char_seq_len, 5u);
     EXPECT_ARRAY_EQ(char_seq_value, char_seq_t, char_seq_len);
 
     free(char_seq_value);
@@ -3486,7 +3486,7 @@ TEST(CDRTests, SequenceWChar)
         cdr_des.deserializeSequence(char_seq_value, char_seq_len);
     });
 
-    EXPECT_EQ(char_seq_len, 5);
+    EXPECT_EQ(char_seq_len, 5u);
     EXPECT_ARRAY_EQ(char_seq_value, wchar_seq_t, char_seq_len);
 
     free(char_seq_value);
@@ -3538,7 +3538,7 @@ TEST(CDRTests, SequenceInt8)
         cdr_des.deserializeSequence(int8_seq_value, int8_seq_len);
     });
 
-    EXPECT_EQ(int8_seq_len, 5);
+    EXPECT_EQ(int8_seq_len, 5u);
     EXPECT_ARRAY_EQ(int8_seq_value, int8_seq_t, int8_seq_len);
 
     free(int8_seq_value);
@@ -3590,7 +3590,7 @@ TEST(CDRTests, SequenceUnsignedShort)
         cdr_des.deserializeSequence(ushort_seq_value, ushort_seq_len);
     });
 
-    EXPECT_EQ(ushort_seq_len, 5);
+    EXPECT_EQ(ushort_seq_len, 5u);
     EXPECT_ARRAY_EQ(ushort_seq_value, ushort_seq_t, ushort_seq_len);
 
     free(ushort_seq_value);
@@ -3642,7 +3642,7 @@ TEST(CDRTests, SequenceShort)
         cdr_des.deserializeSequence(short_seq_value, short_seq_len);
     });
 
-    EXPECT_EQ(short_seq_len, 5);
+    EXPECT_EQ(short_seq_len, 5u);
     EXPECT_ARRAY_EQ(short_seq_value, short_seq_t, short_seq_len);
 
     free(short_seq_value);
@@ -3694,7 +3694,7 @@ TEST(CDRTests, SequenceUnsignedLong)
         cdr_des.deserializeSequence(ulong_seq_value, ulong_seq_len);
     });
 
-    EXPECT_EQ(ulong_seq_len, 5);
+    EXPECT_EQ(ulong_seq_len, 5u);
     EXPECT_ARRAY_EQ(ulong_seq_value, ulong_seq_t, ulong_seq_len);
 
     free(ulong_seq_value);
@@ -3746,7 +3746,7 @@ TEST(CDRTests, SequenceLong)
         cdr_des.deserializeSequence(long_seq_value, long_seq_len);
     });
 
-    EXPECT_EQ(long_seq_len, 5);
+    EXPECT_EQ(long_seq_len, 5u);
     EXPECT_ARRAY_EQ(long_seq_value, long_seq_t, long_seq_len);
 
     free(long_seq_value);
@@ -3798,7 +3798,7 @@ TEST(CDRTests, SequenceUnsignedLongLong)
         cdr_des.deserializeSequence(ulonglong_seq_value, ulonglong_seq_len);
     });
 
-    EXPECT_EQ(ulonglong_seq_len, 5);
+    EXPECT_EQ(ulonglong_seq_len, 5u);
     EXPECT_ARRAY_EQ(ulonglong_seq_value, ulonglong_seq_t, ulonglong_seq_len);
 
     free(ulonglong_seq_value);
@@ -3850,7 +3850,7 @@ TEST(CDRTests, SequenceLongLong)
         cdr_des.deserializeSequence(longlong_seq_value, longlong_seq_len);
     });
 
-    EXPECT_EQ(longlong_seq_len, 5);
+    EXPECT_EQ(longlong_seq_len, 5u);
     EXPECT_ARRAY_EQ(longlong_seq_value, longlong_seq_t, longlong_seq_len);
 
     free(longlong_seq_value);
@@ -3902,7 +3902,7 @@ TEST(CDRTests, SequenceFloat)
         cdr_des.deserializeSequence(float_seq_value, float_seq_len);
     });
 
-    EXPECT_EQ(float_seq_len, 5);
+    EXPECT_EQ(float_seq_len, 5u);
     EXPECT_ARRAY_FLOAT_EQ(float_seq_value, float_seq_t, float_seq_len);
 
     free(float_seq_value);
@@ -3954,7 +3954,7 @@ TEST(CDRTests, SequenceDouble)
         cdr_des.deserializeSequence(double_seq_value, double_seq_len);
     });
 
-    EXPECT_EQ(double_seq_len, 5);
+    EXPECT_EQ(double_seq_len, 5u);
     EXPECT_ARRAY_DOUBLE_EQ(double_seq_value, double_seq_t, double_seq_len);
 
     free(double_seq_value);
@@ -4006,7 +4006,7 @@ TEST(CDRTests, SequenceLongDouble)
         cdr_des.deserializeSequence(ldouble_seq_value, ldouble_seq_len);
     });
 
-    EXPECT_EQ(ldouble_seq_len, 5);
+    EXPECT_EQ(ldouble_seq_len, 5u);
     EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_seq_value, ldouble_seq_t, ldouble_seq_len);
 
     free(ldouble_seq_value);
@@ -4058,7 +4058,7 @@ TEST(CDRTests, SequenceBoolean)
         cdr_des.deserializeSequence(bool_seq_value, bool_seq_len);
     });
 
-    EXPECT_EQ(bool_seq_len, 5);
+    EXPECT_EQ(bool_seq_len, 5u);
     EXPECT_ARRAY_EQ(bool_seq_value, bool_seq_t, bool_seq_len);
 
     free(bool_seq_value);
@@ -4110,7 +4110,7 @@ TEST(CDRTests, SequenceString)
         cdr_des.deserializeSequence(string_seq_value, string_seq_len);
     });
 
-    EXPECT_EQ(string_seq_len, 5);
+    EXPECT_EQ(string_seq_len, 5u);
     EXPECT_ARRAY_EQ(string_seq_value, string_seq_t, string_seq_len);
 
     for(size_t count = 0; count < string_seq_len; ++count)
@@ -4165,7 +4165,7 @@ TEST(CDRTests, SequenceWString)
         cdr_des.deserializeSequence(string_seq_value, string_seq_len);
     });
 
-    EXPECT_EQ(string_seq_len, 5);
+    EXPECT_EQ(string_seq_len, 5u);
     EXPECT_ARRAY_EQ(string_seq_value, wstring_seq_t, string_seq_len);
 
     for(size_t count = 0; count < string_seq_len; ++count)
@@ -4513,33 +4513,33 @@ TEST(CDRTests, Complete)
     EXPECT_EQ(wstring_vector_value, wstring_vector_t);
 
     EXPECT_EQ(triple_ulong_array_t, triple_ulong_array_value);
-    EXPECT_EQ(octet_seq_len, 5);
+    EXPECT_EQ(octet_seq_len, 5u);
     EXPECT_ARRAY_EQ(octet_seq_value, octet_seq_t, 5);
-    EXPECT_EQ(char_seq_len, 5);
+    EXPECT_EQ(char_seq_len, 5u);
     EXPECT_ARRAY_EQ(char_seq_value, char_seq_t, 5);
-    EXPECT_EQ(wchar_seq_len, 5);
+    EXPECT_EQ(wchar_seq_len, 5u);
     EXPECT_ARRAY_EQ(wchar_seq_value, wchar_seq_t, 5);
-    EXPECT_EQ(int8_seq_len, 5);
+    EXPECT_EQ(int8_seq_len, 5u);
     EXPECT_ARRAY_EQ(int8_seq_value, int8_seq_t, 5);
-    EXPECT_EQ(ushort_seq_len, 5);
+    EXPECT_EQ(ushort_seq_len, 5u);
     EXPECT_ARRAY_EQ(ushort_seq_value, ushort_seq_t, 5);
-    EXPECT_EQ(short_seq_len, 5);
+    EXPECT_EQ(short_seq_len, 5u);
     EXPECT_ARRAY_EQ(short_seq_value, short_seq_t, 5);
-    EXPECT_EQ(ulong_seq_len, 5);
+    EXPECT_EQ(ulong_seq_len, 5u);
     EXPECT_ARRAY_EQ(ulong_seq_value, ulong_seq_t, 5);
-    EXPECT_EQ(long_seq_len, 5);
+    EXPECT_EQ(long_seq_len, 5u);
     EXPECT_ARRAY_EQ(long_seq_value, long_seq_t, 5);
-    EXPECT_EQ(ulonglong_seq_len, 5);
+    EXPECT_EQ(ulonglong_seq_len, 5u);
     EXPECT_ARRAY_EQ(ulonglong_seq_value, ulonglong_seq_t, 5);
-    EXPECT_EQ(longlong_seq_len, 5);
+    EXPECT_EQ(longlong_seq_len, 5u);
     EXPECT_ARRAY_EQ(longlong_seq_value, longlong_seq_t, 5);
-    EXPECT_EQ(float_seq_len, 5);
+    EXPECT_EQ(float_seq_len, 5u);
     EXPECT_ARRAY_FLOAT_EQ(float_seq_value, float_seq_t, 5);
-    EXPECT_EQ(double_seq_len, 5);
+    EXPECT_EQ(double_seq_len, 5u);
     EXPECT_ARRAY_DOUBLE_EQ(double_seq_value, double_seq_t, 5);
-    EXPECT_EQ(ldouble_seq_len, 5);
+    EXPECT_EQ(ldouble_seq_len, 5u);
     EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_seq_value, ldouble_seq_t, 5);
-    EXPECT_EQ(wstring_seq_len, 5);
+    EXPECT_EQ(wstring_seq_len, 5u);
     EXPECT_ARRAY_EQ(wstring_seq_value, wstring_seq_t, 5);
 
     EXPECT_EQ(strcmp(c_string_t, c_string_value), 0);
@@ -7760,7 +7760,7 @@ TEST(FastCDRTests, SequenceOctet)
         cdr_des.deserializeSequence(octet_seq_value, octet_seq_len);
     });
 
-    EXPECT_EQ(octet_seq_len, 5);
+    EXPECT_EQ(octet_seq_len, 5u);
     EXPECT_ARRAY_EQ(octet_seq_value, octet_seq_t, octet_seq_len);
 
     free(octet_seq_value);
@@ -7812,7 +7812,7 @@ TEST(FastCDRTests, SequenceChar)
         cdr_des.deserializeSequence(char_seq_value, char_seq_len);
     });
 
-    EXPECT_EQ(char_seq_len, 5);
+    EXPECT_EQ(char_seq_len, 5u);
     EXPECT_ARRAY_EQ(char_seq_value, char_seq_t, char_seq_len);
 
     free(char_seq_value);
@@ -7864,7 +7864,7 @@ TEST(FastCDRTests, SequenceWChar)
         cdr_des.deserializeSequence(char_seq_value, char_seq_len);
     });
 
-    EXPECT_EQ(char_seq_len, 5);
+    EXPECT_EQ(char_seq_len, 5u);
     EXPECT_ARRAY_EQ(char_seq_value, wchar_seq_t, char_seq_len);
 
     free(char_seq_value);
@@ -7916,7 +7916,7 @@ TEST(FastCDRTests, SequenceInt8)
         cdr_des.deserializeSequence(int8_seq_value, int8_seq_len);
     });
 
-    EXPECT_EQ(int8_seq_len, 5);
+    EXPECT_EQ(int8_seq_len, 5u);
     EXPECT_ARRAY_EQ(int8_seq_value, int8_seq_t, int8_seq_len);
 
     free(int8_seq_value);
@@ -7968,7 +7968,7 @@ TEST(FastCDRTests, SequenceUnsignedShort)
         cdr_des.deserializeSequence(ushort_seq_value, ushort_seq_len);
     });
 
-    EXPECT_EQ(ushort_seq_len, 5);
+    EXPECT_EQ(ushort_seq_len, 5u);
     EXPECT_ARRAY_EQ(ushort_seq_value, ushort_seq_t, ushort_seq_len);
 
     free(ushort_seq_value);
@@ -8020,7 +8020,7 @@ TEST(FastCDRTests, SequenceShort)
         cdr_des.deserializeSequence(short_seq_value, short_seq_len);
     });
 
-    EXPECT_EQ(short_seq_len, 5);
+    EXPECT_EQ(short_seq_len, 5u);
     EXPECT_ARRAY_EQ(short_seq_value, short_seq_t, short_seq_len);
 
     free(short_seq_value);
@@ -8072,7 +8072,7 @@ TEST(FastCDRTests, SequenceUnsignedLong)
         cdr_des.deserializeSequence(ulong_seq_value, ulong_seq_len);
     });
 
-    EXPECT_EQ(ulong_seq_len, 5);
+    EXPECT_EQ(ulong_seq_len, 5u);
     EXPECT_ARRAY_EQ(ulong_seq_value, ulong_seq_t, ulong_seq_len);
 
     free(ulong_seq_value);
@@ -8124,7 +8124,7 @@ TEST(FastCDRTests, SequenceLong)
         cdr_des.deserializeSequence(long_seq_value, long_seq_len);
     });
 
-    EXPECT_EQ(long_seq_len, 5);
+    EXPECT_EQ(long_seq_len, 5u);
     EXPECT_ARRAY_EQ(long_seq_value, long_seq_t, long_seq_len);
 
     free(long_seq_value);
@@ -8176,7 +8176,7 @@ TEST(FastCDRTests, SequenceUnsignedLongLong)
         cdr_des.deserializeSequence(ulonglong_seq_value, ulonglong_seq_len);
     });
 
-    EXPECT_EQ(ulonglong_seq_len, 5);
+    EXPECT_EQ(ulonglong_seq_len, 5u);
     EXPECT_ARRAY_EQ(ulonglong_seq_value, ulonglong_seq_t, ulonglong_seq_len);
 
     free(ulonglong_seq_value);
@@ -8228,7 +8228,7 @@ TEST(FastCDRTests, SequenceLongLong)
         cdr_des.deserializeSequence(longlong_seq_value, longlong_seq_len);
     });
 
-    EXPECT_EQ(longlong_seq_len, 5);
+    EXPECT_EQ(longlong_seq_len, 5u);
     EXPECT_ARRAY_EQ(longlong_seq_value, longlong_seq_t, longlong_seq_len);
 
     free(longlong_seq_value);
@@ -8280,7 +8280,7 @@ TEST(FastCDRTests, SequenceFloat)
         cdr_des.deserializeSequence(float_seq_value, float_seq_len);
     });
 
-    EXPECT_EQ(float_seq_len, 5);
+    EXPECT_EQ(float_seq_len, 5u);
     EXPECT_ARRAY_FLOAT_EQ(float_seq_value, float_seq_t, float_seq_len);
 
     free(float_seq_value);
@@ -8332,7 +8332,7 @@ TEST(FastCDRTests, SequenceDouble)
         cdr_des.deserializeSequence(double_seq_value, double_seq_len);
     });
 
-    EXPECT_EQ(double_seq_len, 5);
+    EXPECT_EQ(double_seq_len, 5u);
     EXPECT_ARRAY_DOUBLE_EQ(double_seq_value, double_seq_t, double_seq_len);
 
     free(double_seq_value);
@@ -8384,7 +8384,7 @@ TEST(FastCDRTests, SequenceLongDouble)
         cdr_des.deserializeSequence(ldouble_seq_value, ldouble_seq_len);
     });
 
-    EXPECT_EQ(ldouble_seq_len, 5);
+    EXPECT_EQ(ldouble_seq_len, 5u);
     EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_seq_value, ldouble_seq_t, ldouble_seq_len);
 
     free(ldouble_seq_value);
@@ -8436,7 +8436,7 @@ TEST(FastCDRTests, SequenceBoolean)
         cdr_des.deserializeSequence(bool_seq_value, bool_seq_len);
     });
 
-    EXPECT_EQ(bool_seq_len, 5);
+    EXPECT_EQ(bool_seq_len, 5u);
     EXPECT_ARRAY_EQ(bool_seq_value, bool_seq_t, bool_seq_len);
 
     free(bool_seq_value);
@@ -8488,7 +8488,7 @@ TEST(FastCDRTests, SequenceString)
         cdr_des.deserializeSequence(string_seq_value, string_seq_len);
     });
 
-    EXPECT_EQ(string_seq_len, 5);
+    EXPECT_EQ(string_seq_len, 5u);
     EXPECT_ARRAY_EQ(string_seq_value, string_seq_t, string_seq_len);
 
     for(size_t count = 0; count < string_seq_len; ++count)
@@ -8543,7 +8543,7 @@ TEST(FastCDRTests, SequenceWString)
         cdr_des.deserializeSequence(string_seq_value, string_seq_len);
     });
 
-    EXPECT_EQ(string_seq_len, 5);
+    EXPECT_EQ(string_seq_len, 5u);
     EXPECT_ARRAY_EQ(string_seq_value, wstring_seq_t, string_seq_len);
 
     for(size_t count = 0; count < string_seq_len; ++count)
@@ -8893,33 +8893,33 @@ TEST(FastCDRTests, Complete)
     EXPECT_EQ(wstring_vector_value, wstring_vector_t);
 
     EXPECT_EQ(triple_ulong_array_t, triple_ulong_array_value);
-    EXPECT_EQ(octet_seq_len, 5);
+    EXPECT_EQ(octet_seq_len, 5u);
     EXPECT_ARRAY_EQ(octet_seq_value, octet_seq_t, 5);
-    EXPECT_EQ(char_seq_len, 5);
+    EXPECT_EQ(char_seq_len, 5u);
     EXPECT_ARRAY_EQ(char_seq_value, char_seq_t, 5);
-    EXPECT_EQ(wchar_seq_len, 5);
+    EXPECT_EQ(wchar_seq_len, 5u);
     EXPECT_ARRAY_EQ(wchar_seq_value, wchar_seq_t, 5);
-    EXPECT_EQ(int8_seq_len, 5);
+    EXPECT_EQ(int8_seq_len, 5u);
     EXPECT_ARRAY_EQ(int8_seq_value, int8_seq_t, 5);
-    EXPECT_EQ(ushort_seq_len, 5);
+    EXPECT_EQ(ushort_seq_len, 5u);
     EXPECT_ARRAY_EQ(ushort_seq_value, ushort_seq_t, 5);
-    EXPECT_EQ(short_seq_len, 5);
+    EXPECT_EQ(short_seq_len, 5u);
     EXPECT_ARRAY_EQ(short_seq_value, short_seq_t, 5);
-    EXPECT_EQ(ulong_seq_len, 5);
+    EXPECT_EQ(ulong_seq_len, 5u);
     EXPECT_ARRAY_EQ(ulong_seq_value, ulong_seq_t, 5);
-    EXPECT_EQ(long_seq_len, 5);
+    EXPECT_EQ(long_seq_len, 5u);
     EXPECT_ARRAY_EQ(long_seq_value, long_seq_t, 5);
-    EXPECT_EQ(ulonglong_seq_len, 5);
+    EXPECT_EQ(ulonglong_seq_len, 5u);
     EXPECT_ARRAY_EQ(ulonglong_seq_value, ulonglong_seq_t, 5);
-    EXPECT_EQ(longlong_seq_len, 5);
+    EXPECT_EQ(longlong_seq_len, 5u);
     EXPECT_ARRAY_EQ(longlong_seq_value, longlong_seq_t, 5);
-    EXPECT_EQ(float_seq_len, 5);
+    EXPECT_EQ(float_seq_len, 5u);
     EXPECT_ARRAY_FLOAT_EQ(float_seq_value, float_seq_t, 5);
-    EXPECT_EQ(double_seq_len, 5);
+    EXPECT_EQ(double_seq_len, 5u);
     EXPECT_ARRAY_DOUBLE_EQ(double_seq_value, double_seq_t, 5);
-    EXPECT_EQ(ldouble_seq_len, 5);
+    EXPECT_EQ(ldouble_seq_len, 5u);
     EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_seq_value, ldouble_seq_t, 5);
-    EXPECT_EQ(wstring_seq_len, 5);
+    EXPECT_EQ(wstring_seq_len, 5u);
     EXPECT_ARRAY_EQ(wstring_seq_value, wstring_seq_t, 5);
 
     EXPECT_EQ(strcmp(c_string_t, c_string_value), 0);

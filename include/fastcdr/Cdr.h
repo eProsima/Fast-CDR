@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <iostream>
 
 #if !__APPLE__
 #include <malloc.h>
@@ -2439,6 +2440,12 @@ namespace eprosima
                     {
                         return deserializeStringSequence(sequence_t, numElements);
                     }
+
+                template<class _T = std::wstring>
+                    Cdr& deserializeSequence(std::wstring *&sequence_t, size_t &numElements)
+                    {
+                        return deserializeWStringSequence(sequence_t, numElements);
+                    }
 #endif
 
                 /*!
@@ -2480,6 +2487,12 @@ namespace eprosima
                     Cdr& deserializeSequence<std::string>(std::string *&sequence_t, size_t &numElements)
                     {
                         return deserializeStringSequence(sequence_t, numElements);
+                    }
+
+                template<>
+                    Cdr& deserializeSequence<std::string>(std::wstring *&sequence_t, size_t &numElements)
+                    {
+                        return deserializeWStringSequence(sequence_t, numElements);
                     }
 #endif
 
@@ -2523,6 +2536,8 @@ namespace eprosima
                 Cdr& deserializeBoolSequence(std::vector<bool> &vector_t);
 
                 Cdr& deserializeStringSequence(std::string *&sequence_t, size_t &numElements);
+
+                Cdr& deserializeWStringSequence(std::wstring *&sequence_t, size_t &numElements);
 
 #if HAVE_CXX0X
                 /*!
@@ -2602,7 +2617,7 @@ namespace eprosima
 
                 //TODO
                 const char* readString(uint32_t &length);
-                std::wstring readWString(uint32_t &length);
+                const std::wstring readWString(uint32_t &length);
 
                 //! @brief Reference to the buffer that will be serialized/deserialized.
                 FastBuffer &m_cdrBuffer;

@@ -2472,6 +2472,9 @@ TEST(CDRResizeTests, Complete)
     EXPECT_EQ(strcmp(c_string_t, c_string_value), 0);
     EXPECT_EQ(wcscmp(c_wstring_t, c_wstring_value), 0);
 
+    for(size_t count = 0; count < wstring_seq_len; ++count)
+        wstring_seq_value[count].~basic_string();
+
     free(octet_seq_value);
     free(char_seq_value);
     free(wchar_seq_value);
@@ -4784,6 +4787,9 @@ TEST(FastCDRResizeTests, Complete)
 
     EXPECT_EQ(strcmp(c_string_t, c_string_value), 0);
     EXPECT_EQ(wcscmp(c_wstring_t, c_wstring_value), 0);
+
+    for(size_t count = 0; count < wstring_seq_len; ++count)
+        wstring_seq_value[count].~basic_string();
 
     free(octet_seq_value);
     free(char_seq_value);

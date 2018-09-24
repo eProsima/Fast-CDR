@@ -429,8 +429,7 @@ std::wstring FastCdr::readWString(uint32_t &length)
         wchar_t* wValue = new wchar_t[length];
         deserializeArray(wValue, length);
 #else
-        wchar_t* wValue;
-        wValue = reinterpret_cast<wchar_t*>(&m_currentPosition);
+        wchar_t* wValue = reinterpret_cast<wchar_t*>(&m_currentPosition);
         m_currentPosition += bytesLength;
 #endif
         if (wValue[length - 1] == '\0')
@@ -676,6 +675,32 @@ FastCdr& FastCdr::deserializeStringSequence(std::string *&sequence_t, size_t &nu
         sequence_t = reinterpret_cast<std::string*>(calloc(seqLength, sizeof(std::string)));
         for(uint32_t count = 0; count < seqLength; ++count)
             new(&sequence_t[count]) std::string;
+        deserializeArray(sequence_t, seqLength);
+    }
+    catch(eprosima::fastcdr::exception::Exception &ex)
+    {
+        free(sequence_t);
+        sequence_t = NULL;
+        setState(state_before_error);
+        ex.raise();
+    }
+
+    numElements = seqLength;
+    return *this;
+}
+
+FastCdr& FastCdr::deserializeWStringSequence(std::wstring *&sequence_t, size_t &numElements)
+{
+    uint32_t seqLength = 0;
+    state state_before_error(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        sequence_t = reinterpret_cast<std::wstring*>(calloc(seqLength, sizeof(std::wstring)));
+        for(uint32_t count = 0; count < seqLength; ++count)
+            new(&sequence_t[count]) std::wstring;
         deserializeArray(sequence_t, seqLength);
     }
     catch(eprosima::fastcdr::exception::Exception &ex)

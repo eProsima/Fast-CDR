@@ -4329,7 +4329,9 @@ TEST(CDRTests, Complete)
         cdr_ser.serializeArray(wchar_array_2_t, 5).serializeArray(wstring_array_2_t, 5);
         cdr_ser << wchar_array_t << wstring_array_t;
         cdr_ser << wchar_vector_t << wstring_vector_t;
-        cdr_ser.serializeSequence(wchar_seq_t, 5).serializeSequence(wstring_seq_t, 5);
+        cdr_ser.serializeSequence(wchar_seq_t, 5);
+        cdr_ser.serializeSequence(wstring_seq_t, 5);
+        cdr_ser.serializeSequence(string_seq_t, 5);
         cdr_ser.serialize(c_wstring_t);
     });
 
@@ -4414,6 +4416,7 @@ TEST(CDRTests, Complete)
     std::wstring wstring_array_2_value[5];
     std::vector<std::wstring> wstring_vector_value;
     std::wstring *wstring_seq_value = NULL; size_t wstring_seq_len;
+    std::string *string_seq_value = NULL; size_t string_seq_len;
 
     EXPECT_NO_THROW(
     {
@@ -4443,7 +4446,9 @@ TEST(CDRTests, Complete)
         cdr_des.deserializeArray(wchar_array_2_value, 5).deserializeArray(wstring_array_2_value, 5);
         cdr_des >> wchar_array_value >> wstring_array_value;
         cdr_des >> wchar_vector_value >> wstring_vector_value;
-        cdr_des.deserializeSequence(wchar_seq_value, wchar_seq_len).deserializeSequence(wstring_seq_value, wstring_seq_len);
+        cdr_des.deserializeSequence(wchar_seq_value, wchar_seq_len);
+        cdr_des.deserializeSequence(wstring_seq_value, wstring_seq_len);
+        cdr_des.deserializeSequence(string_seq_value, string_seq_len);
         cdr_des.deserialize(c_wstring_value);
     });
 
@@ -4541,9 +4546,17 @@ TEST(CDRTests, Complete)
     EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_seq_value, ldouble_seq_t, 5);
     EXPECT_EQ(wstring_seq_len, 5u);
     EXPECT_ARRAY_EQ(wstring_seq_value, wstring_seq_t, 5);
+    EXPECT_EQ(string_seq_len, 5u);
+    EXPECT_ARRAY_EQ(string_seq_value, string_seq_t, 5);
 
     EXPECT_EQ(strcmp(c_string_t, c_string_value), 0);
     EXPECT_EQ(wcscmp(c_wstring_t, c_wstring_value), 0);
+
+    for(size_t count = 0; count < wstring_seq_len; ++count)
+        wstring_seq_value[count].~basic_string();
+
+    for(size_t count = 0; count < string_seq_len; ++count)
+        string_seq_value[count].~basic_string();
 
     free(octet_seq_value);
     free(char_seq_value);
@@ -4559,6 +4572,7 @@ TEST(CDRTests, Complete)
     free(double_seq_value);
     free(ldouble_seq_value);
     free(wstring_seq_value);
+    free(string_seq_value);
     free(c_string_value);
     free(c_wstring_value);
 }
@@ -8924,6 +8938,9 @@ TEST(FastCDRTests, Complete)
 
     EXPECT_EQ(strcmp(c_string_t, c_string_value), 0);
     EXPECT_EQ(wcscmp(c_wstring_t, c_wstring_value), 0);
+
+    for(size_t count = 0; count < wstring_seq_len; ++count)
+        wstring_seq_value[count].~basic_string();
 
     free(octet_seq_value);
     free(char_seq_value);

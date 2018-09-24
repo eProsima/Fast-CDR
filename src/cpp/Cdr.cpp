@@ -1777,7 +1777,7 @@ const char* Cdr::readString(uint32_t &length)
     throw eprosima::fastcdr::exception::NotEnoughMemoryException(eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-std::wstring Cdr::readWString(uint32_t &length)
+const std::wstring Cdr::readWString(uint32_t &length)
 {
     std::wstring returnedValue = L"";
     state state_(*this);
@@ -1798,8 +1798,7 @@ std::wstring Cdr::readWString(uint32_t &length)
         wchar_t* wValue = new wchar_t[length];
         deserializeArray(wValue, length);
 #else
-        wchar_t* wValue;
-        wValue = reinterpret_cast<wchar_t*>(&m_currentPosition);
+        wchar_t* wValue = reinterpret_cast<wchar_t*>(&m_currentPosition);
         m_currentPosition += bytesLength;
 #endif
         if (wValue[length - 1] == '\0')
@@ -2290,7 +2289,7 @@ Cdr& Cdr::deserializeArray(long double *ldouble_t, size_t numElements)
             {
                 m_currentPosition += 8;   // Ignore first 8 bytes
                 m_currentPosition >> ldouble_t[i];
-                m_currentPosition += 8;    
+                m_currentPosition += 8;
             }
 #else
             m_currentPosition.rmemcopy(ldouble_t, totalSize);
@@ -2408,6 +2407,32 @@ Cdr& Cdr::deserializeStringSequence(std::string *&sequence_t, size_t &numElement
         sequence_t = reinterpret_cast<std::string*>(calloc(seqLength, sizeof(std::string)));
         for(uint32_t count = 0; count < seqLength; ++count)
             new(&sequence_t[count]) std::string;
+        deserializeArray(sequence_t, seqLength);
+    }
+    catch(eprosima::fastcdr::exception::Exception &ex)
+    {
+        free(sequence_t);
+        sequence_t = NULL;
+        setState(state_before_error);
+        ex.raise();
+    }
+
+    numElements = seqLength;
+    return *this;
+}
+
+Cdr& Cdr::deserializeWStringSequence(std::wstring *&sequence_t, size_t &numElements)
+{
+    uint32_t seqLength = 0;
+    state state_before_error(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        sequence_t = reinterpret_cast<std::wstring*>(calloc(seqLength, sizeof(std::wstring)));
+        for(uint32_t count = 0; count < seqLength; ++count)
+            new(&sequence_t[count]) std::wstring;
         deserializeArray(sequence_t, seqLength);
     }
     catch(eprosima::fastcdr::exception::Exception &ex)

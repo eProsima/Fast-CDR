@@ -1468,6 +1468,12 @@ namespace eprosima
                     {
                         return deserializeStringSequence(sequence_t, numElements);
                     }
+
+                template<class _T = std::wstring>
+                    FastCdr& deserializeSequence(std::wstring *&sequence_t, size_t &numElements)
+                    {
+                        return deserializeWStringSequence(sequence_t, numElements);
+                    }
 #endif
 
                 /*!
@@ -1510,6 +1516,12 @@ namespace eprosima
                     {
                         return deserializeStringSequence(sequence_t, numElements);
                     }
+
+                template<>
+                    FastCdr& deserializeSequence<std::wstring>(std::wstring *&sequence_t, size_t &numElements)
+                    {
+                        return deserializeWStringSequence(sequence_t, numElements);
+                    }
 #endif
 
             private:
@@ -1523,6 +1535,8 @@ namespace eprosima
                 FastCdr& deserializeBoolSequence(std::vector<bool> &vector_t);
 
                 FastCdr& deserializeStringSequence(std::string *&sequence_t, size_t &numElements);
+
+                FastCdr& deserializeWStringSequence(std::wstring *&sequence_t, size_t &numElements);
 
 #if HAVE_CXX0X
                 /*!

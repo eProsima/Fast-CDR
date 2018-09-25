@@ -31,6 +31,8 @@ $ctx.directIncludeDependencies : {include | #include "$include$.h"}; separator="
 #include <array>
 #include <string>
 #include <vector>
+#include <map>
+#include <bitset>
 
 #if defined(_WIN32)
 #if defined(EPROSIMA_USER_DLL_EXPORT)
@@ -123,7 +125,7 @@ $if(ctx.printexception)$
 class $exception.name$ : public eprosima::rpc::exception::UserException
 {
 public:
-    
+
     //! @brief Default constructor.
 	eProsima_user_DllExport $exception.name$();
 
@@ -150,7 +152,7 @@ public:
      * @param ex Exception to be moved.
      */
 	eProsima_user_DllExport $exception.name$& operator=($exception.name$&& ex);
-	
+
     //! @brief Destructor.
 	eProsima_user_DllExport virtual ~$exception.name$() throw();
 
@@ -158,11 +160,11 @@ public:
 	eProsima_user_DllExport virtual void raise() const;
 
     $exception.members:{ member |$public_member_declaration(member=member)$}; separator="\n"$
-    
+
     $size_functions(exception)$
 
     $serialization_functions(exception)$
-    
+
 private:
 	// Exception members
     $exception.members:{ member |$private_member_declaration(member=member)$}; separator="\n"$
@@ -202,44 +204,44 @@ public:
      * @brief Default constructor.
      */
     eProsima_user_DllExport $struct.name$();
-    
+
     /*!
      * @brief Default destructor.
      */
     eProsima_user_DllExport ~$struct.name$();
-    
+
     /*!
      * @brief Copy constructor.
      * @param x Reference to the object $struct.scopedname$ that will be copied.
      */
     eProsima_user_DllExport $struct.name$(const $struct.name$ &x);
-    
+
     /*!
      * @brief Move constructor.
      * @param x Reference to the object $struct.scopedname$ that will be copied.
      */
     eProsima_user_DllExport $struct.name$($struct.name$ &&x);
-    
+
     /*!
      * @brief Copy assignment.
      * @param x Reference to the object $struct.scopedname$ that will be copied.
      */
     eProsima_user_DllExport $struct.name$& operator=(const $struct.name$ &x);
-    
+
     /*!
      * @brief Move assignment.
      * @param x Reference to the object $struct.scopedname$ that will be copied.
      */
     eProsima_user_DllExport $struct.name$& operator=($struct.name$ &&x);
-    
+
     $struct.members:{$public_member_declaration(it)$}; separator="\n"$
-    
+
     $size_functions(struct)$
 
     $serialization_functions(struct)$
 
     $extensions : {$it$}; separator="\n"$
-    
+
 private:
     $struct.members:{$private_member_declaration(it)$}; separator="\n"$
 };
@@ -258,67 +260,123 @@ public:
      * @brief Default constructor.
      */
     eProsima_user_DllExport $union.name$();
-    
+
     /*!
      * @brief Default destructor.
      */
     eProsima_user_DllExport ~$union.name$();
-    
+
     /*!
      * @brief Copy constructor.
      * @param x Reference to the object $union.scopedname$ that will be copied.
      */
     eProsima_user_DllExport $union.name$(const $union.name$ &x);
-    
+
     /*!
      * @brief Move constructor.
      * @param x Reference to the object $union.scopedname$ that will be copied.
      */
     eProsima_user_DllExport $union.name$($union.name$ &&x);
-    
+
     /*!
      * @brief Copy assignment.
      * @param x Reference to the object $union.scopedname$ that will be copied.
      */
     eProsima_user_DllExport $union.name$& operator=(const $union.name$ &x);
-    
+
     /*!
      * @brief Move assignment.
      * @param x Reference to the object $union.scopedname$ that will be copied.
      */
     eProsima_user_DllExport $union.name$& operator=($union.name$ &&x);
-    
+
     /*!
      * @brief This function sets the discriminator value.
      * @param __d New value for the discriminator.
      * @exception eprosima::fastcdr::BadParamException This exception is thrown if the new value doesn't correspond to the selected union member.
      */
     eProsima_user_DllExport void _d($union.discriminator.cppTypename$ __d);
-    
+
     /*!
      * @brief This function returns the value of the discriminator.
      * @return Value of the discriminator
      */
     eProsima_user_DllExport $union.discriminator.cppTypename$ _d() const;
-    
+
     /*!
      * @brief This function returns a reference to the discriminator.
      * @return Reference to the discriminator.
      */
     eProsima_user_DllExport $union.discriminator.cppTypename$& _d();
-    
+
     $union.members:{$public_unionmember_declaration(it)$}; separator="\n"$
-    
+
     $size_functions(union)$
 
     $serialization_functions(union)$
 
     $extensions : {$it$}; separator="\n"$
-    
+
 private:
     $private_declaration(typecode=union.discriminator, name="_d")$
-    
+
     $union.members:{$private_member_declaration(it)$}; separator="\n"$
+};
+>>
+
+bitset_type(ctx, parent, bitset, extensions) ::= <<
+/*!
+ * @brief This class represents the structure $bitset.name$ defined by the user in the IDL file.
+ * @ingroup $ctx.trimfilename$
+ */
+class $bitset.name$
+{
+public:
+
+    /*!
+     * @brief Default constructor.
+     */
+    eProsima_user_DllExport $bitset.name$();
+
+    /*!
+     * @brief Default destructor.
+     */
+    eProsima_user_DllExport ~$bitset.name$();
+
+    /*!
+     * @brief Copy constructor.
+     * @param x Reference to the object $bitset.scopedname$ that will be copied.
+     */
+    eProsima_user_DllExport $bitset.name$(const $bitset.name$ &x);
+
+    /*!
+     * @brief Move constructor.
+     * @param x Reference to the object $bitset.scopedname$ that will be copied.
+     */
+    eProsima_user_DllExport $bitset.name$($bitset.name$ &&x);
+
+    /*!
+     * @brief Copy assignment.
+     * @param x Reference to the object $bitset.scopedname$ that will be copied.
+     */
+    eProsima_user_DllExport $bitset.name$& operator=(const $bitset.name$ &x);
+
+    /*!
+     * @brief Move assignment.
+     * @param x Reference to the object $bitset.scopedname$ that will be copied.
+     */
+    eProsima_user_DllExport $bitset.name$& operator=($bitset.name$ &&x);
+
+    $bitset.bitfields:{$public_bitfield_declaration(it)$}; separator="\n"$
+
+    $size_functions(bitset)$
+
+    $serialization_functions(bitset)$
+
+    $extensions : {$it$}; separator="\n"$
+
+private:
+    std::bitset<$bitset.bitSize$> m_bitset;
 };
 >>
 
@@ -402,6 +460,26 @@ inline eProsima_user_DllExport $member.typecode.cppTypename$& $member.name$()
 $endif$
 >>
 
+public_bitfield_declaration(member) ::= <<
+/*!
+ * @brief This function sets a value in member $member.name$
+ * @param _$member.name$ New value for member $member.name$
+ */
+eProsima_user_DllExport void $member.name$($member.typecode.cppTypename$ _$member.name$);
+
+/*!
+ * @brief This function returns the value of member $member.name$
+ * @return Value of member $member.name$
+ */
+eProsima_user_DllExport $member.typecode.cppTypename$ $member.name$() const;
+
+/*!
+ * @brief This function returns a reference to member $member.name$
+ * @return Reference to member $member.name$
+ */
+eProsima_user_DllExport $member.typecode.cppTypename$& $member.name$();
+>>
+
 private_member_declaration(member) ::= <<$private_declaration(typecode=member.typecode, name=member.name)$>>
 
 public_unionmember_declaration(member) ::= <<
@@ -466,7 +544,7 @@ $typecode.cppTypename$ m_$name$;
  *
  inline
  size_t getMaxSerializedSize() { return $type.maxSerializedSize$;}
- 
+
  *!
  * @brief This function calculates the space needed to serialize a type $type.scopedname$ without alignment.
  *        For all types with a variable size (strings, sequences) and without a maximum limit, this function uses

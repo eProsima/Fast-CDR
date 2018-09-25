@@ -23,6 +23,9 @@ namespace { char dummy; }
 #endif
 
 #include "$ctx.filename$.h"
+$if(ctx.generateTypeObject)$
+#include "$ctx.filename$TypeObject.h"
+$endif$
 
 $if(ctx.cdr)$
 #include <fastcdr/Cdr.h>
@@ -107,7 +110,7 @@ $if(ctx.anyCdr)$
 size_t $exception.scopedname$::getMaxCdrSerializedSize(size_t current_alignment)
 {
     size_t initial_alignment = current_alignment;
-            
+
     $exception.members : { member |$max_serialized_size(ctx=ctx, typecode=member.typecode, var="current_alignment")$}; separator="\n"$
 
     return current_alignment - initial_alignment;
@@ -179,6 +182,11 @@ struct_type(ctx, parent, struct, extensions) ::= <<
 $struct.scopedname$::$struct.name$()
 {
     $struct.members:{ member |$member_default_init(member=member)$}; separator="\n"$
+
+    $if(ctx.generateTypeObject)$
+    // Just to register all known types
+    register$ctx.filename$Types();
+    $endif$
 }
 
 $struct.scopedname$::~$struct.name$()
@@ -198,14 +206,14 @@ $struct.scopedname$::$struct.name$($struct.name$ &&x)
 $struct.scopedname$& $struct.scopedname$::operator=(const $struct.name$ &x)
 {
     $struct.members:{m_$it.name$ = x.m_$it.name$;}; separator="\n"$
-    
+
     return *this;
 }
 
 $struct.scopedname$& $struct.scopedname$::operator=($struct.name$ &&x)
 {
     $struct.members:{$member_move(it)$}; separator="\n"$
-    
+
     return *this;
 }
 
@@ -213,7 +221,7 @@ $if(ctx.anyCdr)$
 size_t $struct.scopedname$::getMaxCdrSerializedSize(size_t current_alignment)
 {
     size_t initial_alignment = current_alignment;
-            
+
     $struct.members : { member |$max_serialized_size(ctx=ctx, typecode=member.typecode, var="current_alignment")$}; separator="\n"$
 
     return current_alignment - initial_alignment;
@@ -260,6 +268,135 @@ $endif$
 $extensions : {$it$}; separator="\n"$
 >>
 
+bitset_type(ctx, parent, bitset) ::= <<
+$bitset.scopedname$::$bitset.name$()
+{
+    $if(ctx.generateTypeObject)$
+    // Just to register all known types
+    register$ctx.filename$Types();
+    $endif$
+}
+
+$bitset.scopedname$::~$bitset.name$()
+{
+}
+
+$bitset.scopedname$::$bitset.name$(const $bitset.name$ &x)
+{
+    m_bitset = x.m_bitset;
+}
+
+$bitset.scopedname$::$bitset.name$($bitset.name$ &&x)
+{
+    m_bitset = x.m_bitset;
+}
+
+$bitset.scopedname$& $bitset.scopedname$::operator=(const $bitset.name$ &x)
+{
+    m_bitset = x.m_bitset;
+
+    return *this;
+}
+
+$bitset.scopedname$& $bitset.scopedname$::operator=($bitset.name$ &&x)
+{
+    m_bitset = x.m_bitset;
+
+    return *this;
+}
+
+$if(ctx.anyCdr)$
+size_t $bitset.scopedname$::getMaxCdrSerializedSize(size_t current_alignment)
+{
+    size_t initial_alignment = current_alignment;
+
+    initial_alignment += sizeof(m_bitset);
+
+    return current_alignment - initial_alignment;
+}
+
+size_t $bitset.scopedname$::getCdrSerializedSize(const $bitset.scopedname$&, size_t current_alignment)
+{
+    size_t initial_alignment = current_alignment;
+
+    initial_alignment += sizeof(m_bitset);
+
+    return current_alignment - initial_alignment;
+}
+
+$endif$
+
+$if(ctx.cdr)$
+void $bitset.scopedname$::serialize(eprosima::fastcdr::Cdr &scdr) const
+{
+    scdr << static_cast<uint64_t>(m_bitset.to_ullong());
+}
+
+void $bitset.scopedname$::deserialize(eprosima::fastcdr::Cdr &dcdr)
+{
+    uint64_t temp = 0;
+    dcdr \>> temp;
+    m_bitset = temp;
+}
+
+$endif$
+
+$if(ctx.fastcdr)$
+void $bitset.scopedname$::serialize(eprosima::fastcdr::FastCdr &scdr) const
+{
+    scdr << static_cast<uint64_t>(m_bitset.to_ullong());
+}
+
+void $bitset.scopedname$::deserialize(eprosima::fastcdr::FastCdr &dcdr)
+{
+    uint64_t temp = 0;
+    dcdr \>> temp;
+    m_bitset = temp;
+}
+
+$endif$
+
+
+$bitset.bitfields:{$public_bitfield_definition(it)$}; separator="\n"$
+
+>>
+
+public_bitfield_definition(member) ::= <<
+void $bitset.scopedname$::$member.name$($member.typecode.cppTypename$ _$member.name$)
+{
+    int base = $member.basePosition$;
+$if(member.typecode.typecode.isType_7)$
+    m_bitset.set(base, _$member.name$);
+$else$
+    int size = $member.typecode.bitSize$;
+    for (int i = base + size - 1; i >= base; --i)
+    {
+        m_bitset.set(i, _$member.name$ | 0x01);
+        _$member.name$ = _$member.name$ \>> 1;
+    }
+$endif$
+
+}
+
+$member.typecode.cppTypename$ $bitset.scopedname$::$member.name$() const
+{
+    int base = $member.basePosition$;
+$if(member.typecode.typecode.isType_7)$
+    return m_bitset.test(base);
+$else$
+    int size = $member.typecode.bitSize$;
+    std::bitset<$member.typecode.bitSize$> aux;
+    for (int i = size - 1; i >= 0; --i)
+    {
+        aux.set(i, m_bitset.test(i + base));
+    }
+    return static_cast<$member.typecode.cppTypename$>(aux.to_ullong());
+$endif$
+
+}
+
+>>
+
 union_type(ctx, parent, union) ::= <<
 $union.scopedname$::$union.name$()
 {
@@ -278,7 +415,7 @@ $union.scopedname$::~$union.name$()
 $union.scopedname$::$union.name$(const $union.name$ &x)
 {
     m__d = x.m__d;
-    
+
     switch(m__d)
     {
         $union.members:{$unionmember_copy(it)$}; separator="\n"$
@@ -289,7 +426,7 @@ $union.scopedname$::$union.name$(const $union.name$ &x)
 $union.scopedname$::$union.name$($union.name$ &&x)
 {
     m__d = x.m__d;
-    
+
     switch(m__d)
     {
         $union.members:{$unionmember_move(it)$}; separator="\n"$
@@ -300,40 +437,43 @@ $union.scopedname$::$union.name$($union.name$ &&x)
 $union.scopedname$& $union.scopedname$::operator=(const $union.name$ &x)
 {
     m__d = x.m__d;
-    
+
     switch(m__d)
     {
         $union.members:{$unionmember_copy(it)$}; separator="\n"$
         $unionmemberdefault_copy(union.defaultMember)$
     }
-    
+
     return *this;
 }
 
 $union.scopedname$& $union.scopedname$::operator=($union.name$ &&x)
 {
     m__d = x.m__d;
-    
+
     switch(m__d)
     {
         $union.members:{$unionmember_move(it)$}; separator="\n"$
         $unionmemberdefault_move(union.defaultMember)$
     }
-    
+
     return *this;
 }
 
 void $union.scopedname$::_d($union.discriminator.cppTypename$ __d)
 {
     bool b = false;
-    
+
     switch(m__d)
     {
         $union.members:{$unionmember_discriminator_case(member=it, totallabels=union.totallabels)$}; separator="\n"$
     }
-    
-    if(!b) throw BadParamException("Discriminator doesn't correspond with the selected union member");
-    
+
+    if(!b)
+    {
+        throw BadParamException("Discriminator doesn't correspond with the selected union member");
+    }
+
     m__d = __d;
 }
 
@@ -457,14 +597,14 @@ void $class$::$member.name$($member.typecode.cppTypename$ _$member.name$)
 $member.typecode.cppTypename$ $class$::$member.name$() const
 {
     $unionmember_check_case_list(member=member, totallabels=totallabels)$
-    
+
     return m_$member.name$;
 }
 
 $member.typecode.cppTypename$& $class$::$member.name$()
 {
     $unionmember_check_case_list(member=member, totallabels=totallabels)$
-    
+
     return m_$member.name$;
 }
 $else$
@@ -483,14 +623,14 @@ void $class$::$member.name$($member.typecode.cppTypename$ &&_$member.name$)
 const $member.typecode.cppTypename$& $class$::$member.name$() const
 {
     $unionmember_check_case_list(member=member, totallabels=totallabels)$
-    
+
     return m_$member.name$;
 }
 
 $member.typecode.cppTypename$& $class$::$member.name$()
 {
     $unionmember_check_case_list(member=member, totallabels=totallabels)$
-    
+
     return m_$member.name$;
 }
 $endif$
@@ -590,7 +730,7 @@ $endif$
 unionmember_check_case_list(member, totallabels) ::= <<
 $if(member.default)$
 bool b = true;
-    
+
 switch(m__d)
 {
     $totallabels:{case $it$:}; separator="\n"$
@@ -601,7 +741,7 @@ switch(m__d)
 }
 $else$
 bool b = false;
-    
+
 switch(m__d)
 {
     $member.labels:{case $it$:}; separator="\n"$
@@ -611,8 +751,11 @@ switch(m__d)
     break;
 }
 $endif$
-    
-if(!b) throw BadParamException("This member is not been selected");
+
+if(!b)
+{
+    throw BadParamException("This member is not been selected");
+}
 >>
 
 unionmember_case_selection_se(ctx, member) ::= <<

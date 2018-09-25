@@ -672,9 +672,7 @@ FastCdr& FastCdr::deserializeStringSequence(std::string *&sequence_t, size_t &nu
 
     try
     {
-        sequence_t = reinterpret_cast<std::string*>(calloc(seqLength, sizeof(std::string)));
-        for(uint32_t count = 0; count < seqLength; ++count)
-            new(&sequence_t[count]) std::string;
+        sequence_t = new std::string[seqLength];
         deserializeArray(sequence_t, seqLength);
     }
     catch(eprosima::fastcdr::exception::Exception &ex)
@@ -698,9 +696,7 @@ FastCdr& FastCdr::deserializeWStringSequence(std::wstring *&sequence_t, size_t &
 
     try
     {
-        sequence_t = reinterpret_cast<std::wstring*>(calloc(seqLength, sizeof(std::wstring)));
-        for(uint32_t count = 0; count < seqLength; ++count)
-            new(&sequence_t[count]) std::wstring;
+        sequence_t = new std::wstring[seqLength];
         deserializeArray(sequence_t, seqLength);
     }
     catch(eprosima::fastcdr::exception::Exception &ex)

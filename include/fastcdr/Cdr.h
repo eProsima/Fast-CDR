@@ -2490,7 +2490,7 @@ namespace eprosima
                     }
 
                 template<>
-                    Cdr& deserializeSequence<std::string>(std::wstring *&sequence_t, size_t &numElements)
+                    Cdr& deserializeSequence<std::wstring>(std::wstring *&sequence_t, size_t &numElements)
                     {
                         return deserializeWStringSequence(sequence_t, numElements);
                     }

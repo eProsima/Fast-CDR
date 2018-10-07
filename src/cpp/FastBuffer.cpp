@@ -81,11 +81,29 @@ bool FastBuffer::resize(size_t minSizeInc)
         {
             m_bufferSize += incBufferSize;
 
-            m_buffer = reinterpret_cast<char*>(realloc(m_buffer, m_bufferSize));
+            /*
+            Summary: Common realloc mistake: 'm_buffer' nulled but not freed upon failure
+            Message: Common realloc mistake: 'm_buffer' nulled but not freed upon failure
+             */
 
-            if(m_buffer != NULL)
-            {
-                return true;
+            void *p = realloc(m_buffer, m_bufferSize);
+            /*
+            more info: http://www.cplusplus.com/reference/cstdlib/realloc/
+            If the function fails to allocate the requested block of memory, a null pointer is returned,
+            and the memory block pointed to by argument ptr is not deallocated
+            (it is still valid, and with its contents unchanged).
+             */
+
+            if (p) {
+               m_buffer = reinterpret_cast<char*>(p);
+
+               if (m_buffer != NULL) {
+                  return true;
+               }
+            }
+            else {
+               free(m_buffer);
+               m_bufferSize = 0;
             }
         }
     }

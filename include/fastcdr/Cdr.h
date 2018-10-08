@@ -93,7 +93,7 @@ namespace eprosima
                     /*!
                      * @brief Default constructor.
                      */
-                    state(const Cdr &cdr);
+                    explicit state(const Cdr &cdr);
 
                     /*!
                      * @brief Copy constructor.

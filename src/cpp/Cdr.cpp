@@ -1438,6 +1438,15 @@ Cdr& Cdr::deserialize(long double &ldouble_t)
         {
             char *dst = reinterpret_cast<char*>(&ldouble_t);
 
+            m_currentPosition++ >> dst[15];
+            m_currentPosition++ >> dst[14];
+            m_currentPosition++ >> dst[13];
+            m_currentPosition++ >> dst[12];
+            m_currentPosition++ >> dst[11];
+            m_currentPosition++ >> dst[10];
+            m_currentPosition++ >> dst[9];
+            m_currentPosition++ >> dst[8];
+
             m_currentPosition++ >> dst[7];
             m_currentPosition++ >> dst[6];
             m_currentPosition++ >> dst[5];

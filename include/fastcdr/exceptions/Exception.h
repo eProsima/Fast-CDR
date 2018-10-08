@@ -53,7 +53,7 @@ namespace eprosima
                      *
                      * @param message A error message. This message is copied.
                      */
-                    Cdr_DllAPI Exception(const char* const &message);
+                    explicit Cdr_DllAPI Exception(const char* const &message);
 
                     /*!
                      * @brief Default copy constructor.

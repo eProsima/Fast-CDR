@@ -84,12 +84,8 @@ bool FastBuffer::resize(size_t minSizeInc)
             if (p)
             {
                m_buffer = reinterpret_cast<char*>(p);
-
-               if (m_buffer != NULL) {
-                  m_bufferSize = newBufferSize;
-
-                  return true;
-               }
+               m_bufferSize = newBufferSize;
+               return true;
             }
         }
     }

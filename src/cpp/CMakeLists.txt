@@ -50,7 +50,7 @@ elseif(NOT EPROSIMA_INSTALLER)
     add_library(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCES})
     set_common_compile_options(${PROJECT_NAME})
     set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
-    set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION})
+    set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
 
     target_compile_definitions(${PROJECT_NAME} PRIVATE ${PROJECT_NAME_UPPER}_SOURCE)
 

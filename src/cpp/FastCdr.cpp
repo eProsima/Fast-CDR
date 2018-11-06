@@ -121,6 +121,43 @@ FastCdr& FastCdr::serialize(const char *string_t)
     return *this;
 }
 
+FastCdr& FastCdr::serialize(const wchar_t *string_t)
+{
+    uint32_t bytesLength = 0;
+    size_t wstrlen = 0;
+
+    if (string_t != nullptr)
+    {
+        wstrlen = wcslen(string_t);
+        bytesLength = static_cast<uint32_t>(wstrlen * 4);
+    }
+
+    if(bytesLength > 0)
+    {
+        FastCdr::state state_(*this);
+        serialize(static_cast<uint32_t>(wstrlen));
+
+        if(((m_lastPosition - m_currentPosition) >= bytesLength) || resize(bytesLength))
+        {
+#if defined(_WIN32)
+            serializeArray(string_t, wstrlen);
+#else
+            m_currentPosition.memcopy(string_t, bytesLength);
+            m_currentPosition += bytesLength; // size on bytes
+#endif
+        }
+        else
+        {
+            setState(state_);
+            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        }
+    }
+    else
+        serialize(bytesLength);
+
+    return *this;
+}
+
 FastCdr& FastCdr::serializeArray(const bool *bool_t, size_t numElements)
 {
     size_t totalSize = sizeof(*bool_t)*numElements;
@@ -240,12 +277,22 @@ FastCdr& FastCdr::serializeArray(const double *double_t, size_t numElements)
 
 FastCdr& FastCdr::serializeArray(const long double *ldouble_t, size_t numElements)
 {
-    size_t totalSize = sizeof(*ldouble_t) * numElements;
+    size_t totalSize = 16 * numElements;
 
     if(((m_lastPosition - m_currentPosition) >= totalSize) || resize(totalSize))
     {
+#if defined(_WIN32)
+        for (size_t idx = 0; idx < numElements; ++idx)
+        {
+            m_currentPosition << static_cast<long double>(0);
+            m_currentPosition += 8;
+            m_currentPosition << ldouble_t[idx];
+            m_currentPosition += 8;
+        }
+#else
         m_currentPosition.memcopy(ldouble_t, totalSize);
         m_currentPosition += totalSize;
+#endif
 
         return *this;
     }
@@ -303,6 +350,43 @@ FastCdr& FastCdr::deserialize(char *&string_t)
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
+FastCdr& FastCdr::deserialize(wchar_t *&string_t)
+{
+    uint32_t length = 0;
+    FastCdr::state state_before_error(*this);
+
+    deserialize(length);
+
+    if(length == 0)
+    {
+        string_t = NULL;
+        return *this;
+    }
+    else if((m_lastPosition - m_currentPosition) >= length)
+    {
+        // Allocate memory.
+        string_t = reinterpret_cast<wchar_t*>(calloc(length + 1, sizeof(wchar_t))); // WStrings never serialize terminating zero
+
+#if defined(_WIN32)
+        for (size_t idx = 0; idx < length; ++idx)
+        {
+            uint32_t temp;
+            m_currentPosition >> temp;
+            string_t[idx] = static_cast<wchar_t>(temp);
+            m_currentPosition += 4;
+        }
+#else
+        memcpy(string_t, &m_currentPosition, length * sizeof(wchar_t));
+        m_currentPosition += length * sizeof(wchar_t);
+#endif
+
+        return *this;
+    }
+
+    setState(state_before_error);
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+}
+
 const char* FastCdr::readString(uint32_t &length)
 {
     const char* returnedValue = "";
@@ -323,6 +407,43 @@ const char* FastCdr::readString(uint32_t &length)
     }
 
     setState(state_before_error);
+    throw eprosima::fastcdr::exception::NotEnoughMemoryException(eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+}
+
+std::wstring FastCdr::readWString(uint32_t &length)
+{
+    std::wstring returnedValue = L"";
+    state state_(*this);
+
+    *this >> length;
+    uint32_t bytesLength = length * 4;
+
+    if(bytesLength == 0)
+    {
+        return returnedValue;
+    }
+    else if((m_lastPosition - m_currentPosition) >= bytesLength)
+    {
+
+#if defined(_WIN32)
+        wchar_t* wValue = new wchar_t[length];
+        deserializeArray(wValue, length);
+#else
+        wchar_t* wValue = reinterpret_cast<wchar_t*>(&m_currentPosition);
+        m_currentPosition += bytesLength;
+#endif
+        if (wValue[length - 1] == '\0')
+        {
+            --length;
+        }
+        returnedValue = std::wstring(wValue, length);
+#if defined(_WIN32)
+        delete [] wValue;
+#endif
+        return returnedValue;
+    }
+
+    setState(state_);
     throw eprosima::fastcdr::exception::NotEnoughMemoryException(eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
@@ -455,12 +576,21 @@ FastCdr& FastCdr::deserializeArray(double *double_t, size_t numElements)
 
 FastCdr& FastCdr::deserializeArray(long double *ldouble_t, size_t numElements)
 {
-    size_t totalSize = sizeof(*ldouble_t) * numElements;
+    size_t totalSize = 16 * numElements;
 
     if((m_lastPosition - m_currentPosition) >= totalSize)
     {
+#if defined(_WIN32)
+        for (size_t idx = 0; idx < numElements; ++idx)
+        {
+            m_currentPosition += 8; // Windows ignores the first 8 bytes
+            m_currentPosition >> ldouble_t[idx];
+            m_currentPosition += 8;
+        }
+#else
         m_currentPosition.rmemcopy(ldouble_t, totalSize);
         m_currentPosition += totalSize;
+#endif
 
         return *this;
     }
@@ -542,9 +672,31 @@ FastCdr& FastCdr::deserializeStringSequence(std::string *&sequence_t, size_t &nu
 
     try
     {
-        sequence_t = reinterpret_cast<std::string*>(calloc(seqLength, sizeof(std::string)));
-        for(uint32_t count = 0; count < seqLength; ++count)
-            new(&sequence_t[count]) std::string;
+        sequence_t = new std::string[seqLength];
+        deserializeArray(sequence_t, seqLength);
+    }
+    catch(eprosima::fastcdr::exception::Exception &ex)
+    {
+        free(sequence_t);
+        sequence_t = NULL;
+        setState(state_before_error);
+        ex.raise();
+    }
+
+    numElements = seqLength;
+    return *this;
+}
+
+FastCdr& FastCdr::deserializeWStringSequence(std::wstring *&sequence_t, size_t &numElements)
+{
+    uint32_t seqLength = 0;
+    state state_before_error(*this);
+
+    deserialize(seqLength);
+
+    try
+    {
+        sequence_t = new std::wstring[seqLength];
         deserializeArray(sequence_t, seqLength);
     }
     catch(eprosima::fastcdr::exception::Exception &ex)

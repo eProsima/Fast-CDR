@@ -82,6 +82,8 @@ public class $struct.name$
 }
 >>
 
+bitset_type(ctx, parent, bitset, extension) ::= <<>>
+
 union_type(ctx, parent, union, extension) ::= <<
 public class $union.name$
 {
@@ -204,7 +206,7 @@ public class $enum.name$
     {
         return new $enum.name$(value);
     }
-    
+
     protected $enum.name$(int value)
     {
         value = value_;

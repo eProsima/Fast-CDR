@@ -21,6 +21,8 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include <map>
+#include <iostream>
 
 #if !__APPLE__
 #include <malloc.h>
@@ -129,13 +131,19 @@ namespace eprosima
 
                 /*!
                  * @brief This function reads the encapsulation of the CDR stream.
-                 *        If the CDR stream contains an encapsulation, then this function will be calles before starting to deserialize.
+                 *        If the CDR stream contains an encapsulation, then this function should be called before starting to deserialize.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
                  * @exception exception::BadParamException This exception is thrown when trying to deserialize an invalid value.
                  */
                 Cdr& read_encapsulation();
 
+                /*!
+                 * @brief This function writes the encapsulation of the CDR stream.
+                 *        If the CDR stream should contain an encapsulation, then this function should be called before starting to serialize.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
                 Cdr& serialize_encapsulation();
 
                 /*!
@@ -144,7 +152,10 @@ namespace eprosima
                  */
                 DDSCdrPlFlag getDDSCdrPlFlag() const;
 
-                // TODO
+                /*!
+                * @brief This function sets the parameter list flag when the CDR type is eprosima::fastcdr::DDS_CDR.
+                * @param plFlag New value for the flag that specifies if the content is a parameter list.
+                */
                 void setDDSCdrPlFlag(DDSCdrPlFlag plFlag);
 
                 /*!
@@ -153,17 +164,23 @@ namespace eprosima
                  */
                 uint16_t getDDSCdrOptions() const;
 
-                // TODO
+                /*!
+                * @brief This function sets the option flags when the CDR type is eprosima::fastcdr::DDS_CDR.
+                * @param options New value for the option flags.
+                */
                 void setDDSCdrOptions(uint16_t options);
 
-                // TODO
-                void changeEndianness(Endianness endianness); 
+                /*!
+                * @brief This function sets the current endianness used by the CDR type.
+                * @param endianness The new endianness value.
+                */
+                void changeEndianness(Endianness endianness);
 
                 /*!
                  * @brief This function returns the current endianness used by the CDR type.
                  * @return The endianness.
                  */
-                Endianness endianness() { return static_cast<Endianness>(m_endianness); }
+                Endianness endianness() const { return static_cast<Endianness>(m_endianness); }
 
                 /*!
                  * @brief This function skips a number of bytes in the CDR stream buffer.
@@ -179,6 +196,7 @@ namespace eprosima
 
                 /*!
                  * @brief This function returns the pointer to the current used buffer.
+                 * @return Pointer to the starting position of the buffer.
                  */
                 char* getBufferPointer();
 
@@ -194,7 +212,12 @@ namespace eprosima
                  */
                 inline size_t getSerializedDataLength() const { return m_currentPosition - m_cdrBuffer.begin();}
 
-                /*! TODO */
+                /*!
+                 * @brief Get the number of bytes needed to align a position to certain data size.
+                 * @param current_alignment Position to be aligned.
+                 * @param dataSize Size of next data to process (should be power of two).
+                 * @return Number of required alignment bytes.
+                 */
                 inline static size_t alignment(size_t current_alignment, size_t dataSize) { return (dataSize - (current_alignment % dataSize)) & (dataSize-1);}
 
                 /*!
@@ -209,6 +232,11 @@ namespace eprosima
                  */
                 void setState(state &state);
 
+                /*!
+                 * @brief This function moves the alignment forward.
+                 * @param numBytes The number of bytes the alignment should advance.
+                 * @return True If alignment was moved successfully.
+                 */
                 bool moveAlignmentForward(size_t numBytes);
 
                 /*!
@@ -272,7 +300,12 @@ namespace eprosima
                  */
                 inline Cdr& operator<<(const int32_t long_t){return serialize(long_t);}
 
-                // TODO in FastCdr
+                /*!
+                 * @brief This operator serializes a wide-char.
+                 * @param wchar The value of the wide-char that will be serialized in the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
                 inline Cdr& operator<<(const wchar_t wchar){return serialize(wchar);}
 
                 /*!
@@ -323,10 +356,20 @@ namespace eprosima
                  */
                 inline Cdr& operator<<(const bool bool_t){return serialize(bool_t);}
 
-                //TODO
+                /*!
+                 * @brief This operator serializes a null-terminated c-string.
+                 * @param string_t Pointer to the begining of the string that will be serialized in the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
                 inline Cdr& operator<<(const char *string_t){return serialize(string_t);}
 
-                //TODO
+                /*!
+                 * @brief This operator serializes a null-terminated c-string.
+                 * @param string_t Pointer to the begining of the string that will be serialized in the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
                 inline Cdr& operator<<(char *string_t){return serialize(string_t);}
 
                 /*!
@@ -336,6 +379,14 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
                 inline Cdr& operator<<(const std::string &string_t){return serialize(string_t);}
+
+                /*!
+                 * @brief This operator serializes a wstring.
+                 * @param string_t The wstring that will be serialized in the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
+                inline Cdr& operator<<(const std::wstring &string_t){return serialize(string_t);}
 
 #if HAVE_CXX0X
                 /*!
@@ -357,7 +408,21 @@ namespace eprosima
                 template<class _T>
                     inline Cdr& operator<<(const std::vector<_T> &vector_t){return serialize<_T>(vector_t);}
 
-                // TODO
+                /*!
+                 * @brief This operator template is used to serialize maps.
+                 * @param map_t The map that will be serialized in the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
+                template<class _K, class _T>
+                    inline Cdr& operator<<(const std::map<_K, _T> &map_t){return serialize<_K, _T>(map_t);}
+
+                /*!
+                 * @brief This operator template is used to serialize any other non-basic type.
+                 * @param type_t A reference to the object that will be serialized in the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
                 template<class _T>
                     inline Cdr& operator<<(const _T &type_t)
                     {
@@ -422,6 +487,12 @@ namespace eprosima
                 inline Cdr& operator>>(int32_t &long_t){return deserialize(long_t);}
 
                 // TODO in FastCdr
+                /*!
+                 * @brief This operator deserializes a wide-char.
+                 * @param wchar The variable that will store the wide-char read from the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
                 inline Cdr& operator>>(wchar_t &wchar){return deserialize(wchar);}
 
                 /*!
@@ -473,7 +544,15 @@ namespace eprosima
                  */
                 inline Cdr& operator>>(bool &bool_t){return deserialize(bool_t);}
 
-                //TODO
+                /*!
+                 * @brief This operator deserializes a null-terminated c-string.
+                 * @param string_t The variable that will store the c-string read from the buffer.
+                 *                 Please note that a newly allocated string will be returned.
+                 *                 The caller should free the returned pointer when appropiate.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 * @exception exception::BadParamException This exception is thrown when trying to deserialize an invalid value.
+                 */
                 inline Cdr& operator>>(char *&string_t){return deserialize(string_t);}
 
                 /*!
@@ -483,6 +562,14 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
                  */
                 inline Cdr& operator>>(std::string &string_t){return deserialize(string_t);}
+
+                /*!
+                 * @brief This operator deserializes a string.
+                 * @param string_t The variable that will store the string read from the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                inline Cdr& operator>>(std::wstring &string_t){return deserialize(string_t);}
 
 #if HAVE_CXX0X
                 /*!
@@ -504,7 +591,21 @@ namespace eprosima
                 template<class _T>
                     inline Cdr& operator>>(std::vector<_T> &vector_t){return deserialize<_T>(vector_t);}
 
-                // TODO
+                /*!
+                 * @brief This operator template is used to deserialize maps.
+                 * @param map_t The variable that will store the map read from the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                template<class _K, class _T>
+                    inline Cdr& operator>>(std::map<_K, _T> &map_t){return deserialize<_K, _T>(map_t);}
+
+                /*!
+                 * @brief This operator template is used to deserialize any other non-basic type.
+                 * @param type_t The variable that will store the object read from the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
                 template<class _T>
                     inline Cdr& operator>>(_T &type_t)
                     {
@@ -521,7 +622,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint8_t octet_t)
                     {
-                        return serialize(static_cast<const char>(octet_t));
+                        return serialize(static_cast<char>(octet_t));
                     }
 
                 /*!
@@ -534,7 +635,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint8_t octet_t, Endianness endianness)
                     {
-                        return serialize(static_cast<const char>(octet_t), endianness);
+                        return serialize(static_cast<char>(octet_t), endianness);
                     }
 
                 /*!
@@ -567,7 +668,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const int8_t int8)
                     {
-                        return serialize(static_cast<const char>(int8));
+                        return serialize(static_cast<char>(int8));
                     }
 
                 /*!
@@ -580,7 +681,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const int8_t int8, Endianness endianness)
                     {
-                        return serialize(static_cast<const char>(int8), endianness);
+                        return serialize(static_cast<char>(int8), endianness);
                     }
 
                 /*!
@@ -592,7 +693,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint16_t ushort_t)
                     {
-                        return serialize(static_cast<const int16_t>(ushort_t));
+                        return serialize(static_cast<int16_t>(ushort_t));
                     }
 
                 /*!
@@ -605,7 +706,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint16_t ushort_t, Endianness endianness)
                     {
-                        return serialize(static_cast<const int16_t>(ushort_t), endianness);
+                        return serialize(static_cast<int16_t>(ushort_t), endianness);
                     }
 
                 /*!
@@ -634,7 +735,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint32_t ulong_t)
                     {
-                        return serialize(static_cast<const int32_t>(ulong_t));
+                        return serialize(static_cast<int32_t>(ulong_t));
                     }
 
                 /*!
@@ -647,7 +748,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint32_t ulong_t, Endianness endianness)
                     {
-                        return serialize(static_cast<const int32_t>(ulong_t), endianness);
+                        return serialize(static_cast<int32_t>(ulong_t), endianness);
                     }
 
                 /*!
@@ -667,16 +768,29 @@ namespace eprosima
                  */
                 Cdr& serialize(const int32_t long_t, Endianness endianness);
 
+                /*!
+                 * @brief This function serializes a wide-char.
+                 * @param wchar The value of the wide-char that will be serialized in the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
                 inline
                     Cdr& serialize(const wchar_t wchar)
                     {
-                        return serialize(static_cast<const uint32_t>(wchar));
+                        return serialize(static_cast<uint32_t>(wchar));
                     }
 
+                /*!
+                 * @brief This function serializes a wide-char with a different endianness.
+                 * @param wchar The value of the wide-char that will be serialized in the buffer.
+                 * @param endianness Endianness that will be used in the serialization of this value.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
                 inline
                     Cdr& serialize(const wchar_t wchar, Endianness endianness)
                     {
-                        return serialize(static_cast<const uint32_t>(wchar), endianness);
+                        return serialize(static_cast<uint32_t>(wchar), endianness);
                     }
 
                 /*!
@@ -688,7 +802,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint64_t ulonglong_t)
                     {
-                        return serialize(static_cast<const int64_t>(ulonglong_t));
+                        return serialize(static_cast<int64_t>(ulonglong_t));
                     }
 
                 /*!
@@ -701,7 +815,7 @@ namespace eprosima
                 inline
                     Cdr& serialize(const uint64_t ulonglong_t, Endianness endianness)
                     {
-                        return serialize(static_cast<const int64_t>(ulonglong_t), endianness);
+                        return serialize(static_cast<int64_t>(ulonglong_t), endianness);
                     }
 
                 /*!
@@ -761,6 +875,7 @@ namespace eprosima
                  * @param ldouble_t The value of the long double that will be serialized in the buffer.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 * @note Due to internal representation differences, WIN32 and *NIX like systems are not compatible.
                  */
                 Cdr& serialize(const long double ldouble_t);
 
@@ -770,6 +885,7 @@ namespace eprosima
                  * @param endianness Endianness that will be used in the serialization of this value.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 * @note Due to internal representation differences, WIN32 and *NIX like systems are not compatible.
                  */
                 Cdr& serialize(const long double ldouble_t, Endianness endianness);
 
@@ -800,7 +916,23 @@ namespace eprosima
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
+                inline Cdr& serialize(char *string_t) { return serialize(static_cast<const char*>(string_t)); }
+
+                /*!
+                 * @brief This function serializes a string.
+                 * @param string_t The pointer to the string that will be serialized in the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
                 Cdr& serialize(const char *string_t);
+
+                /*!
+                 * @brief This function serializes a wstring.
+                 * @param string_t The pointer to the wstring that will be serialized in the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
+                Cdr& serialize(const wchar_t *string_t);
 
                 /*!
                  * @brief This function serializes a string with a different endianness.
@@ -811,11 +943,14 @@ namespace eprosima
                  */
                 Cdr& serialize(const char *string_t, Endianness endianness);
 
-                //TODO
-                inline Cdr& serialize(char *string_t) {return serialize(static_cast<const char*>(string_t));}
-
-                //TODO
-                inline Cdr& serialize(char *string_t, Endianness endianness) {return serialize(static_cast<const char*>(string_t), endianness);}
+                /*!
+                 * @brief This function serializes a wstring with a different endianness.
+                 * @param string_t The pointer to the wstring that will be serialized in the buffer.
+                 * @param endianness Endianness that will be used in the serialization of this value.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
+                Cdr& serialize(const wchar_t *string_t, Endianness endianness);
 
                 /*!
                  * @brief This function serializes a std::string.
@@ -825,6 +960,15 @@ namespace eprosima
                  */
                 inline
                     Cdr& serialize(const std::string &string_t) {return serialize(string_t.c_str());}
+
+                /*!
+                 * @brief This function serializes a std::wstring.
+                 * @param string_t The wstring that will be serialized in the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
+                inline
+                    Cdr& serialize(const std::wstring &string_t) {return serialize(string_t.c_str());}
 
                 /*!
                  * @brief This function serializes a std::string with a different endianness.
@@ -859,13 +1003,13 @@ namespace eprosima
                     { return serializeArray(array_t.data(), array_t.size(), endianness);}
 #endif
 
+#if !defined(_MSC_VER) && HAVE_CXX0X
                 /*!
                  * @brief This function template serializes a sequence of booleans.
                  * @param vector_t The sequence that will be serialized in the buffer.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
-#if !defined(_MSC_VER) && HAVE_CXX0X
                 template<class _T = bool>
                     Cdr& serialize(const std::vector<bool> &vector_t)
                     {
@@ -899,7 +1043,44 @@ namespace eprosima
                         return *this;
                     }
 
-#ifdef _MSC_VER 
+                /*!
+                 * @brief This function template serializes a map.
+                 * @param map_t The map that will be serialized in the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
+                template<class _K, class _T>
+                    Cdr& serialize(const std::map<_K, _T> &map_t)
+                    {
+                        state state_(*this);
+
+                        *this << static_cast<int32_t>(map_t.size());
+
+                        try
+                        {
+                            for (auto it_pair = map_t.begin(); it_pair != map_t.end(); ++it_pair)
+                            {
+                                *this << it_pair->first;
+                                *this << it_pair->second;
+                            }
+                            //return serializeArray(map_t.data(), map_t.size());
+                        }
+                        catch(eprosima::fastcdr::exception::Exception &ex)
+                        {
+                            setState(state_);
+                            ex.raise();
+                        }
+
+                        return *this;
+                    }
+
+#ifdef _MSC_VER
+                /*!
+                 * @brief This function template serializes a sequence of booleans.
+                 * @param vector_t The sequence that will be serialized in the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
                 template<>
                     Cdr& serialize<bool>(const std::vector<bool> &vector_t)
                     {
@@ -934,7 +1115,12 @@ namespace eprosima
                         return *this;
                     }
 
-                // TODO
+                /*!
+                 * @brief This function template serializes a non-basic object.
+                 * @param type_t The object that will be serialized in the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
                 template<class _T>
                     inline Cdr& serialize(const _T &type_t)
                     {
@@ -1111,8 +1297,23 @@ namespace eprosima
                  */
                 Cdr& serializeArray(const int32_t *long_t, size_t numElements, Endianness endianness);
 
+                /*!
+                 * @brief This function serializes an array of wide-chars.
+                 * @param wchar The array of wide-chars that will be serialized in the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
                 Cdr& serializeArray(const wchar_t *wchar, size_t numElements);
 
+                /*!
+                 * @brief This function serializes an array of wide-chars with a different endianness.
+                 * @param wchar The array of longs that will be serialized in the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @param endianness Endianness that will be used in the serialization of this value.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
                 Cdr& serializeArray(const wchar_t *wchar, size_t numElements, Endianness endianness);
 
                 /*!
@@ -1241,7 +1442,13 @@ namespace eprosima
                         return serializeArray(bool_t, numElements);
                     }
 
-                // TODO
+                /*!
+                 * @brief This function serializes an array of strings.
+                 * @param string_t The array of strings that will be serialized in the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
                 inline
                     Cdr& serializeArray(const std::string *string_t, size_t numElements)
                     {
@@ -1250,6 +1457,29 @@ namespace eprosima
                         return *this;
                     }
 
+                /*!
+                 * @brief This function serializes an array of wide-strings.
+                 * @param string_t The array of wide-strings that will be serialized in the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
+                inline
+                    Cdr& serializeArray(const std::wstring *string_t, size_t numElements)
+                    {
+                        for(size_t count = 0; count < numElements; ++count)
+                            serialize(string_t[count].c_str());
+                        return *this;
+                    }
+
+                /*!
+                 * @brief This function serializes an array of strings with a different endianness.
+                 * @param string_t The array of strings that will be serialized in the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @param endianness Endianness that will be used in the serialization of this value.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
                 inline
                     Cdr& serializeArray(const std::string *string_t, size_t numElements, Endianness endianness)
                     {
@@ -1270,7 +1500,41 @@ namespace eprosima
                         return *this;
                     }
 
-                // TODO
+                /*!
+                 * @brief This function serializes an array of wide-strings with a different endianness.
+                 * @param string_t The array of wide-strings that will be serialized in the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @param endianness Endianness that will be used in the serialization of this value.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
+                inline
+                    Cdr& serializeArray(const std::wstring *string_t, size_t numElements, Endianness endianness)
+                    {
+                        bool auxSwap = m_swapBytes;
+                        m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+                        try
+                        {
+                            serializeArray(string_t, numElements);
+                            m_swapBytes = auxSwap;
+                        }
+                        catch(eprosima::fastcdr::exception::Exception &ex)
+                        {
+                            m_swapBytes = auxSwap;
+                            ex.raise();
+                        }
+
+                        return *this;
+                    }
+
+                /*!
+                 * @brief This function template serializes an array of sequences of objects.
+                 * @param vector_t The array of sequences of objects that will be serialized in the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
                 template<class _T>
                     Cdr& serializeArray(const std::vector<_T> *vector_t, size_t numElements)
                     {
@@ -1279,7 +1543,13 @@ namespace eprosima
                         return *this;
                     }
 
-                // TODO
+                /*!
+                 * @brief This function template serializes an array of non-basic objects.
+                 * @param type_t The array of objects that will be serialized in the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
                 template<class _T>
                     Cdr& serializeArray(const _T *type_t, size_t numElements)
                     {
@@ -1288,6 +1558,14 @@ namespace eprosima
                         return *this;
                     }
 
+                /*!
+                 * @brief This function template serializes an array of non-basic objects with a different endianness.
+                 * @param type_t The array of objects that will be serialized in the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @param endianness Endianness that will be used in the serialization of this value.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
                 template<class _T>
                     Cdr& serializeArray(const _T *type_t, size_t numElements, Endianness endianness)
                     {
@@ -1517,6 +1795,12 @@ namespace eprosima
                  */
                 Cdr& deserialize(int32_t &long_t, Endianness endianness);
 
+                /*!
+                 * @brief This function deserializes a wide-char.
+                 * @param wchar The variable that will store the wide-char read from the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
                 inline
                     Cdr& deserialize(wchar_t &wchar)
                     {
@@ -1526,6 +1810,13 @@ namespace eprosima
                         return *this;
                     }
 
+                /*!
+                 * @brief This function deserializes a wide-char with a different endianness.
+                 * @param wchar The variable that will store the wide-char read from the buffer.
+                 * @param endianness Endianness that will be used in the serialization of this value.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
                 inline
                     Cdr& deserialize(wchar_t &wchar, Endianness endianness)
                     {
@@ -1616,6 +1907,7 @@ namespace eprosima
                  * @param ldouble_t The variable that will store the long double read from the buffer.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 * @note Due to internal representation differences, WIN32 and *NIX like systems are not compatible.
                  */
                 Cdr& deserialize(long double &ldouble_t);
 
@@ -1625,6 +1917,7 @@ namespace eprosima
                  * @param endianness Endianness that will be used in the serialization of this value.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 * @note Due to internal representation differences, WIN32 and *NIX like systems are not compatible.
                  */
                 Cdr& deserialize(long double &ldouble_t, Endianness endianness);
 
@@ -1663,15 +1956,37 @@ namespace eprosima
                 Cdr& deserialize(char *&string_t);
 
                 /*!
+                 * @brief This function deserializes a wide string.
+                 * This function allocates memory to store the wide string. The user pointer will be set to point this allocated memory.
+                 * The user will have to free this allocated memory using free()
+                 * @param string_t The pointer that will point to the wide string read from the buffer.
+                 * The user will have to free the allocated memory using free()
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                Cdr& deserialize(wchar_t *&string_t);
+
+                /*!
                  * @brief This function deserializes a string with a different endianness.
                  * This function allocates memory to store the string. The user pointer will be set to point this allocated memory.
-                 * The user will have to free this allocated memory using free() 
+                 * The user will have to free this allocated memory using free()
                  * @param string_t The pointer that will point to the string read from the buffer.
-                 * The user will have to free the allocated memory using free() 
+                 * The user will have to free the allocated memory using free()
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
                  */
                 Cdr& deserialize(char *&string_t, Endianness endianness);
+
+                /*!
+                 * @brief This function deserializes a wide string with a different endianness.
+                 * This function allocates memory to store the wide string. The user pointer will be set to point this allocated memory.
+                 * The user will have to free this allocated memory using free()
+                 * @param string_t The pointer that will point to the wide string read from the buffer.
+                 * The user will have to free the allocated memory using free()
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                Cdr& deserialize(wchar_t *&string_t, Endianness endianness);
 
                 /*!
                  * @brief This function deserializes a std::string.
@@ -1689,6 +2004,20 @@ namespace eprosima
                     }
 
                 /*!
+                 * @brief This function deserializes a std::string.
+                 * @param string_t The variable that will store the string read from the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                inline
+                    Cdr& deserialize(std::wstring &string_t)
+                    {
+                        uint32_t length = 0;
+                        string_t = readWString(length);
+                        return *this;
+                    }
+
+                /*!
                  * @brief This function deserializes a string with a different endianness.
                  * @param string_t The variable that will store the string read from the buffer.
                  * @param endianness Endianness that will be used in the serialization of this value.
@@ -1697,6 +2026,33 @@ namespace eprosima
                  */
                 inline
                     Cdr& deserialize(std::string &string_t, Endianness endianness)
+                    {
+                        bool auxSwap = m_swapBytes;
+                        m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+                        try
+                        {
+                            deserialize(string_t);
+                            m_swapBytes = auxSwap;
+                        }
+                        catch(eprosima::fastcdr::exception::Exception &ex)
+                        {
+                            m_swapBytes = auxSwap;
+                            ex.raise();
+                        }
+
+                        return *this;
+                    }
+
+                /*!
+                 * @brief This function deserializes a string with a different endianness.
+                 * @param string_t The variable that will store the string read from the buffer.
+                 * @param endianness Endianness that will be used in the serialization of this value.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                inline
+                    Cdr& deserialize(std::wstring &string_t, Endianness endianness)
                     {
                         bool auxSwap = m_swapBytes;
                         m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
@@ -1738,13 +2094,13 @@ namespace eprosima
                     { return deserializeArray(array_t.data(), array_t.size(), endianness);}
 #endif
 
+#if !defined(_MSC_VER) && HAVE_CXX0X
                 /*!
                  * @brief This function template deserializes a sequence.
                  * @param vector_t The variable that will store the sequence read from the buffer.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
                  */
-#if !defined(_MSC_VER) && HAVE_CXX0X
                 template<class _T = bool>
                     Cdr& deserialize(std::vector<bool> &vector_t)
                     {
@@ -1780,7 +2136,49 @@ namespace eprosima
                         return *this;
                     }
 
+                /*!
+                 * @brief This function template deserializes a map.
+                 * @param map_t The variable that will store the map read from the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                template<class _K, class _T>
+                    Cdr& deserialize(std::map<_K, _T> &map_t)
+                    {
+                        uint32_t seqLength = 0;
+                        state state_(*this);
+
+                        *this >> seqLength;
+
+                        try
+                        {
+                            //map_t.resize(seqLength);
+                            _K key;
+                            _T value;
+                            for (uint32_t i = 0; i < seqLength; ++i)
+                            {
+                                *this >> key;
+                                *this >> value;
+                                map_t.emplace(std::pair<_K, _T>(key, value));
+                            }
+                            //return deserializeArray(vector_t.data(), vector_t.size());
+                        }
+                        catch(eprosima::fastcdr::exception::Exception &ex)
+                        {
+                            setState(state_);
+                            ex.raise();
+                        }
+
+                        return *this;
+                    }
+
 #ifdef _MSC_VER
+                /*!
+                 * @brief This function template deserializes a sequence.
+                 * @param vector_t The variable that will store the sequence read from the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
                 template<>
                     Cdr& deserialize<bool>(std::vector<bool> &vector_t)
                     {
@@ -1815,7 +2213,12 @@ namespace eprosima
                         return *this;
                     }
 
-                // TODO
+                /*!
+                 * @brief This function template deserializes a non-basic object.
+                 * @param type_t The variable that will store the object read from the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
                 template<class _T>
                     inline Cdr& deserialize(_T &type_t)
                     {
@@ -1992,8 +2395,23 @@ namespace eprosima
                  */
                 Cdr& deserializeArray(int32_t *long_t, size_t numElements, Endianness endianness);
 
+                /*!
+                 * @brief This function deserializes an array of wide-chars.
+                 * @param wchar The variable that will store the array of wide-chars read from the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
                 Cdr& deserializeArray(wchar_t *wchar, size_t numElements);
 
+                /*!
+                 * @brief This function deserializes an array of wide-chars with a different endianness.
+                 * @param wchar The variable that will store the array of wide-chars read from the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @param endianness Endianness that will be used in the serialization of this value.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
                 Cdr& deserializeArray(wchar_t *wchar, size_t numElements, Endianness endianness);
 
                 /*!
@@ -2122,7 +2540,13 @@ namespace eprosima
                         return deserializeArray(bool_t, numElements);
                     }
 
-                // TODO
+                /*!
+                 * @brief This function deserializes an array of strings.
+                 * @param string_t The variable that will store the array of strings read from the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
                 inline
                     Cdr& deserializeArray(std::string *string_t, size_t numElements)
                     {
@@ -2131,6 +2555,29 @@ namespace eprosima
                         return *this;
                     }
 
+                /*!
+                 * @brief This function deserializes an array of wide-strings.
+                 * @param string_t The variable that will store the array of wide-strings read from the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                inline
+                    Cdr& deserializeArray(std::wstring *string_t, size_t numElements)
+                    {
+                        for(size_t count = 0; count < numElements; ++count)
+                            deserialize(string_t[count]);
+                        return *this;
+                    }
+
+                /*!
+                 * @brief This function deserializes an array of strings with a different endianness.
+                 * @param string_t The variable that will store the array of strings read from the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @param endianness Endianness that will be used in the serialization of this value.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
                 inline
                     Cdr& deserializeArray(std::string *string_t, size_t numElements, Endianness endianness)
                     {
@@ -2151,7 +2598,41 @@ namespace eprosima
                         return *this;
                     }
 
-                // TODO
+                /*!
+                 * @brief This function deserializes an array of wide-strings with a different endianness.
+                 * @param string_t The variable that will store the array of wide-strings read from the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @param endianness Endianness that will be used in the serialization of this value.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                inline
+                    Cdr& deserializeArray(std::wstring *string_t, size_t numElements, Endianness endianness)
+                    {
+                        bool auxSwap = m_swapBytes;
+                        m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+
+                        try
+                        {
+                            deserializeArray(string_t, numElements);
+                            m_swapBytes = auxSwap;
+                        }
+                        catch(eprosima::fastcdr::exception::Exception &ex)
+                        {
+                            m_swapBytes = auxSwap;
+                            ex.raise();
+                        }
+
+                        return *this;
+                    }
+
+                /*!
+                 * @brief This function deserializes an array of sequences of objects.
+                 * @param string_t The variable that will store the array of sequences of objects read from the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
                 template<class _T>
                     Cdr& deserializeArray(std::vector<_T> *vector_t, size_t numElements)
                     {
@@ -2160,7 +2641,13 @@ namespace eprosima
                         return *this;
                     }
 
-                // TODO
+                /*!
+                 * @brief This function template deserializes an array of non-basic objects.
+                 * @param type_t The variable that will store the array of objects read from the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
                 template<class _T>
                     Cdr& deserializeArray(_T *type_t, size_t numElements)
                     {
@@ -2169,6 +2656,14 @@ namespace eprosima
                         return *this;
                     }
 
+                /*!
+                 * @brief This function template deserializes an array of non-basic objects with a different endianness.
+                 * @param type_t The variable that will store the array of objects read from the buffer.
+                 * @param numElements Number of the elements in the array.
+                 * @param endianness Endianness that will be used in the serialization of this value.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
                 template<class _T>
                     Cdr& deserializeArray(_T *type_t, size_t numElements, Endianness endianness)
                     {
@@ -2190,17 +2685,41 @@ namespace eprosima
                     }
 
 #if !defined(_MSC_VER) && HAVE_CXX0X
+                /*!
+                 * @brief This function template deserializes a string sequence.
+                 * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
+                 * The user will have to free this allocated memory using free()
+                 * @param sequence_t The pointer that will store the sequence read from the buffer.
+                 * @param numElements This variable return the number of elements of the sequence.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
                 template<class _T = std::string>
                     Cdr& deserializeSequence(std::string *&sequence_t, size_t &numElements)
                     {
                         return deserializeStringSequence(sequence_t, numElements);
+                    }
+
+                /*!
+                 * @brief This function template deserializes a wide-string sequence.
+                 * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
+                 * The user will have to free this allocated memory using free()
+                 * @param sequence_t The pointer that will store the sequence read from the buffer.
+                 * @param numElements This variable return the number of elements of the sequence.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                template<class _T = std::wstring>
+                    Cdr& deserializeSequence(std::wstring *&sequence_t, size_t &numElements)
+                    {
+                        return deserializeWStringSequence(sequence_t, numElements);
                     }
 #endif
 
                 /*!
                  * @brief This function template deserializes a raw sequence.
                  * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
-                 * The user will have to free this allocated memory using free() 
+                 * The user will have to free this allocated memory using free()
                  * @param sequence_t The pointer that will store the sequence read from the buffer.
                  * @param numElements This variable return the number of elements of the sequence.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -2232,17 +2751,41 @@ namespace eprosima
                     }
 
 #ifdef _MSC_VER
+                /*!
+                 * @brief This function template deserializes a string sequence.
+                 * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
+                 * The user will have to free this allocated memory using free()
+                 * @param sequence_t The pointer that will store the sequence read from the buffer.
+                 * @param numElements This variable return the number of elements of the sequence.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
                 template<>
                     Cdr& deserializeSequence<std::string>(std::string *&sequence_t, size_t &numElements)
                     {
                         return deserializeStringSequence(sequence_t, numElements);
+                    }
+
+                /*!
+                 * @brief This function template deserializes a wide-string sequence.
+                 * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
+                 * The user will have to free this allocated memory using free()
+                 * @param sequence_t The pointer that will store the sequence read from the buffer.
+                 * @param numElements This variable return the number of elements of the sequence.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                template<>
+                    Cdr& deserializeSequence<std::wstring>(std::wstring *&sequence_t, size_t &numElements)
+                    {
+                        return deserializeWStringSequence(sequence_t, numElements);
                     }
 #endif
 
                 /*!
                  * @brief This function template deserializes a raw sequence with a different endianness.
                  * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
-                 * The user will have to free this allocated memory using free() 
+                 * The user will have to free this allocated memory using free()
                  * @param sequence_t The pointer that will store the sequence read from the buffer.
                  * @param numElements This variable return the number of elements of the sequence.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -2279,6 +2822,8 @@ namespace eprosima
                 Cdr& deserializeBoolSequence(std::vector<bool> &vector_t);
 
                 Cdr& deserializeStringSequence(std::string *&sequence_t, size_t &numElements);
+
+                Cdr& deserializeWStringSequence(std::wstring *&sequence_t, size_t &numElements);
 
 #if HAVE_CXX0X
                 /*!
@@ -2358,6 +2903,7 @@ namespace eprosima
 
                 //TODO
                 const char* readString(uint32_t &length);
+                const std::wstring readWString(uint32_t &length);
 
                 //! @brief Reference to the buffer that will be serialized/deserialized.
                 FastBuffer &m_cdrBuffer;

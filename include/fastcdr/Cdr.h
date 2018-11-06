@@ -365,6 +365,14 @@ namespace eprosima
                 inline Cdr& operator<<(const char *string_t){return serialize(string_t);}
 
                 /*!
+                 * @brief This operator serializes a null-terminated c-string.
+                 * @param string_t Pointer to the begining of the string that will be serialized in the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
+                inline Cdr& operator<<(char *string_t){return serialize(string_t);}
+
+                /*!
                  * @brief This operator serializes a string.
                  * @param string_t The string that will be serialized in the buffer.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -901,6 +909,14 @@ namespace eprosima
                     {
                         return serialize(bool_t);
                     }
+
+                /*!
+                 * @brief This function serializes a string.
+                 * @param string_t The pointer to the string that will be serialized in the buffer.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+                 */
+                inline Cdr& serialize(char *string_t) { return serialize(static_cast<const char*>(string_t)); }
 
                 /*!
                  * @brief This function serializes a string.

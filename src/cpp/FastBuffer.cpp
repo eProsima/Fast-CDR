@@ -79,13 +79,13 @@ bool FastBuffer::resize(size_t minSizeInc)
         }
         else
         {
-            m_bufferSize += incBufferSize;
-
-            m_buffer = reinterpret_cast<char*>(realloc(m_buffer, m_bufferSize));
-
-            if(m_buffer != NULL)
+            size_t newBufferSize = m_bufferSize + incBufferSize;
+            void *p = realloc(m_buffer, newBufferSize);
+            if (p)
             {
-                return true;
+               m_buffer = reinterpret_cast<char*>(p);
+               m_bufferSize = newBufferSize;
+               return true;
             }
         }
     }

@@ -808,7 +808,7 @@ Cdr& Cdr::serializeArray(const int16_t *short_t, size_t numElements)
 
         if(m_swapBytes)
         {
-            const char *dst = reinterpret_cast<const char*>(&short_t);
+            const char *dst = reinterpret_cast<const char*>(short_t);
             const char *end = dst + totalSize;
 
             for(; dst < end; dst += sizeof(*short_t))
@@ -870,7 +870,7 @@ Cdr& Cdr::serializeArray(const int32_t *long_t, size_t numElements)
 
         if(m_swapBytes)
         {
-            const char *dst = reinterpret_cast<const char*>(&long_t);
+            const char *dst = reinterpret_cast<const char*>(long_t);
             const char *end = dst + totalSize;
 
             for(; dst < end; dst += sizeof(*long_t))
@@ -965,7 +965,7 @@ Cdr& Cdr::serializeArray(const int64_t *longlong_t, size_t numElements)
 
         if(m_swapBytes)
         {
-            const char *dst = reinterpret_cast<const char*>(&longlong_t);
+            const char *dst = reinterpret_cast<const char*>(longlong_t);
             const char *end = dst + totalSize;
 
             for(; dst < end; dst += sizeof(*longlong_t))
@@ -1033,7 +1033,7 @@ Cdr& Cdr::serializeArray(const float *float_t, size_t numElements)
 
         if(m_swapBytes)
         {
-            const char *dst = reinterpret_cast<const char*>(&float_t);
+            const char *dst = reinterpret_cast<const char*>(float_t);
             const char *end = dst + totalSize;
 
             for(; dst < end; dst += sizeof(*float_t))
@@ -1097,7 +1097,7 @@ Cdr& Cdr::serializeArray(const double *double_t, size_t numElements)
 
         if(m_swapBytes)
         {
-            const char *dst = reinterpret_cast<const char*>(&double_t);
+            const char *dst = reinterpret_cast<const char*>(double_t);
             const char *end = dst + totalSize;
 
             for(; dst < end; dst += sizeof(*double_t))
@@ -1166,7 +1166,7 @@ Cdr& Cdr::serializeArray(const long double *ldouble_t, size_t numElements)
 
         if(m_swapBytes)
         {
-            const char *dst = reinterpret_cast<const char*>(&ldouble_t);
+            const char *dst = reinterpret_cast<const char*>(ldouble_t);
             const char *end = dst + totalSize;
 
             for(; dst < end; dst += sizeof(*ldouble_t))
@@ -1885,7 +1885,7 @@ Cdr& Cdr::deserializeArray(int16_t *short_t, size_t numElements)
 
         if(m_swapBytes)
         {
-            char *dst = reinterpret_cast<char*>(&short_t);
+            char *dst = reinterpret_cast<char*>(short_t);
             char *end = dst + totalSize;
 
             for(; dst < end; dst += sizeof(*short_t))
@@ -1947,7 +1947,7 @@ Cdr& Cdr::deserializeArray(int32_t *long_t, size_t numElements)
 
         if(m_swapBytes)
         {
-            char *dst = reinterpret_cast<char*>(&long_t);
+            char *dst = reinterpret_cast<char*>(long_t);
             char *end = dst + totalSize;
 
             for(; dst < end; dst += sizeof(*long_t))
@@ -2046,7 +2046,7 @@ Cdr& Cdr::deserializeArray(int64_t *longlong_t, size_t numElements)
 
         if(m_swapBytes)
         {
-            char *dst = reinterpret_cast<char*>(&longlong_t);
+            char *dst = reinterpret_cast<char*>(longlong_t);
             char *end = dst + totalSize;
 
             for(; dst < end; dst += sizeof(*longlong_t))
@@ -2114,7 +2114,7 @@ Cdr& Cdr::deserializeArray(float *float_t, size_t numElements)
 
         if(m_swapBytes)
         {
-            char *dst = reinterpret_cast<char*>(&float_t);
+            char *dst = reinterpret_cast<char*>(float_t);
             char *end = dst + totalSize;
 
             for(; dst < end; dst += sizeof(*float_t))
@@ -2178,7 +2178,7 @@ Cdr& Cdr::deserializeArray(double *double_t, size_t numElements)
 
         if(m_swapBytes)
         {
-            char *dst = reinterpret_cast<char*>(&double_t);
+            char *dst = reinterpret_cast<char*>(double_t);
             char *end = dst + totalSize;
 
             for(; dst < end; dst += sizeof(*double_t))
@@ -2247,7 +2247,7 @@ Cdr& Cdr::deserializeArray(long double *ldouble_t, size_t numElements)
 
         if(m_swapBytes)
         {
-            char *dst = reinterpret_cast<char*>(&ldouble_t);
+            char *dst = reinterpret_cast<char*>(ldouble_t);
             char *end = dst + totalSize;
 
             for(; dst < end; dst += sizeof(*ldouble_t))

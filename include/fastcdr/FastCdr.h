@@ -56,7 +56,7 @@ namespace eprosima
                     /*!
                      * @brief Default constructor.
                      */
-                    state(const FastCdr &fastcdr);
+                    explicit state(const FastCdr &fastcdr);
 
                     /*!
                      * @brief Copy constructor.
@@ -76,7 +76,7 @@ namespace eprosima
                  *
                  * @param cdrBuffer A reference to the buffer that contains (or will contain) the CDR representation.
                  */
-                FastCdr(FastBuffer &cdrBuffer);
+                explicit FastCdr(FastBuffer &cdrBuffer);
 
                 /*!
                  * @brief This function skips a number of bytes in the CDR stream buffer.

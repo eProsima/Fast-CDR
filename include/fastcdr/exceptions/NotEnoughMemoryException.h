@@ -36,7 +36,7 @@ namespace eprosima
                      *
                      * @param message A error message. This message is copied.
                      */
-                    Cdr_DllAPI NotEnoughMemoryException(const char* const &message);
+                    explicit Cdr_DllAPI NotEnoughMemoryException(const char* const &message);
 
                     /*!
                      * @brief Default copy constructor.
@@ -74,7 +74,7 @@ namespace eprosima
                     virtual Cdr_DllAPI ~NotEnoughMemoryException() throw();
 
                     //! @brief This function throws the object as exception.
-                    virtual Cdr_DllAPI void raise() const;
+                    Cdr_DllAPI void raise() const override;
 
                     //! @brief Default message used in the library.
                     static Cdr_DllAPI const char* const NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT;

@@ -14,21 +14,21 @@
 
 package com.eprosima.fastcdr.idl.generator;
 
-import com.eprosima.log.ColorMessage;
-import com.eprosima.idl.generator.manager.TemplateManager;
 import com.eprosima.idl.context.Context;
-import com.eprosima.idl.parser.typecode.TypeCode;
+import com.eprosima.idl.generator.manager.TemplateManager;
 import com.eprosima.idl.parser.tree.Definition;
 import com.eprosima.idl.parser.tree.Export;
-import com.eprosima.idl.parser.tree.Module;
 import com.eprosima.idl.parser.tree.Interface;
 import com.eprosima.idl.parser.tree.TypeDeclaration;
-
-import org.antlr.stringtemplate.*;
-
+import com.eprosima.idl.parser.typecode.Kind;
+import com.eprosima.log.ColorMessage;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Map;
-import java.io.*;
+import org.antlr.stringtemplate.StringTemplate;
+import org.antlr.stringtemplate.StringTemplateGroup;
+
+
 
 public class TypesGenerator
 {
@@ -204,7 +204,7 @@ public class TypesGenerator
         String extensionname = null;
         System.out.println("processTypesDeclaration " + typedecl.getName());
 
-        if(typedecl.getTypeCode().getKind() == TypeCode.KIND_STRUCT)
+        if(typedecl.getTypeCode().getKind() == Kind.KIND_STRUCT)
         {
             typest = stg_.getInstanceOf("struct_type");
             typest.setAttribute("struct", typedecl.getTypeCode());
@@ -216,7 +216,7 @@ public class TypesGenerator
                 extensionst.setAttribute("struct", typedecl.getTypeCode());
             }
         }
-        else if(typedecl.getTypeCode().getKind() == TypeCode.KIND_UNION)
+        else if(typedecl.getTypeCode().getKind() == Kind.KIND_UNION)
         {
             typest = stg_.getInstanceOf("union_type");
             typest.setAttribute("union", typedecl.getTypeCode());
@@ -228,7 +228,7 @@ public class TypesGenerator
                 extensionst.setAttribute("union", typedecl.getTypeCode());
             }
         }
-        else if(typedecl.getTypeCode().getKind() == TypeCode.KIND_ENUM)
+        else if(typedecl.getTypeCode().getKind() == Kind.KIND_ENUM)
         {
             typest = stg_.getInstanceOf("enum_type");
             typest.setAttribute("enum", typedecl.getTypeCode());
@@ -240,7 +240,7 @@ public class TypesGenerator
                 extensionst.setAttribute("enum", typedecl.getTypeCode());
             }
         }
-        else if(typedecl.getTypeCode().getKind() == TypeCode.KIND_BITSET)
+        else if(typedecl.getTypeCode().getKind() == Kind.KIND_BITSET)
         {
             typest = stg_.getInstanceOf("bitset_type");
             typest.setAttribute("bitset", typedecl.getTypeCode());

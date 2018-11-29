@@ -126,13 +126,15 @@ if(UNIX AND EPROSIMA_INSTALLER)
 endif()
 
 # Install libraries
-if(MSVC OR MSVC_IDE AND EPROSIMA_INSTALLER AND IS_TOP_LEVEL)
-    install_msvc_libraries(i86Win32VS2013)
-    install_msvc_libraries(x64Win64VS2013)
-    install_msvc_libraries(i86Win32VS2015)
-    install_msvc_libraries(x64Win64VS2015)
-    install_msvc_libraries(i86Win32VS2017)
-    install_msvc_libraries(x64Win64VS2017)
+if(MSVC OR MSVC_IDE AND EPROSIMA_INSTALLER)
+    if(IS_TOP_LEVEL)
+        install_msvc_libraries(i86Win32VS2013)
+        install_msvc_libraries(x64Win64VS2013)
+        install_msvc_libraries(i86Win32VS2015)
+        install_msvc_libraries(x64Win64VS2015)
+        install_msvc_libraries(i86Win32VS2017)
+        install_msvc_libraries(x64Win64VS2017)
+    endif()
 
     install(FILES ${PROJECT_SOURCE_DIR}/cmake/packaging/windows/${PROJECT_NAME}-config.cmake
         DESTINATION ${DATA_INSTALL_DIR}/${PROJECT_NAME}/cmake

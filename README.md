@@ -1,6 +1,6 @@
 # Introduction #
 
-**eProsima FastCDR** is a C++ library that provides two serialization mechanisms. One is the standard CDR serialization mechanism, while the other is a faster implementation that modifies the standard.
+**eProsima FastCDR** is a C++ library that provides two serialization mechanisms. One is the OMG standard CDR serialization mechanism, while the other is a faster implementation that modifies the standard.
 
 # Build #
 

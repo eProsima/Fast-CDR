@@ -137,6 +137,9 @@ namespace eprosima
                  * @exception exception::BadParamException This exception is thrown when trying to deserialize an invalid value.
                  */
                 Cdr& read_encapsulation()
+#if defined(_WIN32)
+                    ;
+#endif
 
                 /*!
                  * @brief This function writes the encapsulation of the CDR stream.

@@ -136,7 +136,7 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
                  * @exception exception::BadParamException This exception is thrown when trying to deserialize an invalid value.
                  */
-                Cdr& read_encapsulation();
+                Cdr& read_encapsulation()
 
                 /*!
                  * @brief This function writes the encapsulation of the CDR stream.

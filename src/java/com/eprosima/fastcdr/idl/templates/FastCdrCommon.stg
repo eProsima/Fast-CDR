@@ -49,6 +49,13 @@ scdr.serializeArray(reinterpret_cast<const uint32_t*>($preffix$$object.name$.dat
 $else$
 scdr << $serializeCasting(typecode=object.typecode)$$preffix$$object.name$;
 $endif$
+$elseif(object.typecode.isType_e)$
+$if(object.typecode.contentTypeCode.isType_c)$
+scdr << static_cast<uint32_t>($preffix$$object.name$.size());
+scdr.serializeArray(reinterpret_cast<const uint32_t*>($preffix$$object.name$.data()), $preffix$$object.name$.size());
+$else$
+scdr << $serializeCasting(typecode=object.typecode)$$preffix$$object.name$;
+$endif$
 $else$
 scdr << $serializeCasting(typecode=object.typecode)$$preffix$$object.name$;
 $endif$
@@ -58,6 +65,16 @@ object_deserialization(ctx, object, preffix) ::= <<
 $if(object.typecode.isType_f)$
 $if(object.typecode.contentTypeCode.isType_c)$
 dcdr.deserializeArray(reinterpret_cast<uint32_t*>($preffix$$object.name$.data()), $preffix$$object.name$.size());
+$else$
+dcdr \>> $preffix$$object.name$;
+$endif$
+$elseif(object.typecode.isType_e)$
+$if(object.typecode.contentTypeCode.isType_c)$
+{
+    uint32_t seq_length = 0;
+    dcdr \>> seq_length;
+    dcdr.deserializeArray(reinterpret_cast<uint32_t*>($preffix$$object.name$.data()), seq_length);
+}
 $else$
 dcdr \>> $preffix$$object.name$;
 $endif$

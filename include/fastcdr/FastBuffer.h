@@ -56,7 +56,7 @@ namespace eprosima
                 inline
                     void operator<<(const _FastBuffer_iterator &iterator)
                     {
-                        ptrdiff_t diff = m_currentPosition - m_buffer;
+                        std::ptrdiff_t diff = m_currentPosition - m_buffer;
                         m_buffer = iterator.m_buffer;
                         m_currentPosition = m_buffer + diff;
                     }
@@ -69,7 +69,7 @@ namespace eprosima
                 inline
                     void operator>>(const _FastBuffer_iterator &iterator)
                     {
-                        ptrdiff_t diff = iterator.m_currentPosition - iterator.m_buffer;
+                        std::ptrdiff_t diff = iterator.m_currentPosition - iterator.m_buffer;
                         m_currentPosition = m_buffer + diff;
                     }
 

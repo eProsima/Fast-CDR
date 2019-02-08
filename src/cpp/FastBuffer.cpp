@@ -14,7 +14,9 @@
 
 #include <fastcdr/FastBuffer.h>
 
-#if !__APPLE__
+#if __VXWORKS__
+#include <stdlib.h>
+#elif !__APPLE__
 #include <malloc.h>
 #else
 #include <stdlib.h>

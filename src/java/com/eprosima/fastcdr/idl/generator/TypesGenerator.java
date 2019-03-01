@@ -252,6 +252,18 @@ public class TypesGenerator
                 extensionst.setAttribute("bitset", typedecl.getTypeCode());
             }
         }
+        else if(typedecl.getTypeCode().getKind() == Kind.KIND_BITMASK)
+        {
+            typest = stg_.getInstanceOf("bitmask_type");
+            typest.setAttribute("bitmask", typedecl.getTypeCode());
+
+            // Get extension
+            if(extensions != null && (extensionname =  extensions.get("bitmask_type")) != null)
+            {
+                extensionst = stg_.getInstanceOf(extensionname);
+                extensionst.setAttribute("bitmask", typedecl.getTypeCode());
+            }
+        }
 
         if(typest != null)
         {

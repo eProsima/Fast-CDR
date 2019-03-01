@@ -391,6 +391,17 @@ enum $enum.name$ : uint32_t
 };
 >>
 
+bitmask_type(ctx, parent, bitmask) ::= <<
+/*!
+ * @brief This class represents the bitmask $bitmask.name$ defined by the user in the IDL file.
+ * @ingroup $ctx.trimfilename$
+ */
+enum $bitmask.name$$bitmask.boundType$
+{
+    $bitmask.members:{$it.name$ = 0x01 << $it.position$}; separator=",\n"$
+};
+>>
+
 /***** Utils *****/
 
 public_struct_inheritances(parent) ::= <<$parent.scopedname$>>

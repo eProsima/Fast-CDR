@@ -600,6 +600,8 @@ $endif$
 
 enum_type(ctx, parent, enum) ::= <<>>
 
+bitmask_type(ctx, parent, bitmask) ::= <<>>
+
 /***** Utils *****/
 
 public_unionmember_declaration(class, member, totallabels, defaultvalue) ::= <<

@@ -899,4 +899,169 @@ type_object->complete().union_type().member_seq().emplace_back(cst_$object.name$
 
 >>
 
+bitmask_type(ctx, parent, bitmask) ::= <<
+const TypeIdentifier* Get$bitmask.name$Identifier(bool complete)
+{
+    const TypeIdentifier* c_identifier = TypeObjectFactory::GetInstance()->GetTypeIdentifier("$bitmask.name$", complete);
+    if (c_identifier != nullptr && (!complete || c_identifier->_d() == EK_COMPLETE))
+    {
+        return c_identifier;
+    }
+
+    Get$bitmask.name$Object(complete); // Generated inside
+    return TypeObjectFactory::GetInstance()->GetTypeIdentifier("$bitmask.name$", complete);
+}
+
+const TypeObject* Get$bitmask.name$Object(bool complete)
+{
+    const TypeObject* c_type_object = TypeObjectFactory::GetInstance()->GetTypeObject("$bitmask.name$", complete);
+    if (c_type_object != nullptr)
+    {
+        return c_type_object;
+    }
+    else if (complete)
+    {
+        return GetComplete$bitmask.name$Object();
+    }
+    // else
+    return GetMinimal$bitmask.name$Object();
+}
+
+const TypeObject* GetMinimal$bitmask.name$Object()
+{
+    const TypeObject* c_type_object = TypeObjectFactory::GetInstance()->GetTypeObject("$bitmask.name$", false);
+    if (c_type_object != nullptr)
+    {
+        return c_type_object;
+    }
+
+    TypeObject *type_object = new TypeObject();
+    type_object->_d(EK_MINIMAL);
+    type_object->minimal()._d(TK_BITMASK);
+
+    type_object->minimal().bitmask_type().header().common().bit_bound($bitmask.bitBound$);
+
+    uint32_t value = 0;
+    $bitmask.bitmasks:{ member | $minimal_bitmask_flag(ctx=ctx, object=member)$}; separator="\n"$
+
+    TypeIdentifier identifier;
+    identifier._d(EK_MINIMAL);
+
+    SerializedPayload_t payload(static_cast<uint32_t>(
+        MinimalBitmaskType::getCdrSerializedSize(type_object->minimal().bitmask_type()) + 4));
+    eprosima::fastcdr::FastBuffer fastbuffer((char*) payload.data, payload.max_size);
+    // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
+    eprosima::fastcdr::Cdr ser(
+        fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIANNESS,
+        eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
+    payload.encapsulation = CDR_LE;
+
+    type_object->serialize(ser);
+    payload.length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
+    MD5 objectHash;
+    objectHash.update((char*)payload.data, payload.length);
+    objectHash.finalize();
+    for(int i = 0; i < 14; ++i)
+    {
+        identifier.equivalence_hash()[i] = objectHash.digest[i];
+    }
+
+    TypeObjectFactory::GetInstance()->AddTypeObject("$bitmask.name$", &identifier, type_object);
+    delete type_object;
+    return TypeObjectFactory::GetInstance()->GetTypeObject("$bitmask.name$", false);
+}
+
+const TypeObject* GetComplete$bitmask.name$Object()
+{
+    const TypeObject* c_type_object = TypeObjectFactory::GetInstance()->GetTypeObject("$bitmask.name$", true);
+    if (c_type_object != nullptr && c_type_object->_d() == EK_COMPLETE)
+    {
+        return c_type_object;
+    }
+
+    TypeObject *type_object = new TypeObject();
+    type_object->_d(EK_COMPLETE);
+    type_object->complete()._d(TK_BITMASK);
+
+    type_object->complete().bitmask_type().bitmask_flags().IS_FINAL(false);
+    type_object->complete().bitmask_type().bitmask_flags().IS_APPENDABLE(false);
+    type_object->complete().bitmask_type().bitmask_flags().IS_MUTABLE(false);
+    type_object->complete().bitmask_type().bitmask_flags().IS_NESTED(false);
+    type_object->complete().bitmask_type().bitmask_flags().IS_AUTOID_HASH(false);
+
+    type_object->complete().bitmask_type().header().common().bit_bound($bitmask.bitBound$);
+    //type_object->complete().bitmask_type().header().detail().ann_builtin()...
+    //type_object->complete().bitmask_type().header().detail().ann_custom()...
+    type_object->complete().bitmask_type().header().detail().type_name("$bitmask.name$");
+
+    uint32_t value = 0;
+    $bitmask.members:{ member | $complete_bitmask_flag(ctx=ctx, object=member)$}; separator="\n"$
+
+    TypeIdentifier identifier;
+    identifier._d(EK_COMPLETE);
+
+    SerializedPayload_t payload(static_cast<uint32_t>(
+        CompleteBitmaskType::getCdrSerializedSize(type_object->complete().bitmask_type()) + 4));
+    eprosima::fastcdr::FastBuffer fastbuffer((char*) payload.data, payload.max_size);
+    // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
+    eprosima::fastcdr::Cdr ser(
+        fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIANNESS,
+        eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
+    payload.encapsulation = CDR_LE;
+
+    type_object->serialize(ser);
+    payload.length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
+    MD5 objectHash;
+    objectHash.update((char*)payload.data, payload.length);
+    objectHash.finalize();
+    for(int i = 0; i < 14; ++i)
+    {
+        identifier.equivalence_hash()[i] = objectHash.digest[i];
+    }
+
+    TypeObjectFactory::GetInstance()->AddTypeObject("$bitmask.name$", &identifier, type_object);
+    delete type_object;
+    return TypeObjectFactory::GetInstance()->GetTypeObject("$bitmask.name$", true);
+}
+
+>>
+
+minimal_bitmask_flag(ctx, object) ::= <<
+MinimalBitflag mbf_$object.name$;
+mbf_$object.name$.common().flags().TRY_CONSTRUCT1(false);
+mbf_$object.name$.common().flags().TRY_CONSTRUCT2(false);
+mbf_$object.name$.common().flags().IS_EXTERNAL(false);
+mbf_$object.name$.common().flags().IS_OPTIONAL(false);
+mbf_$object.name$.common().flags().IS_MUST_UNDERSTAND(false);
+mbf_$object.name$.common().flags().IS_KEY(false);
+mbf_$object.name$.common().flags().IS_DEFAULT(false);
+mbf_$object.name$.common().flags().IS_DEFAULT(false);
+mbf_$object.name$.common().position($object.position$);
+MD5 $object.name$_hash("$object.name$");
+for(int i = 0; i < 4; ++i)
+{
+    mbf_$object.name$.detail().name_hash()[i] = $object.name$_hash.digest[i];
+}
+type_object->minimal().bitmask_type().flag_seq().emplace_back(mbf_$object.name$);
+
+>>
+
+complete_bitmask_flag(ctx, object) ::= <<
+CompleteBitflag cbf_$object.name$;
+cbf_$object.name$.common().flags().TRY_CONSTRUCT1(false);
+cbf_$object.name$.common().flags().TRY_CONSTRUCT2(false);
+cbf_$object.name$.common().flags().IS_EXTERNAL(false);
+cbf_$object.name$.common().flags().IS_OPTIONAL(false);
+cbf_$object.name$.common().flags().IS_MUST_UNDERSTAND(false);
+cbf_$object.name$.common().flags().IS_KEY(false);
+cbf_$object.name$.common().flags().IS_DEFAULT(false);
+cbf_$object.name$.common().flags().IS_DEFAULT(false);
+cbf_$object.name$.common().position($object.position$);
+cbf_$object.name$.detail().name("$object.name$");
+//cbf_$object.name$.detail().ann_builtin()...
+//cbf_$object.name$.detail().ann_custom()...
+type_object->complete().bitmask_type().flag_seq().emplace_back(cbf_$object.name$);
+
+>>
+
 /***** Utils *****/

@@ -179,7 +179,7 @@ $endif$
 typedef_decl(ctx, parent, typedefs) ::= <<>>
 
 struct_type(ctx, parent, struct, extensions) ::= <<
-$struct.scopedname$::$struct.name$()
+$struct.scopedname$::$struct.name$()$if(struct.inheritances)$ : $struct.inheritances : {$struct_inherit_default_init(it)$}; separator=",\n"$ $endif$
 {
     $struct.members:{ member |$member_default_init(member=member)$}; separator="\n"$
 
@@ -193,18 +193,20 @@ $struct.scopedname$::~$struct.name$()
 {
 }
 
-$struct.scopedname$::$struct.name$(const $struct.name$ &x)
+$struct.scopedname$::$struct.name$(const $struct.name$ &x)$if(struct.inheritances)$ : $struct.inheritances : {$struct_inherit_copy_init(it)$}; separator=",\n"$ $endif$
 {
     $struct.members:{m_$it.name$ = x.m_$it.name$;}; separator="\n"$
 }
 
-$struct.scopedname$::$struct.name$($struct.name$ &&x)
+$struct.scopedname$::$struct.name$($struct.name$ &&x)$if(struct.inheritances)$ : $struct.inheritances : {$struct_inherit_move_init(it)$}; separator=",\n"$ $endif$
 {
     $struct.members:{$member_move(it)$}; separator="\n"$
 }
 
 $struct.scopedname$& $struct.scopedname$::operator=(const $struct.name$ &x)
 {
+    $if(struct.inheritances)$    $struct.inheritances : {$it.scopedname$::operator=(x);}; separator="\n"$ $endif$
+
     $struct.members:{m_$it.name$ = x.m_$it.name$;}; separator="\n"$
 
     return *this;
@@ -212,6 +214,8 @@ $struct.scopedname$& $struct.scopedname$::operator=(const $struct.name$ &x)
 
 $struct.scopedname$& $struct.scopedname$::operator=($struct.name$ &&x)
 {
+    $if(struct.inheritances)$    $struct.inheritances : {$it.scopedname$::operator=(std::move(x));}; separator="\n"$ $endif$
+
     $struct.members:{$member_move(it)$}; separator="\n"$
 
     return *this;
@@ -221,6 +225,8 @@ $if(ctx.anyCdr)$
 size_t $struct.scopedname$::getMaxCdrSerializedSize(size_t current_alignment)
 {
     size_t initial_alignment = current_alignment;
+
+    $if(struct.inheritances)$    $struct.inheritances : {current_alignment += $it.scopedname$::getMaxCdrSerializedSize(current_alignment);}; separator="\n"$ $endif$
 
     $struct.members : { member |$max_serialized_size(ctx=ctx, typecode=member.typecode, var="current_alignment")$}; separator="\n"$
 
@@ -232,6 +238,8 @@ size_t $struct.scopedname$::getCdrSerializedSize(const $struct.scopedname$& data
     (void)data;
     size_t initial_alignment = current_alignment;
 
+    $if(struct.inheritances)$    $struct.inheritances : {current_alignment += $it.scopedname$::getCdrSerializedSize(data, current_alignment);}; separator="\n"$ $endif$
+
     $struct.members : { member |$serialized_size(ctx=ctx, object=member, data="data", var="current_alignment")$}; separator="\n"$
 
     return current_alignment - initial_alignment;
@@ -242,11 +250,15 @@ $endif$
 $if(ctx.cdr)$
 void $struct.scopedname$::serialize(eprosima::fastcdr::Cdr &scdr) const
 {
+    $if(struct.inheritances)$    $struct.inheritances : {$it.scopedname$::serialize(scdr);}; separator="\n"$ $endif$
+
     $struct.members : { member |$object_serialization(ctx=ctx, object=member, preffix="m_")$}; separator="\n"$
 }
 
 void $struct.scopedname$::deserialize(eprosima::fastcdr::Cdr &dcdr)
 {
+    $if(struct.inheritances)$    $struct.inheritances : {$it.scopedname$::deserialize(dcdr);}; separator="\n"$ $endif$
+
     $struct.members : { member |$object_deserialization(ctx=ctx, object=member, preffix="m_")$}; separator="\n"$
 }
 
@@ -255,11 +267,15 @@ $endif$
 $if(ctx.fastcdr)$
 void $struct.scopedname$::serialize(eprosima::fastcdr::FastCdr &scdr) const
 {
+    $if(struct.inheritances)$    $struct.inheritances : {$it.scopedname$::serialize(scdr);}; separator="\n"$ $endif$
+
     $struct.members : { member |$object_serialization(ctx=ctx, object=member, preffix="m_")$}; separator="\n"$
 }
 
 void $struct.scopedname$::deserialize(eprosima::fastcdr::FastCdr &dcdr)
 {
+    $if(struct.inheritances)$    $struct.inheritances : {$it.scopedname$::deserialize(dcdr);}; separator="\n"$ $endif$
+
     $struct.members : { member |$object_deserialization(ctx=ctx, object=member, preffix="m_")$}; separator="\n"$
 }
 

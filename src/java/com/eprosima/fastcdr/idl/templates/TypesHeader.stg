@@ -196,7 +196,7 @@ struct_type(ctx, parent, struct, extensions) ::= <<
  * @brief This class represents the structure $struct.name$ defined by the user in the IDL file.
  * @ingroup $ctx.trimfilename$
  */
-class $struct.name$
+class $struct.name$$if(struct.inheritances)$ : public $struct.inheritances : {$public_struct_inheritances(it)$}; separator=", "$ $endif$
 {
 public:
 
@@ -208,7 +208,7 @@ public:
     /*!
      * @brief Default destructor.
      */
-    eProsima_user_DllExport ~$struct.name$();
+    eProsima_user_DllExport virtual ~$struct.name$();
 
     /*!
      * @brief Copy constructor.
@@ -341,7 +341,7 @@ public:
     /*!
      * @brief Default destructor.
      */
-    eProsima_user_DllExport ~$bitset.name$();
+    eProsima_user_DllExport virtual ~$bitset.name$();
 
     /*!
      * @brief Copy constructor.
@@ -392,6 +392,8 @@ enum $enum.name$ : uint32_t
 >>
 
 /***** Utils *****/
+
+public_struct_inheritances(parent) ::= <<$parent.scopedname$>>
 
 public_member_declaration(member) ::= <<
 $if(member.typecode.primitive)$

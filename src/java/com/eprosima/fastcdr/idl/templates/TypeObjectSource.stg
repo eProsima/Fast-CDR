@@ -492,6 +492,7 @@ const TypeObject* GetMinimal$struct.name$Object()
     // TODO Inheritance
     //type_object->minimal().struct_type().header().base_type()._d(EK_MINIMAL);
     //type_object->minimal().struct_type().header().base_type().equivalence_hash()[0..13];
+    $struct.inheritances:{$minimal_struct_inheritance(it)$}; separator="\n"$
 
     TypeIdentifier identifier;
     identifier._d(EK_MINIMAL);
@@ -548,6 +549,7 @@ const TypeObject* GetComplete$struct.name$Object()
     // TODO inheritance
     //type_object->complete().struct_type().header().base_type()._d(EK_COMPLETE);
     //type_object->complete().struct_type().header().base_type().equivalence_hash()[0..13];
+    $struct.inheritances:{$complete_struct_inheritance(it)$}; separator="\n"$
 
     TypeIdentifier identifier;
     identifier._d(EK_COMPLETE);
@@ -576,6 +578,14 @@ const TypeObject* GetComplete$struct.name$Object()
     return TypeObjectFactory::GetInstance()->GetTypeObject("$struct.name$", true);
 }
 
+>>
+
+minimal_struct_inheritance(parent) ::= <<
+type_object->minimal().struct_type().header().base_type(*Get$parent.name$Identifier(false));
+>>
+
+complete_struct_inheritance(parent) ::= <<
+type_object->complete().struct_type().header().base_type(*Get$parent.name$Identifier(true));
 >>
 
 minimal_member_object_type(ctx, object) ::= <<
@@ -646,8 +656,10 @@ type_object->complete().struct_type().member_seq().emplace_back(cst_$object.name
 
 >>
 
+// TODO ADD Bitset and Bitmask
 get_type_identifier(ctx, type, ek) ::= <<$if(type.isSequenceType)$TypeObjectFactory::GetInstance()->GetSequenceIdentifier($get_content_type(ctx=ctx, type=type.contentTypeCode)$, $type.maxsize$, $ek$)$elseif(type.isArrayType)$TypeObjectFactory::GetInstance()->GetArrayIdentifier($get_content_type(ctx=ctx, type=type.contentTypeCode)$, {$type.dimensions:{ dim |$dim$}; separator=", "$}, $ek$)$elseif(type.isSetType)$TypeObjectFactory::GetInstance()->GetSequenceIdentifier($get_content_type(ctx=ctx, type=type.contentTypeCode)$, $type.maxsize$, $ek$)$elseif(type.isMapType)$TypeObjectFactory::GetInstance()->GetMapIdentifier($get_content_type(ctx=ctx, type=type.keyTypeCode)$, $get_content_type(ctx=ctx, type=type.valueTypeCode)$, $type.maxsize$, $ek$)$elseif(type.isStringType)$TypeObjectFactory::GetInstance()->GetStringIdentifier($type.maxsize$, false)$elseif(type.isWStringType)$TypeObjectFactory::GetInstance()->GetStringIdentifier($type.maxsize$, true)$elseif(type.objectType)$Get$type.cppTypename$Identifier($ek$)$elseif(type.plainType)$TypeObjectFactory::GetInstance()->GetTypeIdentifier("$type.cppTypename$", false)$else$TypeObjectFactory::GetInstance()->GetTypeIdentifier("$type.cppTypename$", false)$endif$>>
 
+// TODO ADD Bitset and Bitmask
 get_content_type(ctx, type) ::= <<$if(type.plainType)$$if(type.isSequenceType)$TypeNamesGenerator::getSequenceTypeName($get_content_type(ctx=ctx, type=type.contentTypeCode)$, $type.maxsize$)$elseif(type.isArrayType)$TypeNamesGenerator::getArrayTypeName($get_content_type(ctx=ctx, type=type.contentTypeCode)$, {$type.dimensions:{ dim |$dim$}; separator=", "$})$elseif(type.isSetType)$TypeNamesGenerator::getSequenceTypeName($get_content_type(ctx=ctx, type=type.contentTypeCode)$, $type.maxsize$)$elseif(type.isMapType)$TypeNamesGenerator::getMapTypeName($get_content_type(ctx=ctx, type=type.keyTypeCode)$, $get_content_type(ctx=ctx, type=type.valueTypeCode)$, $type.maxsize$)$elseif(type.isStringType)$TypeNamesGenerator::getStringTypeName($type.maxsize$, false)$elseif(type.isWStringType)$TypeNamesGenerator::getStringTypeName($type.maxsize$, true)$else$"$type.cppTypename$"$endif$$else$"$type.cppTypename$"$endif$>>
 
 union_type(ctx, parent, union) ::= <<

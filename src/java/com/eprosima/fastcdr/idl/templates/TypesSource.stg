@@ -378,13 +378,13 @@ $bitset.bitfields:{$public_bitfield_definition(it)$}; separator="\n"$
 >>
 
 public_bitfield_definition(member) ::= <<
-void $bitset.scopedname$::$member.name$($member.typecode.cppTypename$ _$member.name$)
+void $bitset.scopedname$::$member.name$($member.spec.cppTypename$ _$member.name$)
 {
     int base = $member.basePosition$;
-$if(member.typecode.typecode.isType_7)$
+$if(member.spec.typecode.isType_7)$
     m_bitset.set(base, _$member.name$);
 $else$
-    int size = $member.typecode.bitSize$;
+    int size = $member.spec.bitSize$;
     for (int i = base + size - 1; i >= base; --i)
     {
         m_bitset.set(i, _$member.name$ | 0x01);
@@ -394,19 +394,19 @@ $endif$
 
 }
 
-$member.typecode.cppTypename$ $bitset.scopedname$::$member.name$() const
+$member.spec.cppTypename$ $bitset.scopedname$::$member.name$() const
 {
     int base = $member.basePosition$;
-$if(member.typecode.typecode.isType_7)$
+$if(member.spec.typecode.isType_7)$
     return m_bitset.test(base);
 $else$
-    int size = $member.typecode.bitSize$;
-    std::bitset<$member.typecode.bitSize$> aux;
+    int size = $member.spec.bitSize$;
+    std::bitset<$member.spec.bitSize$> aux;
     for (int i = size - 1; i >= 0; --i)
     {
         aux.set(i, m_bitset.test(i + base));
     }
-    return static_cast<$member.typecode.cppTypename$>(aux.to_ullong());
+    return static_cast<$member.spec.cppTypename$>(aux.to_ullong());
 $endif$
 
 }

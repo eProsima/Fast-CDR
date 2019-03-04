@@ -941,7 +941,6 @@ const TypeObject* GetMinimal$bitmask.name$Object()
 
     type_object->minimal().bitmask_type().header().common().bit_bound($bitmask.bitBound$);
 
-    uint32_t value = 0;
     $bitmask.bitmasks:{ member | $minimal_bitmask_flag(ctx=ctx, object=member)$}; separator="\n"$
 
     TypeIdentifier identifier;
@@ -994,7 +993,6 @@ const TypeObject* GetComplete$bitmask.name$Object()
     //type_object->complete().bitmask_type().header().detail().ann_custom()...
     type_object->complete().bitmask_type().header().detail().type_name("$bitmask.name$");
 
-    uint32_t value = 0;
     $bitmask.members:{ member | $complete_bitmask_flag(ctx=ctx, object=member)$}; separator="\n"$
 
     TypeIdentifier identifier;
@@ -1035,7 +1033,6 @@ mbf_$object.name$.common().flags().IS_OPTIONAL(false);
 mbf_$object.name$.common().flags().IS_MUST_UNDERSTAND(false);
 mbf_$object.name$.common().flags().IS_KEY(false);
 mbf_$object.name$.common().flags().IS_DEFAULT(false);
-mbf_$object.name$.common().flags().IS_DEFAULT(false);
 mbf_$object.name$.common().position($object.position$);
 MD5 $object.name$_hash("$object.name$");
 for(int i = 0; i < 4; ++i)
@@ -1055,12 +1052,177 @@ cbf_$object.name$.common().flags().IS_OPTIONAL(false);
 cbf_$object.name$.common().flags().IS_MUST_UNDERSTAND(false);
 cbf_$object.name$.common().flags().IS_KEY(false);
 cbf_$object.name$.common().flags().IS_DEFAULT(false);
-cbf_$object.name$.common().flags().IS_DEFAULT(false);
 cbf_$object.name$.common().position($object.position$);
 cbf_$object.name$.detail().name("$object.name$");
 //cbf_$object.name$.detail().ann_builtin()...
 //cbf_$object.name$.detail().ann_custom()...
 type_object->complete().bitmask_type().flag_seq().emplace_back(cbf_$object.name$);
+
+>>
+
+bitset_type(ctx, parent, bitset, extensions) ::= <<
+const TypeIdentifier* Get$bitset.name$Identifier(bool complete)
+{
+    const TypeIdentifier* c_identifier = TypeObjectFactory::GetInstance()->GetTypeIdentifier("$bitset.name$", complete);
+    if (c_identifier != nullptr && (!complete || c_identifier->_d() == EK_COMPLETE))
+    {
+        return c_identifier;
+    }
+
+    Get$bitset.name$Object(complete); // Generated inside
+    return TypeObjectFactory::GetInstance()->GetTypeIdentifier("$bitset.name$", complete);
+}
+
+const TypeObject* Get$bitset.name$Object(bool complete)
+{
+    const TypeObject* c_type_object = TypeObjectFactory::GetInstance()->GetTypeObject("$bitset.name$", complete);
+    if (c_type_object != nullptr)
+    {
+        return c_type_object;
+    }
+    else if (complete)
+    {
+        return GetComplete$bitset.name$Object();
+    }
+    // else
+    return GetMinimal$bitset.name$Object();
+}
+
+const TypeObject* GetMinimal$bitset.name$Object()
+{
+    const TypeObject* c_type_object = TypeObjectFactory::GetInstance()->GetTypeObject("$bitset.name$", false);
+    if (c_type_object != nullptr)
+    {
+        return c_type_object;
+    }
+
+    TypeObject *type_object = new TypeObject();
+    type_object->_d(EK_MINIMAL);
+    type_object->minimal()._d(TK_BITSET);
+
+    $bitset.bitfields:{ member | $minimal_bitfield(ctx=ctx, object=member)$}; separator="\n"$
+
+    TypeIdentifier identifier;
+    identifier._d(EK_MINIMAL);
+
+    SerializedPayload_t payload(static_cast<uint32_t>(
+        MinimalBitmaskType::getCdrSerializedSize(type_object->minimal().bitset_type()) + 4));
+    eprosima::fastcdr::FastBuffer fastbuffer((char*) payload.data, payload.max_size);
+    // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
+    eprosima::fastcdr::Cdr ser(
+        fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIANNESS,
+        eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
+    payload.encapsulation = CDR_LE;
+
+    type_object->serialize(ser);
+    payload.length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
+    MD5 objectHash;
+    objectHash.update((char*)payload.data, payload.length);
+    objectHash.finalize();
+    for(int i = 0; i < 14; ++i)
+    {
+        identifier.equivalence_hash()[i] = objectHash.digest[i];
+    }
+
+    TypeObjectFactory::GetInstance()->AddTypeObject("$bitset.name$", &identifier, type_object);
+    delete type_object;
+    return TypeObjectFactory::GetInstance()->GetTypeObject("$bitset.name$", false);
+}
+
+const TypeObject* GetComplete$bitset.name$Object()
+{
+    const TypeObject* c_type_object = TypeObjectFactory::GetInstance()->GetTypeObject("$bitset.name$", true);
+    if (c_type_object != nullptr && c_type_object->_d() == EK_COMPLETE)
+    {
+        return c_type_object;
+    }
+
+    TypeObject *type_object = new TypeObject();
+    type_object->_d(EK_COMPLETE);
+    type_object->complete()._d(TK_BITSET);
+
+    type_object->complete().bitset_type().bitset_flags().IS_FINAL(false);
+    type_object->complete().bitset_type().bitset_flags().IS_APPENDABLE(false);
+    type_object->complete().bitset_type().bitset_flags().IS_MUTABLE(false);
+    type_object->complete().bitset_type().bitset_flags().IS_NESTED(false);
+    type_object->complete().bitset_type().bitset_flags().IS_AUTOID_HASH(false);
+
+    //type_object->complete().bitset_type().header().detail().ann_builtin()...
+    //type_object->complete().bitset_type().header().detail().ann_custom()...
+    type_object->complete().bitset_type().header().detail().type_name("$bitset.name$");
+
+    $bitset.bitfields:{ member | $complete_bitfield(ctx=ctx, object=member)$}; separator="\n"$
+
+    TypeIdentifier identifier;
+    identifier._d(EK_COMPLETE);
+
+    SerializedPayload_t payload(static_cast<uint32_t>(
+        CompleteBitmaskType::getCdrSerializedSize(type_object->complete().bitset_type()) + 4));
+    eprosima::fastcdr::FastBuffer fastbuffer((char*) payload.data, payload.max_size);
+    // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
+    eprosima::fastcdr::Cdr ser(
+        fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIANNESS,
+        eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
+    payload.encapsulation = CDR_LE;
+
+    type_object->serialize(ser);
+    payload.length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
+    MD5 objectHash;
+    objectHash.update((char*)payload.data, payload.length);
+    objectHash.finalize();
+    for(int i = 0; i < 14; ++i)
+    {
+        identifier.equivalence_hash()[i] = objectHash.digest[i];
+    }
+
+    TypeObjectFactory::GetInstance()->AddTypeObject("$bitset.name$", &identifier, type_object);
+    delete type_object;
+    return TypeObjectFactory::GetInstance()->GetTypeObject("$bitset.name$", true);
+}
+
+>>
+
+minimal_bitfield(ctx, object) ::= <<
+$if(object.name)$
+MinimalBitfield mbf_$object.name$;
+mbf_$object.name$.common().flags().TRY_CONSTRUCT1(false);
+mbf_$object.name$.common().flags().TRY_CONSTRUCT2(false);
+mbf_$object.name$.common().flags().IS_EXTERNAL(false);
+mbf_$object.name$.common().flags().IS_OPTIONAL(false);
+mbf_$object.name$.common().flags().IS_MUST_UNDERSTAND(false);
+mbf_$object.name$.common().flags().IS_KEY(false);
+mbf_$object.name$.common().flags().IS_DEFAULT(false);
+mbf_$object.name$.common().position($object.basePosition$);
+mbf_$object.name$.common().bitcount($object.spec.bitSize$);
+mbf_$object.name$.common().holder_type($object.spec.typecode.typeIdentifier$);
+MD5 $object.name$_hash("$object.name$");
+for(int i = 0; i < 4; ++i)
+{
+    mbf_$object.name$.detail().name_hash()[i] = $object.name$_hash.digest[i];
+}
+type_object->minimal().bitmask_type().flag_seq().emplace_back(mbf_$object.name$);
+$endif$
+
+>>
+
+complete_bitfield(ctx, object) ::= <<
+$if(object.name)$
+CompleteBitfield cbf_$object.name$;
+cbf_$object.name$.common().flags().TRY_CONSTRUCT1(false);
+cbf_$object.name$.common().flags().TRY_CONSTRUCT2(false);
+cbf_$object.name$.common().flags().IS_EXTERNAL(false);
+cbf_$object.name$.common().flags().IS_OPTIONAL(false);
+cbf_$object.name$.common().flags().IS_MUST_UNDERSTAND(false);
+cbf_$object.name$.common().flags().IS_KEY(false);
+cbf_$object.name$.common().flags().IS_DEFAULT(false);
+mbf_$object.name$.common().position($object.basePosition$);
+mbf_$object.name$.common().bitcount($object.spec.bitSize$);
+mbf_$object.name$.common().holder_type($object.spec.typecode.typeIdentifier$);
+cbf_$object.name$.detail().name("$object.name$");
+//cbf_$object.name$.detail().ann_builtin()...
+//cbf_$object.name$.detail().ann_custom()...
+type_object->complete().bitmask_type().flag_seq().emplace_back(cbf_$object.name$);
+$endif$
 
 >>
 

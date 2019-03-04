@@ -656,10 +656,8 @@ type_object->complete().struct_type().member_seq().emplace_back(cst_$object.name
 
 >>
 
-// TODO ADD Bitset and Bitmask
 get_type_identifier(ctx, type, ek) ::= <<$if(type.isSequenceType)$TypeObjectFactory::GetInstance()->GetSequenceIdentifier($get_content_type(ctx=ctx, type=type.contentTypeCode)$, $type.maxsize$, $ek$)$elseif(type.isArrayType)$TypeObjectFactory::GetInstance()->GetArrayIdentifier($get_content_type(ctx=ctx, type=type.contentTypeCode)$, {$type.dimensions:{ dim |$dim$}; separator=", "$}, $ek$)$elseif(type.isSetType)$TypeObjectFactory::GetInstance()->GetSequenceIdentifier($get_content_type(ctx=ctx, type=type.contentTypeCode)$, $type.maxsize$, $ek$)$elseif(type.isMapType)$TypeObjectFactory::GetInstance()->GetMapIdentifier($get_content_type(ctx=ctx, type=type.keyTypeCode)$, $get_content_type(ctx=ctx, type=type.valueTypeCode)$, $type.maxsize$, $ek$)$elseif(type.isStringType)$TypeObjectFactory::GetInstance()->GetStringIdentifier($type.maxsize$, false)$elseif(type.isWStringType)$TypeObjectFactory::GetInstance()->GetStringIdentifier($type.maxsize$, true)$elseif(type.objectType)$Get$type.cppTypename$Identifier($ek$)$elseif(type.plainType)$TypeObjectFactory::GetInstance()->GetTypeIdentifier("$type.cppTypename$", false)$else$TypeObjectFactory::GetInstance()->GetTypeIdentifier("$type.cppTypename$", false)$endif$>>
 
-// TODO ADD Bitset and Bitmask
 get_content_type(ctx, type) ::= <<$if(type.plainType)$$if(type.isSequenceType)$TypeNamesGenerator::getSequenceTypeName($get_content_type(ctx=ctx, type=type.contentTypeCode)$, $type.maxsize$)$elseif(type.isArrayType)$TypeNamesGenerator::getArrayTypeName($get_content_type(ctx=ctx, type=type.contentTypeCode)$, {$type.dimensions:{ dim |$dim$}; separator=", "$})$elseif(type.isSetType)$TypeNamesGenerator::getSequenceTypeName($get_content_type(ctx=ctx, type=type.contentTypeCode)$, $type.maxsize$)$elseif(type.isMapType)$TypeNamesGenerator::getMapTypeName($get_content_type(ctx=ctx, type=type.keyTypeCode)$, $get_content_type(ctx=ctx, type=type.valueTypeCode)$, $type.maxsize$)$elseif(type.isStringType)$TypeNamesGenerator::getStringTypeName($type.maxsize$, false)$elseif(type.isWStringType)$TypeNamesGenerator::getStringTypeName($type.maxsize$, true)$else$"$type.cppTypename$"$endif$$else$"$type.cppTypename$"$endif$>>
 
 union_type(ctx, parent, union) ::= <<
@@ -1102,6 +1100,8 @@ const TypeObject* GetMinimal$bitset.name$Object()
 
     $bitset.bitfields:{ member | $minimal_bitfield(ctx=ctx, object=member)$}; separator="\n"$
 
+    $bitset.parents:{$minimal_bitset_inheritance(it)$}; separator="\n"$
+
     TypeIdentifier identifier;
     identifier._d(EK_MINIMAL);
 
@@ -1152,6 +1152,8 @@ const TypeObject* GetComplete$bitset.name$Object()
     type_object->complete().bitset_type().header().detail().type_name("$bitset.name$");
 
     $bitset.bitfields:{ member | $complete_bitfield(ctx=ctx, object=member)$}; separator="\n"$
+
+    $bitset.parents:{$complete_bitset_inheritance(it)$}; separator="\n"$
 
     TypeIdentifier identifier;
     identifier._d(EK_COMPLETE);
@@ -1224,6 +1226,14 @@ cbf_$object.name$.detail().name("$object.name$");
 type_object->complete().bitmask_type().flag_seq().emplace_back(cbf_$object.name$);
 $endif$
 
+>>
+
+minimal_bitset_inheritance(parent) ::= <<
+type_object->minimal().bitset_type().header().base_type(*Get$parent.name$Identifier(false));
+>>
+
+complete_bitset_inheritance(parent) ::= <<
+type_object->complete().bitset_type().header().base_type(*Get$parent.name$Identifier(true));
 >>
 
 /***** Utils *****/

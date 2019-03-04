@@ -285,7 +285,7 @@ $extensions : {$it$}; separator="\n"$
 >>
 
 bitset_type(ctx, parent, bitset) ::= <<
-$bitset.scopedname$::$bitset.name$()
+$bitset.scopedname$::$bitset.name$()$if(bitset.parents)$ : $bitset.parents : {$bitset_inherit_default_init(it)$}; separator=",\n"$ $endif$
 {
     $if(ctx.generateTypeObject)$
     // Just to register all known types
@@ -297,18 +297,20 @@ $bitset.scopedname$::~$bitset.name$()
 {
 }
 
-$bitset.scopedname$::$bitset.name$(const $bitset.name$ &x)
+$bitset.scopedname$::$bitset.name$(const $bitset.name$ &x)$if(bitset.parents)$ : $bitset.parents : {$bitset_inherit_copy_init(it)$}; separator=",\n"$ $endif$
 {
     m_bitset = x.m_bitset;
 }
 
-$bitset.scopedname$::$bitset.name$($bitset.name$ &&x)
+$bitset.scopedname$::$bitset.name$($bitset.name$ &&x)$if(bitset.parents)$ : $bitset.parents : {$bitset_inherit_move_init(it)$}; separator=",\n"$ $endif$
 {
     m_bitset = x.m_bitset;
 }
 
 $bitset.scopedname$& $bitset.scopedname$::operator=(const $bitset.name$ &x)
 {
+    $if(bitset.parents)$    $bitset.parents : {$it.scopedname$::operator=(x);}; separator="\n"$ $endif$
+
     m_bitset = x.m_bitset;
 
     return *this;
@@ -316,6 +318,8 @@ $bitset.scopedname$& $bitset.scopedname$::operator=(const $bitset.name$ &x)
 
 $bitset.scopedname$& $bitset.scopedname$::operator=($bitset.name$ &&x)
 {
+    $if(bitset.parents)$    $bitset.parents : {$it.scopedname$::operator=(std::move(x));}; separator="\n"$ $endif$
+
     m_bitset = x.m_bitset;
 
     return *this;
@@ -326,16 +330,20 @@ size_t $bitset.scopedname$::getMaxCdrSerializedSize(size_t current_alignment)
 {
     size_t initial_alignment = current_alignment;
 
-    initial_alignment += sizeof(m_bitset);
+    $if(bitset.parents)$    $bitset.parents : {current_alignment += $it.scopedname$::getMaxCdrSerializedSize(current_alignment);}; separator="\n"$ $endif$
+
+    current_alignment += sizeof(m_bitset);
 
     return current_alignment - initial_alignment;
 }
 
-size_t $bitset.scopedname$::getCdrSerializedSize(const $bitset.scopedname$&, size_t current_alignment)
+size_t $bitset.scopedname$::getCdrSerializedSize(const $bitset.scopedname$& data, size_t current_alignment)
 {
     size_t initial_alignment = current_alignment;
 
-    initial_alignment += sizeof(m_bitset);
+    $if(bitset.parents)$    $bitset.parents : {current_alignment += $it.scopedname$::getCdrSerializedSize(data, current_alignment);}; separator="\n"$ $endif$
+
+    current_alignment += sizeof(m_bitset);
 
     return current_alignment - initial_alignment;
 }
@@ -345,11 +353,15 @@ $endif$
 $if(ctx.cdr)$
 void $bitset.scopedname$::serialize(eprosima::fastcdr::Cdr &scdr) const
 {
+    $if(bitset.parents)$    $bitset.parents : {$it.scopedname$::serialize(scdr);}; separator="\n"$ $endif$
+
     scdr << static_cast<uint64_t>(m_bitset.to_ullong());
 }
 
 void $bitset.scopedname$::deserialize(eprosima::fastcdr::Cdr &dcdr)
 {
+    $if(bitset.parents)$    $bitset.parents : {$it.scopedname$::deserialize(dcdr);}; separator="\n"$ $endif$
+
     uint64_t temp = 0;
     dcdr \>> temp;
     m_bitset = temp;
@@ -360,11 +372,15 @@ $endif$
 $if(ctx.fastcdr)$
 void $bitset.scopedname$::serialize(eprosima::fastcdr::FastCdr &scdr) const
 {
+    $if(bitset.parents)$    $bitset.parents : {$it.scopedname$::serialize(scdr);}; separator="\n"$ $endif$
+
     scdr << static_cast<uint64_t>(m_bitset.to_ullong());
 }
 
 void $bitset.scopedname$::deserialize(eprosima::fastcdr::FastCdr &dcdr)
 {
+    $if(bitset.parents)$    $bitset.parents : {$it.scopedname$::deserialize(dcdr);}; separator="\n"$ $endif$
+
     uint64_t temp = 0;
     dcdr \>> temp;
     m_bitset = temp;

@@ -329,7 +329,7 @@ bitset_type(ctx, parent, bitset, extensions) ::= <<
  * @brief This class represents the structure $bitset.name$ defined by the user in the IDL file.
  * @ingroup $ctx.trimfilename$
  */
-class $bitset.name$
+class $bitset.name$$if(bitset.parents)$ : public $bitset.parents : {$public_bitset_inheritances(it)$}; separator=", "$ $endif$
 {
 public:
 
@@ -405,6 +405,8 @@ enum $bitmask.name$$bitmask.boundType$
 /***** Utils *****/
 
 public_struct_inheritances(parent) ::= <<$parent.scopedname$>>
+
+public_bitset_inheritances(parent) ::= <<$parent.scopedname$>>
 
 public_member_declaration(member) ::= <<
 $if(member.typecode.primitive)$

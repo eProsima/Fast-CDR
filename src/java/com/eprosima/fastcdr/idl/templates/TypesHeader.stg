@@ -97,7 +97,17 @@ definition_list(definitions) ::= <<
 $definitions; separator="\n"$
 >>
 
-annotation(ctx, annotation) ::= <<>>
+annotation(ctx, annotation) ::= <<
+namespace $annotation.name$
+{
+    $annotation.enums : {$enum_type(ctx=ctx, parent=annotation, enum=it)$}; separator="\n"$
+
+    $annotation.typeDefs : {$typedef_decl(ctx=ctx, parent=annotation, typedefs=it)$}; separator="\n"$
+
+    $annotation.constDecls : {$const_decl(ctx=ctx, parent=annotation, const=it)$}; separator="\n"$
+
+}
+>>
 
 interface(ctx, parent, interface, export_list) ::= <<
 /*!

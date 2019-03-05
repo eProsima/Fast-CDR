@@ -16,6 +16,7 @@ package com.eprosima.fastcdr.idl.generator;
 
 import com.eprosima.idl.context.Context;
 import com.eprosima.idl.generator.manager.TemplateManager;
+import com.eprosima.idl.parser.tree.AnnotationDeclaration;
 import com.eprosima.idl.parser.tree.Definition;
 import com.eprosima.idl.parser.tree.Export;
 import com.eprosima.idl.parser.tree.Interface;
@@ -168,6 +169,27 @@ public class TypesGenerator
                             System.out.println(ColorMessage.error() + "Cannot write file " + packagDir + typedecl.getName() + ".java");
                             return false;
                         }
+                    }
+                }
+                else if(definition.isIsAnnotation())
+                {
+                    AnnotationDeclaration annotation = (AnnotationDeclaration)definition;
+
+                    // Create StringTemplate of the annotation
+                    StringTemplate ifcst = stg_.getInstanceOf("annotation");
+                    ifcst.setAttribute("ctx", context);
+                    //ifcst.setAttribute("parent", annotation.getParent());
+                    ifcst.setAttribute("annotation", annotation);
+
+                    StringTemplate extensionst = null;
+                    String extensionname = null;
+                    if(extensions != null && (extensionname = extensions.get("annotation")) != null)
+                    {
+                        extensionst = stg_.getInstanceOf(extensionname);
+                        extensionst.setAttribute("ctx", context);
+                        //extensionst.setAttribute("parent", annotation.getParent());
+                        extensionst.setAttribute("annotation", annotation);
+                        ifcst.setAttribute("extension", extensionst.toString());
                     }
                 }
             }

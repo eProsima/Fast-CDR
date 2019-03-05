@@ -67,6 +67,30 @@ if ($param$ == "$object.name$")
 register_type(ctx, object, param) ::= <<
 factory->AddTypeObject("$object.name$", Get$object.name$Identifier(true), Get$object.name$Object(true));
 factory->AddTypeObject("$object.name$", Get$object.name$Identifier(false), Get$object.name$Object(false));
+$if(object.isAnnotation)$
+{
+    using namespace $object.name$;
+    $register_annotation_types(object)$
+}
+$endif$
+>>
+
+register_annotation_types(annotation) ::= <<
+
+$annotation.enums : {$register_annotation_enum(it)$}; separator="\n"$
+
+$annotation.typeDefs : {$register_annotation_typedef(it)$}; separator="\n"$
+
+>>
+
+register_annotation_enum(enum) ::= <<
+factory->AddTypeObject("$enum.name$", Get$enum.name$Identifier(true), Get$enum.name$Object(true));
+factory->AddTypeObject("$enum.name$", Get$enum.name$Identifier(false), Get$enum.name$Object(false));
+>>
+
+register_annotation_typedef(typedef) ::= <<
+factory->AddTypeObject("$typedef.name$", Get$typedef.name$Identifier(true), Get$typedef.name$Object(true));
+factory->AddTypeObject("$typedef.name$", Get$typedef.name$Identifier(false), Get$typedef.name$Object(false));
 >>
 
 module(ctx, parent, module, definition_list) ::= <<
@@ -77,7 +101,156 @@ definition_list(definitions) ::= <<
 $definitions; separator="\n"$
 >>
 
-annotation(ctx, annotation) ::= <<>>
+annotation(ctx, annotation) ::= <<
+const TypeIdentifier* Get$annotation.name$Identifier(bool complete)
+{
+    const TypeIdentifier* c_identifier = TypeObjectFactory::GetInstance()->GetTypeIdentifier("$annotation.name$", complete);
+    if (c_identifier != nullptr && (!complete || c_identifier->_d() == EK_COMPLETE))
+    {
+        return c_identifier;
+    }
+
+    Get$annotation.name$Object(complete); // Generated inside
+    return TypeObjectFactory::GetInstance()->GetTypeIdentifier("$annotation.name$", complete);
+}
+
+const TypeObject* Get$annotation.name$Object(bool complete)
+{
+    const TypeObject* c_type_object = TypeObjectFactory::GetInstance()->GetTypeObject("$annotation.name$", complete);
+    if (c_type_object != nullptr)
+    {
+        return c_type_object;
+    }
+    else if (complete)
+    {
+        return GetComplete$annotation.name$Object();
+    }
+    // else
+    return GetMinimal$annotation.name$Object();
+}
+
+const TypeObject* GetMinimal$annotation.name$Object()
+{
+    using namespace $annotation.name$;
+    const TypeObject* c_type_object = TypeObjectFactory::GetInstance()->GetTypeObject("$annotation.name$", false);
+    if (c_type_object != nullptr)
+    {
+        return c_type_object;
+    }
+
+    TypeObject *type_object = new TypeObject();
+    type_object->_d(EK_MINIMAL);
+    type_object->minimal()._d(TK_ANNOTATION);
+
+    $annotation.members:{ member | $minimal_annotation_member(ctx=ctx, object=member)$}; separator="\n"$
+
+    TypeIdentifier identifier;
+    identifier._d(EK_MINIMAL);
+
+    SerializedPayload_t payload(static_cast<uint32_t>(
+        MinimalAnnotationType::getCdrSerializedSize(type_object->minimal().annotation_type()) + 4));
+    eprosima::fastcdr::FastBuffer fastbuffer((char*) payload.data, payload.max_size);
+    // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
+    eprosima::fastcdr::Cdr ser(
+        fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIANNESS,
+        eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
+    payload.encapsulation = CDR_LE;
+
+    type_object->serialize(ser);
+    payload.length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
+    MD5 objectHash;
+    objectHash.update((char*)payload.data, payload.length);
+    objectHash.finalize();
+    for(int i = 0; i < 14; ++i)
+    {
+        identifier.equivalence_hash()[i] = objectHash.digest[i];
+    }
+
+    TypeObjectFactory::GetInstance()->AddTypeObject("$annotation.name$", &identifier, type_object);
+    delete type_object;
+    return TypeObjectFactory::GetInstance()->GetTypeObject("$annotation.name$", false);
+}
+
+const TypeObject* GetComplete$annotation.name$Object()
+{
+    using namespace $annotation.name$;
+    const TypeObject* c_type_object = TypeObjectFactory::GetInstance()->GetTypeObject("$annotation.name$", true);
+    if (c_type_object != nullptr && c_type_object->_d() == EK_COMPLETE)
+    {
+        return c_type_object;
+    }
+
+    TypeObject *type_object = new TypeObject();
+    type_object->_d(EK_COMPLETE);
+    type_object->complete()._d(TK_ANNOTATION);
+
+    //type_object->complete().annotation_type().annotation_flags().IS_FINAL(false);
+    //type_object->complete().annotation_type().annotation_flags().IS_APPENDABLE(false);
+    //type_object->complete().annotation_type().annotation_flags().IS_MUTABLE(false);
+    //type_object->complete().annotation_type().annotation_flags().IS_NESTED(false);
+    //type_object->complete().annotation_type().annotation_flags().IS_AUTOID_HASH(false);
+
+    //type_object->complete().annotation_type().header().detail().ann_builtin()...
+    //type_object->complete().annotation_type().header().detail().ann_custom()...
+    type_object->complete().annotation_type().header().annotation_name("$annotation.name$");
+
+    $annotation.members:{ member | $complete_annotation_member(ctx=ctx, object=member)$}; separator="\n"$
+
+    TypeIdentifier identifier;
+    identifier._d(EK_COMPLETE);
+
+    SerializedPayload_t payload(static_cast<uint32_t>(
+        CompleteAnnotationType::getCdrSerializedSize(type_object->complete().annotation_type()) + 4));
+    eprosima::fastcdr::FastBuffer fastbuffer((char*) payload.data, payload.max_size);
+    // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
+    eprosima::fastcdr::Cdr ser(
+        fastbuffer, eprosima::fastcdr::Cdr::LITTLE_ENDIANNESS,
+        eprosima::fastcdr::Cdr::DDS_CDR); // Object that serializes the data.
+    payload.encapsulation = CDR_LE;
+
+    type_object->serialize(ser);
+    payload.length = (uint32_t)ser.getSerializedDataLength(); //Get the serialized length
+    MD5 objectHash;
+    objectHash.update((char*)payload.data, payload.length);
+    objectHash.finalize();
+    for(int i = 0; i < 14; ++i)
+    {
+        identifier.equivalence_hash()[i] = objectHash.digest[i];
+    }
+
+    TypeObjectFactory::GetInstance()->AddTypeObject("$annotation.name$", &identifier, type_object);
+    delete type_object;
+    return TypeObjectFactory::GetInstance()->GetTypeObject("$annotation.name$", true);
+}
+
+namespace $annotation.name$
+{
+$annotation.enums : {$enum_type(ctx=ctx, parent=annotation, enum=it)$}; separator="\n"$
+
+$annotation.typeDefs : {$typedef_decl(ctx=ctx, parent=annotation, typedefs=it)$}; separator="\n"$
+
+} // $annotation.name$ namespace
+>>
+
+minimal_annotation_member(ctx, object) ::= <<
+MinimalAnnotationParameter mam_$object.name$;
+mam_$object.name$.common().member_type_id(*$get_type_identifier(ctx=ctx, type=object.typecode, ek="false")$);
+mam_$object.name$.name("$object.name$");
+mam_$object.name$.default_value("$object.value$");
+
+type_object->minimal().annotation_type().member_seq().emplace_back(mam_$object.name$);
+
+>>
+
+complete_annotation_member(ctx, object) ::= <<
+CompleteAnnotationParameter cam_$object.name$;
+cam_$object.name$.common().member_type_id(*$get_type_identifier(ctx=ctx, type=object.typecode, ek="true")$);
+cam_$object.name$.name("$object.name$");
+cam_$object.name$.default_value("$object.value$");
+
+type_object->complete().annotation_type().member_seq().emplace_back(cam_$object.name$);
+
+>>
 
 interface(ctx, parent, interface, export_list) ::= <<>>
 
@@ -1106,7 +1279,7 @@ const TypeObject* GetMinimal$bitset.name$Object()
     identifier._d(EK_MINIMAL);
 
     SerializedPayload_t payload(static_cast<uint32_t>(
-        MinimalBitmaskType::getCdrSerializedSize(type_object->minimal().bitset_type()) + 4));
+        MinimalBitsetType::getCdrSerializedSize(type_object->minimal().bitset_type()) + 4));
     eprosima::fastcdr::FastBuffer fastbuffer((char*) payload.data, payload.max_size);
     // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
     eprosima::fastcdr::Cdr ser(
@@ -1159,7 +1332,7 @@ const TypeObject* GetComplete$bitset.name$Object()
     identifier._d(EK_COMPLETE);
 
     SerializedPayload_t payload(static_cast<uint32_t>(
-        CompleteBitmaskType::getCdrSerializedSize(type_object->complete().bitset_type()) + 4));
+        CompleteBitsetType::getCdrSerializedSize(type_object->complete().bitset_type()) + 4));
     eprosima::fastcdr::FastBuffer fastbuffer((char*) payload.data, payload.max_size);
     // Fixed endian (Page 221, EquivalenceHash definition of Extensible and Dynamic Topic Types for DDS document)
     eprosima::fastcdr::Cdr ser(
@@ -1200,9 +1373,9 @@ mbf_$object.name$.common().holder_type($object.spec.typecode.typeIdentifier$);
 MD5 $object.name$_hash("$object.name$");
 for(int i = 0; i < 4; ++i)
 {
-    mbf_$object.name$.detail().name_hash()[i] = $object.name$_hash.digest[i];
+    mbf_$object.name$.name_hash()[i] = $object.name$_hash.digest[i];
 }
-type_object->minimal().bitmask_type().flag_seq().emplace_back(mbf_$object.name$);
+type_object->minimal().bitset_type().field_seq().emplace_back(mbf_$object.name$);
 $endif$
 
 >>
@@ -1217,13 +1390,13 @@ cbf_$object.name$.common().flags().IS_OPTIONAL(false);
 cbf_$object.name$.common().flags().IS_MUST_UNDERSTAND(false);
 cbf_$object.name$.common().flags().IS_KEY(false);
 cbf_$object.name$.common().flags().IS_DEFAULT(false);
-mbf_$object.name$.common().position($object.basePosition$);
-mbf_$object.name$.common().bitcount($object.spec.bitSize$);
-mbf_$object.name$.common().holder_type($object.spec.typecode.typeIdentifier$);
+cbf_$object.name$.common().position($object.basePosition$);
+cbf_$object.name$.common().bitcount($object.spec.bitSize$);
+cbf_$object.name$.common().holder_type($object.spec.typecode.typeIdentifier$);
 cbf_$object.name$.detail().name("$object.name$");
 //cbf_$object.name$.detail().ann_builtin()...
 //cbf_$object.name$.detail().ann_custom()...
-type_object->complete().bitmask_type().flag_seq().emplace_back(cbf_$object.name$);
+type_object->complete().bitset_type().field_seq().emplace_back(cbf_$object.name$);
 $endif$
 
 >>

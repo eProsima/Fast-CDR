@@ -1,4 +1,4 @@
-// Copyright 2016 Proyectos y Sistemas de Mantenimiento SL (eProsima).
+// Copyright 2019 Proyectos y Sistemas de Mantenimiento SL (eProsima).
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ namespace { char dummy; }
 #include <fastrtps/utils/md5.h>
 #include <fastrtps/types/TypeObjectFactory.h>
 #include <fastrtps/types/TypeNamesGenerator.h>
+#include <fastrtps/types/AnnotationParameterValue.h>
 #include <fastcdr/FastBuffer.h>
 $if(ctx.cdr)$
 #include <fastcdr/Cdr.h>
@@ -184,14 +185,13 @@ const TypeObject* GetComplete$annotation.name$Object()
     type_object->_d(EK_COMPLETE);
     type_object->complete()._d(TK_ANNOTATION);
 
+    // No flags apply
     //type_object->complete().annotation_type().annotation_flags().IS_FINAL(false);
     //type_object->complete().annotation_type().annotation_flags().IS_APPENDABLE(false);
     //type_object->complete().annotation_type().annotation_flags().IS_MUTABLE(false);
     //type_object->complete().annotation_type().annotation_flags().IS_NESTED(false);
     //type_object->complete().annotation_type().annotation_flags().IS_AUTOID_HASH(false);
 
-    //type_object->complete().annotation_type().header().detail().ann_builtin()...
-    //type_object->complete().annotation_type().header().detail().ann_custom()...
     type_object->complete().annotation_type().header().annotation_name("$annotation.name$");
 
     $annotation.members:{ member | $complete_annotation_member(ctx=ctx, object=member)$}; separator="\n"$
@@ -234,9 +234,19 @@ $annotation.typeDefs : {$typedef_decl(ctx=ctx, parent=annotation, typedefs=it)$}
 
 minimal_annotation_member(ctx, object) ::= <<
 MinimalAnnotationParameter mam_$object.name$;
-mam_$object.name$.common().member_type_id(*$get_type_identifier(ctx=ctx, type=object.typecode, ek="false")$);
+TypeIdentifier* mam_$object.name$_typeId = $get_type_identifier(ctx=ctx, type=object.typecode, ek="false")$;
+if (mam_$object.name$_typeId != nullptr)
+{
+    mam_$object.name$.common().member_type_id(*mam_$object.name$_typeId);
+}
 mam_$object.name$.name("$object.name$");
-mam_$object.name$.default_value("$object.value$");
+
+$if(object.value)$
+AnnotationParameterValue def_value_$object.name$;
+def_value_$object.name$._d(mam_$object.name$.common().member_type_id()._d());
+def_value_$object.name$.from_string("$object.value$");
+mam_$object.name$.default_value(def_value_$object.name$);
+$endif$
 
 type_object->minimal().annotation_type().member_seq().emplace_back(mam_$object.name$);
 
@@ -244,9 +254,19 @@ type_object->minimal().annotation_type().member_seq().emplace_back(mam_$object.n
 
 complete_annotation_member(ctx, object) ::= <<
 CompleteAnnotationParameter cam_$object.name$;
-cam_$object.name$.common().member_type_id(*$get_type_identifier(ctx=ctx, type=object.typecode, ek="true")$);
+TypeIdentifier* cam_$object.name$_typeId = $get_type_identifier(ctx=ctx, type=object.typecode, ek="true")$;
+if (mam_$object.name$_typeId != nullptr)
+{
+    cam_$object.name$.common().member_type_id(*cam_$object.name$_typeId);
+}
 cam_$object.name$.name("$object.name$");
-cam_$object.name$.default_value("$object.value$");
+
+$if(object.value)$
+AnnotationParameterValue def_value_$object.name$;
+def_value_$object.name$._d(cam_$object.name$.common().member_type_id()._d());
+def_value_$object.name$.from_string("$object.value$");
+cam_$object.name$.default_value(def_value_$object.name$);
+$endif$
 
 type_object->complete().annotation_type().member_seq().emplace_back(cam_$object.name$);
 
@@ -299,21 +319,24 @@ const TypeObject* GetMinimal$typedefs.name$Object()
     TypeObject *type_object = new TypeObject();
     type_object->_d(EK_MINIMAL);
     type_object->minimal()._d(TK_ALIAS);
-    type_object->minimal().alias_type().alias_flags().IS_FINAL(false);
-    type_object->minimal().alias_type().alias_flags().IS_APPENDABLE(false);
-    type_object->minimal().alias_type().alias_flags().IS_MUTABLE(false);
-    type_object->minimal().alias_type().alias_flags().IS_NESTED(false);
-    type_object->minimal().alias_type().alias_flags().IS_AUTOID_HASH(false);
+
+    // No flags apply
+    //type_object->minimal().alias_type().alias_flags().IS_FINAL(false);
+    //type_object->minimal().alias_type().alias_flags().IS_APPENDABLE(false);
+    //type_object->minimal().alias_type().alias_flags().IS_MUTABLE(false);
+    //type_object->minimal().alias_type().alias_flags().IS_NESTED(false);
+    //type_object->minimal().alias_type().alias_flags().IS_AUTOID_HASH(false);
 
     // type_object->minimal().alias_type().header()... Is empty
 
-    type_object->minimal().alias_type().body().common().related_flags().TRY_CONSTRUCT1(false);
-    type_object->minimal().alias_type().body().common().related_flags().TRY_CONSTRUCT2(false);
-    type_object->minimal().alias_type().body().common().related_flags().IS_EXTERNAL(false);
-    type_object->minimal().alias_type().body().common().related_flags().IS_OPTIONAL(false);
-    type_object->minimal().alias_type().body().common().related_flags().IS_MUST_UNDERSTAND(false);
-    type_object->minimal().alias_type().body().common().related_flags().IS_KEY(false);
-    type_object->minimal().alias_type().body().common().related_flags().IS_DEFAULT(false);
+    // No flags apply
+    //type_object->minimal().alias_type().body().common().related_flags().TRY_CONSTRUCT1(false);
+    //type_object->minimal().alias_type().body().common().related_flags().TRY_CONSTRUCT2(false);
+    //type_object->minimal().alias_type().body().common().related_flags().IS_EXTERNAL(false);
+    //type_object->minimal().alias_type().body().common().related_flags().IS_OPTIONAL(false);
+    //type_object->minimal().alias_type().body().common().related_flags().IS_MUST_UNDERSTAND(false);
+    //type_object->minimal().alias_type().body().common().related_flags().IS_KEY(false);
+    //type_object->minimal().alias_type().body().common().related_flags().IS_DEFAULT(false);
 
     // Must be defined already, if don't, may be an recursive alias
     const TypeIdentifier *relatedType = TypeObjectFactory::get_instance()->get_type_identifier($get_content_type(ctx=ctx, type=typedefs.typedefContentTypeCode)$, false);
@@ -371,11 +394,13 @@ const TypeObject* GetComplete$typedefs.name$Object()
     TypeObject *type_object = new TypeObject();
     type_object->_d(EK_COMPLETE);
     type_object->complete()._d(TK_ALIAS);
-    type_object->complete().alias_type().alias_flags().IS_FINAL(false);
-    type_object->complete().alias_type().alias_flags().IS_APPENDABLE(false);
-    type_object->complete().alias_type().alias_flags().IS_MUTABLE(false);
-    type_object->complete().alias_type().alias_flags().IS_NESTED(false);
-    type_object->complete().alias_type().alias_flags().IS_AUTOID_HASH(false);
+
+    // No flags apply
+    //type_object->complete().alias_type().alias_flags().IS_FINAL(false);
+    //type_object->complete().alias_type().alias_flags().IS_APPENDABLE(false);
+    //type_object->complete().alias_type().alias_flags().IS_MUTABLE(false);
+    //type_object->complete().alias_type().alias_flags().IS_NESTED(false);
+    //type_object->complete().alias_type().alias_flags().IS_AUTOID_HASH(false);
 
     //type_object->complete().alias_type().header().detail().ann_builtin().verbatim().placement("placement");
     //type_object->complete().alias_type().header().detail().ann_builtin().verbatim().language("language");
@@ -383,13 +408,14 @@ const TypeObject* GetComplete$typedefs.name$Object()
     //type_object->complete().alias_type().header().detail().ann_custom().push_back(...);
     type_object->complete().alias_type().header().detail().type_name("$typedefs.name$");
 
-    type_object->complete().alias_type().body().common().related_flags().TRY_CONSTRUCT1(false);
-    type_object->complete().alias_type().body().common().related_flags().TRY_CONSTRUCT2(false);
-    type_object->complete().alias_type().body().common().related_flags().IS_EXTERNAL(false);
-    type_object->complete().alias_type().body().common().related_flags().IS_OPTIONAL(false);
-    type_object->complete().alias_type().body().common().related_flags().IS_MUST_UNDERSTAND(false);
-    type_object->complete().alias_type().body().common().related_flags().IS_KEY(false);
-    type_object->complete().alias_type().body().common().related_flags().IS_DEFAULT(false);
+    // No flags apply
+    //type_object->complete().alias_type().body().common().related_flags().TRY_CONSTRUCT1(false);
+    //type_object->complete().alias_type().body().common().related_flags().TRY_CONSTRUCT2(false);
+    //type_object->complete().alias_type().body().common().related_flags().IS_EXTERNAL(false);
+    //type_object->complete().alias_type().body().common().related_flags().IS_OPTIONAL(false);
+    //type_object->complete().alias_type().body().common().related_flags().IS_MUST_UNDERSTAND(false);
+    //type_object->complete().alias_type().body().common().related_flags().IS_KEY(false);
+    //type_object->complete().alias_type().body().common().related_flags().IS_DEFAULT(false);
 
     //type_object->complete().alias_type().body().common().ann_builtin()
     //type_object->complete().alias_type().body().common().ann_custom()
@@ -480,7 +506,8 @@ const TypeObject* GetMinimal$enum.name$Object()
     TypeObject *type_object = new TypeObject();
     type_object->_d(EK_MINIMAL);
     type_object->minimal()._d(TK_ENUM);
-    // Unused
+
+    // No flags apply
     //type_object->minimal().enumerated_type().enum_flags().IS_FINAL(false);
     //type_object->minimal().enumerated_type().enum_flags().IS_APPENDABLE(false);
     //type_object->minimal().enumerated_type().enum_flags().IS_MUTABLE(false);
@@ -531,16 +558,43 @@ const TypeObject* GetComplete$enum.name$Object()
     type_object->_d(EK_COMPLETE);
     type_object->complete()._d(TK_ENUM);
 
-    type_object->complete().enumerated_type().enum_flags().IS_FINAL(false);
-    type_object->complete().enumerated_type().enum_flags().IS_APPENDABLE(false);
-    type_object->complete().enumerated_type().enum_flags().IS_MUTABLE(false);
-    type_object->complete().enumerated_type().enum_flags().IS_NESTED(false);
-    type_object->complete().enumerated_type().enum_flags().IS_AUTOID_HASH(false);
+    // No flags apply
+    //type_object->complete().enumerated_type().enum_flags().IS_FINAL(false);
+    //type_object->complete().enumerated_type().enum_flags().IS_APPENDABLE(false);
+    //type_object->complete().enumerated_type().enum_flags().IS_MUTABLE(false);
+    //type_object->complete().enumerated_type().enum_flags().IS_NESTED(false);
+    //type_object->complete().enumerated_type().enum_flags().IS_AUTOID_HASH(false);
 
     type_object->complete().enumerated_type().header().common().bit_bound(32); // TODO fixed by IDL, isn't?
-    //type_object->complete().enumerated_type().header().detail().ann_builtin()...
-    //type_object->complete().enumerated_type().header().detail().ann_custom()...
     type_object->complete().enumerated_type().header().detail().type_name("$enum.name$");
+
+    $if(enum.annotationList)$
+    $enum.annotationList:{ ann |
+{
+    AppliedAnnotation ann;
+    //ann.annotation_typeid(Get$ann.name$Identifier(true));
+    ann.annotation_typeid(*TypeObjectFactory::get_instance()->get_type_identifier_trying_complete("$ann.name$"));
+    $if(ann.valueList)$
+    $ann.valueList:{ annval |
+{
+    AppliedAnnotationParameter annParam;
+    MD5 message_hash("$annval.name$");
+    for(int i = 0; i < 4; ++i)
+    {
+        annParam.paramname_hash()[i] = message_hash.digest[i];
+    }
+    AnnotationParameterValue paramValue;
+    paramValue._d($annval.typecode.kind$);
+    paramValue.from_string("$annval.value$");
+    annParam.value(paramValue);
+    ann.param_seq().push_back(annParam);
+}
+    };separator="\n"$
+    $endif$
+    type_object->complete().enumerated_type().header().detail().ann_custom().push_back(ann);
+}
+    }; separator="\n"$
+    $endif$
 
     uint32_t value = 0;
     $enum.members:{ member | $complete_enumerated_literal(ctx=ctx, object=member)$}; separator="\n"$
@@ -576,14 +630,13 @@ const TypeObject* GetComplete$enum.name$Object()
 
 minimal_enumerated_literal(ctx, object) ::= <<
 MinimalEnumeratedLiteral mel_$object.name$;
-mel_$object.name$.common().flags().TRY_CONSTRUCT1(false);
-mel_$object.name$.common().flags().TRY_CONSTRUCT2(false);
-mel_$object.name$.common().flags().IS_EXTERNAL(false);
-mel_$object.name$.common().flags().IS_OPTIONAL(false);
-mel_$object.name$.common().flags().IS_MUST_UNDERSTAND(false);
-mel_$object.name$.common().flags().IS_KEY(false);
-mel_$object.name$.common().flags().IS_DEFAULT(false);
-mel_$object.name$.common().flags().IS_DEFAULT(false);
+mel_$object.name$.common().flags().TRY_CONSTRUCT1(false); // Doesn't apply
+mel_$object.name$.common().flags().TRY_CONSTRUCT2(false); // Doesn't apply
+mel_$object.name$.common().flags().IS_EXTERNAL(false); // Doesn't apply
+mel_$object.name$.common().flags().IS_OPTIONAL(false); // Doesn't apply
+mel_$object.name$.common().flags().IS_MUST_UNDERSTAND(false); // Doesn't apply
+mel_$object.name$.common().flags().IS_KEY(false); // Doesn't apply
+mel_$object.name$.common().flags().IS_DEFAULT($object.annotationDefaultLiteral$);
 mel_$object.name$.common().value(value++);
 MD5 $object.name$_hash("$object.name$");
 for(int i = 0; i < 4; ++i)
@@ -596,18 +649,44 @@ type_object->minimal().enumerated_type().literal_seq().emplace_back(mel_$object.
 
 complete_enumerated_literal(ctx, object) ::= <<
 CompleteEnumeratedLiteral cel_$object.name$;
-cel_$object.name$.common().flags().TRY_CONSTRUCT1(false);
-cel_$object.name$.common().flags().TRY_CONSTRUCT2(false);
-cel_$object.name$.common().flags().IS_EXTERNAL(false);
-cel_$object.name$.common().flags().IS_OPTIONAL(false);
-cel_$object.name$.common().flags().IS_MUST_UNDERSTAND(false);
-cel_$object.name$.common().flags().IS_KEY(false);
-cel_$object.name$.common().flags().IS_DEFAULT(false);
-cel_$object.name$.common().flags().IS_DEFAULT(false);
+cel_$object.name$.common().flags().TRY_CONSTRUCT1(false); // Doesn't apply
+cel_$object.name$.common().flags().TRY_CONSTRUCT2(false); // Doesn't apply
+cel_$object.name$.common().flags().IS_EXTERNAL(false); // Doesn't apply
+cel_$object.name$.common().flags().IS_OPTIONAL(false); // Doesn't apply
+cel_$object.name$.common().flags().IS_MUST_UNDERSTAND(false); // Doesn't apply
+cel_$object.name$.common().flags().IS_KEY(false); // Doesn't apply
+cel_$object.name$.common().flags().IS_DEFAULT($object.annotationDefaultLiteral$);
 cel_$object.name$.common().value(value++);
 cel_$object.name$.detail().name("$object.name$");
-//cel_$object.name$.detail().ann_builtin()...
-//cel_$object.name$.detail().ann_custom()...
+
+$if(object.annotationList)$
+$object.annotationList:{ ann |
+{
+    AppliedAnnotation ann;
+    //ann.annotation_typeid(Get$ann.name$Identifier(true));
+    ann.annotation_typeid(*TypeObjectFactory::get_instance()->get_type_identifier_trying_complete("$ann.name$"));
+    $if(ann.valueList)$
+    $ann.valueList:{ annval |
+    {
+        AppliedAnnotationParameter annParam;
+        MD5 message_hash("$annval.name$");
+        for(int i = 0; i < 4; ++i)
+        {
+            annParam.paramname_hash()[i] = message_hash.digest[i];
+        }
+        AnnotationParameterValue paramValue;
+        paramValue._d($annval.typecode.kind$);
+        paramValue.from_string("$annval.value$");
+        annParam.value(paramValue);
+        ann.param_seq().push_back(annParam);
+    }
+    };separator="\n"$
+    $endif$
+    cel_$object.name$.detail().ann_custom().push_back(ann);
+}
+}; separator="\n"$
+$endif$
+
 type_object->complete().enumerated_type().literal_seq().emplace_back(cel_$object.name$);
 
 >>
@@ -652,11 +731,11 @@ const TypeObject* GetMinimal$struct.name$Object()
     type_object->_d(EK_MINIMAL);
     type_object->minimal()._d(TK_STRUCTURE);
 
-    type_object->minimal().struct_type().struct_flags().IS_FINAL(false);
-    type_object->minimal().struct_type().struct_flags().IS_APPENDABLE(false);
-    type_object->minimal().struct_type().struct_flags().IS_MUTABLE(false);
-    type_object->minimal().struct_type().struct_flags().IS_NESTED(false);
-    type_object->minimal().struct_type().struct_flags().IS_AUTOID_HASH(false);
+    type_object->minimal().struct_type().struct_flags().IS_FINAL($struct.annotationFinal$);
+    type_object->minimal().struct_type().struct_flags().IS_APPENDABLE($struct.annotationAppendable$);
+    type_object->minimal().struct_type().struct_flags().IS_MUTABLE($struct.annotationMutable$);
+    type_object->minimal().struct_type().struct_flags().IS_NESTED($struct.annotationNested$);
+    type_object->minimal().struct_type().struct_flags().IS_AUTOID_HASH(false); // Unsupported
 
     MemberId memberId = 0;
     $struct.members:{ member | $minimal_member_object_type(ctx=ctx, object=member)$}; separator="\n"$
@@ -706,23 +785,47 @@ const TypeObject* GetComplete$struct.name$Object()
     type_object->_d(EK_COMPLETE);
     type_object->complete()._d(TK_STRUCTURE);
 
-    type_object->complete().struct_type().struct_flags().IS_FINAL(false);
-    type_object->complete().struct_type().struct_flags().IS_APPENDABLE(false);
-    type_object->complete().struct_type().struct_flags().IS_MUTABLE(false);
-    type_object->complete().struct_type().struct_flags().IS_NESTED(false);
-    type_object->complete().struct_type().struct_flags().IS_AUTOID_HASH(false);
+    type_object->complete().struct_type().struct_flags().IS_FINAL($struct.annotationFinal$);
+    type_object->complete().struct_type().struct_flags().IS_APPENDABLE($struct.annotationAppendable$);
+    type_object->complete().struct_type().struct_flags().IS_MUTABLE($struct.annotationMutable$);
+    type_object->complete().struct_type().struct_flags().IS_NESTED($struct.annotationNested$);
+    type_object->complete().struct_type().struct_flags().IS_AUTOID_HASH(false); // Unsupported
 
     MemberId memberId = 0;
     $struct.members:{ member | $complete_member_object_type(ctx=ctx, object=member)$}; separator="\n"$
 
     // Header
     type_object->complete().struct_type().header().detail().type_name("$struct.name$");
-    //type_object->complete().struct_type().header().detail().ann_builtin()...
-    //type_object->complete().struct_type().header().detail().ann_custom()...
     // TODO inheritance
-    //type_object->complete().struct_type().header().base_type()._d(EK_COMPLETE);
-    //type_object->complete().struct_type().header().base_type().equivalence_hash()[0..13];
     $struct.inheritances:{$complete_struct_inheritance(it)$}; separator="\n"$
+
+    $if(struct.annotationList)$
+    $struct.annotationList:{ ann |
+{
+    AppliedAnnotation ann;
+    //ann.annotation_typeid(Get$ann.name$Identifier(true));
+    ann.annotation_typeid(*TypeObjectFactory::get_instance()->get_type_identifier_trying_complete("$ann.name$"));
+    $if(ann.valueList)$
+    $ann.valueList:{ annval |
+{
+    AppliedAnnotationParameter annParam;
+    MD5 message_hash("$annval.name$");
+    for(int i = 0; i < 4; ++i)
+    {
+        annParam.paramname_hash()[i] = message_hash.digest[i];
+    }
+    AnnotationParameterValue paramValue;
+    paramValue._d($annval.typecode.kind$);
+    paramValue.from_string("$annval.value$");
+    annParam.value(paramValue);
+    ann.param_seq().push_back(annParam);
+}
+    };separator="\n"$
+    $endif$
+    type_object->complete().struct_type().header().detail().ann_custom().push_back(ann);
+}
+    }; separator="\n"$
+    $endif$
 
     TypeIdentifier identifier;
     identifier._d(EK_COMPLETE);
@@ -764,13 +867,13 @@ type_object->complete().struct_type().header().base_type(*Get$parent.name$Identi
 minimal_member_object_type(ctx, object) ::= <<
 MinimalStructMember mst_$object.name$;
 mst_$object.name$.common().member_id(memberId++);
-mst_$object.name$.common().member_flags().TRY_CONSTRUCT1(false);
-mst_$object.name$.common().member_flags().TRY_CONSTRUCT2(false);
-mst_$object.name$.common().member_flags().IS_EXTERNAL(false);
-mst_$object.name$.common().member_flags().IS_OPTIONAL(false);
-mst_$object.name$.common().member_flags().IS_MUST_UNDERSTAND(false);
-mst_$object.name$.common().member_flags().IS_KEY(false);
-mst_$object.name$.common().member_flags().IS_DEFAULT(false);
+mst_$object.name$.common().member_flags().TRY_CONSTRUCT1(false); // Unsupported
+mst_$object.name$.common().member_flags().TRY_CONSTRUCT2(false); // Unsupported
+mst_$object.name$.common().member_flags().IS_EXTERNAL(false); // Unsupported
+mst_$object.name$.common().member_flags().IS_OPTIONAL($object.annotationOptional$);
+mst_$object.name$.common().member_flags().IS_MUST_UNDERSTAND($object.annotationMustUnderstand$);
+mst_$object.name$.common().member_flags().IS_KEY($object.annotationKey$);
+mst_$object.name$.common().member_flags().IS_DEFAULT(false); // Doesn't apply
 $if(object.typecode.plainType)$
 mst_$object.name$.common().member_type_id(*$get_type_identifier(ctx=ctx, type=object.typecode, ek="false")$);
 $elseif(object.typecode.objectType)$
@@ -799,13 +902,13 @@ type_object->minimal().struct_type().member_seq().emplace_back(mst_$object.name$
 complete_member_object_type(ctx, object) ::= <<
 CompleteStructMember cst_$object.name$;
 cst_$object.name$.common().member_id(memberId++);
-cst_$object.name$.common().member_flags().TRY_CONSTRUCT1(false);
-cst_$object.name$.common().member_flags().TRY_CONSTRUCT2(false);
-cst_$object.name$.common().member_flags().IS_EXTERNAL(false);
-cst_$object.name$.common().member_flags().IS_OPTIONAL(false);
-cst_$object.name$.common().member_flags().IS_MUST_UNDERSTAND(false);
-cst_$object.name$.common().member_flags().IS_KEY(false);
-cst_$object.name$.common().member_flags().IS_DEFAULT(false);
+cst_$object.name$.common().member_flags().TRY_CONSTRUCT1(false); // Unsupported
+cst_$object.name$.common().member_flags().TRY_CONSTRUCT2(false); // Unsupported
+cst_$object.name$.common().member_flags().IS_EXTERNAL(false); // Unsupported
+cst_$object.name$.common().member_flags().IS_OPTIONAL($object.annotationOptional$);
+cst_$object.name$.common().member_flags().IS_MUST_UNDERSTAND($object.annotationMustUnderstand$);
+cst_$object.name$.common().member_flags().IS_KEY($object.annotationKey$);
+cst_$object.name$.common().member_flags().IS_DEFAULT(false); // Doesn't apply
 $if(object.typecode.plainType)$
 cst_$object.name$.common().member_type_id(*$get_type_identifier(ctx=ctx, type=object.typecode, ek="true")$);
 $elseif(object.typecode.objectType)$
@@ -823,8 +926,35 @@ $endif$
 
 
 cst_$object.name$.detail().name("$object.name$");
-//cst_$object.name$.detail().ann_builtin()...
-//cst_$object.name$.detail().ann_custom()...
+
+$if(object.annotationList)$
+$object.annotationList:{ ann |
+{
+    AppliedAnnotation ann;
+    //ann.annotation_typeid(Get$ann.name$Identifier(true));
+    ann.annotation_typeid(*TypeObjectFactory::get_instance()->get_type_identifier_trying_complete("$ann.name$"));
+    $if(ann.valueList)$
+    $ann.valueList:{ annval |
+    {
+        AppliedAnnotationParameter annParam;
+        MD5 message_hash("$annval.name$");
+        for(int i = 0; i < 4; ++i)
+        {
+            annParam.paramname_hash()[i] = message_hash.digest[i];
+        }
+        AnnotationParameterValue paramValue;
+        paramValue._d($annval.typecode.kind$);
+        paramValue.from_string("$annval.value$");
+        annParam.value(paramValue);
+        ann.param_seq().push_back(annParam);
+    }
+    };separator="\n"$
+    $endif$
+    cst_$object.name$.detail().ann_custom().push_back(ann);
+}
+}; separator="\n"$
+$endif$
+
 type_object->complete().struct_type().member_seq().emplace_back(cst_$object.name$);
 
 >>
@@ -873,19 +1003,19 @@ const TypeObject* GetMinimal$union.name$Object()
     type_object->_d(EK_MINIMAL);
     type_object->minimal()._d(TK_UNION);
 
-    type_object->minimal().union_type().union_flags().IS_FINAL(false);
-    type_object->minimal().union_type().union_flags().IS_APPENDABLE(false);
-    type_object->minimal().union_type().union_flags().IS_MUTABLE(false);
-    type_object->minimal().union_type().union_flags().IS_NESTED(false);
-    type_object->minimal().union_type().union_flags().IS_AUTOID_HASH(false);
+    type_object->minimal().union_type().union_flags().IS_FINAL($union.annotationFinal$);
+    type_object->minimal().union_type().union_flags().IS_APPENDABLE($union.annotationAppendable$);
+    type_object->minimal().union_type().union_flags().IS_MUTABLE($union.annotationMutable$);
+    type_object->minimal().union_type().union_flags().IS_NESTED($union.annotationNested$);
+    type_object->minimal().union_type().union_flags().IS_AUTOID_HASH(false); // Unsupported
 
-    type_object->minimal().union_type().discriminator().common().member_flags().TRY_CONSTRUCT1(false);
-    type_object->minimal().union_type().discriminator().common().member_flags().TRY_CONSTRUCT2(false);
-    type_object->minimal().union_type().discriminator().common().member_flags().IS_EXTERNAL(false);
-    type_object->minimal().union_type().discriminator().common().member_flags().IS_OPTIONAL(false);
-    type_object->minimal().union_type().discriminator().common().member_flags().IS_MUST_UNDERSTAND(false);
-    type_object->minimal().union_type().discriminator().common().member_flags().IS_KEY(false);
-    type_object->minimal().union_type().discriminator().common().member_flags().IS_DEFAULT(false);
+    type_object->minimal().union_type().discriminator().common().member_flags().TRY_CONSTRUCT1(false); // Unsupported
+    type_object->minimal().union_type().discriminator().common().member_flags().TRY_CONSTRUCT2(false); // Unsupported
+    type_object->minimal().union_type().discriminator().common().member_flags().IS_EXTERNAL(false); // Doesn't apply
+    type_object->minimal().union_type().discriminator().common().member_flags().IS_OPTIONAL(false); // Doesn't apply
+    type_object->minimal().union_type().discriminator().common().member_flags().IS_MUST_UNDERSTAND(false); // Doesn't apply
+    type_object->minimal().union_type().discriminator().common().member_flags().IS_KEY(false); // Unsupported
+    type_object->minimal().union_type().discriminator().common().member_flags().IS_DEFAULT(false); // Doesn't apply
 
     type_object->minimal().union_type().discriminator().common().type_id(*$get_type_identifier(ctx=ctx, type=union.discriminator, ek="false")$);
 
@@ -935,32 +1065,83 @@ const TypeObject* GetComplete$union.name$Object()
     type_object->_d(EK_COMPLETE);
     type_object->complete()._d(TK_UNION);
 
-    type_object->complete().union_type().union_flags().IS_FINAL(false);
-    type_object->complete().union_type().union_flags().IS_APPENDABLE(false);
-    type_object->complete().union_type().union_flags().IS_MUTABLE(false);
-    type_object->complete().union_type().union_flags().IS_NESTED(false);
-    type_object->complete().union_type().union_flags().IS_AUTOID_HASH(false);
+    type_object->complete().union_type().union_flags().IS_FINAL($union.annotationFinal$);
+    type_object->complete().union_type().union_flags().IS_APPENDABLE($union.annotationAppendable$);
+    type_object->complete().union_type().union_flags().IS_MUTABLE($union.annotationMutable$);
+    type_object->complete().union_type().union_flags().IS_NESTED($union.annotationNested$);
+    type_object->complete().union_type().union_flags().IS_AUTOID_HASH(false); // Unsupported
 
-    //type_object->complete().union_type().discriminator().ann_builtin()...
-    //type_object->complete().union_type().discriminator().ann_custom()...
-    type_object->complete().union_type().discriminator().common().member_flags().TRY_CONSTRUCT1(false);
-    type_object->complete().union_type().discriminator().common().member_flags().TRY_CONSTRUCT2(false);
-    type_object->complete().union_type().discriminator().common().member_flags().IS_EXTERNAL(false);
-    type_object->complete().union_type().discriminator().common().member_flags().IS_OPTIONAL(false);
-    type_object->complete().union_type().discriminator().common().member_flags().IS_MUST_UNDERSTAND(false);
-    type_object->complete().union_type().discriminator().common().member_flags().IS_KEY(false);
-    type_object->complete().union_type().discriminator().common().member_flags().IS_DEFAULT(false);
+    type_object->complete().union_type().discriminator().common().member_flags().TRY_CONSTRUCT1(false); // Unsupported
+    type_object->complete().union_type().discriminator().common().member_flags().TRY_CONSTRUCT2(false); // Unsupported
+    type_object->complete().union_type().discriminator().common().member_flags().IS_EXTERNAL(false); // Doesn't apply
+    type_object->complete().union_type().discriminator().common().member_flags().IS_OPTIONAL(false); // Doesn't apply
+    type_object->complete().union_type().discriminator().common().member_flags().IS_MUST_UNDERSTAND(false); // Doesn't apply
+    type_object->complete().union_type().discriminator().common().member_flags().IS_KEY(false); // Unsupported
+    type_object->complete().union_type().discriminator().common().member_flags().IS_DEFAULT(false); // Doesn't apply
 
     type_object->complete().union_type().discriminator().common().type_id(*$get_type_identifier(ctx=ctx, type=union.discriminator, ek="true")$);
+
+    $if(union.discriminator.annotationList)$
+    $union.discriminator.annotationList:{ ann |
+{
+    AppliedAnnotation ann;
+    //ann.annotation_typeid(Get$ann.name$Identifier(true));
+    ann.annotation_typeid(*TypeObjectFactory::get_instance()->get_type_identifier_trying_complete("$ann.name$"));
+    $if(ann.valueList)$
+    $ann.valueList:{ annval |
+{
+    AppliedAnnotationParameter annParam;
+    MD5 message_hash("$annval.name$");
+    for(int i = 0; i < 4; ++i)
+    {
+        annParam.paramname_hash()[i] = message_hash.digest[i];
+    }
+    AnnotationParameterValue paramValue;
+    paramValue._d($annval.typecode.kind$);
+    paramValue.from_string("$annval.value$");
+    annParam.value(paramValue);
+    ann.param_seq().push_back(annParam);
+}
+    };separator="\n"$
+    $endif$
+    type_object->complete().union_type().discriminator().ann_custom().push_back(ann);
+}
+    }; separator="\n"$
+    $endif$
 
     MemberId memberId = 0;
     $union.members:{ member | $complete_union_member_object_type(ctx=ctx, object=member, discriminator=union.discriminator)$}; separator="\n"$
 
     // Header
-    //type_object->complete().union_type().header().detail().ann_builtin()..
-    //type_object->complete().union_type().header().detail().ann_builtin()..
     type_object->complete().union_type().header().detail().type_name("$union.name$");
 
+    $if(union.annotationList)$
+    $union.annotationList:{ ann |
+{
+    AppliedAnnotation ann;
+    //ann.annotation_typeid(Get$ann.name$Identifier(true));
+    ann.annotation_typeid(*TypeObjectFactory::get_instance()->get_type_identifier_trying_complete("$ann.name$"));
+    $if(ann.valueList)$
+    $ann.valueList:{ annval |
+{
+    AppliedAnnotationParameter annParam;
+    MD5 message_hash("$annval.name$");
+    for(int i = 0; i < 4; ++i)
+    {
+        annParam.paramname_hash()[i] = message_hash.digest[i];
+    }
+    AnnotationParameterValue paramValue;
+    paramValue._d($annval.typecode.kind$);
+    paramValue.from_string("$annval.value$");
+    annParam.value(paramValue);
+    ann.param_seq().push_back(annParam);
+}
+    };separator="\n"$
+    $endif$
+    type_object->complete().union_type().header().detail().ann_custom().push_back(ann);
+}
+    }; separator="\n"$
+    $endif$
 
     TypeIdentifier* identifier = new TypeIdentifier();
     identifier->_d(EK_COMPLETE);
@@ -995,13 +1176,13 @@ const TypeObject* GetComplete$union.name$Object()
 minimal_union_member_object_type(ctx, object, discriminator) ::= <<
 MinimalUnionMember mst_$object.name$;
 mst_$object.name$.common().member_id(memberId++);
-mst_$object.name$.common().member_flags().TRY_CONSTRUCT1(false);
-mst_$object.name$.common().member_flags().TRY_CONSTRUCT2(false);
-mst_$object.name$.common().member_flags().IS_EXTERNAL(false);
-mst_$object.name$.common().member_flags().IS_OPTIONAL(false);
-mst_$object.name$.common().member_flags().IS_MUST_UNDERSTAND(false);
-mst_$object.name$.common().member_flags().IS_KEY(false);
-mst_$object.name$.common().member_flags().IS_DEFAULT(false);
+mst_$object.name$.common().member_flags().TRY_CONSTRUCT1(false); // Unsupported
+mst_$object.name$.common().member_flags().TRY_CONSTRUCT2(false); // Unsupported
+mst_$object.name$.common().member_flags().IS_EXTERNAL(false); // Unsupported
+mst_$object.name$.common().member_flags().IS_OPTIONAL(fasle); // Doesn't apply
+mst_$object.name$.common().member_flags().IS_MUST_UNDERSTAND(false); // Doesn't apply
+mst_$object.name$.common().member_flags().IS_KEY(false); // Doesn't apply
+mst_$object.name$.common().member_flags().IS_DEFAULT($object.annotationDefault$);
 $if(object.typecode.plainType)$
 mst_$object.name$.common().type_id(*$get_type_identifier(ctx=ctx, type=object.typecode, ek="false")$);
 $elseif(object.typecode.objectType)$
@@ -1034,13 +1215,13 @@ type_object->minimal().union_type().member_seq().emplace_back(mst_$object.name$)
 complete_union_member_object_type(ctx, object, discriminator) ::= <<
 CompleteUnionMember cst_$object.name$;
 cst_$object.name$.common().member_id(memberId++);
-cst_$object.name$.common().member_flags().TRY_CONSTRUCT1(false);
-cst_$object.name$.common().member_flags().TRY_CONSTRUCT2(false);
-cst_$object.name$.common().member_flags().IS_EXTERNAL(false);
-cst_$object.name$.common().member_flags().IS_OPTIONAL(false);
-cst_$object.name$.common().member_flags().IS_MUST_UNDERSTAND(false);
-cst_$object.name$.common().member_flags().IS_KEY(false);
-cst_$object.name$.common().member_flags().IS_DEFAULT(false);
+cst_$object.name$.common().member_flags().TRY_CONSTRUCT1(false); // Unsupported
+cst_$object.name$.common().member_flags().TRY_CONSTRUCT2(false); // Unsupported
+cst_$object.name$.common().member_flags().IS_EXTERNAL(false); // Unsupported
+cst_$object.name$.common().member_flags().IS_OPTIONAL(fasle); // Doesn't apply
+cst_$object.name$.common().member_flags().IS_MUST_UNDERSTAND(false); // Doesn't apply
+cst_$object.name$.common().member_flags().IS_KEY(false); // Doesn't apply
+cst_$object.name$.common().member_flags().IS_DEFAULT($object.annotationDefault$);
 $if(object.typecode.plainType)$
 cst_$object.name$.common().type_id(*$get_type_identifier(ctx=ctx, type=object.typecode, ek="false")$);
 $elseif(object.typecode.objectType)$
@@ -1056,15 +1237,40 @@ $else$
 }
 $endif$
 
-
 $if(object.labels)$
 $object.labels:{ label | cst_$object.name$.common().label_seq().emplace_back($label$);}; separator="\n"$
 $endif$
 
 
 cst_$object.name$.detail().name("$object.name$");
-//cst_$object.name$.detail().ann_builtin()...
-//cst_$object.name$.detail().ann_custom()...
+
+$if(object.annotationList)$
+$object.annotationList:{ ann |
+{
+    AppliedAnnotation ann;
+    //ann.annotation_typeid(Get$ann.name$Identifier(true));
+    ann.annotation_typeid(*TypeObjectFactory::get_instance()->get_type_identifier_trying_complete("$ann.name$"));
+    $if(ann.valueList)$
+    $ann.valueList:{ annval |
+    {
+        AppliedAnnotationParameter annParam;
+        MD5 message_hash("$annval.name$");
+        for(int i = 0; i < 4; ++i)
+        {
+            annParam.paramname_hash()[i] = message_hash.digest[i];
+        }
+        AnnotationParameterValue paramValue;
+        paramValue._d($annval.typecode.kind$);
+        paramValue.from_string("$annval.value$");
+        annParam.value(paramValue);
+        ann.param_seq().push_back(annParam);
+    }
+    };separator="\n"$
+    $endif$
+    cst_$object.name$.detail().ann_custom().push_back(ann);
+}
+}; separator="\n"$
+$endif$
 
 type_object->complete().union_type().member_seq().emplace_back(cst_$object.name$);
 
@@ -1153,15 +1359,43 @@ const TypeObject* GetComplete$bitmask.name$Object()
     type_object->_d(EK_COMPLETE);
     type_object->complete()._d(TK_BITMASK);
 
-    type_object->complete().bitmask_type().bitmask_flags().IS_FINAL(false);
-    type_object->complete().bitmask_type().bitmask_flags().IS_APPENDABLE(false);
-    type_object->complete().bitmask_type().bitmask_flags().IS_MUTABLE(false);
-    type_object->complete().bitmask_type().bitmask_flags().IS_NESTED(false);
-    type_object->complete().bitmask_type().bitmask_flags().IS_AUTOID_HASH(false);
+    // No flags apply
+    //type_object->complete().bitmask_type().bitmask_flags().IS_FINAL(false);
+    //type_object->complete().bitmask_type().bitmask_flags().IS_APPENDABLE(false);
+    //type_object->complete().bitmask_type().bitmask_flags().IS_MUTABLE(false);
+    //type_object->complete().bitmask_type().bitmask_flags().IS_NESTED(false);
+    //type_object->complete().bitmask_type().bitmask_flags().IS_AUTOID_HASH(false);
 
     type_object->complete().bitmask_type().header().common().bit_bound($bitmask.bitBound$);
-    //type_object->complete().bitmask_type().header().detail().ann_builtin()...
-    //type_object->complete().bitmask_type().header().detail().ann_custom()...
+
+    $if(union.annotationList)$
+    $union.annotationList:{ ann |
+{
+    AppliedAnnotation ann;
+    //ann.annotation_typeid(Get$ann.name$Identifier(true));
+    ann.annotation_typeid(*TypeObjectFactory::get_instance()->get_type_identifier_trying_complete("$ann.name$"));
+    $if(ann.valueList)$
+    $ann.valueList:{ annval |
+{
+    AppliedAnnotationParameter annParam;
+    MD5 message_hash("$annval.name$");
+    for(int i = 0; i < 4; ++i)
+    {
+        annParam.paramname_hash()[i] = message_hash.digest[i];
+    }
+    AnnotationParameterValue paramValue;
+    paramValue._d($annval.typecode.kind$);
+    paramValue.from_string("$annval.value$");
+    annParam.value(paramValue);
+    ann.param_seq().push_back(annParam);
+}
+    };separator="\n"$
+    $endif$
+    type_object->complete().bitmask_type().header().detail().ann_custom().push_back(ann);
+}
+    }; separator="\n"$
+    $endif$
+
     type_object->complete().bitmask_type().header().detail().type_name("$bitmask.name$");
 
     $bitmask.members:{ member | $complete_bitmask_flag(ctx=ctx, object=member)$}; separator="\n"$
@@ -1225,8 +1459,35 @@ cbf_$object.name$.common().flags().IS_KEY(false);
 cbf_$object.name$.common().flags().IS_DEFAULT(false);
 cbf_$object.name$.common().position($object.position$);
 cbf_$object.name$.detail().name("$object.name$");
-//cbf_$object.name$.detail().ann_builtin()...
-//cbf_$object.name$.detail().ann_custom()...
+
+$if(object.annotationList)$
+$object.annotationList:{ ann |
+{
+    AppliedAnnotation ann;
+    //ann.annotation_typeid(Get$ann.name$Identifier(true));
+    ann.annotation_typeid(*TypeObjectFactory::get_instance()->get_type_identifier_trying_complete("$ann.name$"));
+    $if(ann.valueList)$
+    $ann.valueList:{ annval |
+    {
+        AppliedAnnotationParameter annParam;
+        MD5 message_hash("$annval.name$");
+        for(int i = 0; i < 4; ++i)
+        {
+            annParam.paramname_hash()[i] = message_hash.digest[i];
+        }
+        AnnotationParameterValue paramValue;
+        paramValue._d($annval.typecode.kind$);
+        paramValue.from_string("$annval.value$");
+        annParam.value(paramValue);
+        ann.param_seq().push_back(annParam);
+    }
+    };separator="\n"$
+    $endif$
+    cbf_$object.name$.detail().ann_custom().push_back(ann);
+}
+}; separator="\n"$
+$endif$
+
 type_object->complete().bitmask_type().flag_seq().emplace_back(cbf_$object.name$);
 
 >>
@@ -1314,14 +1575,41 @@ const TypeObject* GetComplete$bitset.name$Object()
     type_object->_d(EK_COMPLETE);
     type_object->complete()._d(TK_BITSET);
 
-    type_object->complete().bitset_type().bitset_flags().IS_FINAL(false);
-    type_object->complete().bitset_type().bitset_flags().IS_APPENDABLE(false);
-    type_object->complete().bitset_type().bitset_flags().IS_MUTABLE(false);
-    type_object->complete().bitset_type().bitset_flags().IS_NESTED(false);
-    type_object->complete().bitset_type().bitset_flags().IS_AUTOID_HASH(false);
+    // No flags apply
+    //type_object->complete().bitset_type().bitset_flags().IS_FINAL(false);
+    //type_object->complete().bitset_type().bitset_flags().IS_APPENDABLE(false);
+    //type_object->complete().bitset_type().bitset_flags().IS_MUTABLE(false);
+    //type_object->complete().bitset_type().bitset_flags().IS_NESTED(false);
+    //type_object->complete().bitset_type().bitset_flags().IS_AUTOID_HASH(false);
 
-    //type_object->complete().bitset_type().header().detail().ann_builtin()...
-    //type_object->complete().bitset_type().header().detail().ann_custom()...
+    $if(union.annotationList)$
+    $union.annotationList:{ ann |
+{
+    AppliedAnnotation ann;
+    //ann.annotation_typeid(Get$ann.name$Identifier(true));
+    ann.annotation_typeid(*TypeObjectFactory::get_instance()->get_type_identifier_trying_complete("$ann.name$"));
+    $if(ann.valueList)$
+    $ann.valueList:{ annval |
+{
+    AppliedAnnotationParameter annParam;
+    MD5 message_hash("$annval.name$");
+    for(int i = 0; i < 4; ++i)
+    {
+        annParam.paramname_hash()[i] = message_hash.digest[i];
+    }
+    AnnotationParameterValue paramValue;
+    paramValue._d($annval.typecode.kind$);
+    paramValue.from_string("$annval.value$");
+    annParam.value(paramValue);
+    ann.param_seq().push_back(annParam);
+}
+    };separator="\n"$
+    $endif$
+    type_object->complete().bitset_type().header().detail().ann_custom().push_back(ann);
+}
+    }; separator="\n"$
+    $endif$
+
     type_object->complete().bitset_type().header().detail().type_name("$bitset.name$");
 
     $bitset.bitfields:{ member | $complete_bitfield(ctx=ctx, object=member)$}; separator="\n"$
@@ -1394,8 +1682,35 @@ cbf_$object.name$.common().position($object.basePosition$);
 cbf_$object.name$.common().bitcount($object.spec.bitSize$);
 cbf_$object.name$.common().holder_type($object.spec.typecode.typeIdentifier$);
 cbf_$object.name$.detail().name("$object.name$");
-//cbf_$object.name$.detail().ann_builtin()...
-//cbf_$object.name$.detail().ann_custom()...
+
+$if(object.annotationList)$
+$object.annotationList:{ ann |
+{
+    AppliedAnnotation ann;
+    //ann.annotation_typeid(Get$ann.name$Identifier(true));
+    ann.annotation_typeid(*TypeObjectFactory::get_instance()->get_type_identifier_trying_complete("$ann.name$"));
+    $if(ann.valueList)$
+    $ann.valueList:{ annval |
+    {
+        AppliedAnnotationParameter annParam;
+        MD5 message_hash("$annval.name$");
+        for(int i = 0; i < 4; ++i)
+        {
+            annParam.paramname_hash()[i] = message_hash.digest[i];
+        }
+        AnnotationParameterValue paramValue;
+        paramValue._d($annval.typecode.kind$);
+        paramValue.from_string("$annval.value$");
+        annParam.value(paramValue);
+        ann.param_seq().push_back(annParam);
+    }
+    };separator="\n"$
+    $endif$
+    cbf_$object.name$.detail().ann_custom().push_back(ann);
+}
+}; separator="\n"$
+$endif$
+
 type_object->complete().bitset_type().field_seq().emplace_back(cbf_$object.name$);
 $endif$
 

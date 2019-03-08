@@ -228,7 +228,7 @@ size_t $struct.scopedname$::getMaxCdrSerializedSize(size_t current_alignment)
 
     $if(struct.inheritances)$    $struct.inheritances : {current_alignment += $it.scopedname$::getMaxCdrSerializedSize(current_alignment);}; separator="\n"$ $endif$
 
-    $struct.members : { member |$max_serialized_size(ctx=ctx, typecode=member.typecode, var="current_alignment")$}; separator="\n"$
+    $struct.members : { member | $if(!member.annotationNonSerialized)$$max_serialized_size(ctx=ctx, typecode=member.typecode, var="current_alignment")$$endif$}; separator="\n"$
 
     return current_alignment - initial_alignment;
 }
@@ -240,7 +240,7 @@ size_t $struct.scopedname$::getCdrSerializedSize(const $struct.scopedname$& data
 
     $if(struct.inheritances)$    $struct.inheritances : {current_alignment += $it.scopedname$::getCdrSerializedSize(data, current_alignment);}; separator="\n"$ $endif$
 
-    $struct.members : { member |$serialized_size(ctx=ctx, object=member, data="data", var="current_alignment")$}; separator="\n"$
+    $struct.members : { member |$if(!member.annotationNonSerialized)$$serialized_size(ctx=ctx, object=member, data="data", var="current_alignment")$$endif$}; separator="\n"$
 
     return current_alignment - initial_alignment;
 }
@@ -252,14 +252,14 @@ void $struct.scopedname$::serialize(eprosima::fastcdr::Cdr &scdr) const
 {
     $if(struct.inheritances)$    $struct.inheritances : {$it.scopedname$::serialize(scdr);}; separator="\n"$ $endif$
 
-    $struct.members : { member |$object_serialization(ctx=ctx, object=member, preffix="m_")$}; separator="\n"$
+    $struct.members : { member |$if(!member.annotationNonSerialized)$$object_serialization(ctx=ctx, object=member, preffix="m_")$$endif$}; separator="\n"$
 }
 
 void $struct.scopedname$::deserialize(eprosima::fastcdr::Cdr &dcdr)
 {
     $if(struct.inheritances)$    $struct.inheritances : {$it.scopedname$::deserialize(dcdr);}; separator="\n"$ $endif$
 
-    $struct.members : { member |$object_deserialization(ctx=ctx, object=member, preffix="m_")$}; separator="\n"$
+    $struct.members : { member |$if(!member.annotationNonSerialized)$$object_deserialization(ctx=ctx, object=member, preffix="m_")$$endif$}; separator="\n"$
 }
 
 $endif$
@@ -269,14 +269,14 @@ void $struct.scopedname$::serialize(eprosima::fastcdr::FastCdr &scdr) const
 {
     $if(struct.inheritances)$    $struct.inheritances : {$it.scopedname$::serialize(scdr);}; separator="\n"$ $endif$
 
-    $struct.members : { member |$object_serialization(ctx=ctx, object=member, preffix="m_")$}; separator="\n"$
+    $struct.members : { member |$if(!member.annotationNonSerialized)$$object_serialization(ctx=ctx, object=member, preffix="m_")$$endif$}; separator="\n"$
 }
 
 void $struct.scopedname$::deserialize(eprosima::fastcdr::FastCdr &dcdr)
 {
     $if(struct.inheritances)$    $struct.inheritances : {$it.scopedname$::deserialize(dcdr);}; separator="\n"$ $endif$
 
-    $struct.members : { member |$object_deserialization(ctx=ctx, object=member, preffix="m_")$}; separator="\n"$
+    $struct.members : { member |$if(!member.annotationNonSerialized)$$object_deserialization(ctx=ctx, object=member, preffix="m_")$$endif$}; separator="\n"$
 }
 
 $endif$

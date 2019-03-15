@@ -394,6 +394,7 @@ $bitset.bitfields:{$public_bitfield_definition(it)$}; separator="\n"$
 >>
 
 public_bitfield_definition(member) ::= <<
+$if(member.name)$
 void $bitset.scopedname$::$member.name$($member.spec.cppTypename$ _$member.name$)
 {
     int base = $member.basePosition$;
@@ -426,6 +427,7 @@ $else$
 $endif$
 
 }
+$endif$
 
 >>
 

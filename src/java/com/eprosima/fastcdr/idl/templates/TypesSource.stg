@@ -74,7 +74,7 @@ $exception.scopedname$::$exception.name$() : UserException()
 
 $exception.scopedname$::$exception.name$(const $exception.name$ &x) : UserException(x)
 {
-    $exception.members : { member |m_$member.name$ = x.m_$member.name$;}; separator="\n"$
+    $exception.members : { member |$member_copy(member=member)$}; separator="\n"$
 }
 
 $exception.scopedname$::$exception.name$($exception.name$&& x) : UserException(std::move(x))
@@ -85,7 +85,7 @@ $exception.scopedname$::$exception.name$($exception.name$&& x) : UserException(s
 $exception.scopedname$& $exception.scopedname$::operator=(const $exception.name$ &x)
 {
 	UserException::operator=(x);
-	$exception.members : { member |m_$member.name$ = x.m_$member.name$;}; separator="\n"$
+    $exception.members : { member |$member_copy(member=member)$}; separator="\n"$
 	return *this;
 }
 
@@ -191,11 +191,12 @@ $struct.scopedname$::$struct.name$()$if(struct.inheritances)$ : $struct.inherita
 
 $struct.scopedname$::~$struct.name$()
 {
+    $struct.members:{ member |$member_destructor(member=member)$}; separator="\n"$
 }
 
 $struct.scopedname$::$struct.name$(const $struct.name$ &x)$if(struct.inheritances)$ : $struct.inheritances : {$struct_inherit_copy_init(it)$}; separator=",\n"$ $endif$
 {
-    $struct.members:{m_$it.name$ = x.m_$it.name$;}; separator="\n"$
+    $struct.members:{$member_copy(it)$}; separator="\n"$
 }
 
 $struct.scopedname$::$struct.name$($struct.name$ &&x)$if(struct.inheritances)$ : $struct.inheritances : {$struct_inherit_move_init(it)$}; separator=",\n"$ $endif$
@@ -207,7 +208,7 @@ $struct.scopedname$& $struct.scopedname$::operator=(const $struct.name$ &x)
 {
     $if(struct.inheritances)$    $struct.inheritances : {$it.scopedname$::operator=(x);}; separator="\n"$ $endif$
 
-    $struct.members:{m_$it.name$ = x.m_$it.name$;}; separator="\n"$
+    $struct.members:{$member_copy(it)$}; separator="\n"$
 
     return *this;
 }
@@ -280,6 +281,8 @@ void $struct.scopedname$::deserialize(eprosima::fastcdr::FastCdr &dcdr)
 }
 
 $endif$
+
+$struct.members:{$public_member_declaration(class=struct.scopedname, member=it)$}; separator="\n"$
 
 $extensions : {$it$}; separator="\n"$
 >>
@@ -622,6 +625,75 @@ bitmask_type(ctx, parent, bitmask) ::= <<>>
 
 /***** Utils *****/
 
+
+
+public_member_declaration(class, member) ::= <<
+$if(member.typecode.primitive)$
+/*!
+ * @brief This function sets a value in member $member.name$
+ * @param _$member.name$ New value for member $member.name$
+ */
+void $class$::$member.name$($member.typecode.cppTypename$ _$member.name$)
+{
+    $if(member.typecode.forwarded)$*$endif$m_$member.name$ = _$member.name$;
+}
+
+/*!
+ * @brief This function returns the value of member $member.name$
+ * @return Value of member $member.name$
+ */
+$member.typecode.cppTypename$ $class$::$member.name$() const
+{
+    return $if(member.typecode.forwarded)$*$endif$m_$member.name$;
+}
+
+/*!
+ * @brief This function returns a reference to member $member.name$
+ * @return Reference to member $member.name$
+ */
+$member.typecode.cppTypename$& $class$::$member.name$()
+{
+    return $if(member.typecode.forwarded)$*$endif$m_$member.name$;
+}
+$else$
+/*!
+ * @brief This function copies the value in member $member.name$
+ * @param _$member.name$ New value to be copied in member $member.name$
+ */
+void $class$::$member.name$(const $member.typecode.cppTypename$ &_$member.name$)
+{
+    $if(member.typecode.forwarded)$*$endif$m_$member.name$ = _$member.name$;
+}
+
+/*!
+ * @brief This function moves the value in member $member.name$
+ * @param _$member.name$ New value to be moved in member $member.name$
+ */
+void $class$::$member.name$($member.typecode.cppTypename$ &&_$member.name$)
+{
+    $if(member.typecode.forwarded)$*$endif$m_$member.name$ = std::move(_$member.name$);
+}
+
+/*!
+ * @brief This function returns a constant reference to member $member.name$
+ * @return Constant reference to member $member.name$
+ */
+const $member.typecode.cppTypename$& $class$::$member.name$() const
+{
+    return $if(member.typecode.forwarded)$*$endif$m_$member.name$;
+}
+
+/*!
+ * @brief This function returns a reference to member $member.name$
+ * @return Reference to member $member.name$
+ */
+$member.typecode.cppTypename$& $class$::$member.name$()
+{
+    return $if(member.typecode.forwarded)$*$endif$m_$member.name$;
+}
+$endif$
+>>
+
 public_unionmember_declaration(class, member, totallabels, defaultvalue) ::= <<
 $if(member.typecode.primitive)$
 void $class$::$member.name$($member.typecode.cppTypename$ _$member.name$)
@@ -672,11 +744,25 @@ $member.typecode.cppTypename$& $class$::$member.name$()
 $endif$
 >>
 
+member_copy(member) ::= <<
+$if(member.typecode.forwarded)$
+m_$member.name$ = new $member.typecode.cppTypename$();
+*m_$member.name$ = *x.m_$member.name$;
+$else$
+m_$member.name$ = x.m_$member.name$;
+$endif$
+>>
+
 member_move(member) ::= <<
 $if(member.typecode.primitive)$
 m_$member.name$ = x.m_$member.name$;
 $else$
+$if(member.typecode.forwarded)$
+m_$member.name$ = x.m_$member.name$;
+x.m_$member.name$ = nullptr;
+$else$
 m_$member.name$ = std::move(x.m_$member.name$);
+$endif$
 $endif$
 >>
 

@@ -342,6 +342,8 @@ $if(typecode.isType_c)$
 (uint32_t)
 $elseif(typecode.isBitmaskType)$
 ($typecode.castingType$)
+$elseif(typecode.forwarded)$
+*
 $endif$
 >>
 
@@ -359,7 +361,7 @@ $elseif(typecode.isBitmaskType)$
     $preffix$$name$ = ($typecode.scopedname$)enum_value;
 }
 $else$
-dcdr \>> $preffix$$name$;
+dcdr \>> $if(typecode.forwarded)$*$endif$$preffix$$name$;
 $endif$
 >>
 

@@ -340,7 +340,7 @@ size_t $bitset.scopedname$::getMaxCdrSerializedSize(size_t current_alignment)
     return current_alignment - initial_alignment;
 }
 
-size_t $bitset.scopedname$::getCdrSerializedSize(const $bitset.scopedname$& data, size_t current_alignment)
+size_t $bitset.scopedname$::getCdrSerializedSize(const $bitset.scopedname$& $if(bitset.parents)$data$endif$, size_t current_alignment)
 {
     size_t initial_alignment = current_alignment;
 

@@ -586,7 +586,7 @@ const TypeObject* GetComplete$enum.name$Object()
         annParam.paramname_hash()[i] = message_hash.digest[i];
     }
     AnnotationParameterValue paramValue;
-    paramValue._d(TypeObjectFactory::get_instance()->get_type_kind("$annval.typecode.typeIdentifier$"));
+    paramValue._d($annval.typecode.typeIdentifier$);
     paramValue.from_string("$annval.value$");
     annParam.value(paramValue);
     ann.param_seq().push_back(annParam);
@@ -677,7 +677,7 @@ $object.annotationList:{ ann |
             annParam.paramname_hash()[i] = message_hash.digest[i];
         }
         AnnotationParameterValue paramValue;
-        paramValue._d(TypeObjectFactory::get_instance()->get_type_kind("$annval.typecode.typeIdentifier$"));
+        paramValue._d($annval.typecode.typeIdentifier$);
         paramValue.from_string("$annval.value$");
         annParam.value(paramValue);
         ann.param_seq().push_back(annParam);
@@ -817,7 +817,7 @@ const TypeObject* GetComplete$struct.name$Object()
         annParam.paramname_hash()[i] = message_hash.digest[i];
     }
     AnnotationParameterValue paramValue;
-    paramValue._d(TypeObjectFactory::get_instance()->get_type_kind("$annval.typecode.typeIdentifier$"));
+    paramValue._d($annval.typecode.typeIdentifier$);
     paramValue.from_string("$annval.value$");
     annParam.value(paramValue);
     ann.param_seq().push_back(annParam);
@@ -945,7 +945,7 @@ $object.annotationList:{ ann |
             annParam.paramname_hash()[i] = message_hash.digest[i];
         }
         AnnotationParameterValue paramValue;
-        paramValue._d(TypeObjectFactory::get_instance()->get_type_kind("$annval.typecode.typeIdentifier$"));
+        paramValue._d($annval.typecode.typeIdentifier$);
         paramValue.from_string("$annval.value$");
         annParam.value(paramValue);
         ann.param_seq().push_back(annParam);
@@ -1099,7 +1099,7 @@ const TypeObject* GetComplete$union.name$Object()
         annParam.paramname_hash()[i] = message_hash.digest[i];
     }
     AnnotationParameterValue paramValue;
-    paramValue._d(TypeObjectFactory::get_instance()->get_type_kind("$annval.typecode.typeIdentifier$"));
+    paramValue._d($annval.typecode.typeIdentifier$);
     paramValue.from_string("$annval.value$");
     annParam.value(paramValue);
     ann.param_seq().push_back(annParam);
@@ -1133,7 +1133,7 @@ const TypeObject* GetComplete$union.name$Object()
         annParam.paramname_hash()[i] = message_hash.digest[i];
     }
     AnnotationParameterValue paramValue;
-    paramValue._d(TypeObjectFactory::get_instance()->get_type_kind("$annval.typecode.typeIdentifier$"));
+    paramValue._d($annval.typecode.typeIdentifier$);
     paramValue.from_string("$annval.value$");
     annParam.value(paramValue);
     ann.param_seq().push_back(annParam);
@@ -1262,7 +1262,7 @@ $object.annotationList:{ ann |
             annParam.paramname_hash()[i] = message_hash.digest[i];
         }
         AnnotationParameterValue paramValue;
-        paramValue._d(TypeObjectFactory::get_instance()->get_type_kind("$annval.typecode.typeIdentifier$"));
+        paramValue._d($annval.typecode.typeIdentifier$);
         paramValue.from_string("$annval.value$");
         annParam.value(paramValue);
         ann.param_seq().push_back(annParam);
@@ -1386,7 +1386,7 @@ const TypeObject* GetComplete$bitmask.name$Object()
         annParam.paramname_hash()[i] = message_hash.digest[i];
     }
     AnnotationParameterValue paramValue;
-    paramValue._d(TypeObjectFactory::get_instance()->get_type_kind("$annval.typecode.typeIdentifier$"));
+    paramValue._d($annval.typecode.typeIdentifier$);
     paramValue.from_string("$annval.value$");
     annParam.value(paramValue);
     ann.param_seq().push_back(annParam);
@@ -1462,30 +1462,52 @@ cbf_$object.name$.common().flags().IS_DEFAULT(false);
 cbf_$object.name$.common().position($object.position$);
 cbf_$object.name$.detail().name("$object.name$");
 
+// Position annotation always present
+{
+    AppliedAnnotation ann;
+    ann.annotation_typeid(*TypeObjectFactory::get_instance()->get_type_identifier_trying_complete("position"));
+    AppliedAnnotationParameter annParam;
+    MD5 message_hash("value");
+    for(int i = 0; i < 4; ++i)
+    {
+        annParam.paramname_hash()[i] = message_hash.digest[i];
+    }
+    AnnotationParameterValue paramValue;
+    paramValue._d(TK_UINT16);
+    paramValue.uint_16_value($object.position$);
+    annParam.value(paramValue);
+    ann.param_seq().push_back(annParam);
+
+    cbf_$object.name$.detail().ann_custom().push_back(ann);
+}
+
 $if(object.annotationList)$
 $object.annotationList:{ ann |
 {
-    AppliedAnnotation ann;
-    //ann.annotation_typeid(Get$ann.name$Identifier(true));
-    ann.annotation_typeid(*TypeObjectFactory::get_instance()->get_type_identifier_trying_complete("$ann.name$"));
-    $if(ann.valueList)$
-    $ann.valueList:{ annval |
+    if (std::strcmp("position", "$ann.name$") != 0)
     {
-        AppliedAnnotationParameter annParam;
-        MD5 message_hash("$annval.name$");
-        for(int i = 0; i < 4; ++i)
+        AppliedAnnotation ann;
+        //ann.annotation_typeid(Get$ann.name$Identifier(true));
+        ann.annotation_typeid(*TypeObjectFactory::get_instance()->get_type_identifier_trying_complete("$ann.name$"));
+        $if(ann.valueList)$
+        $ann.valueList:{ annval |
         {
-            annParam.paramname_hash()[i] = message_hash.digest[i];
+            AppliedAnnotationParameter annParam;
+            MD5 message_hash("$annval.name$");
+            for(int i = 0; i < 4; ++i)
+            {
+                annParam.paramname_hash()[i] = message_hash.digest[i];
+            }
+            AnnotationParameterValue paramValue;
+            paramValue._d($annval.typecode.typeIdentifier$);
+            paramValue.from_string("$annval.value$");
+            annParam.value(paramValue);
+            ann.param_seq().push_back(annParam);
         }
-        AnnotationParameterValue paramValue;
-        paramValue._d(TypeObjectFactory::get_instance()->get_type_kind("$annval.typecode.typeIdentifier$"));
-        paramValue.from_string("$annval.value$");
-        annParam.value(paramValue);
-        ann.param_seq().push_back(annParam);
+        };separator="\n"$
+        $endif$
+        cbf_$object.name$.detail().ann_custom().push_back(ann);
     }
-    };separator="\n"$
-    $endif$
-    cbf_$object.name$.detail().ann_custom().push_back(ann);
 }
 }; separator="\n"$
 $endif$
@@ -1600,7 +1622,7 @@ const TypeObject* GetComplete$bitset.name$Object()
         annParam.paramname_hash()[i] = message_hash.digest[i];
     }
     AnnotationParameterValue paramValue;
-    paramValue._d(TypeObjectFactory::get_instance()->get_type_kind("$annval.typecode.typeIdentifier$"));
+    paramValue._d($annval.typecode.typeIdentifier$);
     paramValue.from_string("$annval.value$");
     annParam.value(paramValue);
     ann.param_seq().push_back(annParam);
@@ -1685,30 +1707,73 @@ cbf_$object.name$.common().bitcount($object.spec.bitSize$);
 cbf_$object.name$.common().holder_type($object.spec.typecode.typeIdentifier$);
 cbf_$object.name$.detail().name("$object.name$");
 
+// Position annotation always present
+{
+    // Position
+    AppliedAnnotation ann;
+    ann.annotation_typeid(*TypeObjectFactory::get_instance()->get_type_identifier_trying_complete("position"));
+    AppliedAnnotationParameter annParam;
+    MD5 message_hash("value");
+    for(int i = 0; i < 4; ++i)
+    {
+        annParam.paramname_hash()[i] = message_hash.digest[i];
+    }
+    AnnotationParameterValue paramValue;
+    paramValue._d(TK_UINT16);
+    paramValue.uint_16_value($object.basePosition$);
+    annParam.value(paramValue);
+    ann.param_seq().push_back(annParam);
+
+    cbf_$object.name$.detail().ann_custom().push_back(ann);
+}
+
+// Use bit_bound as bitcount.
+{
+    // Position
+    AppliedAnnotation ann;
+    ann.annotation_typeid(*TypeObjectFactory::get_instance()->get_type_identifier_trying_complete("bit_bound"));
+    AppliedAnnotationParameter annParam;
+    MD5 message_hash("value");
+    for(int i = 0; i < 4; ++i)
+    {
+        annParam.paramname_hash()[i] = message_hash.digest[i];
+    }
+    AnnotationParameterValue paramValue;
+    paramValue._d(TK_UINT16);
+    paramValue.uint_16_value($object.spec.bitSize$);
+    annParam.value(paramValue);
+    ann.param_seq().push_back(annParam);
+
+    cbf_$object.name$.detail().ann_custom().push_back(ann);
+}
+
 $if(object.annotationList)$
 $object.annotationList:{ ann |
 {
-    AppliedAnnotation ann;
-    //ann.annotation_typeid(Get$ann.name$Identifier(true));
-    ann.annotation_typeid(*TypeObjectFactory::get_instance()->get_type_identifier_trying_complete("$ann.name$"));
-    $if(ann.valueList)$
-    $ann.valueList:{ annval |
+    if (std::strcmp("position", "$ann.name$") != 0 && std::strcmp("bit_bound", "$ann.name$") != 0)
     {
-        AppliedAnnotationParameter annParam;
-        MD5 message_hash("$annval.name$");
-        for(int i = 0; i < 4; ++i)
+        AppliedAnnotation ann;
+        //ann.annotation_typeid(Get$ann.name$Identifier(true));
+        ann.annotation_typeid(*TypeObjectFactory::get_instance()->get_type_identifier_trying_complete("$ann.name$"));
+        $if(ann.valueList)$
+        $ann.valueList:{ annval |
         {
-            annParam.paramname_hash()[i] = message_hash.digest[i];
+            AppliedAnnotationParameter annParam;
+            MD5 message_hash("$annval.name$");
+            for(int i = 0; i < 4; ++i)
+            {
+                annParam.paramname_hash()[i] = message_hash.digest[i];
+            }
+            AnnotationParameterValue paramValue;
+            paramValue._d($annval.typecode.typeIdentifier$);
+            paramValue.from_string("$annval.value$");
+            annParam.value(paramValue);
+            ann.param_seq().push_back(annParam);
         }
-        AnnotationParameterValue paramValue;
-        paramValue._d(TypeObjectFactory::get_instance()->get_type_kind("$annval.typecode.typeIdentifier$"));
-        paramValue.from_string("$annval.value$");
-        annParam.value(paramValue);
-        ann.param_seq().push_back(annParam);
+        };separator="\n"$
+        $endif$
+        cbf_$object.name$.detail().ann_custom().push_back(ann);
     }
-    };separator="\n"$
-    $endif$
-    cbf_$object.name$.detail().ann_custom().push_back(ann);
 }
 }; separator="\n"$
 $endif$

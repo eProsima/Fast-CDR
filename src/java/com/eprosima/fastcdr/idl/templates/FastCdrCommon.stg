@@ -338,13 +338,7 @@ $endif$
 >>
 
 serializeCasting(typecode) ::= <<
-$if(typecode.isType_c)$
-(uint32_t)
-$elseif(typecode.isBitmaskType)$
-($typecode.castingType$)
-$elseif(typecode.forwarded)$
-*
-$endif$
+$if(typecode.isType_c)$(uint32_t)$elseif(typecode.isBitmaskType)$($typecode.castingType$)$elseif(typecode.forwarded)$*$endif$
 >>
 
 deserializePossibleEnum(typecode, name, preffix) ::= <<

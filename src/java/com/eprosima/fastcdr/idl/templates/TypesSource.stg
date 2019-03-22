@@ -411,9 +411,9 @@ $if(member.spec.typecode.isType_7)$
     m_bitset.set(base, _$member.name$);
 $else$
     int size = $member.spec.bitSize$;
-    for (int i = base + size - 1; i >= base; --i)
+    for (int i = base; i < base + size; ++i)
     {
-        m_bitset.set(i, _$member.name$ | 0x01);
+        m_bitset.set(i, _$member.name$ & 0x01);
         _$member.name$ = _$member.name$ \>> 1;
     }
 $endif$
@@ -428,7 +428,7 @@ $if(member.spec.typecode.isType_7)$
 $else$
     int size = $member.spec.bitSize$;
     std::bitset<$member.spec.bitSize$> aux;
-    for (int i = size - 1; i >= 0; --i)
+    for (int i = 0; i < size; ++i)
     {
         aux.set(i, m_bitset.test(i + base));
     }

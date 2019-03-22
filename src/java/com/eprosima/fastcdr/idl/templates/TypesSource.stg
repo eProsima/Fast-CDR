@@ -335,8 +335,7 @@ size_t $bitset.scopedname$::getMaxCdrSerializedSize(size_t current_alignment)
 
     $if(bitset.parents)$    $bitset.parents : {current_alignment += $it.scopedname$::getMaxCdrSerializedSize(current_alignment);}; separator="\n"$ $endif$
 
-    // TODO Check if this returns the primitive size that hold the bitset
-    current_alignment += sizeof(m_bitset);
+    $bitset.bitfields : { member | $if(!member.annotationNonSerialized)$$if(member.name)$$max_serialized_size(ctx=ctx, typecode=member.spec.typecode, var="current_alignment")$$endif$$endif$}; separator="\n"$
 
     return current_alignment - initial_alignment;
 }
@@ -347,8 +346,7 @@ size_t $bitset.scopedname$::getCdrSerializedSize(const $bitset.scopedname$& $if(
 
     $if(bitset.parents)$    $bitset.parents : {current_alignment += $it.scopedname$::getCdrSerializedSize(data, current_alignment);}; separator="\n"$ $endif$
 
-    // TODO Check if this returns the primitive size that hold the bitset
-    current_alignment += sizeof(m_bitset);
+    $bitset.bitfields : { member | $if(!member.annotationNonSerialized)$$if(member.name)$$serialized_size_type(ctx=ctx, typecode=member.spec.typecode, var="current_alignment")$$endif$$endif$}; separator="\n"$
 
     return current_alignment - initial_alignment;
 }
@@ -360,18 +358,14 @@ void $bitset.scopedname$::serialize(eprosima::fastcdr::Cdr &scdr) const
 {
     $if(bitset.parents)$    $bitset.parents : {$it.scopedname$::serialize(scdr);}; separator="\n"$ $endif$
 
-    // TODO Serializing as uint64_t, but should adjust the size to an optimum primitive?
-    scdr << static_cast<uint64_t>(m_bitset.to_ullong());
+    $bitset.bitfields : { member |$if(!member.annotationNonSerialized)$$bitfield_serialization(ctx=ctx, object=member)$$endif$}; separator="\n"$
 }
 
 void $bitset.scopedname$::deserialize(eprosima::fastcdr::Cdr &dcdr)
 {
     $if(bitset.parents)$    $bitset.parents : {$it.scopedname$::deserialize(dcdr);}; separator="\n"$ $endif$
 
-    // TODO Serializing as uint64_t, but should adjust the size to an optimum primitive?
-    uint64_t temp = 0;
-    dcdr \>> temp;
-    m_bitset = temp;
+    $bitset.bitfields : { member |$if(!member.annotationNonSerialized)$$bitfield_deserialization(ctx=ctx, object=member)$$endif$}; separator="\n"$
 }
 
 $endif$
@@ -381,18 +375,14 @@ void $bitset.scopedname$::serialize(eprosima::fastcdr::FastCdr &scdr) const
 {
     $if(bitset.parents)$    $bitset.parents : {$it.scopedname$::serialize(scdr);}; separator="\n"$ $endif$
 
-    // TODO Serializing as uint64_t, but should adjust the size to an optimum primitive?
-    scdr << static_cast<uint64_t>(m_bitset.to_ullong());
+    $bitset.bitfields : { member |$if(!member.annotationNonSerialized)$$bitfield_serialization(ctx=ctx, object=member)$$endif$}; separator="\n"$
 }
 
 void $bitset.scopedname$::deserialize(eprosima::fastcdr::FastCdr &dcdr)
 {
     $if(bitset.parents)$    $bitset.parents : {$it.scopedname$::deserialize(dcdr);}; separator="\n"$ $endif$
 
-    // TODO Serializing as uint64_t, but should adjust the size to an optimum primitive?
-    uint64_t temp = 0;
-    dcdr \>> temp;
-    m_bitset = temp;
+    $bitset.bitfields : { member |$if(!member.annotationNonSerialized)$$bitfield_deserialization(ctx=ctx, object=member)$$endif$}; separator="\n"$
 }
 
 $endif$

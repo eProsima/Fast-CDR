@@ -359,9 +359,9 @@ $if(typecode.isType_c)$
 }
 $elseif(typecode.isBitmaskType)$
 {
-    $typecode.castingType$ enum_value = 0;
-    dcdr \>> enum_value;
-    $preffix$$name$ = ($typecode.scopedname$)enum_value;
+    $typecode.castingType$ bitmask_value = 0;
+    dcdr \>> bitmask_value;
+    $preffix$$name$ = ($typecode.scopedname$)bitmask_value;
 }
 $else$
 dcdr \>> $if(typecode.forwarded)$*$endif$$preffix$$name$;

@@ -228,3 +228,5 @@ public class $enum.name$
     $extension$
 }
 >>
+
+bitmask_type(ctx, parent, bitmask, extension) ::= <<>>

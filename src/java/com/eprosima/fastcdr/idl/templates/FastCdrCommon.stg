@@ -61,6 +61,10 @@ scdr << $serializeCasting(typecode=object.typecode)$$preffix$$object.name$;
 $endif$
 >>
 
+bitfield_serialization(ctx, object) ::= <<$if(member.name)$
+scdr << static_cast<$member.spec.cppTypename$>($member.name$());$endif$
+>>
+
 object_deserialization(ctx, object, preffix) ::= <<
 $if(object.typecode.isType_f)$
 $if(object.typecode.contentTypeCode.isType_c)$
@@ -75,12 +79,23 @@ $if(object.typecode.contentTypeCode.isType_c)$
     dcdr \>> seq_length;
     dcdr.deserializeArray(reinterpret_cast<uint32_t*>($preffix$$object.name$.data()), seq_length);
 }
+$elseif(object.typecode.contentTypeCode.isBitmaskType)$
+{
+    $typecode.contentTypeCode.castingType$ seq_length = 0;
+    dcdr \>> seq_length;
+    dcdr.deserializeArray(reinterpret_cast<$typecode.contentTypeCode.castingType$*>($preffix$$object.name$.data()), seq_length);
+}
 $else$
 dcdr \>> $preffix$$object.name$;
 $endif$
 $else$
 $deserializePossibleEnum(typecode=object.typecode, name=object.name, preffix=preffix)$
 $endif$
+>>
+
+bitfield_deserialization(ctx, object) ::= <<$if(member.name)$$member.spec.cppTypename$ aux_$member.name$;
+dcdr \>> aux_$member.name$;
+$member.name$(aux_$member.name$);$endif$
 >>
 
 // TODO Todos los tipos. MEJORAR. size of 1 no deberia generar alignment.
@@ -332,9 +347,7 @@ $endif$
 >>
 
 serializeCasting(typecode) ::= <<
-$if(typecode.isType_c)$
-(uint32_t)
-$endif$
+$if(typecode.isType_c)$(uint32_t)$elseif(typecode.isBitmaskType)$($typecode.castingType$)$elseif(typecode.forwarded)$*$endif$
 >>
 
 deserializePossibleEnum(typecode, name, preffix) ::= <<
@@ -344,8 +357,14 @@ $if(typecode.isType_c)$
     dcdr \>> enum_value;
     $preffix$$name$ = ($typecode.scopedname$)enum_value;
 }
+$elseif(typecode.isBitmaskType)$
+{
+    $typecode.castingType$ bitmask_value = 0;
+    dcdr \>> bitmask_value;
+    $preffix$$name$ = ($typecode.scopedname$)bitmask_value;
+}
 $else$
-dcdr \>> $preffix$$name$;
+dcdr \>> $if(typecode.forwarded)$*$endif$$preffix$$name$;
 $endif$
 >>
 

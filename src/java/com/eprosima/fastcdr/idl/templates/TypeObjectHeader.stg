@@ -74,6 +74,14 @@ eProsima_user_DllExport const TypeObject* GetComplete$enum.name$Object();
 
 >>
 
+bitmask_type(ctx, parent, bitmask) ::= <<
+eProsima_user_DllExport const TypeIdentifier* Get$bitmask.name$Identifier(bool complete = false);
+eProsima_user_DllExport const TypeObject* Get$bitmask.name$Object(bool complete = false);
+eProsima_user_DllExport const TypeObject* GetMinimal$bitmask.name$Object();
+eProsima_user_DllExport const TypeObject* GetComplete$bitmask.name$Object();
+
+>>
+
 struct_type(ctx, parent, struct, extensions) ::= <<
 eProsima_user_DllExport const TypeIdentifier* Get$struct.name$Identifier(bool complete = false);
 eProsima_user_DllExport const TypeObject* Get$struct.name$Object(bool complete = false);
@@ -89,4 +97,38 @@ eProsima_user_DllExport const TypeObject* GetMinimal$union.name$Object();
 eProsima_user_DllExport const TypeObject* GetComplete$union.name$Object();
 
 >>
+
+bitset_type(ctx, parent, bitset, extensions) ::= <<
+eProsima_user_DllExport const TypeIdentifier* Get$bitset.name$Identifier(bool complete = false);
+eProsima_user_DllExport const TypeObject* Get$bitset.name$Object(bool complete = false);
+eProsima_user_DllExport const TypeObject* GetMinimal$bitset.name$Object();
+eProsima_user_DllExport const TypeObject* GetComplete$bitset.name$Object();
+
+>>
+
+annotation(ctx, annotation) ::= <<
+eProsima_user_DllExport const TypeIdentifier* Get$annotation.name$Identifier(bool complete = false);
+eProsima_user_DllExport const TypeObject* Get$annotation.name$Object(bool complete = false);
+eProsima_user_DllExport const TypeObject* GetMinimal$annotation.name$Object();
+eProsima_user_DllExport const TypeObject* GetComplete$annotation.name$Object();
+
+namespace $annotation.name$
+{
+$annotation.enums : {$enum_type(ctx=ctx, parent=annotation, enum=it)$}; separator="\n"$
+
+$annotation.typeDefs : {$typedef_decl(ctx=ctx, parent=annotation, typedefs=it)$}; separator="\n"$
+}
+
+>>
+
+module(ctx, parent, module, definition_list) ::= <<
+$definition_list$
+>>
+
+definition_list(definitions) ::= <<
+$definitions; separator="\n"$
+>>
+
+const_decl(ctx, parent, const) ::= <<>>
+
 /***** Utils *****/

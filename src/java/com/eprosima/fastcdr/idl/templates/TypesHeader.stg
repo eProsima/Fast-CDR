@@ -97,7 +97,17 @@ definition_list(definitions) ::= <<
 $definitions; separator="\n"$
 >>
 
-annotation(ctx, annotation) ::= <<>>
+annotation(ctx, annotation) ::= <<
+namespace $annotation.name$
+{
+    $annotation.enums : {$enum_type(ctx=ctx, parent=annotation, enum=it)$}; separator="\n"$
+
+    $annotation.typeDefs : {$typedef_decl(ctx=ctx, parent=annotation, typedefs=it)$}; separator="\n"$
+
+    $annotation.constDecls : {$const_decl(ctx=ctx, parent=annotation, const=it)$}; separator="\n"$
+
+}
+>>
 
 interface(ctx, parent, interface, export_list) ::= <<
 /*!
@@ -196,7 +206,7 @@ struct_type(ctx, parent, struct, extensions) ::= <<
  * @brief This class represents the structure $struct.name$ defined by the user in the IDL file.
  * @ingroup $ctx.trimfilename$
  */
-class $struct.name$
+class $struct.name$$if(struct.inheritances)$ : public $struct.inheritances : {$public_struct_inheritances(it)$}; separator=", "$ $endif$
 {
 public:
 
@@ -208,7 +218,7 @@ public:
     /*!
      * @brief Default destructor.
      */
-    eProsima_user_DllExport ~$struct.name$();
+    eProsima_user_DllExport virtual ~$struct.name$();
 
     /*!
      * @brief Copy constructor.
@@ -329,7 +339,7 @@ bitset_type(ctx, parent, bitset, extensions) ::= <<
  * @brief This class represents the structure $bitset.name$ defined by the user in the IDL file.
  * @ingroup $ctx.trimfilename$
  */
-class $bitset.name$
+class $bitset.name$$if(bitset.parents)$ : public $bitset.parents : {$public_bitset_inheritances(it)$}; separator=", "$ $endif$
 {
 public:
 
@@ -341,7 +351,7 @@ public:
     /*!
      * @brief Default destructor.
      */
-    eProsima_user_DllExport ~$bitset.name$();
+    eProsima_user_DllExport virtual ~$bitset.name$();
 
     /*!
      * @brief Copy constructor.
@@ -391,76 +401,25 @@ enum $enum.name$ : uint32_t
 };
 >>
 
+bitmask_type(ctx, parent, bitmask) ::= <<
+/*!
+ * @brief This class represents the bitmask $bitmask.name$ defined by the user in the IDL file.
+ * @ingroup $ctx.trimfilename$
+ */
+enum $bitmask.name$$bitmask.boundType$
+{
+    $bitmask.members:{$it.name$ = 0x01 << $it.position$}; separator=",\n"$
+};
+>>
+
 /***** Utils *****/
+
+public_struct_inheritances(parent) ::= <<$parent.scopedname$>>
+
+public_bitset_inheritances(parent) ::= <<$parent.scopedname$>>
 
 public_member_declaration(member) ::= <<
 $if(member.typecode.primitive)$
-/*!
- * @brief This function sets a value in member $member.name$
- * @param _$member.name$ New value for member $member.name$
- */
-inline eProsima_user_DllExport void $member.name$($member.typecode.cppTypename$ _$member.name$)
-{
-    m_$member.name$ = _$member.name$;
-}
-
-/*!
- * @brief This function returns the value of member $member.name$
- * @return Value of member $member.name$
- */
-inline eProsima_user_DllExport $member.typecode.cppTypename$ $member.name$() const
-{
-    return m_$member.name$;
-}
-
-/*!
- * @brief This function returns a reference to member $member.name$
- * @return Reference to member $member.name$
- */
-inline eProsima_user_DllExport $member.typecode.cppTypename$& $member.name$()
-{
-    return m_$member.name$;
-}
-$else$
-/*!
- * @brief This function copies the value in member $member.name$
- * @param _$member.name$ New value to be copied in member $member.name$
- */
-inline eProsima_user_DllExport void $member.name$(const $member.typecode.cppTypename$ &_$member.name$)
-{
-    m_$member.name$ = _$member.name$;
-}
-
-/*!
- * @brief This function moves the value in member $member.name$
- * @param _$member.name$ New value to be moved in member $member.name$
- */
-inline eProsima_user_DllExport void $member.name$($member.typecode.cppTypename$ &&_$member.name$)
-{
-    m_$member.name$ = std::move(_$member.name$);
-}
-
-/*!
- * @brief This function returns a constant reference to member $member.name$
- * @return Constant reference to member $member.name$
- */
-inline eProsima_user_DllExport const $member.typecode.cppTypename$& $member.name$() const
-{
-    return m_$member.name$;
-}
-
-/*!
- * @brief This function returns a reference to member $member.name$
- * @return Reference to member $member.name$
- */
-inline eProsima_user_DllExport $member.typecode.cppTypename$& $member.name$()
-{
-    return m_$member.name$;
-}
-$endif$
->>
-
-public_bitfield_declaration(member) ::= <<
 /*!
  * @brief This function sets a value in member $member.name$
  * @param _$member.name$ New value for member $member.name$
@@ -478,6 +437,47 @@ eProsima_user_DllExport $member.typecode.cppTypename$ $member.name$() const;
  * @return Reference to member $member.name$
  */
 eProsima_user_DllExport $member.typecode.cppTypename$& $member.name$();
+$else$
+/*!
+ * @brief This function copies the value in member $member.name$
+ * @param _$member.name$ New value to be copied in member $member.name$
+ */
+eProsima_user_DllExport void $member.name$(const $member.typecode.cppTypename$ &_$member.name$);
+
+/*!
+ * @brief This function moves the value in member $member.name$
+ * @param _$member.name$ New value to be moved in member $member.name$
+ */
+eProsima_user_DllExport void $member.name$($member.typecode.cppTypename$ &&_$member.name$);
+
+/*!
+ * @brief This function returns a constant reference to member $member.name$
+ * @return Constant reference to member $member.name$
+ */
+eProsima_user_DllExport const $member.typecode.cppTypename$& $member.name$() const;
+
+/*!
+ * @brief This function returns a reference to member $member.name$
+ * @return Reference to member $member.name$
+ */
+eProsima_user_DllExport $member.typecode.cppTypename$& $member.name$();
+$endif$
+>>
+
+public_bitfield_declaration(member) ::= <<
+$if(member.name)$
+/*!
+ * @brief This function sets a value in member $member.name$
+ * @param _$member.name$ New value for member $member.name$
+ */
+eProsima_user_DllExport void $member.name$($member.spec.cppTypename$ _$member.name$);
+
+/*!
+ * @brief This function returns the value of member $member.name$
+ * @return Value of member $member.name$
+ */
+eProsima_user_DllExport $member.spec.cppTypename$ $member.name$() const;
+$endif$
 >>
 
 private_member_declaration(member) ::= <<$private_declaration(typecode=member.typecode, name=member.name)$>>
@@ -533,7 +533,7 @@ $endif$
 >>
 
 private_declaration(typecode, name) ::= <<
-$typecode.cppTypename$ m_$name$;
+$typecode.cppTypename$$if(typecode.forwarded)$*$endif$ m_$name$;
 >>
 
 

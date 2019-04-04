@@ -403,7 +403,7 @@ $else$
     int size = $member.spec.bitSize$;
     for (int i = base; i < base + size; ++i)
     {
-        m_bitset.set(i, _$member.name$ & 0x01);
+        m_bitset.set(i, !!(_$member.name$ & 0x01));
         _$member.name$ = _$member.name$ \>> 1;
     }
 $endif$

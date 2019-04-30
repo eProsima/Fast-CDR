@@ -74,7 +74,7 @@ $exception.scopedname$::$exception.name$() : UserException()
 
 $exception.scopedname$::$exception.name$(const $exception.name$ &x) : UserException(x)
 {
-    $exception.members : { member |m_$member.name$ = x.m_$member.name$;}; separator="\n"$
+    $exception.members : { member |$member_copy(member=member)$}; separator="\n"$
 }
 
 $exception.scopedname$::$exception.name$($exception.name$&& x) : UserException(std::move(x))
@@ -85,7 +85,7 @@ $exception.scopedname$::$exception.name$($exception.name$&& x) : UserException(s
 $exception.scopedname$& $exception.scopedname$::operator=(const $exception.name$ &x)
 {
 	UserException::operator=(x);
-	$exception.members : { member |m_$member.name$ = x.m_$member.name$;}; separator="\n"$
+    $exception.members : { member |$member_copy(member=member)$}; separator="\n"$
 	return *this;
 }
 
@@ -179,7 +179,7 @@ $endif$
 typedef_decl(ctx, parent, typedefs) ::= <<>>
 
 struct_type(ctx, parent, struct, extensions) ::= <<
-$struct.scopedname$::$struct.name$()
+$struct.scopedname$::$struct.name$()$if(struct.inheritances)$ : $struct.inheritances : {$struct_inherit_default_init(it)$}; separator=",\n"$ $endif$
 {
     $struct.members:{ member |$member_default_init(member=member)$}; separator="\n"$
 
@@ -191,27 +191,32 @@ $struct.scopedname$::$struct.name$()
 
 $struct.scopedname$::~$struct.name$()
 {
+    $struct.members:{ member |$member_destructor(member=member)$}; separator="\n"$
 }
 
-$struct.scopedname$::$struct.name$(const $struct.name$ &x)
+$struct.scopedname$::$struct.name$(const $struct.name$ &x)$if(struct.inheritances)$ : $struct.inheritances : {$struct_inherit_copy_init(it)$}; separator=",\n"$ $endif$
 {
-    $struct.members:{m_$it.name$ = x.m_$it.name$;}; separator="\n"$
+    $struct.members:{$member_copy(it)$}; separator="\n"$
 }
 
-$struct.scopedname$::$struct.name$($struct.name$ &&x)
+$struct.scopedname$::$struct.name$($struct.name$ &&x)$if(struct.inheritances)$ : $struct.inheritances : {$struct_inherit_move_init(it)$}; separator=",\n"$ $endif$
 {
     $struct.members:{$member_move(it)$}; separator="\n"$
 }
 
 $struct.scopedname$& $struct.scopedname$::operator=(const $struct.name$ &x)
 {
-    $struct.members:{m_$it.name$ = x.m_$it.name$;}; separator="\n"$
+    $if(struct.inheritances)$    $struct.inheritances : {$it.scopedname$::operator=(x);}; separator="\n"$ $endif$
+
+    $struct.members:{$member_copy(it)$}; separator="\n"$
 
     return *this;
 }
 
 $struct.scopedname$& $struct.scopedname$::operator=($struct.name$ &&x)
 {
+    $if(struct.inheritances)$    $struct.inheritances : {$it.scopedname$::operator=(std::move(x));}; separator="\n"$ $endif$
+
     $struct.members:{$member_move(it)$}; separator="\n"$
 
     return *this;
@@ -222,7 +227,9 @@ size_t $struct.scopedname$::getMaxCdrSerializedSize(size_t current_alignment)
 {
     size_t initial_alignment = current_alignment;
 
-    $struct.members : { member |$max_serialized_size(ctx=ctx, typecode=member.typecode, var="current_alignment")$}; separator="\n"$
+    $if(struct.inheritances)$    $struct.inheritances : {current_alignment += $it.scopedname$::getMaxCdrSerializedSize(current_alignment);}; separator="\n"$ $endif$
+
+    $struct.members : { member | $if(!member.annotationNonSerialized)$$max_serialized_size(ctx=ctx, typecode=member.typecode, var="current_alignment")$$endif$}; separator="\n"$
 
     return current_alignment - initial_alignment;
 }
@@ -232,7 +239,9 @@ size_t $struct.scopedname$::getCdrSerializedSize(const $struct.scopedname$& data
     (void)data;
     size_t initial_alignment = current_alignment;
 
-    $struct.members : { member |$serialized_size(ctx=ctx, object=member, data="data", var="current_alignment")$}; separator="\n"$
+    $if(struct.inheritances)$    $struct.inheritances : {current_alignment += $it.scopedname$::getCdrSerializedSize(data, current_alignment);}; separator="\n"$ $endif$
+
+    $struct.members : { member |$if(!member.annotationNonSerialized)$$serialized_size(ctx=ctx, object=member, data="data", var="current_alignment")$$endif$}; separator="\n"$
 
     return current_alignment - initial_alignment;
 }
@@ -242,12 +251,16 @@ $endif$
 $if(ctx.cdr)$
 void $struct.scopedname$::serialize(eprosima::fastcdr::Cdr &scdr) const
 {
-    $struct.members : { member |$object_serialization(ctx=ctx, object=member, preffix="m_")$}; separator="\n"$
+    $if(struct.inheritances)$    $struct.inheritances : {$it.scopedname$::serialize(scdr);}; separator="\n"$ $endif$
+
+    $struct.members : { member |$if(!member.annotationNonSerialized)$$object_serialization(ctx=ctx, object=member, preffix="m_")$$endif$}; separator="\n"$
 }
 
 void $struct.scopedname$::deserialize(eprosima::fastcdr::Cdr &dcdr)
 {
-    $struct.members : { member |$object_deserialization(ctx=ctx, object=member, preffix="m_")$}; separator="\n"$
+    $if(struct.inheritances)$    $struct.inheritances : {$it.scopedname$::deserialize(dcdr);}; separator="\n"$ $endif$
+
+    $struct.members : { member |$if(!member.annotationNonSerialized)$$object_deserialization(ctx=ctx, object=member, preffix="m_")$$endif$}; separator="\n"$
 }
 
 $endif$
@@ -255,21 +268,27 @@ $endif$
 $if(ctx.fastcdr)$
 void $struct.scopedname$::serialize(eprosima::fastcdr::FastCdr &scdr) const
 {
-    $struct.members : { member |$object_serialization(ctx=ctx, object=member, preffix="m_")$}; separator="\n"$
+    $if(struct.inheritances)$    $struct.inheritances : {$it.scopedname$::serialize(scdr);}; separator="\n"$ $endif$
+
+    $struct.members : { member |$if(!member.annotationNonSerialized)$$object_serialization(ctx=ctx, object=member, preffix="m_")$$endif$}; separator="\n"$
 }
 
 void $struct.scopedname$::deserialize(eprosima::fastcdr::FastCdr &dcdr)
 {
-    $struct.members : { member |$object_deserialization(ctx=ctx, object=member, preffix="m_")$}; separator="\n"$
+    $if(struct.inheritances)$    $struct.inheritances : {$it.scopedname$::deserialize(dcdr);}; separator="\n"$ $endif$
+
+    $struct.members : { member |$if(!member.annotationNonSerialized)$$object_deserialization(ctx=ctx, object=member, preffix="m_")$$endif$}; separator="\n"$
 }
 
 $endif$
+
+$struct.members:{$public_member_declaration(class=struct.scopedname, member=it)$}; separator="\n"$
 
 $extensions : {$it$}; separator="\n"$
 >>
 
 bitset_type(ctx, parent, bitset) ::= <<
-$bitset.scopedname$::$bitset.name$()
+$bitset.scopedname$::$bitset.name$()$if(bitset.parents)$ : $bitset.parents : {$bitset_inherit_default_init(it)$}; separator=",\n"$ $endif$
 {
     $if(ctx.generateTypeObject)$
     // Just to register all known types
@@ -281,18 +300,20 @@ $bitset.scopedname$::~$bitset.name$()
 {
 }
 
-$bitset.scopedname$::$bitset.name$(const $bitset.name$ &x)
+$bitset.scopedname$::$bitset.name$(const $bitset.name$ &x)$if(bitset.parents)$ : $bitset.parents : {$bitset_inherit_copy_init(it)$}; separator=",\n"$ $endif$
 {
     m_bitset = x.m_bitset;
 }
 
-$bitset.scopedname$::$bitset.name$($bitset.name$ &&x)
+$bitset.scopedname$::$bitset.name$($bitset.name$ &&x)$if(bitset.parents)$ : $bitset.parents : {$bitset_inherit_move_init(it)$}; separator=",\n"$ $endif$
 {
     m_bitset = x.m_bitset;
 }
 
 $bitset.scopedname$& $bitset.scopedname$::operator=(const $bitset.name$ &x)
 {
+    $if(bitset.parents)$    $bitset.parents : {$it.scopedname$::operator=(x);}; separator="\n"$ $endif$
+
     m_bitset = x.m_bitset;
 
     return *this;
@@ -300,6 +321,8 @@ $bitset.scopedname$& $bitset.scopedname$::operator=(const $bitset.name$ &x)
 
 $bitset.scopedname$& $bitset.scopedname$::operator=($bitset.name$ &&x)
 {
+    $if(bitset.parents)$    $bitset.parents : {$it.scopedname$::operator=(std::move(x));}; separator="\n"$ $endif$
+
     m_bitset = x.m_bitset;
 
     return *this;
@@ -310,16 +333,20 @@ size_t $bitset.scopedname$::getMaxCdrSerializedSize(size_t current_alignment)
 {
     size_t initial_alignment = current_alignment;
 
-    initial_alignment += sizeof(m_bitset);
+    $if(bitset.parents)$    $bitset.parents : {current_alignment += $it.scopedname$::getMaxCdrSerializedSize(current_alignment);}; separator="\n"$ $endif$
+
+    $bitset.bitfields : { member | $if(!member.annotationNonSerialized)$$if(member.name)$$max_serialized_size(ctx=ctx, typecode=member.spec.typecode, var="current_alignment")$$endif$$endif$}; separator="\n"$
 
     return current_alignment - initial_alignment;
 }
 
-size_t $bitset.scopedname$::getCdrSerializedSize(const $bitset.scopedname$&, size_t current_alignment)
+size_t $bitset.scopedname$::getCdrSerializedSize(const $bitset.scopedname$& $if(bitset.parents)$data$endif$, size_t current_alignment)
 {
     size_t initial_alignment = current_alignment;
 
-    initial_alignment += sizeof(m_bitset);
+    $if(bitset.parents)$    $bitset.parents : {current_alignment += $it.scopedname$::getCdrSerializedSize(data, current_alignment);}; separator="\n"$ $endif$
+
+    $bitset.bitfields : { member | $if(!member.annotationNonSerialized)$$if(member.name)$$serialized_size_type(ctx=ctx, typecode=member.spec.typecode, var="current_alignment")$$endif$$endif$}; separator="\n"$
 
     return current_alignment - initial_alignment;
 }
@@ -329,14 +356,16 @@ $endif$
 $if(ctx.cdr)$
 void $bitset.scopedname$::serialize(eprosima::fastcdr::Cdr &scdr) const
 {
-    scdr << static_cast<uint64_t>(m_bitset.to_ullong());
+    $if(bitset.parents)$    $bitset.parents : {$it.scopedname$::serialize(scdr);}; separator="\n"$ $endif$
+
+    $bitset.bitfields : { member |$if(!member.annotationNonSerialized)$$bitfield_serialization(ctx=ctx, object=member)$$endif$}; separator="\n"$
 }
 
 void $bitset.scopedname$::deserialize(eprosima::fastcdr::Cdr &dcdr)
 {
-    uint64_t temp = 0;
-    dcdr \>> temp;
-    m_bitset = temp;
+    $if(bitset.parents)$    $bitset.parents : {$it.scopedname$::deserialize(dcdr);}; separator="\n"$ $endif$
+
+    $bitset.bitfields : { member |$if(!member.annotationNonSerialized)$$bitfield_deserialization(ctx=ctx, object=member)$$endif$}; separator="\n"$
 }
 
 $endif$
@@ -344,14 +373,16 @@ $endif$
 $if(ctx.fastcdr)$
 void $bitset.scopedname$::serialize(eprosima::fastcdr::FastCdr &scdr) const
 {
-    scdr << static_cast<uint64_t>(m_bitset.to_ullong());
+    $if(bitset.parents)$    $bitset.parents : {$it.scopedname$::serialize(scdr);}; separator="\n"$ $endif$
+
+    $bitset.bitfields : { member |$if(!member.annotationNonSerialized)$$bitfield_serialization(ctx=ctx, object=member)$$endif$}; separator="\n"$
 }
 
 void $bitset.scopedname$::deserialize(eprosima::fastcdr::FastCdr &dcdr)
 {
-    uint64_t temp = 0;
-    dcdr \>> temp;
-    m_bitset = temp;
+    $if(bitset.parents)$    $bitset.parents : {$it.scopedname$::deserialize(dcdr);}; separator="\n"$ $endif$
+
+    $bitset.bitfields : { member |$if(!member.annotationNonSerialized)$$bitfield_deserialization(ctx=ctx, object=member)$$endif$}; separator="\n"$
 }
 
 $endif$
@@ -362,38 +393,40 @@ $bitset.bitfields:{$public_bitfield_definition(it)$}; separator="\n"$
 >>
 
 public_bitfield_definition(member) ::= <<
-void $bitset.scopedname$::$member.name$($member.typecode.cppTypename$ _$member.name$)
+$if(member.name)$
+void $bitset.scopedname$::$member.name$($member.spec.cppTypename$ _$member.name$)
 {
     int base = $member.basePosition$;
-$if(member.typecode.typecode.isType_7)$
+$if(member.spec.typecode.isType_7)$
     m_bitset.set(base, _$member.name$);
 $else$
-    int size = $member.typecode.bitSize$;
-    for (int i = base + size - 1; i >= base; --i)
+    int size = $member.spec.bitSize$;
+    for (int i = base; i < base + size; ++i)
     {
-        m_bitset.set(i, _$member.name$ | 0x01);
+        m_bitset.set(i, !!(_$member.name$ & 0x01));
         _$member.name$ = _$member.name$ \>> 1;
     }
 $endif$
 
 }
 
-$member.typecode.cppTypename$ $bitset.scopedname$::$member.name$() const
+$member.spec.cppTypename$ $bitset.scopedname$::$member.name$() const
 {
     int base = $member.basePosition$;
-$if(member.typecode.typecode.isType_7)$
+$if(member.spec.typecode.isType_7)$
     return m_bitset.test(base);
 $else$
-    int size = $member.typecode.bitSize$;
-    std::bitset<$member.typecode.bitSize$> aux;
-    for (int i = size - 1; i >= 0; --i)
+    int size = $member.spec.bitSize$;
+    std::bitset<$member.spec.bitSize$> aux;
+    for (int i = 0; i < size; ++i)
     {
         aux.set(i, m_bitset.test(i + base));
     }
-    return static_cast<$member.typecode.cppTypename$>(aux.to_ullong());
+    return static_cast<$member.spec.cppTypename$>(aux.to_ullong());
 $endif$
 
 }
+$endif$
 
 >>
 
@@ -584,7 +617,78 @@ $endif$
 
 enum_type(ctx, parent, enum) ::= <<>>
 
+bitmask_type(ctx, parent, bitmask) ::= <<>>
+
 /***** Utils *****/
+
+
+
+public_member_declaration(class, member) ::= <<
+$if(member.typecode.primitive)$
+/*!
+ * @brief This function sets a value in member $member.name$
+ * @param _$member.name$ New value for member $member.name$
+ */
+void $class$::$member.name$($member.typecode.cppTypename$ _$member.name$)
+{
+    $if(member.typecode.forwarded)$*$endif$m_$member.name$ = _$member.name$;
+}
+
+/*!
+ * @brief This function returns the value of member $member.name$
+ * @return Value of member $member.name$
+ */
+$member.typecode.cppTypename$ $class$::$member.name$() const
+{
+    return $if(member.typecode.forwarded)$*$endif$m_$member.name$;
+}
+
+/*!
+ * @brief This function returns a reference to member $member.name$
+ * @return Reference to member $member.name$
+ */
+$member.typecode.cppTypename$& $class$::$member.name$()
+{
+    return $if(member.typecode.forwarded)$*$endif$m_$member.name$;
+}
+$else$
+/*!
+ * @brief This function copies the value in member $member.name$
+ * @param _$member.name$ New value to be copied in member $member.name$
+ */
+void $class$::$member.name$(const $member.typecode.cppTypename$ &_$member.name$)
+{
+    $if(member.typecode.forwarded)$*$endif$m_$member.name$ = _$member.name$;
+}
+
+/*!
+ * @brief This function moves the value in member $member.name$
+ * @param _$member.name$ New value to be moved in member $member.name$
+ */
+void $class$::$member.name$($member.typecode.cppTypename$ &&_$member.name$)
+{
+    $if(member.typecode.forwarded)$*$endif$m_$member.name$ = std::move(_$member.name$);
+}
+
+/*!
+ * @brief This function returns a constant reference to member $member.name$
+ * @return Constant reference to member $member.name$
+ */
+const $member.typecode.cppTypename$& $class$::$member.name$() const
+{
+    return $if(member.typecode.forwarded)$*$endif$m_$member.name$;
+}
+
+/*!
+ * @brief This function returns a reference to member $member.name$
+ * @return Reference to member $member.name$
+ */
+$member.typecode.cppTypename$& $class$::$member.name$()
+{
+    return $if(member.typecode.forwarded)$*$endif$m_$member.name$;
+}
+$endif$
+>>
 
 public_unionmember_declaration(class, member, totallabels, defaultvalue) ::= <<
 $if(member.typecode.primitive)$
@@ -636,11 +740,25 @@ $member.typecode.cppTypename$& $class$::$member.name$()
 $endif$
 >>
 
+member_copy(member) ::= <<
+$if(member.typecode.forwarded)$
+m_$member.name$ = new $member.typecode.cppTypename$();
+*m_$member.name$ = *x.m_$member.name$;
+$else$
+m_$member.name$ = x.m_$member.name$;
+$endif$
+>>
+
 member_move(member) ::= <<
 $if(member.typecode.primitive)$
 m_$member.name$ = x.m_$member.name$;
 $else$
+$if(member.typecode.forwarded)$
+m_$member.name$ = x.m_$member.name$;
+x.m_$member.name$ = nullptr;
+$else$
 m_$member.name$ = std::move(x.m_$member.name$);
+$endif$
 $endif$
 >>
 

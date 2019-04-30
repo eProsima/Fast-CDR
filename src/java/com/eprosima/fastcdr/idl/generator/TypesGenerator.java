@@ -16,6 +16,7 @@ package com.eprosima.fastcdr.idl.generator;
 
 import com.eprosima.idl.context.Context;
 import com.eprosima.idl.generator.manager.TemplateManager;
+import com.eprosima.idl.parser.tree.AnnotationDeclaration;
 import com.eprosima.idl.parser.tree.Definition;
 import com.eprosima.idl.parser.tree.Export;
 import com.eprosima.idl.parser.tree.Interface;
@@ -170,6 +171,27 @@ public class TypesGenerator
                         }
                     }
                 }
+                else if(definition.isIsAnnotation())
+                {
+                    AnnotationDeclaration annotation = (AnnotationDeclaration)definition;
+
+                    // Create StringTemplate of the annotation
+                    StringTemplate ifcst = stg_.getInstanceOf("annotation");
+                    ifcst.setAttribute("ctx", context);
+                    //ifcst.setAttribute("parent", annotation.getParent());
+                    ifcst.setAttribute("annotation", annotation);
+
+                    StringTemplate extensionst = null;
+                    String extensionname = null;
+                    if(extensions != null && (extensionname = extensions.get("annotation")) != null)
+                    {
+                        extensionst = stg_.getInstanceOf(extensionname);
+                        extensionst.setAttribute("ctx", context);
+                        //extensionst.setAttribute("parent", annotation.getParent());
+                        extensionst.setAttribute("annotation", annotation);
+                        ifcst.setAttribute("extension", extensionst.toString());
+                    }
+                }
             }
         }
 
@@ -250,6 +272,18 @@ public class TypesGenerator
             {
                 extensionst = stg_.getInstanceOf(extensionname);
                 extensionst.setAttribute("bitset", typedecl.getTypeCode());
+            }
+        }
+        else if(typedecl.getTypeCode().getKind() == Kind.KIND_BITMASK)
+        {
+            typest = stg_.getInstanceOf("bitmask_type");
+            typest.setAttribute("bitmask", typedecl.getTypeCode());
+
+            // Get extension
+            if(extensions != null && (extensionname =  extensions.get("bitmask_type")) != null)
+            {
+                extensionst = stg_.getInstanceOf(extensionname);
+                extensionst.setAttribute("bitmask", typedecl.getTypeCode());
             }
         }
 

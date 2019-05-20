@@ -193,9 +193,7 @@ param_list(parameters) ::= <<>>
 
 param(parameter) ::= <<>>
 
-const_decl(ctx, parent, const) ::= <<
-$if(const.parent)$$if(const.parent.isInterface)$static $endif$$endif$const $const.typeCode.cppTypename$ $const.name$$if(!const.parent)$ = $const.value$$elseif(!const.parent.isInterface)$ = $const.value$$elseif(!const.typeCode.isType_5)$$if(!const.typeCode.isType_6)$ = $const.value$$endif$$endif$;
->>
+const_decl(ctx, parent, const) ::= <<$if(ctx.inScopedFile)$$if(const.parent)$$if(const.parent.isInterface)$static $endif$$endif$const $const.typeCode.cppTypename$ $const.name$$if(!const.parent)$ = $const.value$$elseif(!const.parent.isInterface)$ = $const.value$$elseif(!const.typeCode.isType_5)$$if(!const.typeCode.isType_6)$ = $const.value$$endif$$endif$;$endif$>>
 
 typedef_decl(ctx, parent, typedefs) ::= <<
 $typedefs : { typedef |typedef $typedef.typedefContentTypeCode.cppTypename$ $typedef.name$;}; separator="\n"$

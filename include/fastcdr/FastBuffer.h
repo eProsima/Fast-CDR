@@ -22,11 +22,13 @@
 #include <cstddef>
 #include <utility>
 
-#if defined(FASTCDR_32BIT)
-#define SIZE_TO_32BIT(x) x
-#else
-#define SIZE_TO_32BIT(x) static_cast<uint32_t>(x)
-#endif
+inline uint32_t size_to_uint32(size_t val) {
+  #if defined(FASTCDR_32BIT)
+  return val;
+  #else
+  return static_cast<uint32_t>(val);
+  #endif
+}
 
 namespace eprosima
 {

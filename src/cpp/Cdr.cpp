@@ -639,7 +639,7 @@ Cdr& Cdr::serialize(const char *string_t)
 
     if(string_t != nullptr)
     {
-        length = SIZE_TO_32BIT(strlen(string_t)) + 1;
+        length = size_to_uint32(strlen(string_t)) + 1;
     }
 
     if(length > 0)
@@ -677,13 +677,13 @@ Cdr& Cdr::serialize(const wchar_t *string_t)
     if (string_t != nullptr)
     {
         wstrlen = wcslen(string_t);
-        bytesLength = SIZE_TO_32BIT(wstrlen * 4);
+        bytesLength = size_to_uint32(wstrlen * 4);
     }
 
     if(bytesLength > 0)
     {
         Cdr::state state_(*this);
-        serialize(SIZE_TO_32BIT(wstrlen));
+        serialize(size_to_uint32(wstrlen));
 
         if(((m_lastPosition - m_currentPosition) >= bytesLength) || resize(bytesLength))
         {

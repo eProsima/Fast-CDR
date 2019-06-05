@@ -22,6 +22,12 @@
 #include <cstddef>
 #include <utility>
 
+#if defined(FASTCDR_32BIT)
+#define SIZE_TO_32BIT(x) x
+#else
+#define SIZE_TO_32BIT(x) static_cast<uint32_t>(x)
+#endif
+
 namespace eprosima
 {
     namespace fastcdr

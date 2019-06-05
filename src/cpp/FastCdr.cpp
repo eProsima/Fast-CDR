@@ -90,11 +90,11 @@ FastCdr& FastCdr::serialize(const bool bool_t)
 
 FastCdr& FastCdr::serialize(const char *string_t)
 {
-    size_t length = 0;
+    uint32_t length = 0;
 
     if(string_t != nullptr)
     {
-        length = strlen(string_t) + 1;
+        length = SIZE_TO_32BIT(strlen(string_t)) + 1;
     }
 
     if(length > 0)
@@ -123,19 +123,19 @@ FastCdr& FastCdr::serialize(const char *string_t)
 
 FastCdr& FastCdr::serialize(const wchar_t *string_t)
 {
-    size_t bytesLength = 0;
+    uint32_t bytesLength = 0;
     size_t wstrlen = 0;
 
     if (string_t != nullptr)
     {
         wstrlen = wcslen(string_t);
-        bytesLength = wstrlen * 4;
+        bytesLength = SIZE_TO_32BIT(wstrlen * 4);
     }
 
     if(bytesLength > 0)
     {
         FastCdr::state state_(*this);
-        serialize(wstrlen);
+        serialize(SIZE_TO_32BIT(wstrlen));
 
         if(((m_lastPosition - m_currentPosition) >= bytesLength) || resize(bytesLength))
         {

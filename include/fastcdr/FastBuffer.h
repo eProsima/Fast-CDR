@@ -82,7 +82,11 @@ namespace eprosima
                     inline
                     void operator<<(const _T &data)
                     {
+                        #if defined(FASTCDR_32BIT)
+                        memcpy(m_currentPosition, &data, sizeof(_T));
+                        #else
                         *(reinterpret_cast<_T*>(m_currentPosition)) = data;
+                        #endif
                     }
 
                 /*!
@@ -94,7 +98,13 @@ namespace eprosima
                     inline
                     void operator>>(_T &data)
                     {
+                        #if defined(FASTCDR_32BIT)
+                        _T val;
+                        memcpy(&val, m_currentPosition, sizeof(_T));
+                        data = val;
+                        #else
                         data = *(reinterpret_cast<_T*>(m_currentPosition));
+                        #endif
                     }
 
                 /*!
@@ -167,7 +177,7 @@ namespace eprosima
                  * @brief This function returns the current position in the raw buffer.
                  * @return The current position in the raw buffer.
                  */
-                inline 
+                inline
                     char* operator&()
                     {
                         return m_currentPosition;

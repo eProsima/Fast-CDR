@@ -50,7 +50,7 @@
 #define FASTCDR_32BIT
 #endif
 
-#if defined(_WIN32)
+#if defined(_WIN32) && !defined(_WIN64)
 #define FASTCDR_32BIT
 #endif
 

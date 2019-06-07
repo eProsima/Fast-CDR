@@ -666,7 +666,7 @@ namespace eprosima
                         if(((m_lastPosition - m_currentPosition) >= sizeof(ldouble_t)) || resize(sizeof(ldouble_t)))
                         {
                             m_currentPosition << ldouble_t;
-#if defined(FASTCDR_32BIT)
+#if defined(_WIN32)
                             m_currentPosition += sizeof(ldouble_t);
                             m_currentPosition << static_cast<long double>(0);
 #endif
@@ -1238,7 +1238,7 @@ namespace eprosima
                         {
                             m_currentPosition >> ldouble_t;
                             m_currentPosition += sizeof(ldouble_t);
-#if defined(FASTCDR_32BIT)
+#if defined(_WIN32)
                             m_currentPosition += sizeof(ldouble_t);
 #endif
 

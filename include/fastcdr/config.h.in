@@ -47,6 +47,7 @@
 #endif
 
 #if defined(__ARM_ARCH) && __ARM_ARCH <= 7
+#define FASTCDR_ARM32
 #define FASTCDR_32BIT
 #endif
 

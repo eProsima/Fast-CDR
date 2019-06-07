@@ -541,7 +541,7 @@ Cdr& Cdr::serialize(const long double ldouble_t)
         if(m_swapBytes)
         {
             const char *dst = reinterpret_cast<const char*>(&ldouble_t);
-#if defined(FASTCDR_32BIT)
+#if defined(_WIN32) or defined(FASTCDR_ARM32)
             // Filled with 0's.
             m_currentPosition++ << static_cast<char>(0);
             m_currentPosition++ << static_cast<char>(0);
@@ -581,7 +581,7 @@ Cdr& Cdr::serialize(const long double ldouble_t)
         }
         else
         {
-#if defined(FASTCDR_32BIT)
+#if defined(_WIN32) or defined(FASTCDR_ARM32)
             m_currentPosition << static_cast<long double>(0);
             m_currentPosition += sizeof(ldouble_t);
 #endif
@@ -690,7 +690,8 @@ Cdr& Cdr::serialize(const wchar_t *string_t)
             // Save last datasize.
             m_lastDataSize = sizeof(uint32_t);
 
-#if defined(FASTCDR_32BIT)
+#if defined(_WIN32)
+// #if defined(FASTCDR_32BIT)
             serializeArray(string_t, wstrlen);
 #else
             m_currentPosition.memcopy(string_t, bytesLength);
@@ -1173,7 +1174,7 @@ Cdr& Cdr::serializeArray(const long double *ldouble_t, size_t numElements)
 
             for(; dst < end; dst += sizeof(*ldouble_t))
             {
-#if defined(FASTCDR_32BIT)
+#if defined(_WIN32) or defined(FASTCDR_ARM32)
                 // Filled with 0's.
                 m_currentPosition++ << static_cast<char>(0);
                 m_currentPosition++ << static_cast<char>(0);

@@ -92,7 +92,7 @@ namespace eprosima
                     inline
                     void operator<<(const _T &data)
                     {
-                        #if defined(FASTCDR_32BIT)
+                        #if defined(FASTCDR_ARM32)
                         memcpy(m_currentPosition, &data, sizeof(_T));
                         #else
                         *(reinterpret_cast<_T*>(m_currentPosition)) = data;
@@ -108,7 +108,7 @@ namespace eprosima
                     inline
                     void operator>>(_T &data)
                     {
-                        #if defined(FASTCDR_32BIT)
+                        #if defined(FASTCDR_ARM32)
                         _T val;
                         memcpy(&val, m_currentPosition, sizeof(_T));
                         data = val;

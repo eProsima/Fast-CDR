@@ -23,7 +23,7 @@
 #include <utility>
 
 inline uint32_t size_to_uint32(size_t val) {
-  #if defined(_WIN32) || !defined(FASTCDR_32BIT)
+  #if defined(_WIN32) or not defined(FASTCDR_ARM32)
   // On 64 bit platforms and all Windows architectures (because of C4267), explicitly cast.
   return static_cast<uint32_t>(val);
   #else

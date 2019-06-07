@@ -1214,7 +1214,7 @@ Cdr& Cdr::serializeArray(const long double *ldouble_t, size_t numElements)
         }
         else
         {
-#if defined(FASTCDR_32BIT)
+#if defined(_WIN32) or defined(FASTCDR_ARM32)
             for (size_t i = 0; i < numElements; ++i)
             {
                 m_currentPosition << static_cast<long double>(0);
@@ -1555,7 +1555,7 @@ Cdr& Cdr::deserialize(long double &ldouble_t)
         {
             char *dst = reinterpret_cast<char*>(&ldouble_t);
 
-#if defined(FASTCDR_32BIT)
+#if defined(_WIN32) or defined(FASTCDR_ARM32)
             m_currentPosition += 8;
             m_currentPosition++ >> dst[7];
             m_currentPosition++ >> dst[6];
@@ -1586,7 +1586,7 @@ Cdr& Cdr::deserialize(long double &ldouble_t)
         }
         else
         {
-#if defined(FASTCDR_32BIT)
+#if defined(_WIN32) or defined(FASTCDR_ARM32)
             // Windows case, just deserializes the last 8 bytes, and ignores the first 8
             m_currentPosition += 8; // sizeof(ldouble_t);
 #endif
@@ -1694,7 +1694,8 @@ Cdr& Cdr::deserialize(wchar_t *&string_t)
         // Allocate memory.
         string_t = reinterpret_cast<wchar_t*>(calloc(length + 1, sizeof(wchar_t))); // WStrings never serialize terminating zero
 
-#if defined(FASTCDR_32BIT)
+#if defined(_WIN32)
+// #if defined(FASTCDR_32BIT)
         for (size_t idx = 0; idx < length; ++idx)
         {
             uint32_t temp;
@@ -1797,7 +1798,7 @@ const std::wstring Cdr::readWString(uint32_t &length)
         // Save last datasize.
         m_lastDataSize = sizeof(uint32_t);
 
-#if defined(FASTCDR_32BIT)
+#if defined(_WIN32) or defined(FASTCDR_ARM32)
         wchar_t* wValue = new wchar_t[length];
         deserializeArray(wValue, length);
 #else
@@ -1809,7 +1810,7 @@ const std::wstring Cdr::readWString(uint32_t &length)
             --length;
         }
         returnedValue = std::wstring(wValue, length);
-#if defined(FASTCDR_32BIT)
+#if defined(_WIN32) or defined(FASTCDR_ARM32)
         delete [] wValue;
 #endif
         return returnedValue;
@@ -2255,7 +2256,7 @@ Cdr& Cdr::deserializeArray(long double *ldouble_t, size_t numElements)
 
             for(; dst < end; dst += sizeof(*ldouble_t))
             {
-#if defined(FASTCDR_32BIT)
+#if defined(_WIN32) or defined(FASTCDR_ARM32)
                 m_currentPosition += 8;
                 m_currentPosition++ >> dst[7];
                 m_currentPosition++ >> dst[6];
@@ -2287,7 +2288,7 @@ Cdr& Cdr::deserializeArray(long double *ldouble_t, size_t numElements)
         }
         else
         {
-#if defined(FASTCDR_32BIT)
+#if defined(_WIN32) or defined(FASTCDR_ARM32)
             for (size_t i = 0; i < numElements; ++i)
             {
                 m_currentPosition += 8;   // Ignore first 8 bytes

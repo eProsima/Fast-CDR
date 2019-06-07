@@ -139,7 +139,8 @@ FastCdr& FastCdr::serialize(const wchar_t *string_t)
 
         if(((m_lastPosition - m_currentPosition) >= bytesLength) || resize(bytesLength))
         {
-#if defined(FASTCDR_32BIT)
+// #if defined(FASTCDR_32BIT)
+#if defined(_WIN32)
             serializeArray(string_t, wstrlen);
 #else
             m_currentPosition.memcopy(string_t, bytesLength);
@@ -281,7 +282,7 @@ FastCdr& FastCdr::serializeArray(const long double *ldouble_t, size_t numElement
 
     if(((m_lastPosition - m_currentPosition) >= totalSize) || resize(totalSize))
     {
-#if defined(FASTCDR_32BIT)
+#if defined(_WIN32) or defined(FASTCDR_ARM32)
         for (size_t idx = 0; idx < numElements; ++idx)
         {
             m_currentPosition << static_cast<long double>(0);
@@ -367,7 +368,8 @@ FastCdr& FastCdr::deserialize(wchar_t *&string_t)
         // Allocate memory.
         string_t = reinterpret_cast<wchar_t*>(calloc(length + 1, sizeof(wchar_t))); // WStrings never serialize terminating zero
 
-#if defined(FASTCDR_32BIT)
+// #if defined(FASTCDR_32BIT)
+#if defined(_WIN32)
         for (size_t idx = 0; idx < length; ++idx)
         {
             uint32_t temp;
@@ -425,7 +427,7 @@ std::wstring FastCdr::readWString(uint32_t &length)
     else if((m_lastPosition - m_currentPosition) >= bytesLength)
     {
 
-#if defined(FASTCDR_32BIT)
+#if defined(_WIN32) or defined(FASTCDR_ARM32)
         wchar_t* wValue = new wchar_t[length];
         deserializeArray(wValue, length);
 #else
@@ -437,7 +439,7 @@ std::wstring FastCdr::readWString(uint32_t &length)
             --length;
         }
         returnedValue = std::wstring(wValue, length);
-#if defined(FASTCDR_32BIT)
+#if defined(_WIN32) or defined(FASTCDR_ARM32)
         delete [] wValue;
 #endif
         return returnedValue;
@@ -580,7 +582,7 @@ FastCdr& FastCdr::deserializeArray(long double *ldouble_t, size_t numElements)
 
     if((m_lastPosition - m_currentPosition) >= totalSize)
     {
-#if defined(FASTCDR_32BIT)
+#if defined(_WIN32) or defined(FASTCDR_ARM32)
         for (size_t idx = 0; idx < numElements; ++idx)
         {
             m_currentPosition += 8; // Windows ignores the first 8 bytes

@@ -139,7 +139,6 @@ FastCdr& FastCdr::serialize(const wchar_t *string_t)
 
         if(((m_lastPosition - m_currentPosition) >= bytesLength) || resize(bytesLength))
         {
-// #if defined(FASTCDR_32BIT)
 #if defined(_WIN32)
             serializeArray(string_t, wstrlen);
 #else
@@ -368,7 +367,6 @@ FastCdr& FastCdr::deserialize(wchar_t *&string_t)
         // Allocate memory.
         string_t = reinterpret_cast<wchar_t*>(calloc(length + 1, sizeof(wchar_t))); // WStrings never serialize terminating zero
 
-// #if defined(FASTCDR_32BIT)
 #if defined(_WIN32)
         for (size_t idx = 0; idx < length; ++idx)
         {

@@ -691,7 +691,6 @@ Cdr& Cdr::serialize(const wchar_t *string_t)
             m_lastDataSize = sizeof(uint32_t);
 
 #if defined(_WIN32)
-// #if defined(FASTCDR_32BIT)
             serializeArray(string_t, wstrlen);
 #else
             m_currentPosition.memcopy(string_t, bytesLength);
@@ -1695,7 +1694,6 @@ Cdr& Cdr::deserialize(wchar_t *&string_t)
         string_t = reinterpret_cast<wchar_t*>(calloc(length + 1, sizeof(wchar_t))); // WStrings never serialize terminating zero
 
 #if defined(_WIN32)
-// #if defined(FASTCDR_32BIT)
         for (size_t idx = 0; idx < length; ++idx)
         {
             uint32_t temp;

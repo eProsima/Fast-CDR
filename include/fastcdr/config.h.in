@@ -48,11 +48,6 @@
 
 #if defined(__ARM_ARCH) && __ARM_ARCH <= 7
 #define FASTCDR_ARM32
-#define FASTCDR_32BIT
-#endif
-
-#if defined(_WIN32) && !defined(_WIN64)
-#define FASTCDR_32BIT
 #endif
 
 #endif // _FASTCDR_CONFIG_H_

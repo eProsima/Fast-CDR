@@ -22,6 +22,16 @@
 #include <cstddef>
 #include <utility>
 
+inline uint32_t size_to_uint32(size_t val) {
+  #if defined(_WIN32) || !defined(FASTCDR_ARM32)
+  // On 64 bit platforms and all Windows architectures (because of C4267), explicitly cast.
+  return static_cast<uint32_t>(val);
+  #else
+  // Skip useless cast on 32-bit builds.
+  return val;
+  #endif
+}
+
 namespace eprosima
 {
     namespace fastcdr
@@ -82,7 +92,11 @@ namespace eprosima
                     inline
                     void operator<<(const _T &data)
                     {
+                        #if defined(FASTCDR_ARM32)
+                        memcpy(m_currentPosition, &data, sizeof(_T));
+                        #else
                         *(reinterpret_cast<_T*>(m_currentPosition)) = data;
+                        #endif
                     }
 
                 /*!
@@ -94,7 +108,13 @@ namespace eprosima
                     inline
                     void operator>>(_T &data)
                     {
+                        #if defined(FASTCDR_ARM32)
+                        _T val;
+                        memcpy(&val, m_currentPosition, sizeof(_T));
+                        data = val;
+                        #else
                         data = *(reinterpret_cast<_T*>(m_currentPosition));
+                        #endif
                     }
 
                 /*!
@@ -167,7 +187,7 @@ namespace eprosima
                  * @brief This function returns the current position in the raw buffer.
                  * @return The current position in the raw buffer.
                  */
-                inline 
+                inline
                     char* operator&()
                     {
                         return m_currentPosition;

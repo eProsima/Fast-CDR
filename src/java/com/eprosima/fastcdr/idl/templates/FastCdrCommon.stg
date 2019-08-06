@@ -77,6 +77,7 @@ $if(object.typecode.contentTypeCode.isType_c)$
 {
     uint32_t seq_length = 0;
     dcdr \>> seq_length;
+    $preffix$$object.name$.resize(seq_length);
     dcdr.deserializeArray(reinterpret_cast<uint32_t*>($preffix$$object.name$.data()), seq_length);
 }
 $elseif(object.typecode.contentTypeCode.isBitmaskType)$

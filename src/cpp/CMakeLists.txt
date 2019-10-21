@@ -150,8 +150,15 @@ elseif(NOT EPROSIMA_INSTALLER)
         )
 
     export(TARGETS ${PROJECT_NAME} FILE ${PROJECT_BINARY_DIR}/cmake/config/${PROJECT_NAME}-targets.cmake)
+
+    if(INSTALLER_PLATFORM)
+        set(INSTALL_DESTINATION_PATH ${DATA_INSTALL_DIR}/${PROJECT_NAME}-${INSTALLER_PLATFORM}/cmake)
+    else()
+        set(INSTALL_DESTINATION_PATH ${LIB_INSTALL_DIR}/${PROJECT_NAME}/cmake${MSVCARCH_DIR_EXTENSION_EXT})
+    endif()
+
     install(EXPORT ${PROJECT_NAME}-targets
-        DESTINATION ${LIB_INSTALL_DIR}/${PROJECT_NAME}/cmake${MSVCARCH_DIR_EXTENSION_EXT}
+        DESTINATION ${INSTALL_DESTINATION_PATH}
         COMPONENT cmake
         )
 
@@ -178,9 +185,16 @@ elseif(NOT EPROSIMA_INSTALLER)
     # Create CMake package config file
     ###############################################################################
     include(CMakePackageConfigHelpers)
+
+    if(BUILD_SHARED_LIBS)
+        set(FASTRTPS_PACKAGE_OPT_BIN_DIR_CONDITION "if(MSVC OR MSVC_IDE)")
+    else()
+        set(FASTRTPS_PACKAGE_OPT_BIN_DIR_CONDITION "if(0)")
+    endif()
+
     configure_package_config_file(${PROJECT_SOURCE_DIR}/cmake/packaging/Config.cmake.in
         ${PROJECT_BINARY_DIR}/cmake/config/${PROJECT_NAME}-config.cmake
-        INSTALL_DESTINATION ${LIB_INSTALL_DIR}/${PROJECT_NAME}/cmake${MSVCARCH_DIR_EXTENSION_EXT}
+	INSTALL_DESTINATION ${INSTALL_DESTINATION_PATH}
         PATH_VARS BIN_INSTALL_DIR INCLUDE_INSTALL_DIR LIB_INSTALL_DIR
         )
     write_basic_package_version_file(${PROJECT_BINARY_DIR}/cmake/config/${PROJECT_NAME}-config-version.cmake
@@ -189,7 +203,7 @@ elseif(NOT EPROSIMA_INSTALLER)
         )
     install(FILES ${PROJECT_BINARY_DIR}/cmake/config/${PROJECT_NAME}-config.cmake
         ${PROJECT_BINARY_DIR}/cmake/config/${PROJECT_NAME}-config-version.cmake
-        DESTINATION ${LIB_INSTALL_DIR}/${PROJECT_NAME}/cmake${MSVCARCH_DIR_EXTENSION_EXT}
+        DESTINATION ${INSTALL_DESTINATION_PATH}
         COMPONENT cmake
         )
 

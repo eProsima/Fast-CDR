@@ -46,4 +46,8 @@
 #define __BIG_ENDIAN__ @__BIG_ENDIAN__@
 #endif
 
+#if defined(__ARM_ARCH) && __ARM_ARCH <= 7
+#define FASTCDR_ARM32
+#endif
+
 #endif // _FASTCDR_CONFIG_H_

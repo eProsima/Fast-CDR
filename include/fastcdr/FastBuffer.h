@@ -125,7 +125,9 @@ namespace eprosima
                 inline
                     void memcopy(const void* src, const size_t size)
                     {
-                        memcpy(m_currentPosition, src, size);
+                        if (size > 0) {
+                            memcpy(m_currentPosition, src, size);
+                        }
                     }
 
                 /*!
@@ -136,7 +138,9 @@ namespace eprosima
                 inline
                     void rmemcopy(void* dst, const size_t size)
                     {
-                        memcpy(dst, m_currentPosition, size);
+                        if (size > 0) {
+                            memcpy(dst, m_currentPosition, size);
+                        }
                     }
 
                 /*!

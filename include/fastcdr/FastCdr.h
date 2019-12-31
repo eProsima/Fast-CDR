@@ -709,7 +709,9 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
                  */
                 inline
-                    FastCdr& serialize(const std::string &string_t) {return serialize(string_t.c_str());}
+                    FastCdr& serialize(const std::string &string_t) {
+                        return serializeSequence(string_t.c_str(), string_t.size());
+                    }
 
                 /*!
                  * @brief This function serializes a std::wstring.

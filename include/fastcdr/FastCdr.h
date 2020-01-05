@@ -720,7 +720,9 @@ namespace eprosima
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
                  */
                 inline
-                    FastCdr& serialize(const std::wstring &string_t) {return serialize(string_t.c_str());}
+                    FastCdr& serialize(const std::wstring &string_t) {
+                        return serializeSequence(string_t.c_str(), string_t.size());
+                    }
 
 #if HAVE_CXX0X
                 /*!
@@ -958,7 +960,7 @@ namespace eprosima
                     FastCdr& serializeArray(const std::string *string_t, size_t numElements)
                     {
                         for(size_t count = 0; count < numElements; ++count)
-                            serialize(string_t[count].c_str());
+                            serialize(string_t[count]);
                         return *this;
                     }
 
@@ -973,7 +975,7 @@ namespace eprosima
                     FastCdr& serializeArray(const std::wstring *string_t, size_t numElements)
                     {
                         for(size_t count = 0; count < numElements; ++count)
-                            serialize(string_t[count].c_str());
+                            serialize(string_t[count]);
                         return *this;
                     }
 
@@ -1290,9 +1292,10 @@ namespace eprosima
                 inline
                     FastCdr& deserialize(std::string &string_t)
                     {
-                        uint32_t length = 0;
-                        const char *str = readString(length);
-                        string_t = std::string(str, length);
+                        size_t length;
+                        char * ptr;
+                        deserializeSequence(ptr, length);
+                        string_t.assign(ptr, length);
                         return *this;
                     }
 
@@ -1305,8 +1308,10 @@ namespace eprosima
                 inline
                     FastCdr& deserialize(std::wstring &string_t)
                     {
-                        uint32_t length = 0;
-                        string_t = readWString(length);
+                        size_t length;
+                        wchar_t * ptr;
+                        deserializeSequence(ptr, length);
+                        string_t.assign(ptr, length);
                         return *this;
                     }
 

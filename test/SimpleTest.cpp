@@ -912,7 +912,7 @@ TEST(CDRTests, WString)
     NotEnoughMemoryException);
 }
 
-TEST(CDRTests, WStringBinary)
+TEST(CDRTests, BinaryWString)
 {
     // Check good case.
     char buffer[BUFFER_LENGTH];
@@ -5298,6 +5298,59 @@ TEST(FastCDRTests, String)
     NotEnoughMemoryException);
 }
 
+TEST(FastCDRTests, BinaryString)
+{
+    // Check good case.
+    char buffer[BUFFER_LENGTH];
+
+    // Serialization.
+    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+    FastCdr cdr_ser(cdrbuffer);
+
+    const char binary_string_buffer[] = "\000\041";
+    const std::string binary_string(binary_string_buffer,
+        sizeof(binary_string_buffer));
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser << binary_string;
+    });
+
+    // Deserialization.
+    FastCdr cdr_des(cdrbuffer);
+
+    std::string string_value;
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des >> string_value;
+    });
+
+    EXPECT_EQ(string_value, binary_string);
+
+    // Check bad case without space
+    char buffer_bad[1];
+
+    // Serialization.
+    FastBuffer cdrbuffer_bad(buffer_bad, 1);
+    FastCdr cdr_ser_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_ser_bad << binary_string;
+    },
+    NotEnoughMemoryException);
+
+    // Deserialization.
+    FastCdr cdr_des_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_des_bad >> string_value;
+    },
+    NotEnoughMemoryException);
+}
+
 TEST(FastCDRTests, WString)
 {
     // Check good case.
@@ -5334,6 +5387,59 @@ TEST(FastCDRTests, WString)
     EXPECT_THROW(
     {
         cdr_ser_bad << wstring_t;
+    },
+    NotEnoughMemoryException);
+
+    // Deserialization.
+    FastCdr cdr_des_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_des_bad >> string_value;
+    },
+    NotEnoughMemoryException);
+}
+
+TEST(FastCDRTests, BinaryWString)
+{
+    // Check good case.
+    char buffer[BUFFER_LENGTH];
+
+    // Serialization.
+    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+    FastCdr cdr_ser(cdrbuffer);
+
+    const wchar_t binary_string_buffer[] = L"\000\041";
+    const std::wstring binary_string(binary_string_buffer,
+        sizeof(binary_string_buffer) / sizeof(wchar_t));
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser << binary_string;
+    });
+
+    // Deserialization.
+    FastCdr cdr_des(cdrbuffer);
+
+    std::wstring string_value;
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des >> string_value;
+    });
+
+    EXPECT_EQ(string_value, binary_string);
+
+    // Check bad case without space
+    char buffer_bad[1];
+
+    // Serialization.
+    FastBuffer cdrbuffer_bad(buffer_bad, 1);
+    FastCdr cdr_ser_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_ser_bad << binary_string;
     },
     NotEnoughMemoryException);
 

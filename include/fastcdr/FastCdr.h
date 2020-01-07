@@ -1746,10 +1746,6 @@ namespace eprosima
 
                 bool resize(size_t minSizeInc);
 
-                const char* readString(uint32_t &length);
-
-                std::wstring readWString(uint32_t &length);
-
                 //! @brief Reference to the buffer that will be serialized/deserialized.
                 FastBuffer &m_cdrBuffer;
 

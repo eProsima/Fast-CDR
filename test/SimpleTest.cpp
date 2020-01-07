@@ -150,6 +150,118 @@ static void EXPECT_ARRAY_LONG_DOUBLE_EQ(long double *array1, const long double *
     }
 }
 
+static std::string GET_BINARY_STRING() {
+    const char binary_string_buffer[] = "\000\041";
+    const std::string binary_string(binary_string_buffer,
+        sizeof(binary_string_buffer));
+    return binary_string;
+}
+
+static std::wstring GET_BINARY_WSTRING() {
+    const wchar_t binary_string_buffer[] = L"\000\041";
+    const std::wstring binary_string(binary_string_buffer,
+        sizeof(binary_string_buffer) / sizeof(wchar_t));
+    return binary_string;
+}
+
+template<class T>
+void CDR_STREAM_HANDLE_ERROR(const T& value) {
+    // Check good case.
+    char buffer[BUFFER_LENGTH];
+
+    // Serialization.
+    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+    Cdr cdr_ser(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser << value;
+    });
+
+    // Deserialization.
+    Cdr cdr_des(cdrbuffer);
+
+    T deserialized_value;
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des >> deserialized_value;
+    });
+
+    EXPECT_EQ(deserialized_value, value);
+
+    // Check bad case without space
+    char buffer_bad[1];
+
+    // Serialization.
+    FastBuffer cdrbuffer_bad(buffer_bad, 1);
+    Cdr cdr_ser_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_ser_bad << value;
+    },
+    NotEnoughMemoryException);
+
+    // Deserialization.
+    Cdr cdr_des_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_des_bad >> deserialized_value;
+    },
+    NotEnoughMemoryException);
+}
+
+template<class T>
+void FAST_CDR_STREAM_HANDLE_ERROR(const T& value) {
+    // Check good case.
+    char buffer[BUFFER_LENGTH];
+
+    // Serialization.
+    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+    FastCdr cdr_ser(cdrbuffer);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser << value;
+    });
+
+    // Deserialization.
+    FastCdr cdr_des(cdrbuffer);
+
+    T deserialized_value;
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des >> deserialized_value;
+    });
+
+    EXPECT_EQ(deserialized_value, value);
+
+    // Check bad case without space
+    char buffer_bad[1];
+
+    // Serialization.
+    FastBuffer cdrbuffer_bad(buffer_bad, 1);
+    FastCdr cdr_ser_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_ser_bad << value;
+    },
+    NotEnoughMemoryException);
+
+    // Deserialization.
+    FastCdr cdr_des_bad(cdrbuffer_bad);
+
+    EXPECT_THROW(
+    {
+        cdr_des_bad >> deserialized_value;
+    },
+    NotEnoughMemoryException);
+}
+
 TEST(FastBufferTests, Constructors)
 {
     char buffer[BUFFER_LENGTH];
@@ -295,443 +407,47 @@ TEST(CDRTests, Int8)
 
 TEST(CDRTests, UnsignedShort)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ushort_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    uint16_t ushort_value = 0;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ushort_value;
-    });
-
-    EXPECT_EQ(ushort_value, ushort_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ushort_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ushort_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(ushort_t);
 }
 
 TEST(CDRTests, Short)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << short_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    int16_t short_value = 0;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> short_value;
-    });
-
-    EXPECT_EQ(short_value, short_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << short_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> short_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(short_t);
 }
 
 TEST(CDRTests, UnsignedLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ulong_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    uint32_t ulong_value = 0;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ulong_value;
-    });
-
-    EXPECT_EQ(ulong_value, ulong_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ulong_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ulong_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(ulong_t);
 }
 
 TEST(CDRTests, Long)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << long_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    int32_t long_value = 0;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> long_value;
-    });
-
-    EXPECT_EQ(long_value, long_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << long_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> long_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(long_t);
 }
 
 TEST(CDRTests, UnsignedLongLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ulonglong_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    uint64_t ulonglong_value = 0;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ulonglong_value;
-    });
-
-    EXPECT_EQ(ulonglong_value, ulonglong_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ulonglong_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ulonglong_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(ulonglong_t);
 }
 
 TEST(CDRTests, LongLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << longlong_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    int64_t longlong_value = 0;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> longlong_value;
-    });
-
-    EXPECT_EQ(longlong_value, longlong_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << longlong_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> longlong_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(longlong_t);
 }
 
 TEST(CDRTests, Float)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << float_tt;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    float float_value = 0;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> float_value;
-    });
-
-    EXPECT_FLOAT_EQ(float_value, float_tt);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << float_tt;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> float_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(float_tt);
 }
 
 TEST(CDRTests, Double)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << double_tt;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    double double_value = 0;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> double_value;
-    });
-
-    EXPECT_DOUBLE_EQ(double_value, double_tt);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << double_tt;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> double_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(double_tt);
 }
 
 TEST(CDRTests, LongDouble)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ldouble_tt;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    long double ldouble_value = 0;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ldouble_value;
-    });
-
-    EXPECT_LONG_DOUBLE_EQ(ldouble_value, ldouble_tt);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ldouble_tt;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ldouble_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(ldouble_tt);
 }
 
 TEST(CDRTests, Boolean)
@@ -763,1088 +479,112 @@ TEST(CDRTests, Boolean)
 
 TEST(CDRTests, String)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << string_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::string string_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> string_value;
-    });
-
-    EXPECT_EQ(string_value, string_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << string_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> string_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(string_t);
 }
 
 TEST(CDRTests, BinaryString)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    const char binary_string_buffer[] = "\000\041";
-    const std::string binary_string(binary_string_buffer,
-        sizeof(binary_string_buffer));
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << binary_string;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::string string_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> string_value;
-    });
-
-    EXPECT_EQ(string_value, binary_string);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << binary_string;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> string_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(GET_BINARY_STRING());
 }
 
 TEST(CDRTests, WString)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << wstring_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::wstring string_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> string_value;
-    });
-
-    EXPECT_EQ(string_value, wstring_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << wstring_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> string_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(wstring_t);
 }
 
 TEST(CDRTests, BinaryWString)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    const wchar_t binary_string_buffer[] = L"\000\041";
-    const std::wstring binary_string(binary_string_buffer,
-        sizeof(binary_string_buffer) / sizeof(wchar_t));
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << binary_string;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::wstring string_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> string_value;
-    });
-
-    EXPECT_EQ(string_value, binary_string);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << binary_string;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> string_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(GET_BINARY_WSTRING());
 }
 
 TEST(CDRTests, EmptyString)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << emptystring_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::string string_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> string_value;
-    });
-
-    EXPECT_EQ(string_value, emptystring_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << emptystring_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> string_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(emptystring_t);
 }
 
 TEST(CDRTests, EmptyWString)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << emptywstring_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::wstring wstring_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> wstring_value;
-    });
-
-    EXPECT_EQ(wstring_value, emptywstring_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << emptywstring_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> wstring_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(emptywstring_t);
 }
 
 TEST(CDRTests, STDArrayOctet)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << octet_array_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::array<uint8_t, 5> octet_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> octet_array_value;
-    });
-
-    EXPECT_EQ(octet_array_value, octet_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << octet_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> octet_array_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(octet_array_t);
 }
 
 TEST(CDRTests, STDArrayChar)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << char_array_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::array<char, 5> char_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> char_array_value;
-    });
-
-    EXPECT_EQ(char_array_value, char_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << char_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> char_array_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(char_array_t);
 }
 
 TEST(CDRTests, STDArrayWChar)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << wchar_array_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::array<wchar_t, 5> char_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> char_array_value;
-    });
-
-    EXPECT_EQ(char_array_value, wchar_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << wchar_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> char_array_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(wchar_array_t);
 }
 
 TEST(CDRTests, STDArrayInt8)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << int8_array_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::array<int8_t, 5> int8_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> int8_array_value;
-    });
-
-    EXPECT_EQ(int8_array_value, int8_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << int8_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> int8_array_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(int8_array_t);
 }
 
 TEST(CDRTests, STDArrayUnsignedShort)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ushort_array_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::array<uint16_t, 5> ushort_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ushort_array_value;
-    });
-
-    EXPECT_EQ(ushort_array_value, ushort_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ushort_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ushort_array_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(ushort_array_t);
 }
 
 TEST(CDRTests, STDArrayShort)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << short_array_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::array<int16_t, 5> short_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> short_array_value;
-    });
-
-    EXPECT_EQ(short_array_value, short_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << short_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> short_array_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(short_array_t);
 }
 
 TEST(CDRTests, STDArrayUnsignedLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ulong_array_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::array<uint32_t, 5> ulong_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ulong_array_value;
-    });
-
-    EXPECT_EQ(ulong_array_value, ulong_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ulong_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ulong_array_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(ulong_array_t);
 }
 
 TEST(CDRTests, STDArrayLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << long_array_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::array<int32_t, 5> long_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> long_array_value;
-    });
-
-    EXPECT_EQ(long_array_value, long_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << long_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> long_array_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(long_array_t);
 }
 
 TEST(CDRTests, STDArrayUnsignedLongLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ulonglong_array_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::array<uint64_t, 5> ulonglong_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ulonglong_array_value;
-    });
-
-    EXPECT_EQ(ulonglong_array_value, ulonglong_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ulonglong_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ulonglong_array_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(ulonglong_array_t);
 }
 
 TEST(CDRTests, STDArrayLongLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << longlong_array_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::array<int64_t, 5> longlong_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> longlong_array_value;
-    });
-
-    EXPECT_EQ(longlong_array_value, longlong_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << longlong_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> longlong_array_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(longlong_array_t);
 }
 
 TEST(CDRTests, STDArrayFloat)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << float_array_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::array<float, 5> float_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> float_array_value;
-    });
-
-    EXPECT_EQ(float_array_value, float_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << float_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> float_array_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(float_array_t);
 }
 
 TEST(CDRTests, STDArrayDouble)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << double_array_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::array<double, 5> double_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> double_array_value;
-    });
-
-    EXPECT_EQ(double_array_value, double_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << double_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> double_array_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(double_array_t);
 }
 
 TEST(CDRTests, STDArrayLongDouble)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ldouble_array_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::array<long double, 5> ldouble_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ldouble_array_value;
-    });
-
-    EXPECT_EQ(ldouble_array_value, ldouble_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ldouble_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ldouble_array_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(ldouble_array_t);
 }
 
 TEST(CDRTests, STDArrayBoolean)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << bool_array_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::array<bool, 5> bool_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> bool_array_value;
-    });
-
-    EXPECT_EQ(bool_array_value, bool_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << bool_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> bool_array_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(bool_array_t);
 }
 
 TEST(CDRTests, STDArrayString)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << string_array_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::array<std::string, 5> string_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> string_array_value;
-    });
-
-    EXPECT_EQ(string_array_value, string_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << string_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> string_array_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(string_array_t);
 }
 
 TEST(CDRTests, STDArrayWString)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << wstring_array_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::array<std::wstring, 5> string_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> string_array_value;
-    });
-
-    EXPECT_EQ(string_array_value, wstring_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << wstring_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> string_array_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(wstring_array_t);
 }
 
 TEST(CDRTests, ArrayOctet)
@@ -2633,835 +1373,87 @@ TEST(CDRTests, ArrayWString)
 
 TEST(CDRTests, STDVectorOctet)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << octet_vector_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::vector<uint8_t> octet_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> octet_vector_value;
-    });
-
-    EXPECT_EQ(octet_vector_value, octet_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << octet_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> octet_vector_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(octet_vector_t);
 }
 
 TEST(CDRTests, STDVectorChar)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << char_vector_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::vector<char> char_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> char_vector_value;
-    });
-
-    EXPECT_EQ(char_vector_value, char_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << char_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> char_vector_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(char_vector_t);
 }
 
 TEST(CDRTests, STDVectorWChar)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << wchar_vector_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::vector<wchar_t> char_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> char_vector_value;
-    });
-
-    EXPECT_EQ(char_vector_value, wchar_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << wchar_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> char_vector_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(wchar_vector_t);
 }
 
 TEST(CDRTests, STDVectorInt8)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << int8_vector_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::vector<int8_t> int8_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> int8_vector_value;
-    });
-
-    EXPECT_EQ(int8_vector_value, int8_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << int8_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> int8_vector_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(int8_vector_t);
 }
 
 TEST(CDRTests, STDVectorUnsignedShort)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ushort_vector_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::vector<uint16_t> ushort_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ushort_vector_value;
-    });
-
-    EXPECT_EQ(ushort_vector_value, ushort_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ushort_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ushort_vector_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(ushort_vector_t);
 }
 
 TEST(CDRTests, STDVectorShort)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << short_vector_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::vector<int16_t> short_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> short_vector_value;
-    });
-
-    EXPECT_EQ(short_vector_value, short_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << short_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> short_vector_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(short_vector_t);
 }
 
 TEST(CDRTests, STDVectorUnsignedLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ulong_vector_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::vector<uint32_t> ulong_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ulong_vector_value;
-    });
-
-    EXPECT_EQ(ulong_vector_value, ulong_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ulong_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ulong_vector_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(ulong_vector_t);
 }
 
 TEST(CDRTests, STDVectorLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << long_vector_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::vector<int32_t> long_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> long_vector_value;
-    });
-
-    EXPECT_EQ(long_vector_value, long_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << long_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> long_vector_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(long_vector_t);
 }
 
 TEST(CDRTests, STDVectorUnsignedLongLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ulonglong_vector_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::vector<uint64_t> ulonglong_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ulonglong_vector_value;
-    });
-
-    EXPECT_EQ(ulonglong_vector_value, ulonglong_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ulonglong_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ulonglong_vector_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(ulonglong_vector_t);
 }
 
 TEST(CDRTests, STDVectorLongLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << longlong_vector_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::vector<int64_t> longlong_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> longlong_vector_value;
-    });
-
-    EXPECT_EQ(longlong_vector_value, longlong_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << longlong_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> longlong_vector_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(longlong_vector_t);
 }
 
 TEST(CDRTests, STDVectorFloat)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << float_vector_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::vector<float> float_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> float_vector_value;
-    });
-
-    EXPECT_EQ(float_vector_value, float_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << float_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> float_vector_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(float_vector_t);
 }
 
 TEST(CDRTests, STDVectorDouble)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << double_vector_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::vector<double> double_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> double_vector_value;
-    });
-
-    EXPECT_EQ(double_vector_value, double_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << double_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> double_vector_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(double_vector_t);
 }
 
 TEST(CDRTests, STDVectorLongDouble)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ldouble_vector_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::vector<long double> ldouble_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ldouble_vector_value;
-    });
-
-    EXPECT_EQ(ldouble_vector_value, ldouble_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ldouble_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ldouble_vector_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(ldouble_vector_t);
 }
 
 TEST(CDRTests, STDVectorBoolean)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << bool_vector_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::vector<bool> bool_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> bool_vector_value;
-    });
-
-    EXPECT_EQ(bool_vector_value, bool_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << bool_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> bool_vector_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(bool_vector_t);
 }
 
 TEST(CDRTests, STDVectorString)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << string_vector_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::vector<std::string> string_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> string_vector_value;
-    });
-
-    EXPECT_EQ(string_vector_value, string_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << string_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> string_vector_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(string_vector_t);
 }
 
 TEST(CDRTests, STDVectorWString)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << wstring_vector_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::vector<std::wstring> string_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> string_vector_value;
-    });
-
-    EXPECT_EQ(string_vector_value, wstring_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << wstring_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> string_vector_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(wstring_vector_t);
 }
 
 TEST(CDRTests, STDTripleArrayUnsignedLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    Cdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << triple_ulong_array_t;
-    });
-
-    // Deserialization.
-    Cdr cdr_des(cdrbuffer);
-
-    std::array<std::array<std::array<uint32_t, 3>, 2>, 2> triple_ulong_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> triple_ulong_array_value;
-    });
-
-    EXPECT_EQ(triple_ulong_array_value, triple_ulong_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    Cdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << triple_ulong_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    Cdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> triple_ulong_array_value;
-    },
-    NotEnoughMemoryException);
+    CDR_STREAM_HANDLE_ERROR(triple_ulong_array_t);
 }
 
 TEST(CDRTests, SequenceOctet)
@@ -4783,443 +2775,47 @@ TEST(FastCDRTests, Int8)
 
 TEST(FastCDRTests, UnsignedShort)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ushort_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    uint16_t ushort_value = 0;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ushort_value;
-    });
-
-    EXPECT_EQ(ushort_value, ushort_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ushort_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ushort_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(ushort_t);
 }
 
 TEST(FastCDRTests, Short)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << short_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    int16_t short_value = 0;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> short_value;
-    });
-
-    EXPECT_EQ(short_value, short_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << short_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> short_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(short_t);
 }
 
 TEST(FastCDRTests, UnsignedLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ulong_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    uint32_t ulong_value = 0;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ulong_value;
-    });
-
-    EXPECT_EQ(ulong_value, ulong_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ulong_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ulong_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(ulong_t);
 }
 
 TEST(FastCDRTests, Long)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << long_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    int32_t long_value = 0;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> long_value;
-    });
-
-    EXPECT_EQ(long_value, long_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << long_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> long_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(long_t);
 }
 
 TEST(FastCDRTests, UnsignedLongLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ulonglong_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    uint64_t ulonglong_value = 0;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ulonglong_value;
-    });
-
-    EXPECT_EQ(ulonglong_value, ulonglong_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ulonglong_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ulonglong_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(ulonglong_t);
 }
 
 TEST(FastCDRTests, LongLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << longlong_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    int64_t longlong_value = 0;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> longlong_value;
-    });
-
-    EXPECT_EQ(longlong_value, longlong_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << longlong_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> longlong_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(longlong_t);
 }
 
 TEST(FastCDRTests, Float)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << float_tt;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    float float_value = 0;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> float_value;
-    });
-
-    EXPECT_FLOAT_EQ(float_value, float_tt);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << float_tt;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> float_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(float_tt);
 }
 
 TEST(FastCDRTests, Double)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << double_tt;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    double double_value = 0;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> double_value;
-    });
-
-    EXPECT_DOUBLE_EQ(double_value, double_tt);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << double_tt;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> double_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(double_tt);
 }
 
 TEST(FastCDRTests, LongDouble)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ldouble_tt;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    long double ldouble_value = 0;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ldouble_value;
-    });
-
-    EXPECT_LONG_DOUBLE_EQ(ldouble_value, ldouble_tt);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ldouble_tt;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ldouble_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(ldouble_tt);
 }
 
 TEST(FastCDRTests, Boolean)
@@ -5251,1088 +2847,112 @@ TEST(FastCDRTests, Boolean)
 
 TEST(FastCDRTests, String)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << string_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::string string_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> string_value;
-    });
-
-    EXPECT_EQ(string_value, string_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << string_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> string_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(string_t);
 }
 
 TEST(FastCDRTests, BinaryString)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    const char binary_string_buffer[] = "\000\041";
-    const std::string binary_string(binary_string_buffer,
-        sizeof(binary_string_buffer));
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << binary_string;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::string string_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> string_value;
-    });
-
-    EXPECT_EQ(string_value, binary_string);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << binary_string;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> string_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(GET_BINARY_STRING());
 }
 
 TEST(FastCDRTests, WString)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << wstring_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::wstring string_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> string_value;
-    });
-
-    EXPECT_EQ(string_value, wstring_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << wstring_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> string_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(wstring_t);
 }
 
 TEST(FastCDRTests, BinaryWString)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    const wchar_t binary_string_buffer[] = L"\000\041";
-    const std::wstring binary_string(binary_string_buffer,
-        sizeof(binary_string_buffer) / sizeof(wchar_t));
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << binary_string;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::wstring string_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> string_value;
-    });
-
-    EXPECT_EQ(string_value, binary_string);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << binary_string;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> string_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(GET_BINARY_WSTRING());
 }
 
 TEST(FastCDRTests, EmptyString)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << emptystring_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::string string_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> string_value;
-    });
-
-    EXPECT_EQ(string_value, emptystring_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << emptystring_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> string_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(emptystring_t);
 }
 
 TEST(FastCDRTests, EmptyWString)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << emptywstring_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::wstring wstring_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> wstring_value;
-    });
-
-    EXPECT_EQ(wstring_value, emptywstring_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << emptywstring_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> wstring_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(emptywstring_t);
 }
 
 TEST(FastCDRTests, STDArrayOctet)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << octet_array_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::array<uint8_t, 5> octet_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> octet_array_value;
-    });
-
-    EXPECT_EQ(octet_array_value, octet_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << octet_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> octet_array_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(octet_array_t);
 }
 
 TEST(FastCDRTests, STDArrayChar)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << char_array_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::array<char, 5> char_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> char_array_value;
-    });
-
-    EXPECT_EQ(char_array_value, char_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << char_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> char_array_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(char_array_t);
 }
 
 TEST(FastCDRTests, STDArrayWChar)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << wchar_array_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::array<wchar_t, 5> char_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> char_array_value;
-    });
-
-    EXPECT_EQ(char_array_value, wchar_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << wchar_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> char_array_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(wchar_array_t);
 }
 
 TEST(FastCDRTests, STDArrayInt8)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << int8_array_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::array<int8_t, 5> int8_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> int8_array_value;
-    });
-
-    EXPECT_EQ(int8_array_value, int8_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << int8_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> int8_array_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(int8_array_t);
 }
 
 TEST(FastCDRTests, STDArrayUnsignedShort)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ushort_array_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::array<uint16_t, 5> ushort_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ushort_array_value;
-    });
-
-    EXPECT_EQ(ushort_array_value, ushort_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ushort_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ushort_array_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(ushort_array_t);
 }
 
 TEST(FastCDRTests, STDArrayShort)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << short_array_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::array<int16_t, 5> short_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> short_array_value;
-    });
-
-    EXPECT_EQ(short_array_value, short_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << short_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> short_array_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(short_array_t);
 }
 
 TEST(FastCDRTests, STDArrayUnsignedLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ulong_array_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::array<uint32_t, 5> ulong_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ulong_array_value;
-    });
-
-    EXPECT_EQ(ulong_array_value, ulong_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ulong_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ulong_array_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(ulong_array_t);
 }
 
 TEST(FastCDRTests, STDArrayLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << long_array_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::array<int32_t, 5> long_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> long_array_value;
-    });
-
-    EXPECT_EQ(long_array_value, long_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << long_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> long_array_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(long_array_t);
 }
 
 TEST(FastCDRTests, STDArrayUnsignedLongLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ulonglong_array_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::array<uint64_t, 5> ulonglong_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ulonglong_array_value;
-    });
-
-    EXPECT_EQ(ulonglong_array_value, ulonglong_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ulonglong_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ulonglong_array_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(ulonglong_array_t);
 }
 
 TEST(FastCDRTests, STDArrayLongLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << longlong_array_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::array<int64_t, 5> longlong_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> longlong_array_value;
-    });
-
-    EXPECT_EQ(longlong_array_value, longlong_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << longlong_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> longlong_array_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(longlong_array_t);
 }
 
 TEST(FastCDRTests, STDArrayFloat)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << float_array_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::array<float, 5> float_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> float_array_value;
-    });
-
-    EXPECT_EQ(float_array_value, float_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << float_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> float_array_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(float_array_t);
 }
 
 TEST(FastCDRTests, STDArrayDouble)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << double_array_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::array<double, 5> double_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> double_array_value;
-    });
-
-    EXPECT_EQ(double_array_value, double_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << double_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> double_array_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(double_array_t);
 }
 
 TEST(FastCDRTests, STDArrayLongDouble)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ldouble_array_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::array<long double, 5> ldouble_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ldouble_array_value;
-    });
-
-    EXPECT_EQ(ldouble_array_value, ldouble_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ldouble_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ldouble_array_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(ldouble_array_t);
 }
 
 TEST(FastCDRTests, STDArrayBoolean)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << bool_array_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::array<bool, 5> bool_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> bool_array_value;
-    });
-
-    EXPECT_EQ(bool_array_value, bool_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << bool_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> bool_array_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(bool_array_t);
 }
 
 TEST(FastCDRTests, STDArrayString)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << string_array_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::array<std::string, 5> string_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> string_array_value;
-    });
-
-    EXPECT_EQ(string_array_value, string_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << string_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> string_array_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(string_array_t);
 }
 
 TEST(FastCDRTests, STDArrayWString)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << wstring_array_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::array<std::wstring, 5> string_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> string_array_value;
-    });
-
-    EXPECT_EQ(string_array_value, wstring_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << wstring_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> string_array_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(wstring_array_t);
 }
 
 TEST(FastCDRTests, ArrayOctet)
@@ -7121,835 +3741,87 @@ TEST(FastCDRTests, ArrayWString)
 
 TEST(FastCDRTests, STDVectorOctet)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << octet_vector_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::vector<uint8_t> octet_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> octet_vector_value;
-    });
-
-    EXPECT_EQ(octet_vector_value, octet_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << octet_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> octet_vector_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(octet_vector_t);
 }
 
 TEST(FastCDRTests, STDVectorChar)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << char_vector_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::vector<char> char_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> char_vector_value;
-    });
-
-    EXPECT_EQ(char_vector_value, char_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << char_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> char_vector_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(char_vector_t);
 }
 
 TEST(FastCDRTests, STDVectorWChar)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << wchar_vector_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::vector<wchar_t> char_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> char_vector_value;
-    });
-
-    EXPECT_EQ(char_vector_value, wchar_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << wchar_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> char_vector_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(wchar_vector_t);
 }
 
 TEST(FastCDRTests, STDVectorInt8)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << int8_vector_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::vector<int8_t> int8_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> int8_vector_value;
-    });
-
-    EXPECT_EQ(int8_vector_value, int8_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << int8_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> int8_vector_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(int8_vector_t);
 }
 
 TEST(FastCDRTests, STDVectorUnsignedShort)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ushort_vector_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::vector<uint16_t> ushort_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ushort_vector_value;
-    });
-
-    EXPECT_EQ(ushort_vector_value, ushort_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ushort_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ushort_vector_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(ushort_vector_t);
 }
 
 TEST(FastCDRTests, STDVectorShort)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << short_vector_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::vector<int16_t> short_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> short_vector_value;
-    });
-
-    EXPECT_EQ(short_vector_value, short_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << short_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> short_vector_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(short_vector_t);
 }
 
 TEST(FastCDRTests, STDVectorUnsignedLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ulong_vector_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::vector<uint32_t> ulong_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ulong_vector_value;
-    });
-
-    EXPECT_EQ(ulong_vector_value, ulong_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ulong_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ulong_vector_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(ulong_vector_t);
 }
 
 TEST(FastCDRTests, STDVectorLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << long_vector_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::vector<int32_t> long_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> long_vector_value;
-    });
-
-    EXPECT_EQ(long_vector_value, long_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << long_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> long_vector_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(long_vector_t);
 }
 
 TEST(FastCDRTests, STDVectorUnsignedLongLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ulonglong_vector_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::vector<uint64_t> ulonglong_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ulonglong_vector_value;
-    });
-
-    EXPECT_EQ(ulonglong_vector_value, ulonglong_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ulonglong_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ulonglong_vector_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(ulonglong_vector_t);
 }
 
 TEST(FastCDRTests, STDVectorLongLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << longlong_vector_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::vector<int64_t> longlong_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> longlong_vector_value;
-    });
-
-    EXPECT_EQ(longlong_vector_value, longlong_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << longlong_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> longlong_vector_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(longlong_vector_t);
 }
 
 TEST(FastCDRTests, STDVectorFloat)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << float_vector_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::vector<float> float_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> float_vector_value;
-    });
-
-    EXPECT_EQ(float_vector_value, float_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << float_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> float_vector_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(float_vector_t);
 }
 
 TEST(FastCDRTests, STDVectorDouble)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << double_vector_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::vector<double> double_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> double_vector_value;
-    });
-
-    EXPECT_EQ(double_vector_value, double_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << double_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> double_vector_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(double_vector_t);
 }
 
 TEST(FastCDRTests, STDVectorLongDouble)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << ldouble_vector_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::vector<long double> ldouble_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> ldouble_vector_value;
-    });
-
-    EXPECT_EQ(ldouble_vector_value, ldouble_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << ldouble_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> ldouble_vector_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(ldouble_vector_t);
 }
 
 TEST(FastCDRTests, STDVectorBoolean)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << bool_vector_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::vector<bool> bool_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> bool_vector_value;
-    });
-
-    EXPECT_EQ(bool_vector_value, bool_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << bool_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> bool_vector_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(bool_vector_t);
 }
 
 TEST(FastCDRTests, STDVectorString)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << string_vector_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::vector<std::string> string_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> string_vector_value;
-    });
-
-    EXPECT_EQ(string_vector_value, string_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << string_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> string_vector_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(string_vector_t);
 }
 
 TEST(FastCDRTests, STDVectorWString)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << wstring_vector_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::vector<std::wstring> string_vector_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> string_vector_value;
-    });
-
-    EXPECT_EQ(string_vector_value, wstring_vector_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << wstring_vector_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> string_vector_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(wstring_vector_t);
 }
 
 TEST(FastCDRTests, STDTripleArrayUnsignedLong)
 {
-    // Check good case.
-    char buffer[BUFFER_LENGTH];
-
-    // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-    FastCdr cdr_ser(cdrbuffer);
-
-    EXPECT_NO_THROW(
-    {
-        cdr_ser << triple_ulong_array_t;
-    });
-
-    // Deserialization.
-    FastCdr cdr_des(cdrbuffer);
-
-    std::array<std::array<std::array<uint32_t, 3>, 2>, 2> triple_ulong_array_value;
-
-    EXPECT_NO_THROW(
-    {
-        cdr_des >> triple_ulong_array_value;
-    });
-
-    EXPECT_EQ(triple_ulong_array_value, triple_ulong_array_t);
-
-    // Check bad case without space
-    char buffer_bad[1];
-
-    // Serialization.
-    FastBuffer cdrbuffer_bad(buffer_bad, 1);
-    FastCdr cdr_ser_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_ser_bad << triple_ulong_array_t;
-    },
-    NotEnoughMemoryException);
-
-    // Deserialization.
-    FastCdr cdr_des_bad(cdrbuffer_bad);
-
-    EXPECT_THROW(
-    {
-        cdr_des_bad >> triple_ulong_array_value;
-    },
-    NotEnoughMemoryException);
+    FAST_CDR_STREAM_HANDLE_ERROR(triple_ulong_array_t);
 }
 
 TEST(FastCDRTests, SequenceOctet)

@@ -387,66 +387,6 @@ FastCdr& FastCdr::deserialize(wchar_t *&string_t)
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-const char* FastCdr::readString(uint32_t &length)
-{
-    const char* returnedValue = "";
-    state state_before_error(*this);
-
-    *this >> length;
-
-    if(length == 0)
-    {
-        return returnedValue;
-    }
-    else if((m_lastPosition - m_currentPosition) >= length)
-    {
-        returnedValue = &m_currentPosition;
-        m_currentPosition += length;
-        if(returnedValue[length-1] == '\0') --length;
-        return returnedValue;
-    }
-
-    setState(state_before_error);
-    throw eprosima::fastcdr::exception::NotEnoughMemoryException(eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
-}
-
-std::wstring FastCdr::readWString(uint32_t &length)
-{
-    std::wstring returnedValue = L"";
-    state state_(*this);
-
-    *this >> length;
-    uint32_t bytesLength = length * 4;
-
-    if(bytesLength == 0)
-    {
-        return returnedValue;
-    }
-    else if((m_lastPosition - m_currentPosition) >= bytesLength)
-    {
-
-#if defined(_WIN32) || defined(FASTCDR_ARM32)
-        wchar_t* wValue = new wchar_t[length];
-        deserializeArray(wValue, length);
-#else
-        wchar_t* wValue = reinterpret_cast<wchar_t*>(&m_currentPosition);
-        m_currentPosition += bytesLength;
-#endif
-        if (wValue[length - 1] == '\0')
-        {
-            --length;
-        }
-        returnedValue = std::wstring(wValue, length);
-#if defined(_WIN32) || defined(FASTCDR_ARM32)
-        delete [] wValue;
-#endif
-        return returnedValue;
-    }
-
-    setState(state_);
-    throw eprosima::fastcdr::exception::NotEnoughMemoryException(eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
-}
-
 FastCdr& FastCdr::deserializeArray(bool *bool_t, size_t numElements)
 {
     size_t totalSize = sizeof(*bool_t)*numElements;

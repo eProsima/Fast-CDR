@@ -2007,6 +2007,7 @@ namespace eprosima
                         char * ptr;
                         deserializeSequence(ptr, length);
                         string_t.assign(ptr, length);
+                        free(ptr);
                         return *this;
                     }
 
@@ -2023,6 +2024,7 @@ namespace eprosima
                         wchar_t * ptr;
                         deserializeSequence(ptr, length);
                         string_t.assign(ptr, length);
+                        free(ptr);
                         return *this;
                     }
 

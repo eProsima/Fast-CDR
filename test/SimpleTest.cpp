@@ -2211,7 +2211,7 @@ TEST(CDRTests, SequenceString)
     EXPECT_EQ(string_seq_len, 5u);
     EXPECT_ARRAY_EQ(string_seq_value, string_seq_t, string_seq_len);
 
-    delete[] string_seq_value;
+    free(string_seq_value);
 
     // Check bad case without space
     char buffer_bad[1];
@@ -2263,7 +2263,7 @@ TEST(CDRTests, SequenceWString)
     EXPECT_EQ(string_seq_len, 5u);
     EXPECT_ARRAY_EQ(string_seq_value, wstring_seq_t, string_seq_len);
 
-    delete[] string_seq_value;
+    free(string_seq_value);
 
     // Check bad case without space
     char buffer_bad[1];
@@ -2644,9 +2644,9 @@ TEST(CDRTests, Complete)
     EXPECT_EQ(strcmp(c_string_t, c_string_value), 0);
     EXPECT_EQ(wcscmp(c_wstring_t, c_wstring_value), 0);
 
-    delete[] wstring_seq_value;
+    free(wstring_seq_value);
 
-    delete[] string_seq_value;
+    free(string_seq_value);
 
     free(octet_seq_value);
     free(char_seq_value);
@@ -4579,7 +4579,7 @@ TEST(FastCDRTests, SequenceString)
     EXPECT_EQ(string_seq_len, 5u);
     EXPECT_ARRAY_EQ(string_seq_value, string_seq_t, string_seq_len);
 
-    delete[] string_seq_value;
+    free(string_seq_value);
 
     // Check bad case without space
     char buffer_bad[1];
@@ -4631,7 +4631,7 @@ TEST(FastCDRTests, SequenceWString)
     EXPECT_EQ(string_seq_len, 5u);
     EXPECT_ARRAY_EQ(string_seq_value, wstring_seq_t, string_seq_len);
 
-    delete[] string_seq_value;
+    free(string_seq_value);
 
     // Check bad case without space
     char buffer_bad[1];
@@ -5007,7 +5007,7 @@ TEST(FastCDRTests, Complete)
     EXPECT_EQ(strcmp(c_string_t, c_string_value), 0);
     EXPECT_EQ(wcscmp(c_wstring_t, c_wstring_value), 0);
 
-    delete[] wstring_seq_value;
+    free(wstring_seq_value);
 
     free(octet_seq_value);
     free(char_seq_value);

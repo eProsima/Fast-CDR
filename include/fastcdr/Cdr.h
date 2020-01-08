@@ -2695,6 +2695,38 @@ namespace eprosima
                         return *this;
                     }
 
+#if !defined(_MSC_VER) && HAVE_CXX0X
+                /*!
+                 * @brief This function template deserializes a string sequence.
+                 * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
+                 * The user will have to free this allocated memory using free()
+                 * @param sequence_t The pointer that will store the sequence read from the buffer.
+                 * @param numElements This variable return the number of elements of the sequence.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                template<class _T = std::string>
+                    Cdr& deserializeSequence(std::string *&sequence_t, size_t &numElements)
+                    {
+                        return deserializeStringSequence(sequence_t, numElements);
+                    }
+
+                /*!
+                 * @brief This function template deserializes a wide-string sequence.
+                 * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
+                 * The user will have to free this allocated memory using free()
+                 * @param sequence_t The pointer that will store the sequence read from the buffer.
+                 * @param numElements This variable return the number of elements of the sequence.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                template<class _T = std::wstring>
+                    Cdr& deserializeSequence(std::wstring *&sequence_t, size_t &numElements)
+                    {
+                        return deserializeWStringSequence(sequence_t, numElements);
+                    }
+#endif
+
                 /*!
                  * @brief This function template deserializes a raw sequence.
                  * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
@@ -2729,6 +2761,37 @@ namespace eprosima
                         return *this;
                     }
 
+#ifdef _MSC_VER
+                /*!
+                 * @brief This function template deserializes a string sequence.
+                 * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
+                 * The user will have to free this allocated memory using free()
+                 * @param sequence_t The pointer that will store the sequence read from the buffer.
+                 * @param numElements This variable return the number of elements of the sequence.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                template<>
+                    Cdr& deserializeSequence<std::string>(std::string *&sequence_t, size_t &numElements)
+                    {
+                        return deserializeStringSequence(sequence_t, numElements);
+                    }
+
+                /*!
+                 * @brief This function template deserializes a wide-string sequence.
+                 * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
+                 * The user will have to free this allocated memory using free()
+                 * @param sequence_t The pointer that will store the sequence read from the buffer.
+                 * @param numElements This variable return the number of elements of the sequence.
+                 * @return Reference to the eprosima::fastcdr::Cdr object.
+                 * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+                 */
+                template<>
+                    Cdr& deserializeSequence<std::wstring>(std::wstring *&sequence_t, size_t &numElements)
+                    {
+                        return deserializeWStringSequence(sequence_t, numElements);
+                    }
+#endif
 
                 /*!
                  * @brief This function template deserializes a raw sequence with a different endianness.
@@ -2768,6 +2831,10 @@ namespace eprosima
                 Cdr& serializeBoolSequence(const std::vector<bool> &vector_t);
 
                 Cdr& deserializeBoolSequence(std::vector<bool> &vector_t);
+
+                Cdr& deserializeStringSequence(std::string *&sequence_t, size_t &numElements);
+
+                Cdr& deserializeWStringSequence(std::wstring *&sequence_t, size_t &numElements);
 
 #if HAVE_CXX0X
                 /*!

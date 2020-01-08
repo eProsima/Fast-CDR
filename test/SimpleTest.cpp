@@ -186,9 +186,9 @@ void CDR_STREAM_HANDLE_ERROR(const T& value) {
     EXPECT_NO_THROW(
     {
         cdr_des >> deserialized_value;
+        EXPECT_EQ(deserialized_value, value);
     });
 
-    EXPECT_EQ(deserialized_value, value);
 
     // Check bad case without space
     char buffer_bad[1];
@@ -235,9 +235,9 @@ void FAST_CDR_STREAM_HANDLE_ERROR(const T& value) {
     EXPECT_NO_THROW(
     {
         cdr_des >> deserialized_value;
+        EXPECT_EQ(deserialized_value, value);
     });
 
-    EXPECT_EQ(deserialized_value, value);
 
     // Check bad case without space
     char buffer_bad[1];

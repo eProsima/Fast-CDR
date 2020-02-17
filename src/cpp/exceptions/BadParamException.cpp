@@ -18,21 +18,21 @@ using namespace eprosima::fastcdr::exception;
 
 const char* const BadParamException::BAD_PARAM_MESSAGE_DEFAULT ="Bad parameter";
 
-BadParamException::BadParamException(const char* const &message) : Exception(message)
+BadParamException::BadParamException(const char* const &message) noexcept : Exception(message)
 {
 }
 
-BadParamException::BadParamException(const BadParamException &ex) : Exception(ex)
+BadParamException::BadParamException(const BadParamException &ex) noexcept : Exception(ex)
 {
 }
 
 #if HAVE_CXX0X
-BadParamException::BadParamException(BadParamException&& ex) : Exception(std::move(ex))
+BadParamException::BadParamException(BadParamException&& ex) noexcept : Exception(std::move(ex))
 {
 }
 #endif
 
-BadParamException& BadParamException::operator=(const BadParamException &ex)
+BadParamException& BadParamException::operator=(const BadParamException &ex) noexcept
 {
     if(this != &ex)
     {
@@ -43,7 +43,7 @@ BadParamException& BadParamException::operator=(const BadParamException &ex)
 }
 
 #if HAVE_CXX0X
-BadParamException& BadParamException::operator=(BadParamException&& ex)
+BadParamException& BadParamException::operator=(BadParamException&& ex) noexcept
 {
     if(this != &ex)
     {
@@ -54,7 +54,7 @@ BadParamException& BadParamException::operator=(BadParamException&& ex)
 }
 #endif
 
-BadParamException::~BadParamException() throw()
+BadParamException::~BadParamException() noexcept
 {
 }
 

@@ -34,16 +34,16 @@ namespace eprosima
                     /*!
                      * @brief Default constructor.
                      *
-                     * @param message A error message. This message is copied.
+                     * @param message A error message. This message pointer is copied.
                      */
-                    Cdr_DllAPI BadParamException(const char* const &message);
+                    Cdr_DllAPI BadParamException(const char* const &message) noexcept;
 
                     /*!
                      * @brief Default copy constructor.
                      *
                      * @param ex BadParamException that will be copied.
                      */
-                    Cdr_DllAPI BadParamException(const BadParamException &ex);
+                    Cdr_DllAPI BadParamException(const BadParamException &ex) noexcept;
 
 #if HAVE_CXX0X
                     /*!
@@ -51,7 +51,7 @@ namespace eprosima
                      *
                      * @param ex BadParamException that will be moved.
                      */
-                    Cdr_DllAPI BadParamException(BadParamException&& ex);
+                    Cdr_DllAPI BadParamException(BadParamException&& ex) noexcept;
 #endif
 
                     /*!
@@ -59,7 +59,7 @@ namespace eprosima
                      *
                      * @param ex BadParamException that will be copied.
                      */
-                    Cdr_DllAPI BadParamException& operator=(const BadParamException &ex);
+                    Cdr_DllAPI BadParamException& operator=(const BadParamException &ex) noexcept;
 
 #if HAVE_CXX0X
                     /*!
@@ -67,11 +67,11 @@ namespace eprosima
                      *
                      * @param ex BadParamException that will be moved.
                      */
-                    BadParamException& operator=(BadParamException&& ex);
+                    BadParamException& operator=(BadParamException&& ex) noexcept;
 #endif
 
                     //! @brief Default constructor
-                    virtual Cdr_DllAPI ~BadParamException() throw();
+                    virtual Cdr_DllAPI ~BadParamException() noexcept;
 
                     //! @brief This function throws the object as exception.
                     virtual Cdr_DllAPI void raise() const;

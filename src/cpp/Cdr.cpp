@@ -2249,7 +2249,7 @@ Cdr& Cdr::deserializeArray(long double *ldouble_t, size_t numElements)
 
         if(m_swapBytes)
         {
-            char *dst = reinterpret_cast<char*>(&ldouble_t);
+            char *dst = reinterpret_cast<char*>(ldouble_t);
             char *end = dst + totalSize;
 
             for(; dst < end; dst += sizeof(*ldouble_t))

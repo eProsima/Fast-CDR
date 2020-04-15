@@ -24,7 +24,7 @@
 #include <map>
 #include <iostream>
 
-#if !__APPLE__
+#if !__APPLE__ && !__FreeBSD__
 #include <malloc.h>
 #else
 #include <stdlib.h>

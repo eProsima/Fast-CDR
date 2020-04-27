@@ -2152,16 +2152,14 @@ namespace eprosima
 
                         try
                         {
-                            //map_t.resize(seqLength);
-                            _K key;
-                            _T value;
                             for (uint32_t i = 0; i < seqLength; ++i)
                             {
+                                _K key;
+                                _T value;
                                 *this >> key;
                                 *this >> value;
-                                map_t.emplace(std::pair<_K, _T>(key, value));
+                                map_t.emplace(std::pair<_K, _T>(std::move(key), std::move(value)));
                             }
-                            //return deserializeArray(vector_t.data(), vector_t.size());
                         }
                         catch(eprosima::fastcdr::exception::Exception &ex)
                         {

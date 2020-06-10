@@ -44,7 +44,7 @@ namespace eprosima
                      *
                      * @return The error message.
                      */
-                    virtual Cdr_DllAPI const char* what() const noexcept ;
+                    virtual Cdr_DllAPI const char* what() const noexcept override;
 
                 protected:
 

@@ -18,7 +18,7 @@
 using namespace eprosima::fastcdr;
 using namespace ::exception;
 
-#if __BIG_ENDIAN__
+#if FASTCDR_IS_BIG_ENDIAN_TARGET
 const Cdr::Endianness Cdr::DEFAULT_ENDIAN = BIG_ENDIANNESS;
 #else
 const Cdr::Endianness Cdr::DEFAULT_ENDIAN = LITTLE_ENDIANNESS;

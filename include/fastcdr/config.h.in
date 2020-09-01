@@ -42,8 +42,8 @@
 #endif
 
 // Endianness defines
-#ifndef __BIG_ENDIAN__
-#define __BIG_ENDIAN__ @__BIG_ENDIAN__@
+#ifndef FASTCDR_IS_BIG_ENDIAN_TARGET
+#define FASTCDR_IS_BIG_ENDIAN_TARGET @FASTCDR_IS_BIG_ENDIAN_TARGET@
 #endif
 
 #if defined(__ARM_ARCH) && __ARM_ARCH <= 7

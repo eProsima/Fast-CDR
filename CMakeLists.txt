@@ -268,11 +268,11 @@ if(BUILD_DOCUMENTATION)
     ### ReadTheDocs ########################
 #    if(NOT CHECK_DOCUMENTATION)
 #        add_custom_target(readthedocs
-#            COMMAND "${WGET_EXE}" "https://media.readthedocs.org/htmlzip/eprosima-fast-rtps/v${PROJECT_VERSION}/eprosima-fast-rtps.zip"
-#            COMMAND "${UNZIP_EXE}" "eprosima-fast-rtps.zip" -d "${PROJECT_BINARY_DIR}/doc/"
+#            COMMAND "${WGET_EXE}" "https://media.readthedocs.org/htmlzip/eprosima-fast-cdr/v${PROJECT_VERSION}/eprosima-fast-cdr.zip"
+#            COMMAND "${UNZIP_EXE}" "eprosima-fast-cdr.zip" -d "${PROJECT_BINARY_DIR}/doc/"
 #            COMMAND ${CMAKE_COMMAND} -E remove_directory "${PROJECT_BINARY_DIR}/doc/manual"
-#            COMMAND ${CMAKE_COMMAND} -E rename "${PROJECT_BINARY_DIR}/doc/eprosima-fast-rtps-v${PROJECT_VERSION}" "${PROJECT_BINARY_DIR}/doc/manual"
-#            COMMAND ${CMAKE_COMMAND} -E remove "eprosima-fast-rtps.zip"
+#            COMMAND ${CMAKE_COMMAND} -E rename "${PROJECT_BINARY_DIR}/doc/eprosima-fast-cdr-v${PROJECT_VERSION}" "${PROJECT_BINARY_DIR}/doc/manual"
+#            COMMAND ${CMAKE_COMMAND} -E remove "eprosima-fast-cdr.zip"
 #            )
 #
 #        add_dependencies(readthedocs docdirs)

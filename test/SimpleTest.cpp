@@ -4342,7 +4342,7 @@ TEST(CDRTests, Complete)
     char buffer[BUFFER_LENGTH * 2];
 
     // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH* 2);
+    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH * 2);
     Cdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
@@ -8734,7 +8734,7 @@ TEST(FastCDRTests, Complete)
     char buffer[BUFFER_LENGTH * 2];
 
     // Serialization.
-    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH* 2);
+    FastBuffer cdrbuffer(buffer, BUFFER_LENGTH * 2);
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(

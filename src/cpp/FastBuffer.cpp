@@ -18,61 +18,70 @@
 #include <malloc.h>
 #else
 #include <stdlib.h>
-#endif
+#endif // if !__APPLE__ && !__FreeBSD__ && !__VXWORKS__
 
 #define BUFFER_START_LENGTH 200
 
 using namespace eprosima::fastcdr;
 
-FastBuffer::FastBuffer() : m_buffer(nullptr),
-    m_bufferSize(0), m_internalBuffer(true)
+FastBuffer::FastBuffer()
+    : m_buffer(nullptr)
+    , m_bufferSize(0)
+    , m_internalBuffer(true)
 {
 }
 
-FastBuffer::FastBuffer(char* const buffer, const size_t bufferSize) : m_buffer(buffer),
-    m_bufferSize(bufferSize), m_internalBuffer(false)
+FastBuffer::FastBuffer(
+        char* const buffer,
+        const size_t bufferSize)
+    : m_buffer(buffer)
+    , m_bufferSize(bufferSize)
+    , m_internalBuffer(false)
 {
 }
 
 FastBuffer::~FastBuffer()
 {
-    if(m_internalBuffer && m_buffer != nullptr)
+    if (m_internalBuffer && m_buffer != nullptr)
     {
         free(m_buffer);
     }
 }
 
-bool FastBuffer::reserve(size_t size)
+bool FastBuffer::reserve(
+        size_t size)
 {
     if (m_internalBuffer && m_buffer == NULL)
     {
         m_buffer = reinterpret_cast<char*>(malloc(size));
-        if (m_buffer) {
-          m_bufferSize = size;
-          return true;
+        if (m_buffer)
+        {
+            m_bufferSize = size;
+            return true;
         }
     }
     return false;
 }
 
-bool FastBuffer::resize(size_t minSizeInc)
+bool FastBuffer::resize(
+        size_t minSizeInc)
 {
     size_t incBufferSize = BUFFER_START_LENGTH;
 
-    if(m_internalBuffer)
+    if (m_internalBuffer)
     {
-        if(minSizeInc > BUFFER_START_LENGTH)
+        if (minSizeInc > BUFFER_START_LENGTH)
         {
             incBufferSize = minSizeInc;
         }
 
-        if(m_buffer == NULL)
+        if (m_buffer == NULL)
         {
             m_bufferSize = incBufferSize;
 
             m_buffer = reinterpret_cast<char*>(malloc(m_bufferSize));
 
-            if(m_buffer != NULL)
+            if (m_buffer != NULL)
             {
                 return true;
             }
@@ -83,7 +92,7 @@ bool FastBuffer::resize(size_t minSizeInc)
 
             m_buffer = reinterpret_cast<char*>(realloc(m_buffer, m_bufferSize));
 
-            if(m_buffer != NULL)
+            if (m_buffer != NULL)
             {
                 return true;
             }

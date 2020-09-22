@@ -294,7 +294,7 @@ namespace eprosima
 
                 /*!
                  * @brief This operator serializes a long.
-                 * @param ulong_t The value of the long that will be serialized in the buffer.
+                 * @param long_t The value of the long that will be serialized in the buffer.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
@@ -649,10 +649,10 @@ namespace eprosima
                 /*!
                  * @brief This function serializes a character with a different endianness.
                  * @param char_t The value of the character that will be serialized in the buffer.
-                 * @param endianness Endianness that will be used in the serialization of this value.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
+                // * @param endianness Endianness that will be used in the serialization of this value.
                 inline
                     Cdr& serialize(const char char_t, Endianness /*endianness*/)
                     {
@@ -673,7 +673,7 @@ namespace eprosima
 
                 /*!
                  * @brief This function serializes an int8_t with a different endianness.
-                 * @param octet_t The value of the int8_t that will be serialized in the buffer.
+                 * @param int8 The value of the int8_t that will be serialized in the buffer.
                  * @param endianness Endianness that will be used in the serialization of this value.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
@@ -900,10 +900,10 @@ namespace eprosima
                 /*!
                  * @brief This function serializes a boolean with a different endianness.
                  * @param bool_t The value of the boolean that will be serialized in the buffer.
-                 * @param endianness Endianness that will be used in the serialization of this value.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
+                // * @param endianness Endianness that will be used in the serialization of this value.
                 inline
                     Cdr& serialize(const bool bool_t, Endianness /*endianness*/)
                     {
@@ -1145,10 +1145,10 @@ namespace eprosima
                  * @brief This function serializes an array of octets with a different endianness.
                  * @param octet_t The array of octets that will be serialized in the buffer.
                  * @param numElements Number of the elements in the array.
-                 * @param endianness Endianness that will be used in the serialization of this value.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
+                // * @param endianness Endianness that will be used in the serialization of this value.
                 inline
                     Cdr& serializeArray(const uint8_t *octet_t, size_t numElements, Endianness /*endianness*/)
                     {
@@ -1168,10 +1168,10 @@ namespace eprosima
                  * @brief This function serializes an array of characters with a different endianness.
                  * @param char_t The array of characters that will be serialized in the buffer.
                  * @param numElements Number of the elements in the array.
-                 * @param endianness Endianness that will be used in the serialization of this value.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
+                // * @param endianness Endianness that will be used in the serialization of this value.
                 inline
                     Cdr& serializeArray(const char *char_t, size_t numElements, Endianness /*endianness*/)
                     {
@@ -1195,10 +1195,10 @@ namespace eprosima
                  * @brief This function serializes an array of int8_t with a different endianness.
                  * @param int8 The array of int8_t that will be serialized in the buffer.
                  * @param numElements Number of the elements in the array.
-                 * @param endianness Endianness that will be used in the serialization of this value.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
+                // * @param endianness Endianness that will be used in the serialization of this value.
                 inline
                     Cdr& serializeArray(const int8_t *int8, size_t numElements, Endianness /*endianness*/)
                     {
@@ -1432,10 +1432,10 @@ namespace eprosima
                  * @brief This function serializes an array of booleans with a different endianness.
                  * @param bool_t The array of booleans that will be serialized in the buffer.
                  * @param numElements Number of the elements in the array.
-                 * @param endianness Endianness that will be used in the serialization of this value.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
+                // * @param endianness Endianness that will be used in the serialization of this value.
                 inline
                     Cdr& serializeArray(const bool *bool_t, size_t numElements, Endianness /*endianness*/)
                     {
@@ -1617,6 +1617,7 @@ namespace eprosima
                  * @brief This function template serializes a raw sequence with a different endianness.
                  * @param sequence_t Pointer to the sequence that will be serialized in the buffer.
                  * @param numElements The number of elements contained in the sequence.
+                 * @param endianness Endianness that will be used in the serialization of this value.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
                  */
@@ -1676,10 +1677,10 @@ namespace eprosima
                 /*!
                  * @brief This function deserializes a character with a different endianness.
                  * @param char_t The variable that will store the character read from the buffer.
-                 * @param endianness Endianness that will be used in the serialization of this value.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
                  */
+                // * @param endianness Endianness that will be used in the serialization of this value.
                 inline
                     Cdr& deserialize(char &char_t, Endianness /*endianness*/)
                     {
@@ -1933,11 +1934,11 @@ namespace eprosima
                 /*!
                  * @brief This function deserializes a boolean with a different endianness.
                  * @param bool_t The variable that will store the boolean read from the buffer.
-                 * @param endianness Endianness that will be used in the serialization of this value.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
                  * @exception exception::BadParamException This exception is thrown when trying to deserialize an invalid value.
                  */
+                 // * @param endianness Endianness that will be used in the serialization of this value.
                 inline
                     Cdr& deserialize(bool &bool_t, Endianness /*endianness*/)
                     {
@@ -1971,6 +1972,7 @@ namespace eprosima
                  * This function allocates memory to store the string. The user pointer will be set to point this allocated memory.
                  * The user will have to free this allocated memory using free()
                  * @param string_t The pointer that will point to the string read from the buffer.
+                 * @param endianness Endianness that will be used in the deserialization of this value.
                  * The user will have to free the allocated memory using free()
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
@@ -1982,6 +1984,7 @@ namespace eprosima
                  * This function allocates memory to store the wide string. The user pointer will be set to point this allocated memory.
                  * The user will have to free this allocated memory using free()
                  * @param string_t The pointer that will point to the wide string read from the buffer.
+                 * @param endianness Endianness that will be used in the deserialization of this value.
                  * The user will have to free the allocated memory using free()
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
@@ -2264,10 +2267,10 @@ namespace eprosima
                  * @brief This function deserializes an array of characters with a different endianness.
                  * @param char_t The variable that will store the array of characters read from the buffer.
                  * @param numElements Number of the elements in the array.
-                 * @param endianness Endianness that will be used in the serialization of this value.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
                  */
+                // * @param endianness Endianness that will be used in the serialization of this value.
                 inline
                     Cdr& deserializeArray(char *char_t, size_t numElements, Endianness /*endianness*/)
                     {
@@ -2528,10 +2531,10 @@ namespace eprosima
                  * @brief This function deserializes an array of booleans with a different endianness.
                  * @param bool_t The variable that will store the array of booleans read from the buffer.
                  * @param numElements Number of the elements in the array.
-                 * @param endianness Endianness that will be used in the serialization of this value.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
                  */
+                // * @param endianness Endianness that will be used in the serialization of this value.
                 inline
                     Cdr& deserializeArray(bool *bool_t, size_t numElements, Endianness /*endianness*/)
                     {
@@ -2626,7 +2629,7 @@ namespace eprosima
 
                 /*!
                  * @brief This function deserializes an array of sequences of objects.
-                 * @param string_t The variable that will store the array of sequences of objects read from the buffer.
+                 * @param vector_t The variable that will store the array of sequences of objects read from the buffer.
                  * @param numElements Number of the elements in the array.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
@@ -2786,6 +2789,7 @@ namespace eprosima
                  * The user will have to free this allocated memory using free()
                  * @param sequence_t The pointer that will store the sequence read from the buffer.
                  * @param numElements This variable return the number of elements of the sequence.
+                 * @param endianness Endianness that will be used in the deserialization of this value.
                  * @return Reference to the eprosima::fastcdr::Cdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
                  */

@@ -148,6 +148,12 @@ set(BIN_INSTALL_DIR bin/ CACHE PATH "Installation directory for binaries")
 set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for C++ headers")
 set(LIB_INSTALL_DIR lib${LIB_SUFFIX}/ CACHE PATH "Installation directory for libraries")
 set(DATA_INSTALL_DIR share/ CACHE PATH "Installation directory for data")
+if(WIN32)
+    set(DOC_DIR "doc")
+else()
+    set(DOC_DIR "${DATA_INSTALL_DIR}/doc")
+endif()
+set(DOC_INSTALL_DIR ${DOC_DIR} CACHE PATH "Installation directory for documentation")
 if(WIN32 AND EPROSIMA_INSTALLER AND IS_TOP_LEVEL)
     set(LICENSE_INSTALL_DIR . CACHE PATH "Installation directory for licenses")
 else()
@@ -179,6 +185,110 @@ if(EPROSIMA_BUILD_TESTS AND IS_TOP_LEVEL AND NOT EPROSIMA_INSTALLER)
 endif()
 
 ###############################################################################
+# Documentation
+###############################################################################
+# Add an option to toggle the generation of the API documentation.
+option(BUILD_DOCUMENTATION "Use doxygen to create product documentation" OFF)
+option(CHECK_DOCUMENTATION "Use doxygen to check code documentation" OFF)
+
+if(EPROSIMA_INSTALLER)
+    set(BUILD_DOCUMENTATION ON)
+    set(DOXYGEN_SHOULD_SKIP_THIS_PUBLIC "DOXYGEN_SHOULD_SKIP_THIS_PUBLIC")
+endif()
+
+if(CHECK_DOCUMENTATION)
+    set(BUILD_DOCUMENTATION ON)
+endif()
+
+if(BUILD_DOCUMENTATION)
+    find_package(Doxygen)
+    if(NOT DOXYGEN_FOUND)
+        message(FATAL_ERROR "doxygen is needed to build the documentation. Please install it correctly")
+    endif()
+    if(UNIX)
+        find_program(DOXYFILE_MAKE make)
+        if(DOXYFILE_MAKE)
+            message(STATUS "Found Make: ${DOXYFILE_MAKE}")
+        else()
+            message(FATAL_ERROR "make is needed to build the documentation. Please install it correctly")
+        endif()
+    elseif(WIN32)
+        set(DOXYFILE_MAKE make.bat)
+    endif()
+
+    if(NOT CHECK_DOCUMENTATION)
+        find_program(WGET_EXE wget)
+        if(WGET_EXE)
+            message(STATUS "Found WGet: ${WGET_EXE}")
+        else()
+            message(FATAL_ERROR "wget is needed to build the documentation. Please install it correctly")
+        endif()
+        find_program(UNZIP_EXE unzip)
+        if(UNZIP_EXE)
+            message(STATUS "Found Unzip: ${UNZIP_EXE}")
+        else()
+            message(FATAL_ERROR "unzip is needed to build the documentation. Please install it correctly")
+        endif()
+    endif()
+
+    # Target to create documentation directories
+    add_custom_target(docdirs
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/doc
+        COMMENT "Creating documentation directory" VERBATIM)
+
+    ### Doxygen ########################3
+    if(CHECK_DOCUMENTATION)
+        set(USE_DOT NO)
+    else()
+        set(USE_DOT YES)
+    endif()
+    # Configure the template doxyfile for or specific project
+    configure_file(doxyfile.in ${PROJECT_BINARY_DIR}/doxyfile @ONLY IMMEDIATE)
+    # Add custom target to run doxygen when ever the project is build
+    add_custom_target(doxygen
+        COMMAND "${DOXYGEN_EXECUTABLE}" "${PROJECT_BINARY_DIR}/doxyfile"
+        SOURCES "${PROJECT_BINARY_DIR}/doxyfile"
+        COMMENT "Generating API documentation with doxygen" VERBATIM)
+
+    add_dependencies(doxygen docdirs)
+
+    ### README html ########################
+
+    if(WIN32)
+        set(README_LOCATION "${PROJECT_BINARY_DIR}/")
+        set(README_LOCATION_PREFFIX "doc/")
+        set(README_INSTALL_LOCATION ".")
+    else()
+        set(README_LOCATION "${PROJECT_BINARY_DIR}/doc/")
+        set(README_INSTALL_LOCATION "${DOC_INSTALL_DIR}")
+    endif()
+
+    configure_file(doc/README.html.in ${README_LOCATION}/README.html @ONLY IMMEDIATE)
+
+    ### ReadTheDocs ########################
+#    if(NOT CHECK_DOCUMENTATION)
+#        add_custom_target(readthedocs
+#            COMMAND "${WGET_EXE}" "https://media.readthedocs.org/htmlzip/eprosima-fast-rtps/v${PROJECT_VERSION}/eprosima-fast-rtps.zip"
+#            COMMAND "${UNZIP_EXE}" "eprosima-fast-rtps.zip" -d "${PROJECT_BINARY_DIR}/doc/"
+#            COMMAND ${CMAKE_COMMAND} -E remove_directory "${PROJECT_BINARY_DIR}/doc/manual"
+#            COMMAND ${CMAKE_COMMAND} -E rename "${PROJECT_BINARY_DIR}/doc/eprosima-fast-rtps-v${PROJECT_VERSION}" "${PROJECT_BINARY_DIR}/doc/manual"
+#            COMMAND ${CMAKE_COMMAND} -E remove "eprosima-fast-rtps.zip"
+#            )
+#
+#        add_dependencies(readthedocs docdirs)
+#    endif()
+
+    add_custom_target(doc ALL
+        COMMENT "Generated project documentation" VERBATIM)
+
+    add_dependencies(doc doxygen)
+#    if(NOT CHECK_DOCUMENTATION)
+#        add_dependencies(doc readthedocs)
+#    endif()
+endif()
+
+
+###############################################################################
 # Packaging
 ###############################################################################
 # Install licenses
@@ -189,6 +299,33 @@ install(FILES ${PROJECT_SOURCE_DIR}/LICENSE
 set(CPACK_COMPONENT_LICENSES_HIDDEN 1)
 
 set(CPACK_COMPONENTS_ALL headers licenses)
+
+if(BUILD_DOCUMENTATION)
+
+    # Instalation of doxygen files
+    install(DIRECTORY ${PROJECT_BINARY_DIR}/doc/api_reference
+        DESTINATION ${DOC_INSTALL_DIR}
+        COMPONENT documentation
+        )
+
+    install(FILES "${README_LOCATION}/README.html"
+        DESTINATION ${README_INSTALL_LOCATION}
+        COMPONENT documentation
+        )
+
+#    if(NOT CHECK_DOCUMENTATION)
+#        install(DIRECTORY ${PROJECT_BINARY_DIR}/doc/manual
+#            DESTINATION ${DOC_INSTALL_DIR}
+#            COMPONENT documentation
+#            )
+#    endif()
+
+    ### Documentation component
+    set(CPACK_COMPONENT_DOCUMENTATION_DISPLAY_NAME "Documentation")
+    set(CPACK_COMPONENT_DOCUMENTATION_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} documentation")
+
+    set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} documentation)
+endif()
 
 if(MSVC OR MSVC_IDE)
     if(EPROSIMA_INSTALLER)

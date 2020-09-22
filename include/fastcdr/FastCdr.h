@@ -992,7 +992,7 @@ namespace eprosima
 
                 /*!
                  * @brief This function template serializes an array of non-basic type objects.
-                 * @param string_t The array of objects that will be serialized in the buffer.
+                 * @param type_t The array of objects that will be serialized in the buffer.
                  * @param numElements Number of the elements in the array.
                  * @return Reference to the eprosima::fastcdr::FastCdr object.
                  * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.

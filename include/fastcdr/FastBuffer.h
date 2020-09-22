@@ -74,7 +74,7 @@ namespace eprosima
                 /*!
                  * @brief This operator changes the position where the iterator points.
                  * This operator takes the index of the source iterator, but the iterator continues using its raw buffer.
-                 * @param The source iterator. The iterator will use the source's iterator index to point to its own raw buffer.
+                 * @param iterator The source iterator. The iterator will use the source's iterator index to point to its own raw buffer.
                  */
                 inline
                     void operator>>(const _FastBuffer_iterator &iterator)
@@ -145,7 +145,7 @@ namespace eprosima
 
                 /*!
                  * @brief This operator returns the subtraction of the current interator's position and the source iterator's position.
-                 * @iterator Source iterator whose position is subtracted to the current iterator's position.
+                 * @param it Source iterator whose position is subtracted to the current iterator's position.
                  * @return The result of subtract the current iterator's position and the source iterator's position.
                  */
                 inline

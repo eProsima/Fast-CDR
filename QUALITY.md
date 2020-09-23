@@ -63,7 +63,7 @@ CI testing is automatically triggered by incoming pull requests.
 Current nightly results can be seen here for all supported platforms:
 
 * Linux [![Linux ci](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux/badge/icon?subject=%20%20%20Linux%20CI%20)](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux/)
-* Linux-aarch64 [![Linux arm64 ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_linux_aarch64/badge/icon?subject=%20%20%20Linux%20Aarch64%20CI%20)](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux_aarch64/)
+* Linux-aarch64 [![Linux arm64 ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_linux_aarch64/badge/icon?subject=%20%20%20Linux-aarch64%20CI%20)](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux_aarch64/)
 * Windows [![Windows ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_windows/label=windows-secure,platform=x64,toolset=v141/badge/icon?subject=%20%20%20%20Windows%20CI%20)](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_windows/label=windows-secure,platform=x64,toolset=v141)
 * Mac [![Mac ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_mac/badge/icon?subject=%20%20%20%20%20%20%20Mac%20CI%20)](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_mac)
 
@@ -102,7 +102,7 @@ New features are required to have tests before being added as stated in [CONTRIB
 Current nightly results can be found here:
 
 * Linux [![Linux ci](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux/badge/icon?subject=%20%20%20Linux%20CI%20)](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux/)
-* Linux-aarch64 [![Linux arm64 ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_linux_aarch64/badge/icon?subject=%20%20%20Linux%20Aarch64%20CI%20)](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux_aarch64/)
+* Linux-aarch64 [![Linux arm64 ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_linux_aarch64/badge/icon?subject=%20%20%20Linux-aarch64%20CI%20)](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux_aarch64/)
 * Windows [![Windows ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_windows/label=windows-secure,platform=x64,toolset=v141/badge/icon?subject=%20%20%20%20Windows%20CI%20)](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_windows/label=windows-secure,platform=x64,toolset=v141)
 * Mac [![Mac ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_mac/badge/icon?subject=%20%20%20%20%20%20%20Mac%20CI%20)](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_mac)
 
@@ -149,7 +149,7 @@ However, the tendency will be to homogenize the older source files to the code s
 **eProsima Fast CDR** supports the following platforms and tests each change against all of them as can be seen in the current nightly results:
 
 * Linux [![Linux ci](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux/badge/icon?subject=%20%20%20Linux%20CI%20)](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux/)
-* Linux-aarch64 [![Linux arm64 ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_linux_aarch64/badge/icon?subject=%20%20%20Linux%20Aarch64%20CI%20)](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux_aarch64/)
+* Linux-aarch64 [![Linux arm64 ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_linux_aarch64/badge/icon?subject=%20%20%20Linux-aarch64%20CI%20)](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux_aarch64/)
 * Windows [![Windows ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_windows/label=windows-secure,platform=x64,toolset=v141/badge/icon?subject=%20%20%20%20Windows%20CI%20)](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_windows/label=windows-secure,platform=x64,toolset=v141)
 * Mac [![Mac ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_mac/badge/icon?subject=%20%20%20%20%20%20%20Mac%20CI%20)](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_mac)
 

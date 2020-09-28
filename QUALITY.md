@@ -157,11 +157,11 @@ More information about the supported platforms can be found in [PLATFORM_SUPPORT
 
 ## Vulnerability Disclosure Policy [7.i]
 
-*eprosima Fast DDS* vulnerability Disclosure Policy can be found [here](https://github.com/eProsima/policies/blob/main/VULNERABILITY.md)
+**eprosima Fast CDR** vulnerability Disclosure Policy can be found [here](https://github.com/eProsima/policies/blob/main/VULNERABILITY.md)
 
 # Current Status Summary
 
-The chart below compares the requirements in the [REP-2004](https://www.ros.org/reps/rep-2004.html#quality-level-comparison-chart) with the current state of *eprosima Fast DDS*
+The chart below compares the requirements in the [REP-2004](https://www.ros.org/reps/rep-2004.html#quality-level-comparison-chart) with the current state of **eprosima Fast CDR**
 |Number| Requirement| Current State |
 |--|--|--|
 |1| **Version policy** |---|

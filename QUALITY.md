@@ -1,0 +1,200 @@
+This document is a declaration of software quality for **eProsima Fast CDR** based on the guidelines provided in the [ROS 2 REP-2004 document](https://www.ros.org/reps/rep-2004.html).
+
+Quality Declaration
+=============================
+
+**eProsima Fast CDR** is a C++ library that provides two serialization mechanisms.
+One is the [standard CDR](https://www.omg.org/cgi-bin/doc?formal/02-06-51) serialization mechanism, while the other is a faster implementation that modifies the standard.
+
+**eProsima Fast CDR** claims to be in the **Quality Level 2** category.
+
+Below are the rationales, notes and caveats for this claim, organized by each requirement listed in the [Package Requirements for Quality Level 1 in REP-2004](https://www.ros.org/reps/rep-2004.html#package-requirements).
+
+## Version Policy [1]
+
+### Version Scheme [1.i]
+
+The **Versioning Policy Declaration** for **eProsima Fast CDR** can be found [here](VERSIONING.md) and it adheres to [`semver`](https://semver.org/).
+
+### Version Stability [1.ii]
+
+**eProsima Fast CDR** is at a stable version, i.e. `>=1.0.0`.
+The latest version and the release notes can be found [here](https://github.com/eProsima/Fast-CDR/releases).
+
+### Public API Declaration [1.iii]
+
+The public API is documented using [Doxygen](https://www.doxygen.nl/index.html) and can be build using the CMake option `BUILD_DOCUMENTATION` set to `ON`.
+The API reference generated can also be found in [eProsima/all-docs](https://github.com/eProsima/all-docs/blob/master/resources/Fast-CDR-v1_0_15.pdf)
+
+### API Stability Policy [1.iv]
+
+**eProsima Fast CDR** will only break public API between major releases.
+
+### ABI Stability Policy [1.v]
+
+Any ABI break in **eProsima Fast CDR** will be done between minor versions and it should be clearly stated on the release notes.
+
+## Change Control Process [2]
+
+The stability of **eProsima Fast CDR** is ensured through reviews, CI and tests.
+The change control process can be found in [CONTRIBUTING](https://github.com/eProsima/policies/blob/main/CONTRIBUTING.md)
+
+All changes to **eProsima Fast CDR** occur through pull requests that are required to pass all CI tests.
+In case of failure, only maintainers can merge the pull request, and only when there is enough evidence that the failure is unrelated to the change.
+Additionally, all pull requests must have a positive review from one other contributor that did not author the pull request.
+
+### Change Requests [2.i]
+
+All changes will occur through a pull request.
+
+### Contributor Origin [2.ii]
+
+**eProsima Fast CDR** uses the [Developer Certificate of Origin (DCO)](https://developercertificate.org/) as its confirmation of contributor origin policy since version 1.0.14.
+More information can be found in [CONTRIBUTING](https://github.com/eProsima/policies/blob/main/CONTRIBUTING.md)
+
+### Peer Review Policy [2.iii]
+
+All pull requests will be peer-reviewed by at least one other contributor who did not author the pull request. Approval is required before merging.
+
+### Continuous Integration [2.iv]
+
+All pull requests must pass CI to be considered for merging, unless maintainers consider that there is enough evidence that the failure is unrelated to the changes.
+CI testing is automatically triggered by incoming pull requests.
+Current nightly results can be seen here for all supported platforms:
+
+* Linux [![Linux ci](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux/badge/icon?subject=%20%20%20Linux%20CI%20)](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux/)
+* Linux-aarch64 [![Linux arm64 ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_linux_aarch64/badge/icon?subject=%20%20%20Linux-aarch64%20CI%20)](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux_aarch64/)
+* Windows [![Windows ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_windows/label=windows-secure,platform=x64,toolset=v141/badge/icon?subject=%20%20%20%20Windows%20CI%20)](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_windows/label=windows-secure,platform=x64,toolset=v141)
+* Mac [![Mac ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_mac/badge/icon?subject=%20%20%20%20%20%20%20Mac%20CI%20)](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_mac)
+
+### Documentation Policy [2.v]
+
+All pull requests must resolve related documentation changes before merging as stated in [CONTRIBUTING](https://github.com/eProsima/policies/blob/main/CONTRIBUTING.md).
+
+## Documentation [3]
+
+### Feature Documentation [3.i]
+
+**eProsima Fast CDR** provides only two features corresponding to each one of its serialization mechanisms:
+
+* [Standard CDR](https://www.omg.org/cgi-bin/doc?formal/02-06-51) serialization mechanism.
+* CDR standard modified to provide a faster implementation.
+
+### Public API Documentation [3.ii]
+
+**eProsima Fast CDR** includes a complete API Reference generated by [Doxygen](https://www.doxygen.nl/index.html) and hosted in [eProsima/all-docs](https://github.com/eProsima/all-docs/blob/master/resources/Fast-CDR-v1_0_15.pdf) (PDF document for **eProsima Fast CDR** version 1.0.15).
+
+### License [3.iii]
+
+The license for **eProsima Fast CDR** is Apache 2.0, and a summary can be found in each source file.
+A full copy of the license can be found [here](LICENSE).
+
+### Copyright Statements [3.iv]
+
+**eProsima Fast CDR** copyright holder provide a statement of copyright in each source file.
+
+## Testing [4]
+
+### Feature Testing [4.i]
+
+**eProsima Fast CDR** provides tests which simulate typical usage, and they are located in the [`test` directory](test).
+New features are required to have tests before being added as stated in [CONTRIBUTING](https://github.com/eProsima/policies/blob/main/CONTRIBUTING.md).
+Current nightly results can be found here:
+
+* Linux [![Linux ci](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux/badge/icon?subject=%20%20%20Linux%20CI%20)](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux/)
+* Linux-aarch64 [![Linux arm64 ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_linux_aarch64/badge/icon?subject=%20%20%20Linux-aarch64%20CI%20)](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux_aarch64/)
+* Windows [![Windows ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_windows/label=windows-secure,platform=x64,toolset=v141/badge/icon?subject=%20%20%20%20Windows%20CI%20)](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_windows/label=windows-secure,platform=x64,toolset=v141)
+* Mac [![Mac ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_mac/badge/icon?subject=%20%20%20%20%20%20%20Mac%20CI%20)](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_mac)
+
+### Public API Testing [4.ii]
+
+Each part of the public API has tests, and new additions or changes to the public API require tests before being added.
+The tests aim to cover typical usage and corner cases.
+
+### Coverage [4.iii]
+
+**eProsima Fast CDR** coverage reports can be accessed from the Linux CI nightly results. These reports provide statistics of line and conditional coverage.
+
+* [Linux Coverage Report](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux/4/cobertura/)
+* [Mac Coverage Report](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_mac/2/cobertura/)
+
+Changes are required to make a best effort to keep or increase coverage before being accepted, but decreases are allowed if properly justified and accepted by maintainers.
+
+### Performance [4.iv]
+
+**eProsima Fast CDR** does not provide performance tests.
+However, performance is indirectly tested by *eprosima Fast DDS*.
+
+Any performance regression detected in *eprosima Fast DDS* would be analyzed and, in case that it is related to **eProsima Fast CDR** or could be solved modifying this library, changes could be made to the library in order to revert the performance regression.
+
+### Linters and Static Analysis [4.v]
+
+**eProsima Fast CDR** [code style](https://github.com/eProsima/cpp-style) is enforced using [*uncrustify*](https://github.com/uncrustify/uncrustify).
+Among the CI tests there are tests that ensures that every pull request is compliant with the code style.
+The latest pull request results can be seen [here](http://jenkins.eprosima.com:8080/job/fastcdr_github_uncrustify/lastBuild/).
+The tests only check files where changes have been made.
+Therefore, the code style is only enforced in some files.
+However, the tendency will be to homogenize the older source files to the code style.
+
+**eProsima Fast CDR** uses [Synopsis Coverity static code analysis](https://scan.coverity.com/projects/eprosima-fast-cdr).
+
+## Dependencies [5]
+
+### Direct Runtime Dependencies [5.iii]
+
+**eProsima Fast CDR** has no run-time or build-time dependencies that need to be considered for this declaration.
+
+## Platform Support [6]
+
+**eProsima Fast CDR** supports the following platforms and tests each change against all of them as can be seen in the current nightly results:
+
+* Linux [![Linux ci](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux/badge/icon?subject=%20%20%20Linux%20CI%20)](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux/)
+* Linux-aarch64 [![Linux arm64 ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_linux_aarch64/badge/icon?subject=%20%20%20Linux-aarch64%20CI%20)](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux_aarch64/)
+* Windows [![Windows ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_windows/label=windows-secure,platform=x64,toolset=v141/badge/icon?subject=%20%20%20%20Windows%20CI%20)](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_windows/label=windows-secure,platform=x64,toolset=v141)
+* Mac [![Mac ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_mac/badge/icon?subject=%20%20%20%20%20%20%20Mac%20CI%20)](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_mac)
+
+More information about the supported platforms can be found in [PLATFORM_SUPPORT](PLATFORM_SUPPORT.md)
+
+## Vulnerability Disclosure Policy [7.i]
+
+**eprosima Fast CDR** vulnerability Disclosure Policy can be found [here](https://github.com/eProsima/policies/blob/main/VULNERABILITY.md)
+
+# Current Status Summary
+
+The chart below compares the requirements in the [REP-2004](https://www.ros.org/reps/rep-2004.html#quality-level-comparison-chart) with the current state of **eprosima Fast CDR**
+|Number| Requirement| Current State |
+|--|--|--|
+|1| **Version policy** |---|
+|1.i|Version Policy available |✓|
+|1.ii|Stable version |✓|
+|1.iii|Declared public API|✓|
+|1.iv|API stability policy|✓|
+|1.v|ABI stability policy|✓|
+|2| **Change control process** |---|
+|2.i| All changes occur on change request |✓|
+|2.ii| Contributor origin (DCO, CLA, etc) |✓|
+|2.iii| Peer review policy |✓|
+|2.iv| CI policy for change requests |✓|
+|2.v| Documentation policy for change requests |✓|
+|3| **Documentation** | --- |
+|3.i| Per feature documentation |✓|
+|3.ii| Per public API item documentation |✓|
+|3.iii| Declared License(s) |✓|
+|3.iv| Copyright in source files|✓|
+|3.v.a| Quality declaration linked to README |✓|
+|3.v.b| Centralized declaration available for peer review |✓|
+|4| **Testing** | --- |
+|4.i| Feature items tests |✓|
+|4.ii| Public API tests |✓|
+|4.iii.a| Using coverage |✓|
+|4.iii.b| Coverage policy ||
+|4.iv.a| Performance tests (if applicable) |N/A|
+|4.iv.b| Performance tests policy|N/A|
+|4.v.a| Code style enforcement (linters)|✓|
+|4.v.b| Use of static analysis tools |✓|
+|5| **Dependencies** | --- |
+|5.iii| Justifies quality use of dependencies |✓|
+|6| **Platform support** | --- |
+|6.i| Support targets Tier1 ROS platforms|✓|
+|7| **Security** | --- |
+|7.i| Vulnerability Disclosure Policy |✓|

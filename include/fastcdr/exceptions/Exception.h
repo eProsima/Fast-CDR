@@ -26,22 +26,22 @@ namespace exception {
  * @brief This abstract class is used to create exceptions.
  * @ingroup EXCEPTIONMODULE
  */
-class Exception : public std::exception
+class Cdr_DllAPI Exception : public std::exception
 {
 public:
 
     //! \brief Default destructor.
-    virtual Cdr_DllAPI ~Exception() noexcept;
+    virtual ~Exception() noexcept;
 
     //! \brief This function throws the object as exception.
-    virtual Cdr_DllAPI void raise() const = 0;
+    virtual void raise() const = 0;
 
     /*!
      * @brief This function returns the error message.
      *
      * @return The error message.
      */
-    virtual Cdr_DllAPI const char* what() const noexcept override;
+    virtual const char* what() const noexcept override;
 
 protected:
 
@@ -50,7 +50,7 @@ protected:
      *
      * @param message A error message. This message pointer is copied.
      */
-    Cdr_DllAPI Exception(
+    Exception(
             const char* const& message) noexcept;
 
     /*!
@@ -58,7 +58,7 @@ protected:
      *
      * @param ex Exception that will be copied.
      */
-    Cdr_DllAPI Exception(
+    Exception(
             const Exception& ex) noexcept;
 
 #if HAVE_CXX0X
@@ -67,7 +67,7 @@ protected:
      *
      * @param ex Exception that will be moved.
      */
-    Cdr_DllAPI Exception(
+    Exception(
             Exception&& ex) noexcept;
 #endif // if HAVE_CXX0X
 
@@ -76,7 +76,7 @@ protected:
      *
      * @param ex Exception that will be copied.
      */
-    Cdr_DllAPI Exception& operator =(
+    Exception& operator =(
             const Exception& ex) noexcept;
 
 #if HAVE_CXX0X
@@ -85,7 +85,7 @@ protected:
      *
      * @param ex Exception that will be moved.
      */
-    Cdr_DllAPI Exception& operator =(
+    Exception& operator =(
             Exception&&) noexcept;
 #endif // if HAVE_CXX0X
 

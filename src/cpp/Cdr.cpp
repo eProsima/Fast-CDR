@@ -586,8 +586,31 @@ Cdr& Cdr::serialize(
 
         if (m_swapBytes)
         {
+#if FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
+            __float128 tmp = ldouble_t;
+            const char* dst = reinterpret_cast<const char*>(&tmp);
+#else
             const char* dst = reinterpret_cast<const char*>(&ldouble_t);
-#if defined(_WIN32) || defined(FASTCDR_ARM32)
+#endif // FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
+#if FASTCDR_HAVE_FLOAT128 || FASTCDR_SIZEOF_LONG_DOUBLE == 16
+            m_currentPosition++ << dst[15];
+            m_currentPosition++ << dst[14];
+            m_currentPosition++ << dst[13];
+            m_currentPosition++ << dst[12];
+            m_currentPosition++ << dst[11];
+            m_currentPosition++ << dst[10];
+            m_currentPosition++ << dst[9];
+            m_currentPosition++ << dst[8];
+            m_currentPosition++ << dst[7];
+            m_currentPosition++ << dst[6];
+            m_currentPosition++ << dst[5];
+            m_currentPosition++ << dst[4];
+            m_currentPosition++ << dst[3];
+            m_currentPosition++ << dst[2];
+            m_currentPosition++ << dst[1];
+            m_currentPosition++ << dst[0];
+#else
+#if FASTCDR_SIZEOF_LONG_DOUBLE == 8
             // Filled with 0's.
             m_currentPosition++ << static_cast<char>(0);
             m_currentPosition++ << static_cast<char>(0);
@@ -606,33 +629,28 @@ Cdr& Cdr::serialize(
             m_currentPosition++ << dst[1];
             m_currentPosition++ << dst[0];
 #else
-
-            m_currentPosition++ << dst[15];
-            m_currentPosition++ << dst[14];
-            m_currentPosition++ << dst[13];
-            m_currentPosition++ << dst[12];
-            m_currentPosition++ << dst[11];
-            m_currentPosition++ << dst[10];
-            m_currentPosition++ << dst[9];
-            m_currentPosition++ << dst[8];
-            m_currentPosition++ << dst[7];
-            m_currentPosition++ << dst[6];
-            m_currentPosition++ << dst[5];
-            m_currentPosition++ << dst[4];
-            m_currentPosition++ << dst[3];
-            m_currentPosition++ << dst[2];
-            m_currentPosition++ << dst[1];
-            m_currentPosition++ << dst[0];
-#endif // if defined(_WIN32) || defined(FASTCDR_ARM32)
+#error unsupported long double type and no __float128 available
+#endif // FASTCDR_SIZEOF_LONG_DOUBLE == 8
+#endif // FASTCDR_HAVE_FLOAT128 || FASTCDR_SIZEOF_LONG_DOUBLE == 16
         }
         else
         {
-#if defined(_WIN32) || defined(FASTCDR_ARM32)
+#if FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
+            __float128 tmp = ldouble_t;
+            m_currentPosition << tmp;
+            m_currentPosition += 16;
+#else
+#if FASTCDR_SIZEOF_LONG_DOUBLE == 8
             m_currentPosition << static_cast<long double>(0);
             m_currentPosition += sizeof(ldouble_t);
-#endif // if defined(_WIN32) || defined(FASTCDR_ARM32)
+#endif // FASTCDR_SIZEOF_LONG_DOUBLE == 8
+#if FASTCDR_SIZEOF_LONG_DOUBLE == 8 || FASTCDR_SIZEOF_LONG_DOUBLE == 16
             m_currentPosition << ldouble_t;
             m_currentPosition += sizeof(ldouble_t);
+#else
+#error unsupported long double type and no __float128 available
+#endif // FASTCDR_SIZEOF_LONG_DOUBLE == 8 || FASTCDR_SIZEOF_LONG_DOUBLE == 16
+#endif // FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
         }
 
         return *this;
@@ -1277,32 +1295,13 @@ Cdr& Cdr::serializeArray(
             makeAlign(align);
         }
 
+#if FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
         if (m_swapBytes)
         {
-            const char* dst = reinterpret_cast<const char*>(&ldouble_t);
-            const char* end = dst + totalSize;
-
-            for (; dst < end; dst += sizeof(*ldouble_t))
+            for (size_t i = 0; i < numElements; ++i, ++ldouble_t)
             {
-#if defined(_WIN32) || defined(FASTCDR_ARM32)
-                // Filled with 0's.
-                m_currentPosition++ << static_cast<char>(0);
-                m_currentPosition++ << static_cast<char>(0);
-                m_currentPosition++ << static_cast<char>(0);
-                m_currentPosition++ << static_cast<char>(0);
-                m_currentPosition++ << static_cast<char>(0);
-                m_currentPosition++ << static_cast<char>(0);
-                m_currentPosition++ << static_cast<char>(0);
-                m_currentPosition++ << static_cast<char>(0);
-                m_currentPosition++ << dst[7];
-                m_currentPosition++ << dst[6];
-                m_currentPosition++ << dst[5];
-                m_currentPosition++ << dst[4];
-                m_currentPosition++ << dst[3];
-                m_currentPosition++ << dst[2];
-                m_currentPosition++ << dst[1];
-                m_currentPosition++ << dst[0];
-#else
+                __float128 tmp = *ldouble_t;
+                const char* dst = reinterpret_cast<const char*>(&tmp);
                 m_currentPosition++ << dst[15];
                 m_currentPosition++ << dst[14];
                 m_currentPosition++ << dst[13];
@@ -1319,12 +1318,61 @@ Cdr& Cdr::serializeArray(
                 m_currentPosition++ << dst[2];
                 m_currentPosition++ << dst[1];
                 m_currentPosition++ << dst[0];
-#endif // if defined(_WIN32) || defined(FASTCDR_ARM32)
             }
         }
         else
         {
-#if defined(_WIN32) || defined(FASTCDR_ARM32)
+            for (size_t i = 0; i < numElements; ++i, ++ldouble_t)
+            {
+                __float128 tmp = *ldouble_t;
+                m_currentPosition << tmp;
+                m_currentPosition += 16;
+            }
+        }
+#else
+#if FASTCDR_SIZEOF_LONG_DOUBLE == 8 || FASTCDR_SIZEOF_LONG_DOUBLE == 16
+        if (m_swapBytes)
+        {
+            const char* dst = reinterpret_cast<const char*>(&ldouble_t);
+            const char* end = dst + totalSize;
+
+            for (; dst < end; dst += sizeof(*ldouble_t))
+            {
+#if FASTCDR_SIZEOF_LONG_DOUBLE == 16
+                m_currentPosition++ << dst[15];
+                m_currentPosition++ << dst[14];
+                m_currentPosition++ << dst[13];
+                m_currentPosition++ << dst[12];
+                m_currentPosition++ << dst[11];
+                m_currentPosition++ << dst[10];
+                m_currentPosition++ << dst[9];
+                m_currentPosition++ << dst[8];
+#else
+                m_currentPosition++ << static_cast<char>(0);
+                m_currentPosition++ << static_cast<char>(0);
+                m_currentPosition++ << static_cast<char>(0);
+                m_currentPosition++ << static_cast<char>(0);
+                m_currentPosition++ << static_cast<char>(0);
+                m_currentPosition++ << static_cast<char>(0);
+                m_currentPosition++ << static_cast<char>(0);
+                m_currentPosition++ << static_cast<char>(0);
+#endif // FASTCDR_SIZEOF_LONG_DOUBLE == 16
+                m_currentPosition++ << dst[7];
+                m_currentPosition++ << dst[6];
+                m_currentPosition++ << dst[5];
+                m_currentPosition++ << dst[4];
+                m_currentPosition++ << dst[3];
+                m_currentPosition++ << dst[2];
+                m_currentPosition++ << dst[1];
+                m_currentPosition++ << dst[0];
+            }
+        }
+        else
+        {
+#if FASTCDR_SIZEOF_LONG_DOUBLE == 16
+            m_currentPosition.memcopy(ldouble_t, totalSize);
+            m_currentPosition += totalSize;
+#else
             for (size_t i = 0; i < numElements; ++i)
             {
                 m_currentPosition << static_cast<long double>(0);
@@ -1332,11 +1380,12 @@ Cdr& Cdr::serializeArray(
                 m_currentPosition << ldouble_t[i];
                 m_currentPosition += 8;
             }
-#else
-            m_currentPosition.memcopy(ldouble_t, totalSize);
-            m_currentPosition += totalSize;
-#endif // if defined(_WIN32) || defined(FASTCDR_ARM32)
+#endif // FASTCDR_SIZEOF_LONG_DOUBLE == 16
         }
+#else
+#error unsupported long double type and no __float128 available
+#endif // FASTCDR_SIZEOF_LONG_DOUBLE == 8 || FASTCDR_SIZEOF_LONG_DOUBLE == 16
+#endif // FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
 
         return *this;
     }
@@ -1683,19 +1732,13 @@ Cdr& Cdr::deserialize(
 
         if (m_swapBytes)
         {
-            char* dst = reinterpret_cast<char*>(&ldouble_t);
-
-#if defined(_WIN32) || defined(FASTCDR_ARM32)
-            m_currentPosition += 8;
-            m_currentPosition++ >> dst[7];
-            m_currentPosition++ >> dst[6];
-            m_currentPosition++ >> dst[5];
-            m_currentPosition++ >> dst[4];
-            m_currentPosition++ >> dst[3];
-            m_currentPosition++ >> dst[2];
-            m_currentPosition++ >> dst[1];
-            m_currentPosition++ >> dst[0];
+#if FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
+            __float128 tmp = ldouble_t;
+            char* dst = reinterpret_cast<char*>(&tmp);
 #else
+            char* dst = reinterpret_cast<char*>(&ldouble_t);
+#endif // FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
+#if FASTCDR_HAVE_FLOAT128 || FASTCDR_SIZEOF_LONG_DOUBLE == 16
             m_currentPosition++ >> dst[15];
             m_currentPosition++ >> dst[14];
             m_currentPosition++ >> dst[13];
@@ -1712,16 +1755,41 @@ Cdr& Cdr::deserialize(
             m_currentPosition++ >> dst[2];
             m_currentPosition++ >> dst[1];
             m_currentPosition++ >> dst[0];
-#endif // if defined(_WIN32) || defined(FASTCDR_ARM32)
+#if FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
+            ldouble_t = static_cast<long double>(tmp);
+#endif // FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
+#else
+#if FASTCDR_SIZEOF_LONG_DOUBLE == 8
+            m_currentPosition += 8;
+            m_currentPosition++ >> dst[7];
+            m_currentPosition++ >> dst[6];
+            m_currentPosition++ >> dst[5];
+            m_currentPosition++ >> dst[4];
+            m_currentPosition++ >> dst[3];
+            m_currentPosition++ >> dst[2];
+            m_currentPosition++ >> dst[1];
+            m_currentPosition++ >> dst[0];
+#else
+#error unsupported long double type and no __float128 available
+#endif // FASTCDR_SIZEOF_LONG_DOUBLE == 8
+#endif // FASTCDR_HAVE_FLOAT128 || FASTCDR_SIZEOF_LONG_DOUBLE == 16
         }
         else
         {
-#if defined(_WIN32) || defined(FASTCDR_ARM32)
-            // Windows case, just deserializes the last 8 bytes, and ignores the first 8
-            m_currentPosition += 8; // sizeof(ldouble_t);
-#endif // if defined(_WIN32) || defined(FASTCDR_ARM32)
+#if FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
+            __float128 tmp;
+            m_currentPosition >> tmp;
+            m_currentPosition += 16;
+            ldouble_t = static_cast<long double>(tmp);
+#else
+#if FASTCDR_SIZEOF_LONG_DOUBLE == 8 || FASTCDR_SIZEOF_LONG_DOUBLE == 16
+#if FASTCDR_SIZEOF_LONG_DOUBLE == 8
+            m_currentPosition += 8;
+#endif // FASTCDR_SIZEOF_LONG_DOUBLE == 8
             m_currentPosition >> ldouble_t;
             m_currentPosition += sizeof(ldouble_t);
+#endif // FASTCDR_SIZEOF_LONG_DOUBLE == 8 || FASTCDR_SIZEOF_LONG_DOUBLE == 16
+#endif // FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
         }
 
         return *this;
@@ -2441,24 +2509,13 @@ Cdr& Cdr::deserializeArray(
             makeAlign(align);
         }
 
+#if FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
         if (m_swapBytes)
         {
-            char* dst = reinterpret_cast<char*>(ldouble_t);
-            char* end = dst + totalSize;
-
-            for (; dst < end; dst += sizeof(*ldouble_t))
+            for (size_t i = 0; i < numElements; ++i)
             {
-#if defined(_WIN32) || defined(FASTCDR_ARM32)
-                m_currentPosition += 8;
-                m_currentPosition++ >> dst[7];
-                m_currentPosition++ >> dst[6];
-                m_currentPosition++ >> dst[5];
-                m_currentPosition++ >> dst[4];
-                m_currentPosition++ >> dst[3];
-                m_currentPosition++ >> dst[2];
-                m_currentPosition++ >> dst[1];
-                m_currentPosition++ >> dst[0];
-#else
+                __float128 tmp;
+                char* dst = reinterpret_cast<char*>(&tmp);
                 m_currentPosition++ >> dst[15];
                 m_currentPosition++ >> dst[14];
                 m_currentPosition++ >> dst[13];
@@ -2475,23 +2532,66 @@ Cdr& Cdr::deserializeArray(
                 m_currentPosition++ >> dst[2];
                 m_currentPosition++ >> dst[1];
                 m_currentPosition++ >> dst[0];
-#endif // if defined(_WIN32) || defined(FASTCDR_ARM32)
+                ldouble_t[i] = static_cast<long double>(tmp);
             }
         }
         else
         {
-#if defined(_WIN32) || defined(FASTCDR_ARM32)
             for (size_t i = 0; i < numElements; ++i)
             {
-                m_currentPosition += 8;   // Ignore first 8 bytes
+                __float128 tmp;
+                m_currentPosition >> tmp;
+                m_currentPosition += 16;
+                ldouble_t[i] = static_cast<long double>(tmp);
+            }
+        }
+#else
+#if FASTCDR_SIZEOF_LONG_DOUBLE == 8 || FASTCDR_SIZEOF_LONG_DOUBLE == 16
+        if (m_swapBytes)
+        {
+            char* dst = reinterpret_cast<char*>(ldouble_t);
+            char* end = dst + numElements * sizeof(*ldouble_t);
+
+            for (; dst < end; dst += sizeof(*ldouble_t))
+            {
+#if FASTCDR_SIZEOF_LONG_DOUBLE == 16
+                m_currentPosition++ >> dst[15];
+                m_currentPosition++ >> dst[14];
+                m_currentPosition++ >> dst[13];
+                m_currentPosition++ >> dst[12];
+                m_currentPosition++ >> dst[11];
+                m_currentPosition++ >> dst[10];
+                m_currentPosition++ >> dst[9];
+                m_currentPosition++ >> dst[8];
+#else
+                m_currentPosition += 8;
+#endif // FASTCDR_SIZEOF_LONG_DOUBLE == 16
+                m_currentPosition++ >> dst[7];
+                m_currentPosition++ >> dst[6];
+                m_currentPosition++ >> dst[5];
+                m_currentPosition++ >> dst[4];
+                m_currentPosition++ >> dst[3];
+                m_currentPosition++ >> dst[2];
+                m_currentPosition++ >> dst[1];
+                m_currentPosition++ >> dst[0];
+            }
+        }
+        else
+        {
+#if FASTCDR_SIZEOF_LONG_DOUBLE == 16
+            m_currentPosition.rmemcopy(ldouble_t, totalSize);
+            m_currentPosition += totalSize;
+#else
+            for (size_t i = 0; i < numElements; ++i)
+            {
+                m_currentPosition += 8; // ignore first 8 bytes
                 m_currentPosition >> ldouble_t[i];
                 m_currentPosition += 8;
             }
-#else
-            m_currentPosition.rmemcopy(ldouble_t, totalSize);
-            m_currentPosition += totalSize;
-#endif // if defined(_WIN32) || defined(FASTCDR_ARM32)
+#endif // FASTCDR_SIZEOF_LONG_DOUBLE == 16
         }
+#endif // FASTCDR_SIZEOF_LONG_DOUBLE == 8 || FASTCDR_SIZEOF_LONG_DOUBLE == 16
+#endif // FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
 
         return *this;
     }

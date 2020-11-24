@@ -48,7 +48,11 @@
 #define Cdr_DllAPI
 #endif // if defined(EPROSIMA_ALL_DYN_LINK) || defined(FASTCDR_DYN_LINK)
 #else
+#if __GNUC__ >= 4
+#define Cdr_DllAPI __attribute__((visibility("default")))
+#else
 #define Cdr_DllAPI
+#endif // if __GNUC__ >= 4
 #endif // _WIN32
 
 // Auto linking.

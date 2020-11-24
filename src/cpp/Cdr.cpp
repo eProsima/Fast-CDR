@@ -2041,7 +2041,7 @@ Cdr& Cdr::deserializeArray(
 
         if (m_swapBytes)
         {
-            char* dst = reinterpret_cast<char*>(&short_t);
+            char* dst = reinterpret_cast<char*>(short_t);
             char* end = dst + totalSize;
 
             for (; dst < end; dst += sizeof(*short_t))
@@ -2110,7 +2110,7 @@ Cdr& Cdr::deserializeArray(
 
         if (m_swapBytes)
         {
-            char* dst = reinterpret_cast<char*>(&long_t);
+            char* dst = reinterpret_cast<char*>(long_t);
             char* end = dst + totalSize;
 
             for (; dst < end; dst += sizeof(*long_t))
@@ -2221,7 +2221,7 @@ Cdr& Cdr::deserializeArray(
 
         if (m_swapBytes)
         {
-            char* dst = reinterpret_cast<char*>(&longlong_t);
+            char* dst = reinterpret_cast<char*>(longlong_t);
             char* end = dst + totalSize;
 
             for (; dst < end; dst += sizeof(*longlong_t))
@@ -2296,7 +2296,7 @@ Cdr& Cdr::deserializeArray(
 
         if (m_swapBytes)
         {
-            char* dst = reinterpret_cast<char*>(&float_t);
+            char* dst = reinterpret_cast<char*>(float_t);
             char* end = dst + totalSize;
 
             for (; dst < end; dst += sizeof(*float_t))
@@ -2367,7 +2367,7 @@ Cdr& Cdr::deserializeArray(
 
         if (m_swapBytes)
         {
-            char* dst = reinterpret_cast<char*>(&double_t);
+            char* dst = reinterpret_cast<char*>(double_t);
             char* end = dst + totalSize;
 
             for (; dst < end; dst += sizeof(*double_t))

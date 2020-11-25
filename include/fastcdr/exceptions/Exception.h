@@ -19,6 +19,12 @@
 #include <string>
 #include <exception>
 
+#ifdef _MSC_VER
+#pragma warning(push)
+// C4275: non dll-interface class '...' used as base for dll-interface class '...'
+#pragma warning(disable: 4275)
+#endif // _MSC_VER
+
 namespace eprosima {
 namespace fastcdr {
 namespace exception {
@@ -96,5 +102,9 @@ private:
 }         //namespace exception
 }     //namespace fastcdr
 } //namespace eprosima
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif // _MSC_VER
 
 #endif // _FASTCDR_EXCEPTIONS_EXCEPTION_H_

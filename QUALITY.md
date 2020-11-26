@@ -116,8 +116,8 @@ The tests aim to cover typical usage and corner cases.
 *eProsima Fast CDR* aims to provide a line coverage **above 95%**.
 *Fast CDR* code coverage policy comprises:
 1. All contributions to *Fast CDR* must increase (or at least keep) current line coverage.
-   This is done to ensure that the **95%** line coverage goal is in time met.
-1. Line coverage regressions only are permitted if properly justified and accepted by maintainers.
+   This is done to ensure that the **95%** line coverage goal is eventually met.
+1. Line coverage regressions are only permitted if properly justified and accepted by maintainers.
 1. If the CI system reports a coverage regression after a pull request has been merged, the maintainers must study the case and decide how to proceed, mostly reverting the changes and asking for a more thorough testing of the committed changes.
 1. This policy is enforced through the [nightly Fast CDR coverage CI job](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_coverage_linux/).
 

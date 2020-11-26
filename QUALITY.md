@@ -1,7 +1,6 @@
 This document is a declaration of software quality for **eProsima Fast CDR** based on the guidelines provided in the [ROS 2 REP-2004 document](https://www.ros.org/reps/rep-2004.html).
 
-Quality Declaration
-=============================
+# Quality Declaration
 
 **eProsima Fast CDR** is a C++ library that provides two serialization mechanisms.
 One is the [standard CDR](https://www.omg.org/cgi-bin/doc?formal/02-06-51) serialization mechanism, while the other is a faster implementation that modifies the standard.
@@ -113,12 +112,16 @@ The tests aim to cover typical usage and corner cases.
 
 ### Coverage [4.iii]
 
-**eProsima Fast CDR** coverage reports can be accessed from the Linux CI nightly results. These reports provide statistics of line and conditional coverage.
+[![Coverage](https://img.shields.io/jenkins/coverage/cobertura.svg?jobUrl=http%3A%2F%2Fjenkins.eprosima.com%3A8080%2Fjob%2Fnightly_fastcdr_coverage_linux)](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_coverage_linux)
+*eProsima Fast CDR* aims to provide a line coverage **above 95%**.
+*Fast CDR* code coverage policy comprises:
+1. All contributions to *Fast CDR* must increase (or at least keep) current line coverage.
+   This is done to ensure that the **95%** line coverage goal is eventually met.
+1. Line coverage regressions are only permitted if properly justified and accepted by maintainers.
+1. If the CI system reports a coverage regression after a pull request has been merged, the maintainers must study the case and decide how to proceed, mostly reverting the changes and asking for a more thorough testing of the committed changes.
+1. This policy is enforced through the [nightly Fast CDR coverage CI job](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_coverage_linux/).
 
-* [Linux Coverage Report](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux/4/cobertura/)
-* [Mac Coverage Report](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_mac/2/cobertura/)
-
-Changes are required to make a best effort to keep or increase coverage before being accepted, but decreases are allowed if properly justified and accepted by maintainers.
+As stated in [CONTRIBUTING.md](CONTRIBUTING.md), developers and contributors are asked to run a line coverage assessment locally before submitting a PR.
 
 ### Performance [4.iv]
 
@@ -187,7 +190,7 @@ The chart below compares the requirements in the [REP-2004](https://www.ros.org/
 |4.i| Feature items tests |✓|
 |4.ii| Public API tests |✓|
 |4.iii.a| Using coverage |✓|
-|4.iii.b| Coverage policy ||
+|4.iii.b| Coverage policy |✓|
 |4.iv.a| Performance tests (if applicable) |N/A|
 |4.iv.b| Performance tests policy|N/A|
 |4.v.a| Code style enforcement (linters)|✓|

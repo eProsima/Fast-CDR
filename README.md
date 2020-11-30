@@ -24,5 +24,5 @@ Also in [eProsima][eprosima] you can find packages for Linux using autotools and
 
 ## Quality Declaration
 
-**eprosima Fast CDR** claims to be in the **Quality Level 2** category based on the guidelines provided by [ROS 2](https://ros.org/reps/rep-2004.html).
+**eprosima Fast CDR** claims to be in the **Quality Level 1** category based on the guidelines provided by [ROS 2](https://ros.org/reps/rep-2004.html).
 See the [Quality Declaration](QUALITY.md) for more details.

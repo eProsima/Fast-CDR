@@ -5,7 +5,7 @@ This document is a declaration of software quality for **eProsima Fast CDR** bas
 **eProsima Fast CDR** is a C++ library that provides two serialization mechanisms.
 One is the [standard CDR](https://www.omg.org/cgi-bin/doc?formal/02-06-51) serialization mechanism, while the other is a faster implementation that modifies the standard.
 
-**eProsima Fast CDR** claims to be in the **Quality Level 2** category.
+**eProsima Fast CDR** claims to be in the **Quality Level 1** category.
 
 Below are the rationales, notes and caveats for this claim, organized by each requirement listed in the [Package Requirements for Quality Level 1 in REP-2004](https://www.ros.org/reps/rep-2004.html#package-requirements).
 

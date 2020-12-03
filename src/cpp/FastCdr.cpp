@@ -325,7 +325,19 @@ FastCdr& FastCdr::serializeArray(
 
     if (((m_lastPosition - m_currentPosition) >= totalSize) || resize(totalSize))
     {
-#if defined(_WIN32) || defined(FASTCDR_ARM32)
+#if FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
+        for (size_t idx = 0; idx < numElements; ++idx)
+        {
+            __float128 tmp = ldouble_t[idx];
+            m_currentPosition << tmp;
+            m_currentPosition += 16;
+        }
+#else
+#if FASTCDR_SIZEOF_LONG_DOUBLE == 16
+        m_currentPosition.memcopy(ldouble_t, totalSize);
+        m_currentPosition += totalSize;
+#else
+#if FASTCDR_SIZEOF_LONG_DOUBLE == 8
         for (size_t idx = 0; idx < numElements; ++idx)
         {
             m_currentPosition << static_cast<long double>(0);
@@ -334,9 +346,10 @@ FastCdr& FastCdr::serializeArray(
             m_currentPosition += 8;
         }
 #else
-        m_currentPosition.memcopy(ldouble_t, totalSize);
-        m_currentPosition += totalSize;
-#endif // if defined(_WIN32) || defined(FASTCDR_ARM32)
+#error unsupported long double type and no __float128 available
+#endif // FASTCDR_SIZEOF_LONG_DOUBLE == 8
+#endif // FASTCDR_SIZEOF_LONG_DOUBLE == 16
+#endif // FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
 
         return *this;
     }
@@ -654,17 +667,31 @@ FastCdr& FastCdr::deserializeArray(
 
     if ((m_lastPosition - m_currentPosition) >= totalSize)
     {
-#if defined(_WIN32) || defined(FASTCDR_ARM32)
+#if FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
         for (size_t idx = 0; idx < numElements; ++idx)
         {
-            m_currentPosition += 8; // Windows ignores the first 8 bytes
+            __float128 tmp;
+            m_currentPosition >> tmp;
+            m_currentPosition += 16;
+            ldouble_t[idx] = static_cast<long double>(tmp);
+        }
+#else
+#if FASTCDR_SIZEOF_LONG_DOUBLE == 16
+        m_currentPosition.rmemcopy(ldouble_t, totalSize);
+        m_currentPosition += totalSize;
+#else
+#if FASTCDR_SIZEOF_LONG_DOUBLE == 8
+        for (size_t idx = 0; idx < numElements; ++idx)
+        {
+            m_currentPosition += 8;
             m_currentPosition >> ldouble_t[idx];
             m_currentPosition += 8;
         }
 #else
-        m_currentPosition.rmemcopy(ldouble_t, totalSize);
-        m_currentPosition += totalSize;
-#endif // if defined(_WIN32) || defined(FASTCDR_ARM32)
+#error unsupported long double type and no __float128 available
+#endif // FASTCDR_SIZEOF_LONG_DOUBLE == 8
+#endif // FASTCDR_SIZEOF_LONG_DOUBLE == 16
+#endif // FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
 
         return *this;
     }

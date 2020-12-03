@@ -72,6 +72,18 @@ macro(check_compile_feature)
     endif()
 endmacro()
 
+macro(check_type_sizes)
+    include(CheckTypeSize)
+    check_type_size("long double" TYPE_LONG_DOUBLE)
+    set(FASTCDR_SIZEOF_LONG_DOUBLE ${TYPE_LONG_DOUBLE})
+    check_type_size("__float128" TYPE_FLOAT128)
+    if(HAVE_TYPE_FLOAT128)
+        set(FASTCDR_HAVE_FLOAT128 1)
+    else()
+        set(FASTCDR_HAVE_FLOAT128 0)
+    endif()
+endmacro()
+
 macro(check_endianness)
     # Test endianness
     include(TestBigEndian)

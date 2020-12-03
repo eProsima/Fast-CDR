@@ -133,6 +133,7 @@ include(${PROJECT_SOURCE_DIR}/cmake/common/check_configuration.cmake)
 check_stdcxx()
 check_compile_feature()
 check_endianness()
+check_type_sizes()
 
 ###############################################################################
 # Check MSVC architecture

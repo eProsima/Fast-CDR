@@ -61,7 +61,7 @@ jobs:
     #    uses a compiled language
 
     - name: Build
-      run:
+      run: |
        mkdir build && cd build
        cmake ..
        cmake --build .

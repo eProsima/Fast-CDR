@@ -60,7 +60,8 @@ jobs:
     #    and modify them (or add more) to build your code if your project
     #    uses a compiled language
 
-    - run: |
+    - name: Build
+      run:
        mkdir build && cd build
        cmake ..
        cmake --build .

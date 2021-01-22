@@ -493,21 +493,13 @@ std::wstring FastCdr::readWString(
     else if ((m_lastPosition - m_currentPosition) >= bytesLength)
     {
 
-#if defined(_WIN32) || defined(FASTCDR_ARM32)
-        wchar_t* wValue = new wchar_t[length];
-        deserializeArray(wValue, length);
-#else
-        wchar_t* wValue = reinterpret_cast<wchar_t*>(&m_currentPosition);
-        m_currentPosition += bytesLength;
-#endif // if defined(_WIN32) || defined(FASTCDR_ARM32)
-        if (wValue[length - 1] == '\0')
+        returnedValue.resize(length);
+        deserializeArray(const_cast<wchar_t*>(returnedValue.c_str()), length);
+        if (returnedValue[length - 1] == L'\0')
         {
             --length;
+            returnedValue.erase(length);
         }
-        returnedValue = std::wstring(wValue, length);
-#if defined(_WIN32) || defined(FASTCDR_ARM32)
-        delete [] wValue;
-#endif // if defined(_WIN32) || defined(FASTCDR_ARM32)
         return returnedValue;
     }
 

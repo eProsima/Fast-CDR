@@ -2576,6 +2576,19 @@ public:
 
         *this >> seqLength;
 
+        if (seqLength == 0)
+        {
+            vector_t.clear();
+            return *this;
+        }
+
+        if ((m_lastPosition - m_currentPosition) < seqLength)
+        {
+            setState(state_before_error);
+            throw eprosima::fastcdr::exception::NotEnoughMemoryException(
+                eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        }
+
         try
         {
             vector_t.resize(seqLength);

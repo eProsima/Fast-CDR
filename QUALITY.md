@@ -141,6 +141,8 @@ However, the tendency will be to homogenize the older source files to the code s
 
 **eProsima Fast CDR** uses [Synopsis Coverity static code analysis](https://scan.coverity.com/projects/eprosima-fast-cdr).
 
+**eProsima Fast CDR** uses [CodeQL](https://github.com/eProsima/Fast-CDR/security/code-scanning?query=tool%3ACodeQL) to find security issues on the code.
+
 ## Dependencies [5]
 
 ### Direct Runtime Dependencies [5.iii]

@@ -2656,11 +2656,11 @@ Cdr& Cdr::deserializeBoolSequence(
 
     *this >> seqLength;
 
-    vector_t.resize(seqLength);
     size_t totalSize = seqLength * sizeof(bool);
 
     if ((m_lastPosition - m_currentPosition) >= totalSize)
     {
+        vector_t.resize(seqLength);
         // Save last datasize.
         m_lastDataSize = sizeof(bool);
 

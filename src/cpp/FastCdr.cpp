@@ -731,11 +731,11 @@ FastCdr& FastCdr::deserializeBoolSequence(
 
     *this >> seqLength;
 
-    vector_t.resize(seqLength);
     size_t totalSize = seqLength * sizeof(bool);
 
     if ((m_lastPosition - m_currentPosition) >= totalSize)
     {
+        vector_t.resize(seqLength);
         for (uint32_t count = 0; count < seqLength; ++count)
         {
             uint8_t value = 0;

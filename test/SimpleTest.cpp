@@ -426,6 +426,33 @@ TEST(CDRTests, DDSEncapsulation)
     }
 }
 
+TEST(CDRTests, CorbaEncapsulation)
+{
+    char encapsulation[1]{ 0 };
+    eprosima::fastcdr::FastBuffer buffer(encapsulation, 1);
+    eprosima::fastcdr::Cdr cdr(buffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::Cdr::CORBA_CDR);
+
+    std::array<bool, 256> valid_encapsulations;
+    valid_encapsulations.fill(false);
+
+    valid_encapsulations[0x00] = true;  // BIG_ENDIAN
+    valid_encapsulations[0x01] = true;  // LITTLE_ENDIAN
+
+    for (uint16_t i = 0; i < 256; ++i)
+    {
+        cdr.reset();
+        encapsulation[0] = static_cast<char>(i & 0xFF);
+        if (valid_encapsulations[i])
+        {
+            EXPECT_NO_THROW(cdr.read_encapsulation());
+        }
+        else
+        {
+            EXPECT_THROW(cdr.read_encapsulation(), eprosima::fastcdr::exception::BadParamException);
+        }
+    }
+}
+
 TEST(CDRTests, Octet)
 {
     check_good_case(octet_t);

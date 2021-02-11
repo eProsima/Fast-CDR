@@ -374,17 +374,10 @@ TEST(CDRTests, DDSEncapsulation)
 
     // First encapsulation byte should be 0
     {
-        for (char i = -1; i < 0; ++i)
+        for (uint16_t i = 1; i < 256; ++i)
         {
             cdr.reset();
-            encapsulation[0] = i;
-            EXPECT_THROW(cdr.read_encapsulation(), eprosima::fastcdr::exception::BadParamException);
-        }
-
-        for (char i = 0x7F; i > 0; --i)
-        {
-            cdr.reset();
-            encapsulation[0] = i;
+            encapsulation[0] = static_cast<char>(i & 0xFF);
             EXPECT_THROW(cdr.read_encapsulation(), eprosima::fastcdr::exception::BadParamException);
         }
 

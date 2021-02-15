@@ -14,7 +14,10 @@
 
 #include <fastcdr/Cdr.h>
 #include <fastcdr/FastCdr.h>
+
+#include <fastcdr/exceptions/BadParamException.h>
 #include <fastcdr/exceptions/Exception.h>
+#include <fastcdr/exceptions/NotEnoughMemoryException.h>
 
 #include <stdio.h>
 #include <limits>
@@ -360,6 +363,86 @@ TEST(FastBufferTests, Constructors)
         eprosima::fastcdr::FastBuffer buffer1(buffer, BUFFER_LENGTH);
         buffer1.resize(1000);
         eprosima::fastcdr::FastBuffer buffer2(std::move(buffer1));
+    }
+}
+
+TEST(CDRTests, DDSEncapsulation)
+{
+    char encapsulation[4]{ 0, 0, 0, 0 };
+    eprosima::fastcdr::FastBuffer buffer(encapsulation, 4);
+    eprosima::fastcdr::Cdr cdr(buffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::Cdr::DDS_CDR);
+
+    // First encapsulation byte should be 0
+    {
+        for (uint16_t i = 1; i < 256; ++i)
+        {
+            cdr.reset();
+            encapsulation[0] = static_cast<char>(i & 0xFF);
+            EXPECT_THROW(cdr.read_encapsulation(), eprosima::fastcdr::exception::BadParamException);
+        }
+
+        cdr.reset();
+        encapsulation[0] = 0;
+        EXPECT_NO_THROW(cdr.read_encapsulation());
+    }
+
+    std::array<bool, 256> valid_encapsulations;
+    valid_encapsulations.fill(false);
+
+    // Valid representation identifiers from table 10.3
+    valid_encapsulations[0x00] = true;  // CDR_BE
+    valid_encapsulations[0x01] = true;  // CDR_LE
+    valid_encapsulations[0x02] = true;  // PL_CDR_BE
+    valid_encapsulations[0x03] = true;  // PL_CDR_LE
+
+    // TODO(Miguel C): Change when more encapsulations are supported
+    // valid_encapsulations[0x10] = true;  // CDR2_BE
+    // valid_encapsulations[0x11] = true;  // CDR2_LE
+    // valid_encapsulations[0x12] = true;  // PL_CDR2_BE
+    // valid_encapsulations[0x13] = true;  // PL_CDR2_LE
+    // valid_encapsulations[0x14] = true;  // D_CDR_BE
+    // valid_encapsulations[0x15] = true;  // D_CDR_LE
+    // valid_encapsulations[0x04] = true;  // XML
+
+    for (uint16_t i = 0; i < 256; ++i)
+    {
+        cdr.reset();
+        encapsulation[1] = static_cast<char>(i & 0xFF);
+        if (valid_encapsulations[i])
+        {
+            EXPECT_NO_THROW(cdr.read_encapsulation());
+        }
+        else
+        {
+            EXPECT_THROW(cdr.read_encapsulation(), eprosima::fastcdr::exception::BadParamException);
+        }
+    }
+}
+
+TEST(CDRTests, CorbaEncapsulation)
+{
+    char encapsulation[1]{ 0 };
+    eprosima::fastcdr::FastBuffer buffer(encapsulation, 1);
+    eprosima::fastcdr::Cdr cdr(buffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::Cdr::CORBA_CDR);
+
+    std::array<bool, 256> valid_encapsulations;
+    valid_encapsulations.fill(false);
+
+    valid_encapsulations[0x00] = true;  // BIG_ENDIAN
+    valid_encapsulations[0x01] = true;  // LITTLE_ENDIAN
+
+    for (uint16_t i = 0; i < 256; ++i)
+    {
+        cdr.reset();
+        encapsulation[0] = static_cast<char>(i & 0xFF);
+        if (valid_encapsulations[i])
+        {
+            EXPECT_NO_THROW(cdr.read_encapsulation());
+        }
+        else
+        {
+            EXPECT_THROW(cdr.read_encapsulation(), eprosima::fastcdr::exception::BadParamException);
+        }
     }
 }
 

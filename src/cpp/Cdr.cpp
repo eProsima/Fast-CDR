@@ -72,6 +72,10 @@ Cdr& Cdr::read_encapsulation()
         if (m_cdrType == DDS_CDR)
         {
             (*this) >> dummy;
+            if (0 != dummy)
+            {
+                throw BadParamException("Unexpected non-zero initial byte received in Cdr::read_encapsulation");
+            }
         }
 
         // Get the ecampsulation byte.
@@ -84,28 +88,25 @@ Cdr& Cdr::read_encapsulation()
             m_swapBytes = !m_swapBytes;
             m_endianness = (encapsulationKind & 0x1);
         }
-    }
-    catch (Exception& ex)
-    {
-        setState(state_before_error);
-        ex.raise();
-    }
 
-    // If it is DDS_CDR type, view if contains a parameter list.
-    if (encapsulationKind & DDS_CDR_WITH_PL)
-    {
+        // Check encapsulationKind correctness
+        uint8_t allowed_kind_mask = LITTLE_ENDIANNESS;
         if (m_cdrType == DDS_CDR)
         {
-            m_plFlag = DDS_CDR_WITH_PL;
+            allowed_kind_mask |= DDS_CDR_WITH_PL;
         }
-        else
+
+        if (0 != (encapsulationKind & ~allowed_kind_mask))
         {
             throw BadParamException("Unexpected CDR type received in Cdr::read_encapsulation");
         }
-    }
 
-    try
-    {
+        // If it is DDS_CDR type, view if contains a parameter list.
+        if ((encapsulationKind & DDS_CDR_WITH_PL) && ((m_cdrType == DDS_CDR)))
+        {
+            m_plFlag = DDS_CDR_WITH_PL;
+        }
+
         if (m_cdrType == DDS_CDR)
         {
             (*this) >> m_options;

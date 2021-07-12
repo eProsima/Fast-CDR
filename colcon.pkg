@@ -1,0 +1,5 @@
+{
+    "name": "fastcdr",
+    "type": "cmake",
+    "dependencies" : ["googletest-distribution"]
+}

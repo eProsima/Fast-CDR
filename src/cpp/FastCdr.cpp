@@ -776,8 +776,8 @@ FastCdr& FastCdr::deserializeStringSequence(
     }
     catch (eprosima::fastcdr::exception::Exception& ex)
     {
-        free(sequence_t);
         delete [] sequence_t;
+        sequence_t = NULL;
         setState(state_before_error);
         ex.raise();
     }

@@ -145,8 +145,17 @@ endif()
 ###############################################################################
 # Installation paths
 ###############################################################################
+option(APPEND_PROJECT_NAME_TO_INCLUDEDIR
+  "When ON headers are installed to a path ending with a folder called \
+  ${PROJECT_NAME}. This avoids include directory search order issues when \
+  overriding this package from a merged catkin, ament, or colcon workspace."
+  OFF)
+
 set(BIN_INSTALL_DIR bin/ CACHE PATH "Installation directory for binaries")
-set(INCLUDE_INSTALL_DIR include/${PROJECT_NAME}/ CACHE PATH "Installation directory for C++ headers")
+set(INCLUDE_INSTALL_DIR include/ CACHE PATH "Installation directory for C++ headers")
+if(APPEND_PROJECT_NAME_TO_INCLUDEDIR)
+  string(APPEND INCLUDE_INSTALL_DIR "${PROJECT_NAME}/")
+endif()
 set(LIB_INSTALL_DIR lib${LIB_SUFFIX}/ CACHE PATH "Installation directory for libraries")
 set(DATA_INSTALL_DIR share/ CACHE PATH "Installation directory for data")
 if(WIN32)

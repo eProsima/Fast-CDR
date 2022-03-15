@@ -132,10 +132,18 @@ macro(check_type_sizes)
 endmacro()
 
 macro(check_endianness)
-    # Test endianness
-    include(TestBigEndian)
-    test_big_endian(BIG_ENDIAN)
-    set(FASTCDR_IS_BIG_ENDIAN_TARGET ${BIG_ENDIAN})
+    if(CMAKE_CXX_BYTE_ORDER)
+        if(CMAKE_CXX_BYTE_ORDER STREQUAL "BIG_ENDIAN")
+            set(FASTCDR_IS_BIG_ENDIAN_TARGET 1)
+        else()
+            set(FASTCDR_IS_BIG_ENDIAN_TARGET 0)
+        endif()
+    else()
+        # Test endianness
+        include(TestBigEndian)
+        test_big_endian(BIG_ENDIAN)
+        set(FASTCDR_IS_BIG_ENDIAN_TARGET ${BIG_ENDIAN})
+    endif()
 endmacro()
 
 macro(check_msvc_arch)

@@ -119,16 +119,6 @@ function(check_stdcxx enforced_level)
 
 endfunction()
 
-macro(check_compile_feature)
-    # Check constexpr
-    list(FIND CMAKE_CXX_COMPILE_FEATURES "cxx_constexpr" CXX_CONSTEXPR_SUPPORTED)
-    if(${CXX_CONSTEXPR_SUPPORTED} GREATER -1)
-        set(HAVE_CXX_CONSTEXPR 1)
-    else()
-        set(HAVE_CXX_CONSTEXPR 0)
-    endif()
-endmacro()
-
 macro(check_type_sizes)
     include(CheckTypeSize)
     check_type_size("long double" TYPE_LONG_DOUBLE)

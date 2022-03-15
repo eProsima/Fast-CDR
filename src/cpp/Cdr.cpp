@@ -24,7 +24,7 @@ const Cdr::Endianness Cdr::DEFAULT_ENDIAN = BIG_ENDIANNESS;
 const Cdr::Endianness Cdr::DEFAULT_ENDIAN = LITTLE_ENDIANNESS;
 #endif // if FASTCDR_IS_BIG_ENDIAN_TARGET
 
-CONSTEXPR size_t ALIGNMENT_LONG_DOUBLE = 8;
+constexpr size_t ALIGNMENT_LONG_DOUBLE = 8;
 
 Cdr::state::state(
         const Cdr& cdr)

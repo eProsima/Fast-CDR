@@ -147,7 +147,6 @@ include(${PROJECT_SOURCE_DIR}/cmake/common/check_configuration.cmake)
 set(FORCE_CXX "11" CACHE STRING "C++ standard fulfillment selection")
 check_stdcxx(${FORCE_CXX})
 
-check_compile_feature()
 check_endianness()
 check_type_sizes()
 

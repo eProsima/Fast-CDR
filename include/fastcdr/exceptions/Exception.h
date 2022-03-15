@@ -61,7 +61,6 @@ protected:
     Cdr_DllAPI Exception(
             const Exception& ex) noexcept;
 
-#if HAVE_CXX0X
     /*!
      * @brief Default move constructor.
      *
@@ -69,7 +68,6 @@ protected:
      */
     Cdr_DllAPI Exception(
             Exception&& ex) noexcept;
-#endif // if HAVE_CXX0X
 
     /*!
      * @brief Assigment operation.
@@ -79,7 +77,6 @@ protected:
     Cdr_DllAPI Exception& operator =(
             const Exception& ex) noexcept;
 
-#if HAVE_CXX0X
     /*!
      * @brief Assigment operation.
      *
@@ -87,7 +84,6 @@ protected:
      */
     Cdr_DllAPI Exception& operator =(
             Exception&&) noexcept;
-#endif // if HAVE_CXX0X
 
 private:
 

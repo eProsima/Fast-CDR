@@ -3,13 +3,14 @@
 
 using namespace std;
 
-template<typename ...Args>
-void printer(Args&&... args)
+template<typename ... Args>
+void printer(
+        Args&&... args)
 {
     (cout << ... << args) << endl;
 }
 
 int main()
 {
-    printer("eProsima",0b101010,'x');
+    printer("eProsima", 0b101010, 'x');
 }

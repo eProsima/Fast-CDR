@@ -1,6 +1,11 @@
 # Script that builds an external dummy project to check standard enforcement
 include(CMakePrintHelpers)
 
+# generate a per-test directory test to allow parallel execution
+string(MD5 TEST_DIR "${FORCE_CXX} ${TEST_FALLBACK} ${BUILD_DIR}")
+get_filename_component(BUILD_DIR ${BUILD_DIR} ABSOLUTE)
+string(JOIN "/" BUILD_DIR ${BUILD_DIR} ${TEST_DIR})
+
 # clean build dir if exits
 if(EXISTS "${BUILD_DIR}")
     file(REMOVE_RECURSE "${BUILD_DIR}" )

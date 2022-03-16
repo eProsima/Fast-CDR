@@ -74,14 +74,14 @@ set(LIB_VERSION_STR "${LIB_MAJOR_VERSION}.${LIB_MINOR_VERSION}.${LIB_PATCH_VERSI
 # Project                                                                     #
 ###############################################################################
 if(CMAKE_VERSION VERSION_LESS 3.0)
-    project(fastcdr C CXX)
+    project(fastcdr CXX)
     set(PROJECT_VERSION_MAJOR "${LIB_MAJOR_VERSION}")
     set(PROJECT_VERSION_MINOR "${LIB_MINOR_VERSION}")
     set(PROJECT_VERSION_PATCH "${LIB_PATCH_VERSION}")
     set(PROJECT_VERSION "${LIB_VERSION_STR}")
 else()
     cmake_policy(SET CMP0048 NEW)
-    project(fastcdr VERSION "${LIB_VERSION_STR}" LANGUAGES C CXX)
+    project(fastcdr VERSION "${LIB_VERSION_STR}" LANGUAGES CXX)
 endif()
 
 set(PROJECT_NAME_STYLED "FastCDR")

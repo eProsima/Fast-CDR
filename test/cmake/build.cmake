@@ -17,19 +17,21 @@ execute_process(COMMAND ${CMAKE_COMMAND}
                         -B${BUILD_DIR} .
                 WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR} 
                 OUTPUT_VARIABLE my_output
+                ERROR_VARIABLE error_log
                 RESULT_VARIABLE fail_to_build)
 
 if(fail_to_build)
     message(FATAL_ERROR "The dummy test fail to generate!!!")
-    cmake_print_variables(my_output)
+    cmake_print_variables(my_output error_log)
 endif()
 
 execute_process(COMMAND ${CMAKE_COMMAND}
                         --build ${BUILD_DIR} --target std_force_test
                 OUTPUT_VARIABLE my_output
+                ERROR_VARIABLE error_log
                 RESULT_VARIABLE fail_to_build)
 
-if(fail_to_build)
+if(fail_to_build OR (error_log MATCHES "[Ww][Aa][Rr][Nn][Ii][Nn][Gg]"))
     message(FATAL_ERROR "The dummy test fail to build!!!")
-    cmake_print_variables(my_output)
+    cmake_print_variables(my_output error_log)
 endif()

@@ -28,7 +28,7 @@ add_gtest(UnitTests SOURCES ${UNITTESTS_SOURCE})
 # CMake modules tests
 ###############################################################################
 
-set(build_dir "${fastcdr_BINARY_DIR}/test/cmake_test")
+set(build_dir "${fastcdr_BINARY_DIR}/test/force_cxx")
 set(module_dir "${fastcdr_SOURCE_DIR}/cmake/common")
 set(script "${CMAKE_CURRENT_LIST_DIR}/cmake/build.cmake")
 

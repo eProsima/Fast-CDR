@@ -1212,7 +1212,7 @@ public:
     Cdr& serialize(
             const std::string& string_t)
     {
-        return serialize(string_t.c_str());
+        return serializeSequence(string_t.c_str(), string_t.size() + 1);
     }
 
     /*!
@@ -1225,7 +1225,7 @@ public:
     Cdr& serialize(
             const std::wstring& string_t)
     {
-        return serialize(string_t.c_str());
+        return serializeSequence(string_t.c_str(), string_t.size() + 1);
     }
 
     /*!
@@ -1240,7 +1240,7 @@ public:
             const std::string& string_t,
             Endianness endianness)
     {
-        return serialize(string_t.c_str(), endianness);
+        return serializeSequence(string_t.c_str(), string_t.size() + 1, endianness);
     }
 
 #if HAVE_CXX0X
@@ -1810,7 +1810,7 @@ public:
     {
         for (size_t count = 0; count < numElements; ++count)
         {
-            serialize(string_t[count].c_str());
+            serializeSequence(string_t[count].c_str(), string_t[count].size() + 1);
         }
         return *this;
     }
@@ -1829,7 +1829,7 @@ public:
     {
         for (size_t count = 0; count < numElements; ++count)
         {
-            serialize(string_t[count].c_str());
+            serializeSequence(string_t[count].c_str(), string_t[count].size() + 1);
         }
         return *this;
     }

@@ -1172,6 +1172,17 @@ public:
             const char* string_t);
 
     /*!
+     * @brief This function serializes a string.
+     * @param string_t The pointer to the string that will be serialized in the buffer.
+     * @param length Length of input string.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+     */
+    Cdr& serialize(
+            const char *string_t,
+            size_t length);
+
+    /*!
      * @brief This function serializes a wstring.
      * @param string_t The pointer to the wstring that will be serialized in the buffer.
      * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -1189,6 +1200,19 @@ public:
      */
     Cdr& serialize(
             const char* string_t,
+            Endianness endianness);
+
+    /*!
+     * @brief This function serializes a string with a different endianness and predefined size.
+     * @param string_t The pointer to the string that will be serialized in the buffer.
+     * @param length Length of input string.
+     * @param endianness Endianness that will be used in the serialization of this value.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+     */
+    Cdr& serialize(
+            const char *string_t,
+            size_t length,
             Endianness endianness);
 
     /*!
@@ -1212,7 +1236,7 @@ public:
     Cdr& serialize(
             const std::string& string_t)
     {
-        return serialize(string_t.c_str());
+        return serialize(string_t.c_str(), string_t.size());
     }
 
     /*!
@@ -1240,7 +1264,7 @@ public:
             const std::string& string_t,
             Endianness endianness)
     {
-        return serialize(string_t.c_str(), endianness);
+        return serialize(string_t.c_str(), string_t.size(), endianness);
     }
 
 #if HAVE_CXX0X

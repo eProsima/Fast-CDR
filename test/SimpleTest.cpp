@@ -241,14 +241,31 @@ static void check_good_case(
     // Serialization.
     {
         FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-        Cdr cdr_ser(cdrbuffer);
+        Cdr cdr_ser(cdrbuffer, eprosima::fastcdr::Cdr::Endianness::LITTLE_ENDIANNESS);
         EXPECT_NO_THROW(cdr_ser << input_value);
     }
 
     // Deserialization.
     {
         FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-        Cdr cdr_des(cdrbuffer);
+        Cdr cdr_des(cdrbuffer, eprosima::fastcdr::Cdr::Endianness::LITTLE_ENDIANNESS);
+        T output_value{};
+
+        EXPECT_NO_THROW(cdr_des >> output_value);
+        EXPECT_EQ(output_value, input_value);
+    }
+
+    // Serialization.
+    {
+        FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+        Cdr cdr_ser(cdrbuffer, eprosima::fastcdr::Cdr::Endianness::BIG_ENDIANNESS);
+        EXPECT_NO_THROW(cdr_ser << input_value);
+    }
+
+    // Deserialization.
+    {
+        FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+        Cdr cdr_des(cdrbuffer, eprosima::fastcdr::Cdr::Endianness::BIG_ENDIANNESS);
         T output_value{};
 
         EXPECT_NO_THROW(cdr_des >> output_value);
@@ -291,14 +308,30 @@ static void check_good_case_array(
     // Serialization.
     {
         FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-        Cdr cdr_ser(cdrbuffer);
+        Cdr cdr_ser(cdrbuffer, eprosima::fastcdr::Cdr::Endianness::LITTLE_ENDIANNESS);
         EXPECT_NO_THROW(cdr_ser.serializeArray(input_value, N));
     }
 
     // Deserialization.
     {
         FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
-        Cdr cdr_des(cdrbuffer);
+        Cdr cdr_des(cdrbuffer, eprosima::fastcdr::Cdr::Endianness::LITTLE_ENDIANNESS);
+        T output_value[N];
+
+        EXPECT_NO_THROW(cdr_des.deserializeArray(output_value, N));
+        EXPECT_ARRAY_EQ(output_value, input_value, N);
+    }
+    // Serialization.
+    {
+        FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+        Cdr cdr_ser(cdrbuffer, eprosima::fastcdr::Cdr::Endianness::BIG_ENDIANNESS);
+        EXPECT_NO_THROW(cdr_ser.serializeArray(input_value, N));
+    }
+
+    // Deserialization.
+    {
+        FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+        Cdr cdr_des(cdrbuffer, eprosima::fastcdr::Cdr::Endianness::BIG_ENDIANNESS);
         T output_value[N];
 
         EXPECT_NO_THROW(cdr_des.deserializeArray(output_value, N));

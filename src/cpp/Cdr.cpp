@@ -765,8 +765,24 @@ Cdr& Cdr::serialize(
 #if defined(_WIN32)
             serializeArray(string_t, wstrlen);
 #else
-            m_currentPosition.memcopy(string_t, bytesLength);
-            m_currentPosition += bytesLength; // size on bytes
+            if (m_swapBytes)
+            {
+                const char* dst = reinterpret_cast<const char*>(string_t);
+                const char* end = dst + bytesLength;
+
+                for (; dst < end; dst += sizeof(*string_t))
+                {
+                    m_currentPosition++ << dst[3];
+                    m_currentPosition++ << dst[2];
+                    m_currentPosition++ << dst[1];
+                    m_currentPosition++ << dst[0];
+                }
+            }
+            else
+            {
+                m_currentPosition.memcopy(string_t, bytesLength);
+                m_currentPosition += bytesLength; // size on bytes
+            }
 #endif // if defined(_WIN32)
         }
         else

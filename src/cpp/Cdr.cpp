@@ -898,7 +898,7 @@ Cdr& Cdr::serializeArray(
 
         if (m_swapBytes)
         {
-            const char* dst = reinterpret_cast<const char*>(&short_t);
+            const char* dst = reinterpret_cast<const char*>(short_t);
             const char* end = dst + totalSize;
 
             for (; dst < end; dst += sizeof(*short_t))
@@ -967,7 +967,7 @@ Cdr& Cdr::serializeArray(
 
         if (m_swapBytes)
         {
-            const char* dst = reinterpret_cast<const char*>(&long_t);
+            const char* dst = reinterpret_cast<const char*>(long_t);
             const char* end = dst + totalSize;
 
             for (; dst < end; dst += sizeof(*long_t))
@@ -1076,7 +1076,7 @@ Cdr& Cdr::serializeArray(
 
         if (m_swapBytes)
         {
-            const char* dst = reinterpret_cast<const char*>(&longlong_t);
+            const char* dst = reinterpret_cast<const char*>(longlong_t);
             const char* end = dst + totalSize;
 
             for (; dst < end; dst += sizeof(*longlong_t))
@@ -1151,7 +1151,7 @@ Cdr& Cdr::serializeArray(
 
         if (m_swapBytes)
         {
-            const char* dst = reinterpret_cast<const char*>(&float_t);
+            const char* dst = reinterpret_cast<const char*>(float_t);
             const char* end = dst + totalSize;
 
             for (; dst < end; dst += sizeof(*float_t))
@@ -1222,7 +1222,7 @@ Cdr& Cdr::serializeArray(
 
         if (m_swapBytes)
         {
-            const char* dst = reinterpret_cast<const char*>(&double_t);
+            const char* dst = reinterpret_cast<const char*>(double_t);
             const char* end = dst + totalSize;
 
             for (; dst < end; dst += sizeof(*double_t))
@@ -1334,7 +1334,7 @@ Cdr& Cdr::serializeArray(
 #if FASTCDR_SIZEOF_LONG_DOUBLE == 8 || FASTCDR_SIZEOF_LONG_DOUBLE == 16
         if (m_swapBytes)
         {
-            const char* dst = reinterpret_cast<const char*>(&ldouble_t);
+            const char* dst = reinterpret_cast<const char*>(ldouble_t);
             const char* end = dst + totalSize;
 
             for (; dst < end; dst += sizeof(*ldouble_t))

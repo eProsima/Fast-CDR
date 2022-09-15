@@ -23,7 +23,7 @@ The latest version and the release notes can be found [here](https://github.com/
 ### Public API Declaration [1.iii]
 
 The public API is documented using [Doxygen](https://www.doxygen.nl/index.html) and can be build using the CMake option `BUILD_DOCUMENTATION` set to `ON`.
-The API reference generated can also be found in [eProsima/all-docs](https://github.com/eProsima/all-docs/blob/master/resources/Fast-CDR-v1_0_15.pdf)
+The API reference generated can also be found in [eProsima webpage](https://www.eprosima.com/images/PDFs/Fast_CDR.pdf)
 
 ### API Stability Policy [1.iv]
 

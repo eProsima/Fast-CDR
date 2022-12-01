@@ -52,7 +52,12 @@ elseif(NOT EPROSIMA_INSTALLER)
     set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
     set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
 
-    target_compile_definitions(${PROJECT_NAME} PRIVATE ${PROJECT_NAME_UPPER}_SOURCE)
+    target_compile_definitions(${PROJECT_NAME}
+        PRIVATE
+        ${PROJECT_NAME_UPPER}_SOURCE
+	INTERFACE
+        $<$<BOOL:${WIN32}>:${PROJECT_NAME_UPPER}_NO_LIB>
+        )
 
     # Define public headers
     target_include_directories(${PROJECT_NAME} PUBLIC
@@ -68,7 +73,6 @@ elseif(NOT EPROSIMA_INSTALLER)
         get_target_property(TARGET_TYPE ${PROJECT_NAME} TYPE)
         if(TARGET_TYPE STREQUAL "SHARED_LIBRARY")
             # Export symbols in DLL library
-            target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_NAME_UPPER}_DYN_LINK)
             set_target_properties(${PROJECT_NAME} PROPERTIES
                 PDB_NAME_DEBUG "${PROJECT_NAME}d-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}"
                 PDB_OUTPUT_DIRECTORY_DEBUG "${CMAKE_CURRENT_BINARY_DIR}/symbols"

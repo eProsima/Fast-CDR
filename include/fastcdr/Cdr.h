@@ -1378,7 +1378,7 @@ public:
             Endianness endianness)
     {
         bool auxSwap = m_swapBytes;
-        m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+        m_swapBytes = (m_swapBytes && (static_cast<Endianness>(m_endianness) == endianness)) || (!m_swapBytes && (static_cast<Endianness>(m_endianness) != endianness));
 
         try
         {
@@ -1849,7 +1849,7 @@ public:
             Endianness endianness)
     {
         bool auxSwap = m_swapBytes;
-        m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+        m_swapBytes = (m_swapBytes && (static_cast<Endianness>(m_endianness) == endianness)) || (!m_swapBytes && (static_cast<Endianness>(m_endianness) != endianness));
 
         try
         {
@@ -1880,7 +1880,7 @@ public:
             Endianness endianness)
     {
         bool auxSwap = m_swapBytes;
-        m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+        m_swapBytes = (m_swapBytes && (static_cast<Endianness>(m_endianness) == endianness)) || (!m_swapBytes && (static_cast<Endianness>(m_endianness) != endianness));
 
         try
         {
@@ -1949,7 +1949,7 @@ public:
             Endianness endianness)
     {
         bool auxSwap = m_swapBytes;
-        m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+        m_swapBytes = (m_swapBytes && (static_cast<Endianness>(m_endianness) == endianness)) || (!m_swapBytes && (static_cast<Endianness>(m_endianness) != endianness));
 
         try
         {
@@ -2009,7 +2009,7 @@ public:
             Endianness endianness)
     {
         bool auxSwap = m_swapBytes;
-        m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+        m_swapBytes = (m_swapBytes && (static_cast<Endianness>(m_endianness) == endianness)) || (!m_swapBytes && (static_cast<Endianness>(m_endianness) != endianness));
 
         try
         {
@@ -2469,7 +2469,7 @@ public:
             Endianness endianness)
     {
         bool auxSwap = m_swapBytes;
-        m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+        m_swapBytes = (m_swapBytes && (static_cast<Endianness>(m_endianness) == endianness)) || (!m_swapBytes && (static_cast<Endianness>(m_endianness) != endianness));
 
         try
         {
@@ -2498,7 +2498,7 @@ public:
             Endianness endianness)
     {
         bool auxSwap = m_swapBytes;
-        m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+        m_swapBytes = (m_swapBytes && (static_cast<Endianness>(m_endianness) == endianness)) || (!m_swapBytes && (static_cast<Endianness>(m_endianness) != endianness));
 
         try
         {
@@ -2667,7 +2667,7 @@ public:
             Endianness endianness)
     {
         bool auxSwap = m_swapBytes;
-        m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+        m_swapBytes = (m_swapBytes && (static_cast<Endianness>(m_endianness) == endianness)) || (!m_swapBytes && (static_cast<Endianness>(m_endianness) != endianness));
 
         try
         {
@@ -3136,7 +3136,7 @@ public:
             Endianness endianness)
     {
         bool auxSwap = m_swapBytes;
-        m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+        m_swapBytes = (m_swapBytes && (static_cast<Endianness>(m_endianness) == endianness)) || (!m_swapBytes && (static_cast<Endianness>(m_endianness) != endianness));
 
         try
         {
@@ -3167,7 +3167,7 @@ public:
             Endianness endianness)
     {
         bool auxSwap = m_swapBytes;
-        m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+        m_swapBytes = (m_swapBytes && (static_cast<Endianness>(m_endianness) == endianness)) || (!m_swapBytes && (static_cast<Endianness>(m_endianness) != endianness));
 
         try
         {
@@ -3236,7 +3236,7 @@ public:
             Endianness endianness)
     {
         bool auxSwap = m_swapBytes;
-        m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+        m_swapBytes = (m_swapBytes && (static_cast<Endianness>(m_endianness) == endianness)) || (!m_swapBytes && (static_cast<Endianness>(m_endianness) != endianness));
 
         try
         {
@@ -3379,7 +3379,7 @@ public:
             Endianness endianness)
     {
         bool auxSwap = m_swapBytes;
-        m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
+        m_swapBytes = (m_swapBytes && (static_cast<Endianness>(m_endianness) == endianness)) || (!m_swapBytes && (static_cast<Endianness>(m_endianness) != endianness));
 
         try
         {

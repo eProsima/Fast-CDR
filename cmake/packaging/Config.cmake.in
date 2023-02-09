@@ -31,3 +31,5 @@ else()
         include(${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@-static-targets.cmake)
     endif()
 endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/fastddsgen.cmake")

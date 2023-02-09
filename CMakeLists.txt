@@ -325,6 +325,11 @@ set(CPACK_COMPONENT_LICENSES_HIDDEN 1)
 
 set(CPACK_COMPONENTS_ALL headers licenses)
 
+install(FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/packaging/fastddsgen.cmake"
+    DESTINATION "lib/cmake/${PROJECT_NAME}"
+)
+
 if(BUILD_DOCUMENTATION)
 
     # Instalation of doxygen files

@@ -135,14 +135,6 @@ endif()
 
 # Install libraries
 
-# Generate different target names depending on linking
-get_target_property(TARGET_TYPE ${PROJECT_NAME} TYPE)
-if(TARGET_TYPE STREQUAL "SHARED_LIBRARY")
-    set(FASTCDR_LINKING dynamic)
-else()
-    set(FASTCDR_LINKING static)
-endif()
-
 if(MSVC OR MSVC_IDE AND EPROSIMA_INSTALLER)
     if(IS_TOP_LEVEL)
         install_msvc_libraries(i86Win32VS2013)
@@ -158,15 +150,22 @@ if(MSVC OR MSVC_IDE AND EPROSIMA_INSTALLER)
         COMPONENT cmake
         )
 elseif(NOT EPROSIMA_INSTALLER)
+
     install(TARGETS ${PROJECT_NAME}
-        EXPORT ${PROJECT_NAME}-${FASTCDR_LINKING}-targets
+        EXPORT ${PROJECT_NAME}-targets
         RUNTIME DESTINATION ${BIN_INSTALL_DIR}${MSVCARCH_DIR_EXTENSION}
         LIBRARY DESTINATION ${LIB_INSTALL_DIR}${MSVCARCH_DIR_EXTENSION}
         ARCHIVE DESTINATION ${LIB_INSTALL_DIR}${MSVCARCH_DIR_EXTENSION}
         COMPONENT libraries${MSVCARCH_EXTENSION}
         )
 
-    export(TARGETS ${PROJECT_NAME} FILE ${PROJECT_BINARY_DIR}/cmake/config/${PROJECT_NAME}-${FASTCDR_LINKING}-targets.cmake)
+    # Generate different target names depending on linking
+    get_target_property(TARGET_TYPE ${PROJECT_NAME} TYPE)
+    if(TARGET_TYPE STREQUAL "SHARED_LIBRARY")
+         set(FASTCDR_LINKING shared)
+    else()
+         set(FASTCDR_LINKING static)
+    endif()
 
     if(INSTALLER_PLATFORM)
         set(INSTALL_DESTINATION_PATH ${DATA_INSTALL_DIR}/${PROJECT_NAME}-${INSTALLER_PLATFORM}/cmake)
@@ -174,8 +173,9 @@ elseif(NOT EPROSIMA_INSTALLER)
         set(INSTALL_DESTINATION_PATH ${LIB_INSTALL_DIR}/cmake/${PROJECT_NAME}${MSVCARCH_DIR_EXTENSION_EXT})
     endif()
 
-    install(EXPORT ${PROJECT_NAME}-${FASTCDR_LINKING}-targets
+    install(EXPORT ${PROJECT_NAME}-targets
         DESTINATION ${INSTALL_DESTINATION_PATH}
+	FILE ${PROJECT_NAME}-${FASTCDR_LINKING}-targets.cmake
         COMPONENT cmake
         )
 

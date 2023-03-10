@@ -1,0 +1,81 @@
+# CI for Fast CDR repository
+# The Action is triggered with a PR or push and every night at 00:00
+# Additionally, it can be also triggered manually
+
+name: Fast-CDR-test
+
+on:
+
+  schedule:
+    - cron: '0 0 * * *'
+
+  push:
+
+  workflow_dispatch:
+    inputs:
+      cmake_args:
+        description: 'Optional CMake arguments'
+        required: false
+        type: string
+        default: ''
+      ctest_args:
+        description: 'Optional CTest arguments'
+        required: false
+        type: string
+        default: ''
+      fastdds_branch:
+        description: 'Branch or tag of Fast CDR repository (https://github.com/eProsima/Fast-CDR)'
+        required: false
+        default: 'master'
+
+  pull_request:
+    branches:
+      - 'master'
+    paths-ignore:
+      - '**.md'
+      - '**.txt'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+#############################
+######  UBUNTU BUILD  #######
+#############################
+  ubuntu-build-and-test:
+    name: Colcon build and test
+
+    if: ${{ !(contains(github.event.pull_request.labels.*.name, 'no-test') ||
+              contains(github.event.pull_request.labels.*.name, 'skip-ci')) }}
+
+    runs-on: ${{ matrix.ubuntu-version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu-version:
+          - 'ubuntu-20.04'
+          - 'ubuntu-22.04'
+
+    steps:
+    - name: Sync eProsima/Fast-CDR repository
+      uses: actions/checkout@v3
+      with:
+          path: src/Fast-CDR
+
+    - name: Install Python dependencies
+      uses: ./src/Fast-CDR/.github/actions/install-python-packages
+
+    - name: Fetch repo
+      if: ${{ github.event.inputs.fastdds_branch}}
+      run: |
+        cd src/Fast-CDR && git checkout ${{ inputs.fastdds_branch }} && cd ../..
+
+    - name: Build
+      run: |
+        colcon build --event-handlers=console_direct+ --cmake-args ${{ inputs.cmake_args }}
+
+    - name: Run Tests
+      run: |
+        colcon test --event-handlers=console_direct+ --packages-select fastcdr --ctest-args ${{ inputs.ctest_args }}

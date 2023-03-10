@@ -65,7 +65,7 @@ jobs:
           path: src/Fast-CDR
 
     - name: Install Python dependencies
-      uses: ./src/Fast-CDR/.github/actions/install-python-packages
+      uses: eProsima/eProsima-CI/ubuntu/install_colcon@feature/uncrustify
 
     - name: Fetch repo
       if: ${{ github.event.inputs.fastdds_branch}}

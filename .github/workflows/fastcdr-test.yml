@@ -23,7 +23,7 @@ on:
         required: false
         type: string
         default: ''
-      fastdds_branch:
+      fastcdr_branch:
         description: 'Branch or tag of Fast CDR repository (https://github.com/eProsima/Fast-CDR)'
         required: false
         default: 'master'
@@ -68,9 +68,9 @@ jobs:
       uses: eProsima/eProsima-CI/ubuntu/install_colcon@feature/uncrustify
 
     - name: Fetch repo
-      if: ${{ github.event.inputs.fastdds_branch}}
+      if: ${{ github.event.inputs.fastcdr_branch}}
       run: |
-        cd src/Fast-CDR && git checkout ${{ inputs.fastdds_branch }} && cd ../..
+        cd src/Fast-CDR && git checkout ${{ inputs.fastcdr_branch }} && cd ../..
 
     - name: Build
       run: |

@@ -61,7 +61,7 @@ jobs:
           path: src/Fast-CDR
 
     - name: Install Python dependencies
-      uses: eProsima/eProsima-CI/ubuntu/install_colcon@feature/uncrustify
+      uses: eProsima/eProsima-CI/ubuntu/install_colcon@test/feature/uncrustify
 
     - name: Build
       run: |

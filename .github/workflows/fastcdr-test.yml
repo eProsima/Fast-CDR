@@ -23,10 +23,6 @@ on:
         required: false
         type: string
         default: ''
-      fastcdr_branch:
-        description: 'Branch or tag of Fast CDR repository (https://github.com/eProsima/Fast-CDR)'
-        required: false
-        default: 'master'
 
   pull_request:
     branches:
@@ -67,14 +63,9 @@ jobs:
     - name: Install Python dependencies
       uses: eProsima/eProsima-CI/ubuntu/install_colcon@feature/uncrustify
 
-    - name: Fetch repo
-      if: ${{ github.event.inputs.fastcdr_branch}}
-      run: |
-        cd src/Fast-CDR && git checkout ${{ inputs.fastcdr_branch }} && cd ../..
-
     - name: Build
       run: |
-        colcon build --event-handlers=console_direct+ --cmake-args ${{ inputs.cmake_args }}
+        colcon build --event-handlers=console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo ${{ inputs.cmake_args }}
 
     - name: Run Tests
       run: |

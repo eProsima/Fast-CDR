@@ -65,7 +65,7 @@ jobs:
 
     - name: Build
       run: |
-        colcon build --event-handlers=console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo ${{ inputs.cmake_args }}
+        colcon build --event-handlers=console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo -DEPROSIMA_BUILD_TESTS=ON ${{ inputs.cmake_args }}
 
     - name: Run Tests
       run: |

@@ -60,13 +60,32 @@ jobs:
       with:
           path: src/Fast-CDR
 
-    - name: Install Colcon and dependencies
+    - name: Install Colcon and Dependencies
       uses: eProsima/eProsima-CI/ubuntu/install_colcon@main
+
+    # Temporal step as this platform will be discontinued soon
+    - name: Install Gtest Backwards Compatibility
+      if: ${{ matrix.ubuntu-version == 'ubuntu-20.04' }}
+      run: |
+          git clone --branch release-1.12.1 https://github.com/google/googletest.git && \
+          colcon build \
+            --event-handlers=console_direct+ \
+            --packages-select googletest-distribution
+
+    - name: Install Gtest
+      uses: eProsima/eProsima-CI/ubuntu/install_gtest@feature/install_gtest
 
     - name: Build
       run: |
-        colcon build --event-handlers=console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo -DEPROSIMA_BUILD_TESTS=ON ${{ inputs.cmake_args }}
+        colcon build \
+            --event-handlers=console_direct+ \
+            --packages-select fastcdr \
+            --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo -DEPROSIMA_BUILD_TESTS=ON \
+            ${{ inputs.cmake_args }}
 
     - name: Run Tests
       run: |
-        colcon test --event-handlers=console_direct+ --packages-select fastcdr --ctest-args ${{ inputs.ctest_args }}
+        colcon test \
+            --event-handlers=console_direct+ \
+            --packages-select fastcdr \
+            --ctest-args ${{ inputs.ctest_args }}

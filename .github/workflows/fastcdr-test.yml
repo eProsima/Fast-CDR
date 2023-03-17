@@ -60,7 +60,7 @@ jobs:
       with:
           path: src/Fast-CDR
 
-    - name: Install Colcon and Dependencies
+    - name: Install Colcon dependencies
       uses: eProsima/eProsima-CI/ubuntu/install_colcon@main
 
     # Temporal step as this platform will be discontinued soon
@@ -73,6 +73,7 @@ jobs:
             --packages-select googletest-distribution
 
     - name: Install Gtest
+      if: ${{ matrix.ubuntu-version == 'ubuntu-22.04' }}
       uses: eProsima/eProsima-CI/ubuntu/install_gtest@feature/install_gtest
 
     - name: Build
@@ -88,4 +89,5 @@ jobs:
         colcon test \
             --event-handlers=console_direct+ \
             --packages-select fastcdr \
+            --return-code-on-test-failure \
             --ctest-args ${{ inputs.ctest_args }}

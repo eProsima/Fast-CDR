@@ -91,3 +91,10 @@ jobs:
             --packages-select fastcdr \
             --return-code-on-test-failure \
             --ctest-args ${{ inputs.ctest_args }}
+
+    - name: Archive Test Results
+      if: always()
+      uses: actions/upload-artifact@v1
+      with:
+        name: test-results-${{ matrix.ubuntu-version }}
+        path: log/latest_test/fastcdr

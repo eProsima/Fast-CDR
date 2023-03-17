@@ -1,0 +1,100 @@
+# CI for Fast CDR repository
+# The Action is triggered with a PR or push and every night at 00:00
+# Additionally, it can be also triggered manually
+
+name: Fast-CDR-test
+
+on:
+
+  schedule:
+    - cron: '0 0 * * *'
+
+  push:
+
+  workflow_dispatch:
+    inputs:
+      cmake_args:
+        description: 'Optional CMake arguments'
+        required: false
+        type: string
+        default: ''
+      ctest_args:
+        description: 'Optional CTest arguments'
+        required: false
+        type: string
+        default: ''
+
+  pull_request:
+    branches:
+      - 'master'
+    paths-ignore:
+      - '**.md'
+      - '**.txt'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+
+#############################
+######  UBUNTU BUILD  #######
+#############################
+  ubuntu-build-and-test:
+    name: Colcon build and test
+
+    if: ${{ !(contains(github.event.pull_request.labels.*.name, 'no-test') ||
+              contains(github.event.pull_request.labels.*.name, 'skip-ci')) }}
+
+    runs-on: ${{ matrix.ubuntu-version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu-version:
+          - 'ubuntu-20.04'
+          - 'ubuntu-22.04'
+
+    steps:
+    - name: Sync eProsima/Fast-CDR repository
+      uses: actions/checkout@v3
+      with:
+          path: src/Fast-CDR
+
+    - name: Install Colcon dependencies
+      uses: eProsima/eProsima-CI/ubuntu/install_colcon@main
+
+    # Temporal step as this platform will be discontinued soon
+    - name: Install Gtest Backwards Compatibility
+      if: ${{ matrix.ubuntu-version == 'ubuntu-20.04' }}
+      run: |
+          git clone --branch release-1.12.1 https://github.com/google/googletest.git && \
+          colcon build \
+            --event-handlers=console_direct+ \
+            --packages-select googletest-distribution
+
+    - name: Install Gtest
+      if: ${{ matrix.ubuntu-version == 'ubuntu-22.04' }}
+      uses: eProsima/eProsima-CI/ubuntu/install_gtest@feature/install_gtest
+
+    - name: Build
+      run: |
+        colcon build \
+            --event-handlers=console_direct+ \
+            --packages-select fastcdr \
+            --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo -DEPROSIMA_BUILD_TESTS=ON \
+            ${{ inputs.cmake_args }}
+
+    - name: Run Tests
+      run: |
+        colcon test \
+            --event-handlers=console_direct+ \
+            --packages-select fastcdr \
+            --return-code-on-test-failure \
+            --ctest-args ${{ inputs.ctest_args }}
+
+    - name: Archive Test Results
+      if: always()
+      uses: actions/upload-artifact@v1
+      with:
+        name: test-results-${{ matrix.ubuntu-version }}
+        path: log/latest_test/fastcdr

@@ -96,18 +96,25 @@ Cdr& Cdr::read_encapsulation()
         }
 
         // Check encapsulationKind correctness
-        const uint8_t encoding_flag = encapsulation & 0x1_8u;
+        const uint8_t encoding_flag = encapsulation & ~0x1_8u;
         switch (encoding_flag)
         {
-            case EncodingAlgorithmFlag::PLAIN_CDR:
             case EncodingAlgorithmFlag::PL_CDR:
             case EncodingAlgorithmFlag::PLAIN_CDR2:
             case EncodingAlgorithmFlag::DELIMIT_CDR2:
             case EncodingAlgorithmFlag::PL_CDR2:
+                if (CdrType::CORBA_CDR == m_cdrType)
+                {
+                    throw BadParamException(
+                              "Unexpected encoding algorithm received in Cdr::read_encapsulation for CORBA CDR");
+                }
+                encoding_flag_ = static_cast<EncodingAlgorithmFlag>(encoding_flag);
+                break;
+            case EncodingAlgorithmFlag::PLAIN_CDR:
                 encoding_flag_ = static_cast<EncodingAlgorithmFlag>(encoding_flag);
                 break;
             default:
-                throw BadParamException("Unexpected CDR type received in Cdr::read_encapsulation");
+                throw BadParamException("Unexpected encoding algorithm received in Cdr::read_encapsulation for DDS CDR");
         }
 
         if (m_cdrType == DDS_CDR)

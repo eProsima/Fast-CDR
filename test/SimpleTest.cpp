@@ -423,19 +423,16 @@ TEST(CDRTests, DDSEncapsulation)
     valid_encapsulations.fill(false);
 
     // Valid representation identifiers from table 10.3
-    valid_encapsulations[0x00] = true;  // CDR_BE
-    valid_encapsulations[0x01] = true;  // CDR_LE
-    valid_encapsulations[0x02] = true;  // PL_CDR_BE
-    valid_encapsulations[0x03] = true;  // PL_CDR_LE
-
-    // TODO(Miguel C): Change when more encapsulations are supported
-    // valid_encapsulations[0x10] = true;  // CDR2_BE
-    // valid_encapsulations[0x11] = true;  // CDR2_LE
-    // valid_encapsulations[0x12] = true;  // PL_CDR2_BE
-    // valid_encapsulations[0x13] = true;  // PL_CDR2_LE
-    // valid_encapsulations[0x14] = true;  // D_CDR_BE
-    // valid_encapsulations[0x15] = true;  // D_CDR_LE
-    // valid_encapsulations[0x04] = true;  // XML
+    valid_encapsulations[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR] = true;  // PLAIN_CDR_BE
+    valid_encapsulations[1 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR] = true;   // PLAIN_CDR_LE
+    valid_encapsulations[0 + Cdr::EncodingAlgorithmFlag::PL_CDR] = true;  // PL_CDR_BE
+    valid_encapsulations[1 + Cdr::EncodingAlgorithmFlag::PL_CDR] = true;   // PL_CDR_LE
+    valid_encapsulations[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2] = true;  // PLAIN_CDR2_BE
+    valid_encapsulations[1 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2] = true;   // PLAIN_CDR2_LE
+    valid_encapsulations[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2] = true;  // DELIMIT_CDR2_BE
+    valid_encapsulations[1 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2] = true;   // DELIMIT_CDR2_LE
+    valid_encapsulations[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2] = true;  // PL_CDR2_BE
+    valid_encapsulations[1 + Cdr::EncodingAlgorithmFlag::PL_CDR2] = true;   // PL_CDR2_LE
 
     for (uint16_t i = 0; i < 256; ++i)
     {

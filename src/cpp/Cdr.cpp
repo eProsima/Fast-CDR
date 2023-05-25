@@ -26,6 +26,12 @@ const Cdr::Endianness Cdr::DEFAULT_ENDIAN = LITTLE_ENDIANNESS;
 
 constexpr size_t ALIGNMENT_LONG_DOUBLE = 8;
 
+constexpr uint8_t operator ""_8u(
+        unsigned long long int value)
+{
+    return static_cast<uint8_t>(value);
+}
+
 Cdr::state::state(
         const Cdr& cdr)
     : m_currentPosition(cdr.m_currentPosition)
@@ -50,7 +56,6 @@ Cdr::Cdr(
         const CdrType cdrType)
     : m_cdrBuffer(cdrBuffer)
     , m_cdrType(cdrType)
-    , m_plFlag(DDS_CDR_WITHOUT_PL)
     , m_options(0)
     , m_endianness(static_cast<uint8_t>(endianness))
     , m_swapBytes(endianness == DEFAULT_ENDIAN ? false : true)
@@ -63,7 +68,7 @@ Cdr::Cdr(
 
 Cdr& Cdr::read_encapsulation()
 {
-    uint8_t dummy = 0, encapsulationKind = 0;
+    uint8_t dummy = 0, encapsulation = 0;
     state state_before_error(*this);
 
     try
@@ -79,32 +84,30 @@ Cdr& Cdr::read_encapsulation()
         }
 
         // Get the ecampsulation byte.
-        (*this) >> encapsulationKind;
+        (*this) >> encapsulation;
 
 
         // If it is a different endianness, make changes.
-        if (m_endianness != (encapsulationKind & 0x1))
+        const bool endianness = encapsulation & 0x1_8u;
+        if (m_endianness != endianness)
         {
             m_swapBytes = !m_swapBytes;
-            m_endianness = (encapsulationKind & 0x1);
+            m_endianness = endianness;
         }
 
         // Check encapsulationKind correctness
-        uint8_t allowed_kind_mask = LITTLE_ENDIANNESS;
-        if (m_cdrType == DDS_CDR)
+        const uint8_t encoding_flag = encapsulation & 0x1_8u;
+        switch (encoding_flag)
         {
-            allowed_kind_mask |= DDS_CDR_WITH_PL;
-        }
-
-        if (0 != (encapsulationKind & ~allowed_kind_mask))
-        {
-            throw BadParamException("Unexpected CDR type received in Cdr::read_encapsulation");
-        }
-
-        // If it is DDS_CDR type, view if contains a parameter list.
-        if ((encapsulationKind & DDS_CDR_WITH_PL) && ((m_cdrType == DDS_CDR)))
-        {
-            m_plFlag = DDS_CDR_WITH_PL;
+            case EncodingAlgorithmFlag::PLAIN_CDR:
+            case EncodingAlgorithmFlag::PL_CDR:
+            case EncodingAlgorithmFlag::PLAIN_CDR2:
+            case EncodingAlgorithmFlag::DELIMIT_CDR2:
+            case EncodingAlgorithmFlag::PL_CDR2:
+                encoding_flag_ = static_cast<EncodingAlgorithmFlag>(encoding_flag);
+                break;
+            default:
+                throw BadParamException("Unexpected CDR type received in Cdr::read_encapsulation");
         }
 
         if (m_cdrType == DDS_CDR)
@@ -124,7 +127,7 @@ Cdr& Cdr::read_encapsulation()
 
 Cdr& Cdr::serialize_encapsulation()
 {
-    uint8_t dummy = 0, encapsulationKind = 0;
+    uint8_t dummy = 0, encapsulation = 0;
     state state_before_error(*this);
 
     try
@@ -136,10 +139,10 @@ Cdr& Cdr::serialize_encapsulation()
         }
 
         // Construct encapsulation byte.
-        encapsulationKind = (static_cast<uint8_t>(m_plFlag) | m_endianness);
+        encapsulation = (encoding_flag_ | m_endianness);
 
         // Serialize the encapsulation byte.
-        (*this) << encapsulationKind;
+        (*this) << encapsulation;
     }
     catch (Exception& ex)
     {
@@ -164,15 +167,15 @@ Cdr& Cdr::serialize_encapsulation()
     return *this;
 }
 
-Cdr::DDSCdrPlFlag Cdr::getDDSCdrPlFlag() const
+Cdr::EncodingAlgorithmFlag Cdr::get_encoding_flag() const
 {
-    return m_plFlag;
+    return encoding_flag_;
 }
 
-void Cdr::setDDSCdrPlFlag(
-        DDSCdrPlFlag plFlag)
+void Cdr::set_encoding_flag(
+        Cdr::EncodingAlgorithmFlag encoding_flag)
 {
-    m_plFlag = plFlag;
+    encoding_flag_ = encoding_flag;
 }
 
 uint16_t Cdr::getDDSCdrOptions() const

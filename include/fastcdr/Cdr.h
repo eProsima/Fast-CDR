@@ -34,6 +34,8 @@
 
 namespace eprosima {
 namespace fastcdr {
+
+static constexpr uint32_t MEMBER_ID_INVALID_VALUE = 0xFFFFFFFF;
 /*!
  * @brief This class offers an interface to serialize/deserialize some basic types using CDR protocol inside an eprosima::fastcdr::FastBuffer.
  * @ingroup FASTCDRAPIREFERENCE
@@ -51,15 +53,20 @@ public:
         DDS_CDR
     } CdrType;
 
-    //! @brief This enumeration represents the two posible values of the flag that points if the content is a parameter list (only in DDS CDR).
-
+    //! @brief This enumeration represents the supported XCDR encoding algorithms.
     typedef enum : uint8_t
     {
-        //! @brief Specifies that the content is not a parameter list.
-        DDS_CDR_WITHOUT_PL = 0x0,
-        //! @brief Specifies that the content is a parameter list.
-        DDS_CDR_WITH_PL = 0x2
-    } DDSCdrPlFlag;
+        //! @brief Specifies that the content is PLAIN_CDR.
+        PLAIN_CDR = 0x0,
+        //! @brief Specifies that the content is PL_CDR,
+        PL_CDR = 0x2,
+        //! @brief Specifies that the content is PLAIN_CDR2.
+        PLAIN_CDR2 = 0x6,
+        //! @brief Specifies that the content is DELIMIT_CDR2.
+        DELIMIT_CDR2 = 0x8,
+        //! @brief Specifies that the content is PL_CDR2.
+        PL_CDR2 = 0xa
+    } EncodingAlgorithmFlag;
 
     /*!
      * @brief This enumeration represents endianness types.
@@ -145,17 +152,17 @@ public:
     Cdr& serialize_encapsulation();
 
     /*!
-     * @brief This function returns the parameter list flag when the CDR type is eprosima::fastcdr::DDS_CDR.
-     * @return The flag that specifies if the content is a parameter list.
+     * @brief Returns the EncodingAlgorithmFlag set in the encapsulation when the CDR type is eprosima::fastcdr::DDS_CDR.
+     * @return The specified flag in the encapsulation.
      */
-    DDSCdrPlFlag getDDSCdrPlFlag() const;
+    EncodingAlgorithmFlag get_encoding_flag() const;
 
     /*!
-     * @brief This function sets the parameter list flag when the CDR type is eprosima::fastcdr::DDS_CDR.
-     * @param plFlag New value for the flag that specifies if the content is a parameter list.
+     * @brief Sets the EncodingAlgorithmFlag for th encapsulation when the CDR type is eprosima::fastcdr::DDS_CDR.
+     * @param encoding_flag Value to be used in the encapsulation.
      */
-    void setDDSCdrPlFlag(
-            DDSCdrPlFlag plFlag);
+    void set_encoding_flag(
+            EncodingAlgorithmFlag encoding_flag);
 
     /*!
      * @brief This function returns the option flags when the CDR type is eprosima::fastcdr::DDS_CDR.
@@ -3414,6 +3421,12 @@ public:
         return *this;
     }
 
+    void set_next_member_id(
+            uint32_t id)
+    {
+        next_member_id_ = id;
+    }
+
 private:
 
     Cdr(
@@ -3543,8 +3556,8 @@ private:
     //! @brief The type of CDR that will be use in serialization/deserialization.
     CdrType m_cdrType;
 
-    //! @brief Using DDS_CDR type, this attribute stores if the stream buffer contains a parameter list or not.
-    DDSCdrPlFlag m_plFlag;
+    //! @brief Using eprosima::fastcdr::DDS_CDR type, this attribute stores the encoding algorithm.
+    EncodingAlgorithmFlag encoding_flag_ {EncodingAlgorithmFlag::PLAIN_CDR};
 
     //! @brief This attribute stores the option flags when the CDR type is DDS_CDR;
     uint16_t m_options;
@@ -3566,8 +3579,15 @@ private:
 
     //! @brief The last position in the buffer;
     FastBuffer::iterator m_lastPosition;
+
+    //!
+    uint32_t next_member_id_ = MEMBER_ID_INVALID_VALUE;
+
 };
+
 }     //namespace fastcdr
 } //namespace eprosima
+
+#include "xcdr/MemberId.hpp"
 
 #endif // _CDR_CDR_H_

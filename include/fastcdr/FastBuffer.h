@@ -47,11 +47,7 @@ public:
      * @brief Default constructor.
      * The iterator points any position.
      */
-    _FastBuffer_iterator()
-        : m_buffer(NULL)
-        , m_currentPosition(NULL)
-    {
-    }
+    _FastBuffer_iterator() = default;
 
     /*!
      * @brief Constructor.
@@ -210,13 +206,19 @@ public:
         return m_currentPosition;
     }
 
+    bool operator ==(
+            const _FastBuffer_iterator& other_iterator) const
+    {
+        return other_iterator.m_currentPosition == m_currentPosition;
+    }
+
 private:
 
     //! Pointer to the raw buffer.
-    char* m_buffer;
+    char* m_buffer {nullptr};
 
     //! Current position in the raw buffer.
-    char* m_currentPosition;
+    char* m_currentPosition {nullptr};
 };
 
 /*!

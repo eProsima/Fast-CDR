@@ -12,8 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
+#include <cstdint>
+
 namespace eprosima {
 namespace fastcdr {
+
+class Cdr;
 
 class MemberId
 {
@@ -22,34 +27,29 @@ public:
     MemberId() = default;
 
     MemberId(
-            uint32_t id)
+            uint32_t id_value)
+        : id(id_value)
     {
-        id_ = id;
     }
 
     bool operator ==(
-            uint32_t id)
+            uint32_t id_value)
     {
-        return id_ == id;
+        return id == id_value;
     }
 
     bool operator ==(
-            const MemberId id)
+            const MemberId member_id)
     {
-        return id.id_ == id_;
+        return id == member_id.id;
     }
 
-    friend Cdr& operator <<(
-            Cdr& cdr,
-            const MemberId& id)
-    {
-        cdr.set_next_member_id(id.id_);
-        return cdr;
-    }
+    uint32_t id = member_id_invalid_value_;
 
 private:
 
-    uint32_t id_ = MEMBER_ID_INVALID_VALUE;
+    static constexpr uint32_t member_id_invalid_value_ = 0xFFFFFFFF;
+
 };
 
 static constexpr MemberId MEMBER_ID_INVALID {};

@@ -15,8 +15,10 @@
 #include <fastcdr/Cdr.h>
 #include <fastcdr/exceptions/BadParamException.h>
 
-using namespace eprosima::fastcdr;
-using namespace ::exception;
+namespace eprosima {
+namespace fastcdr {
+
+using namespace exception;
 
 #if FASTCDR_IS_BIG_ENDIAN_TARGET
 const Cdr::Endianness Cdr::DEFAULT_ENDIAN = BIG_ENDIANNESS;
@@ -50,16 +52,24 @@ Cdr::state::state(
 {
 }
 
+bool Cdr::state::operator ==(
+        const Cdr::state& other_state) const
+{
+    return
+        other_state.m_currentPosition == m_currentPosition &&
+        other_state.m_alignPosition == m_alignPosition &&
+        other_state.m_swapBytes == m_swapBytes &&
+        other_state.m_lastDataSize == m_lastDataSize;
+}
+
 Cdr::Cdr(
         FastBuffer& cdrBuffer,
         const Endianness endianness,
         const CdrType cdrType)
     : m_cdrBuffer(cdrBuffer)
     , m_cdrType(cdrType)
-    , m_options(0)
-    , m_endianness(static_cast<uint8_t>(endianness))
+    , m_endianness(endianness)
     , m_swapBytes(endianness == DEFAULT_ENDIAN ? false : true)
-    , m_lastDataSize(0)
     , m_currentPosition(cdrBuffer.begin())
     , m_alignPosition(cdrBuffer.begin())
     , m_lastPosition(cdrBuffer.end())
@@ -117,6 +127,8 @@ Cdr& Cdr::read_encapsulation()
                 throw BadParamException("Unexpected encoding algorithm received in Cdr::read_encapsulation for DDS CDR");
         }
 
+        current_encoding_ = encoding_flag_;
+
         if (m_cdrType == DDS_CDR)
         {
             (*this) >> m_options;
@@ -124,7 +136,7 @@ Cdr& Cdr::read_encapsulation()
     }
     catch (Exception& ex)
     {
-        setState(state_before_error);
+        set_state(state_before_error);
         ex.raise();
     }
 
@@ -150,10 +162,12 @@ Cdr& Cdr::serialize_encapsulation()
 
         // Serialize the encapsulation byte.
         (*this) << encapsulation;
+
+        current_encoding_ = encoding_flag_;
     }
     catch (Exception& ex)
     {
-        setState(state_before_error);
+        set_state(state_before_error);
         ex.raise();
     }
 
@@ -166,7 +180,7 @@ Cdr& Cdr::serialize_encapsulation()
     }
     catch (Exception& ex)
     {
-        setState(state_before_error);
+        set_state(state_before_error);
         ex.raise();
     }
 
@@ -230,13 +244,13 @@ char* Cdr::getCurrentPosition()
     return &m_currentPosition;
 }
 
-Cdr::state Cdr::getState()
+Cdr::state Cdr::get_state() const
 {
     return Cdr::state(*this);
 }
 
-void Cdr::setState(
-        state& current_state)
+void Cdr::set_state(
+        const state& current_state)
 {
     m_currentPosition >> current_state.m_currentPosition;
     m_alignPosition >> current_state.m_alignPosition;
@@ -250,6 +264,10 @@ void Cdr::reset()
     m_alignPosition = m_cdrBuffer.begin();
     m_swapBytes = m_endianness == DEFAULT_ENDIAN ? false : true;
     m_lastDataSize = 0;
+    encoding_flag_ = EncodingAlgorithmFlag::PLAIN_CDR;
+    current_encoding_ = EncodingAlgorithmFlag::PLAIN_CDR;
+    next_member_id_ = MEMBER_ID_INVALID;
+    m_options = 0;
 }
 
 bool Cdr::moveAlignmentForward(
@@ -739,7 +757,7 @@ Cdr& Cdr::serialize(
         }
         else
         {
-            setState(state_before_error);
+            set_state(state_before_error);
             throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
     }
@@ -798,7 +816,7 @@ Cdr& Cdr::serialize(
         }
         else
         {
-            setState(state_);
+            set_state(state_);
             throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
     }
@@ -1903,7 +1921,7 @@ Cdr& Cdr::deserialize(
         return *this;
     }
 
-    setState(state_before_error);
+    set_state(state_before_error);
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
@@ -1942,7 +1960,7 @@ Cdr& Cdr::deserialize(
         return *this;
     }
 
-    setState(state_before_error);
+    set_state(state_before_error);
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
@@ -2014,7 +2032,7 @@ const char* Cdr::readString(
         return returnedValue;
     }
 
-    setState(state_before_error);
+    set_state(state_before_error);
     throw eprosima::fastcdr::exception::NotEnoughMemoryException(
               eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
@@ -2047,7 +2065,7 @@ const std::wstring Cdr::readWString(
         return returnedValue;
     }
 
-    setState(state_);
+    set_state(state_);
     throw eprosima::fastcdr::exception::NotEnoughMemoryException(
               eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
@@ -2669,7 +2687,7 @@ Cdr& Cdr::serializeBoolSequence(
     }
     else
     {
-        setState(state_before_error);
+        set_state(state_before_error);
         throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
@@ -2713,7 +2731,7 @@ Cdr& Cdr::deserializeBoolSequence(
     }
     else
     {
-        setState(state_before_error);
+        set_state(state_before_error);
         throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
@@ -2738,7 +2756,7 @@ Cdr& Cdr::deserializeStringSequence(
     {
         delete [] sequence_t;
         sequence_t = NULL;
-        setState(state_before_error);
+        set_state(state_before_error);
         ex.raise();
     }
 
@@ -2764,10 +2782,133 @@ Cdr& Cdr::deserializeWStringSequence(
     {
         delete [] sequence_t;
         sequence_t = NULL;
-        setState(state_before_error);
+        set_state(state_before_error);
         ex.raise();
     }
 
     numElements = seqLength;
     return *this;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// XCDR extensions
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+Cdr& Cdr::begin_serialize_member(
+        const MemberId& member_id,
+        Cdr::state& current_state)
+{
+    static_cast<void>(current_state);
+    assert(current_state == Cdr::state(*this));
+
+    switch (current_encoding_)
+    {
+        case EncodingAlgorithmFlag::PLAIN_CDR:
+        case EncodingAlgorithmFlag::PL_CDR:
+            (void)member_id;
+            break;
+        case EncodingAlgorithmFlag::PLAIN_CDR2:
+        case EncodingAlgorithmFlag::DELIMIT_CDR2:
+        {
+            bool is_present = false;
+            serialize(is_present);
+        }
+        break;
+        case EncodingAlgorithmFlag::PL_CDR2:
+            (void)member_id;
+            break;
+        default:
+            throw BadParamException("Unexpected current encoding in Cdr::begin_serialize_member");
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::end_serialize_member(
+        const Cdr::state& current_state)
+{
+    switch (current_encoding_)
+    {
+        case EncodingAlgorithmFlag::PLAIN_CDR:
+        case EncodingAlgorithmFlag::PL_CDR:
+            (void)current_state;
+            break;
+        case EncodingAlgorithmFlag::PLAIN_CDR2:
+        case EncodingAlgorithmFlag::DELIMIT_CDR2:
+            if (1 < m_currentPosition - current_state.m_currentPosition)
+            {
+                bool is_present = true;
+                Cdr::state previous_state(*this);
+                set_state(current_state);
+                serialize(is_present);
+                set_state(previous_state);
+            }
+
+            break;
+        case EncodingAlgorithmFlag::PL_CDR2:
+            (void)current_state;
+            break;
+        default:
+            throw BadParamException("Unexpected current encoding in Cdr::begin_serialize_member");
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::begin_deserialize_member(
+        MemberId& member_id,
+        Cdr::state& current_state,
+        bool& is_present)
+{
+    static_cast<void>(current_state);
+    assert(current_state == Cdr::state(*this));
+
+    switch (current_encoding_)
+    {
+        case EncodingAlgorithmFlag::PLAIN_CDR:
+        case EncodingAlgorithmFlag::PL_CDR:
+            (void)member_id;
+            break;
+        case EncodingAlgorithmFlag::PLAIN_CDR2:
+        case EncodingAlgorithmFlag::DELIMIT_CDR2:
+        {
+            deserialize(is_present);
+            current_state.member_size_ = is_present ? 1 : 0;
+        }
+        break;
+        case EncodingAlgorithmFlag::PL_CDR2:
+            (void)member_id;
+            break;
+        default:
+            throw BadParamException("Unexpected current encoding in Cdr::begin_serialize_member");
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::end_deserialize_member(
+        const Cdr::state& current_state)
+{
+    switch (current_encoding_)
+    {
+        case EncodingAlgorithmFlag::PLAIN_CDR:
+        case EncodingAlgorithmFlag::PL_CDR:
+            (void)current_state;
+            break;
+        case EncodingAlgorithmFlag::PLAIN_CDR2:
+        case EncodingAlgorithmFlag::DELIMIT_CDR2:
+            assert(0 == current_state.member_size_ ?
+                    1 == m_currentPosition - current_state.m_currentPosition :
+                    1 < m_currentPosition - current_state.m_currentPosition);
+            break;
+        case EncodingAlgorithmFlag::PL_CDR2:
+            (void)current_state;
+            break;
+        default:
+            throw BadParamException("Unexpected current encoding in Cdr::begin_serialize_member");
+    }
+
+    return *this;
+}
+
+} // namespace fastcdr
+} // namespace eprosima

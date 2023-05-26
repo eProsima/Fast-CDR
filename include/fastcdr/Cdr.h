@@ -15,14 +15,18 @@
 #ifndef _FASTCDR_CDR_H_
 #define _FASTCDR_CDR_H_
 
+#include <array>
+#include <cassert>
+#include <cstdint>
+#include <iostream>
+#include <map>
+#include <string>
+#include <vector>
+
 #include "fastcdr_dll.h"
 #include "FastBuffer.h"
 #include "exceptions/NotEnoughMemoryException.h"
-#include <stdint.h>
-#include <string>
-#include <vector>
-#include <map>
-#include <iostream>
+#include "xcdr/MemberId.hpp"
 
 #if !__APPLE__ && !__FreeBSD__ && !__VXWORKS__
 #include <malloc.h>
@@ -30,12 +34,9 @@
 #include <stdlib.h>
 #endif // if !__APPLE__ && !__FreeBSD__ && !__VXWORKS__
 
-#include <array>
-
 namespace eprosima {
 namespace fastcdr {
 
-static constexpr uint32_t MEMBER_ID_INVALID_VALUE = 0xFFFFFFFF;
 /*!
  * @brief This class offers an interface to serialize/deserialize some basic types using CDR protocol inside an eprosima::fastcdr::FastBuffer.
  * @ingroup FASTCDRAPIREFERENCE
@@ -101,12 +102,16 @@ public:
          * @brief Copy constructor.
          */
         state(
-                const state&);
+                const state& state);
+
+
+        bool operator ==(
+                const state& other_state) const;
 
     private:
 
         state& operator =(
-                const state&) = delete;
+                const state& state) = delete;
 
         //! @brief The position in the buffer when the state was created.
         const FastBuffer::iterator m_currentPosition;
@@ -115,10 +120,13 @@ public:
         const FastBuffer::iterator m_alignPosition;
 
         //! @brief This attribute specified if it is needed to swap the bytes when the state was created..
-        bool m_swapBytes;
+        bool m_swapBytes {false};
 
         //! @brief Stores the last datasize serialized/deserialized when the state was created.
-        size_t m_lastDataSize;
+        size_t m_lastDataSize {0};
+
+        //!
+        uint32_t member_size_ {0};
     };
 
     /*!
@@ -241,17 +249,17 @@ public:
     }
 
     /*!
-     * @brief This function returns the current state of the CDR serialization process.
+     * @brief Returns the current state of the CDR serialization process.
      * @return The current state of the CDR serialization process.
      */
-    state getState();
+    state get_state() const;
 
     /*!
-     * @brief This function sets a previous state of the CDR serialization process;
+     * @brief Sets a previous state of the CDR serialization process;
      * @param state Previous state that will be set.
      */
-    void setState(
-            state& state);
+    void set_state(
+            const state& state);
 
     /*!
      * @brief This function moves the alignment forward.
@@ -1295,7 +1303,7 @@ public:
         }
         catch (eprosima::fastcdr::exception::Exception& ex)
         {
-            setState(state_before_error);
+            set_state(state_before_error);
             ex.raise();
         }
 
@@ -1327,7 +1335,7 @@ public:
         }
         catch (eprosima::fastcdr::exception::Exception& ex)
         {
-            setState(state_);
+            set_state(state_);
             ex.raise();
         }
 
@@ -1995,7 +2003,7 @@ public:
         }
         catch (eprosima::fastcdr::exception::Exception& ex)
         {
-            setState(state_before_error);
+            set_state(state_before_error);
             ex.raise();
         }
 
@@ -2589,7 +2597,7 @@ public:
 
         if ((m_lastPosition - m_currentPosition) < seqLength)
         {
-            setState(state_before_error);
+            set_state(state_before_error);
             throw eprosima::fastcdr::exception::NotEnoughMemoryException(
                       eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
@@ -2601,7 +2609,7 @@ public:
         }
         catch (eprosima::fastcdr::exception::Exception& ex)
         {
-            setState(state_before_error);
+            set_state(state_before_error);
             ex.raise();
         }
 
@@ -2636,7 +2644,7 @@ public:
         }
         catch (eprosima::fastcdr::exception::Exception& ex)
         {
-            setState(state_);
+            set_state(state_);
             ex.raise();
         }
 
@@ -3342,7 +3350,7 @@ public:
         {
             free(sequence_t);
             sequence_t = NULL;
-            setState(state_before_error);
+            set_state(state_before_error);
             ex.raise();
         }
 
@@ -3421,10 +3429,31 @@ public:
         return *this;
     }
 
-    void set_next_member_id(
-            uint32_t id)
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// XCDR extensions
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Cdr& begin_serialize_member(
+            const MemberId& member_id,
+            Cdr::state& current_state);
+
+    Cdr& end_serialize_member(
+            const Cdr::state& current_state);
+
+    Cdr& begin_deserialize_member(
+            MemberId& member_id,
+            Cdr::state& current_state,
+            bool& is_present);
+
+    Cdr& end_deserialize_member(
+            const Cdr::state& current_state);
+
+    template<class _T = MemberId>
+    inline Cdr& operator << (
+            const MemberId& type_t)
     {
-        next_member_id_ = id;
+        assert(next_member_id_ == MEMBER_ID_INVALID);
+        next_member_id_ = type_t;
+        return *this;
     }
 
 private:
@@ -3554,22 +3583,22 @@ private:
     FastBuffer& m_cdrBuffer;
 
     //! @brief The type of CDR that will be use in serialization/deserialization.
-    CdrType m_cdrType;
+    CdrType m_cdrType {CdrType::CORBA_CDR};
 
     //! @brief Using eprosima::fastcdr::DDS_CDR type, this attribute stores the encoding algorithm.
     EncodingAlgorithmFlag encoding_flag_ {EncodingAlgorithmFlag::PLAIN_CDR};
 
     //! @brief This attribute stores the option flags when the CDR type is DDS_CDR;
-    uint16_t m_options;
+    uint16_t m_options {0};
 
     //! @brief The endianness that will be applied over the buffer.
-    uint8_t m_endianness;
+    uint8_t m_endianness {Endianness::LITTLE_ENDIANNESS};
 
     //! @brief This attribute specifies if it is needed to swap the bytes.
-    bool m_swapBytes;
+    bool m_swapBytes {false};
 
     //! @brief Stores the last datasize serialized/deserialized. It's used to optimize.
-    size_t m_lastDataSize;
+    size_t m_lastDataSize {0};
 
     //! @brief The current position in the serialization/deserialization process.
     FastBuffer::iterator m_currentPosition;
@@ -3581,13 +3610,14 @@ private:
     FastBuffer::iterator m_lastPosition;
 
     //!
-    uint32_t next_member_id_ = MEMBER_ID_INVALID_VALUE;
+    MemberId next_member_id_;
+
+    //!
+    EncodingAlgorithmFlag current_encoding_ {EncodingAlgorithmFlag::PLAIN_CDR};
 
 };
 
 }     //namespace fastcdr
 } //namespace eprosima
-
-#include "xcdr/MemberId.hpp"
 
 #endif // _CDR_CDR_H_

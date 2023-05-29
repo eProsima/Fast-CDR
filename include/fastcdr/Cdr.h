@@ -138,6 +138,9 @@ public:
 
         //!
         XCdrHeaderSelection header_selection_ {XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT};
+
+        //!
+        XCdrHeaderSelection header_serialized_ {XCdrHeaderSelection::SHORT_HEADER};
     };
 
     /*!
@@ -3599,6 +3602,18 @@ private:
             const MemberId& member_id);
 
     void xcdr1_end_short_member_header(
+            size_t member_serialized_size);
+
+    void xcdr1_serialize_long_member_header(
+            const MemberId& member_id);
+
+    void xcdr1_end_long_member_header(
+            size_t member_serialized_size);
+
+    void xcdr1_change_to_short_member_header(
+            size_t member_serialized_size);
+
+    void xcdr1_change_to_long_member_header(
             size_t member_serialized_size);
 
     void xcdr1_deserialize_member_header(

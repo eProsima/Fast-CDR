@@ -17,7 +17,7 @@
 ###############################################################################
 set(XCDR_TEST_SOURCE
     optional.cpp
-    xcdr_tests.cpp
+    xcdrv1.cpp
     )
 add_executable(xcdr_tests ${XCDR_TEST_SOURCE})
 set_common_compile_options(xcdr_tests)

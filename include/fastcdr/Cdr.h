@@ -83,6 +83,14 @@ public:
     //! @brief Default endiness in the system.
     static const Endianness DEFAULT_ENDIAN;
 
+    typedef enum
+    {
+        SHORT_HEADER,
+        LONG_HEADER,
+        AUTO_WITH_SHORT_HEADER_BY_DEFAULT,
+        AUTO_WITH_LONG_HEADER_BY_DEFAULT
+    } XCdrHeaderSelection;
+
     /*!
      * @brief This class stores the current state of a CDR serialization.
      */
@@ -114,10 +122,10 @@ public:
                 const state& state) = delete;
 
         //! @brief The position in the buffer when the state was created.
-        const FastBuffer::iterator m_currentPosition;
+        const FastBuffer::iterator offset_;
 
         //! @brief The position from the aligment is calculated,  when the state was created..
-        const FastBuffer::iterator m_alignPosition;
+        const FastBuffer::iterator origin_;
 
         //! @brief This attribute specified if it is needed to swap the bytes when the state was created..
         bool m_swapBytes {false};
@@ -127,6 +135,9 @@ public:
 
         //!
         uint32_t member_size_ {0};
+
+        //!
+        XCdrHeaderSelection header_selection_ {XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT};
     };
 
     /*!
@@ -232,7 +243,7 @@ public:
      */
     inline size_t getSerializedDataLength() const
     {
-        return m_currentPosition - m_cdrBuffer.begin();
+        return offset_ - m_cdrBuffer.begin();
     }
 
     /*!
@@ -274,7 +285,7 @@ public:
      */
     inline void resetAlignment()
     {
-        m_alignPosition = m_currentPosition;
+        origin_ = offset_;
     }
 
     /*!
@@ -2595,7 +2606,7 @@ public:
             return *this;
         }
 
-        if ((m_lastPosition - m_currentPosition) < seqLength)
+        if ((end_ - offset_) < seqLength)
         {
             set_state(state_before_error);
             throw eprosima::fastcdr::exception::NotEnoughMemoryException(
@@ -3434,7 +3445,8 @@ public:
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     Cdr& begin_serialize_member(
             const MemberId& member_id,
-            Cdr::state& current_state);
+            Cdr::state& current_state,
+            XCdrHeaderSelection header_selection = XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT);
 
     Cdr& end_serialize_member(
             const Cdr::state& current_state);
@@ -3551,7 +3563,7 @@ private:
             size_t dataSize) const
     {
         return dataSize >
-               m_lastDataSize ? (dataSize - ((m_currentPosition - m_alignPosition) % dataSize)) &
+               m_lastDataSize ? (dataSize - ((offset_ - origin_) % dataSize)) &
                (dataSize - 1) : 0;
     }
 
@@ -3562,7 +3574,8 @@ private:
     inline void makeAlign(
             size_t align)
     {
-        m_currentPosition += align;
+        offset_ += align;
+        m_lastDataSize = 0;
     }
 
     /*!
@@ -3578,6 +3591,19 @@ private:
             uint32_t& length);
     const std::wstring readWString(
             uint32_t& length);
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// XCDR extensions
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    void xcdr1_serialize_short_member_header(
+            const MemberId& member_id);
+
+    void xcdr1_end_short_member_header(
+            size_t member_serialized_size);
+
+    void xcdr1_deserialize_member_header(
+            MemberId& member_id,
+            Cdr::state& current_state);
 
     //! @brief Reference to the buffer that will be serialized/deserialized.
     FastBuffer& m_cdrBuffer;
@@ -3601,13 +3627,13 @@ private:
     size_t m_lastDataSize {0};
 
     //! @brief The current position in the serialization/deserialization process.
-    FastBuffer::iterator m_currentPosition;
+    FastBuffer::iterator offset_;
 
     //! @brief The position from where the aligment is calculated.
-    FastBuffer::iterator m_alignPosition;
+    FastBuffer::iterator origin_;
 
     //! @brief The last position in the buffer;
-    FastBuffer::iterator m_lastPosition;
+    FastBuffer::iterator end_;
 
     //!
     MemberId next_member_id_;

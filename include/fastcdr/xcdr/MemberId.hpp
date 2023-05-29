@@ -33,18 +33,26 @@ public:
     }
 
     bool operator ==(
-            uint32_t id_value)
+            uint32_t id_value) const
     {
         return id == id_value;
     }
 
     bool operator ==(
-            const MemberId member_id)
+            const MemberId member_id) const
     {
         return id == member_id.id;
     }
 
-    uint32_t id = member_id_invalid_value_;
+    bool operator !=(
+            const MemberId member_id) const
+    {
+        return id != member_id.id;
+    }
+
+    uint32_t id { member_id_invalid_value_ };
+
+    bool must_understand { false };
 
 private:
 

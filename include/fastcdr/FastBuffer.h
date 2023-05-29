@@ -58,8 +58,8 @@ public:
     explicit _FastBuffer_iterator(
             char* buffer,
             size_t index)
-        : m_buffer(buffer)
-        , m_currentPosition(&m_buffer[index])
+        : buffer_(buffer)
+        , current_position_(&buffer_[index])
     {
     }
 
@@ -73,9 +73,9 @@ public:
     void operator <<(
             const _FastBuffer_iterator& iterator)
     {
-        ptrdiff_t diff = m_currentPosition - m_buffer;
-        m_buffer = iterator.m_buffer;
-        m_currentPosition = m_buffer + diff;
+        ptrdiff_t diff = current_position_ - buffer_;
+        buffer_ = iterator.buffer_;
+        current_position_ = buffer_ + diff;
     }
 
     /*!
@@ -87,8 +87,8 @@ public:
     void operator >>(
             const _FastBuffer_iterator& iterator)
     {
-        ptrdiff_t diff = iterator.m_currentPosition - iterator.m_buffer;
-        m_currentPosition = m_buffer + diff;
+        ptrdiff_t diff = iterator.current_position_ - iterator.buffer_;
+        current_position_ = buffer_ + diff;
     }
 
     /*!
@@ -101,7 +101,7 @@ public:
     void operator <<(
             const _T& data)
     {
-        memcpy(m_currentPosition, &data, sizeof(_T));
+        memcpy(current_position_, &data, sizeof(_T));
     }
 
     /*!
@@ -114,7 +114,7 @@ public:
     void operator >>(
             _T& data)
     {
-        memcpy(&data, m_currentPosition, sizeof(_T));
+        memcpy(&data, current_position_, sizeof(_T));
     }
 
     /*!
@@ -129,7 +129,7 @@ public:
     {
         if (size > 0)
         {
-            memcpy(m_currentPosition, src, size);
+            memcpy(current_position_, src, size);
         }
     }
 
@@ -145,7 +145,7 @@ public:
     {
         if (size > 0)
         {
-            memcpy(dst, m_currentPosition, size);
+            memcpy(dst, current_position_, size);
         }
     }
 
@@ -157,7 +157,7 @@ public:
     void operator +=(
             size_t numBytes)
     {
-        m_currentPosition += numBytes;
+        current_position_ += numBytes;
     }
 
     /*!
@@ -169,7 +169,7 @@ public:
     size_t operator -(
             const _FastBuffer_iterator& it) const
     {
-        return static_cast<size_t>(m_currentPosition - it.m_currentPosition);
+        return static_cast<size_t>(current_position_ - it.current_position_);
     }
 
     /*!
@@ -179,7 +179,7 @@ public:
     inline
     _FastBuffer_iterator operator ++()
     {
-        ++m_currentPosition;
+        ++current_position_;
         return *this;
     }
 
@@ -203,22 +203,22 @@ public:
     inline
     char* operator &()
     {
-        return m_currentPosition;
+        return current_position_;
     }
 
     bool operator ==(
             const _FastBuffer_iterator& other_iterator) const
     {
-        return other_iterator.m_currentPosition == m_currentPosition;
+        return other_iterator.current_position_ == current_position_;
     }
 
 private:
 
     //! Pointer to the raw buffer.
-    char* m_buffer {nullptr};
+    char* buffer_ {nullptr};
 
     //! Current position in the raw buffer.
-    char* m_currentPosition {nullptr};
+    char* current_position_ {nullptr};
 };
 
 /*!
@@ -238,7 +238,7 @@ public:
      * The user can obtain this internal stream using the function eprosima::fastcdr::FastBuffers::getBuffer(). Be careful because this internal stream
      * is deleted in the destruction of the eprosima::fastcdr::FastBuffers object.
      */
-    FastBuffer();
+    FastBuffer() = default;
 
     /*!
      * @brief This constructor assigns the user's stream of bytes to the eprosima::fastcdr::FastBuffers object.
@@ -254,12 +254,12 @@ public:
     //! Move constructor
     FastBuffer(
             FastBuffer&& fbuffer)
-        : m_buffer(nullptr)
-        , m_bufferSize(0)
+        : buffer_(nullptr)
+        , size_(0)
         , m_internalBuffer(true)
     {
-        std::swap(m_buffer, fbuffer.m_buffer);
-        std::swap(m_bufferSize, fbuffer.m_bufferSize);
+        std::swap(buffer_, fbuffer.buffer_);
+        std::swap(size_, fbuffer.size_);
         std::swap(m_internalBuffer, fbuffer.m_internalBuffer);
     }
 
@@ -267,8 +267,8 @@ public:
     FastBuffer& operator =(
             FastBuffer&& fbuffer)
     {
-        std::swap(m_buffer, fbuffer.m_buffer);
-        std::swap(m_bufferSize, fbuffer.m_bufferSize);
+        std::swap(buffer_, fbuffer.buffer_);
+        std::swap(size_, fbuffer.size_);
         std::swap(m_internalBuffer, fbuffer.m_internalBuffer);
         return *this;
     }
@@ -284,7 +284,7 @@ public:
      */
     inline char* getBuffer() const
     {
-        return m_buffer;
+        return buffer_;
     }
 
     /*!
@@ -293,7 +293,7 @@ public:
      */
     inline size_t getBufferSize() const
     {
-        return m_bufferSize;
+        return size_;
     }
 
     /*!
@@ -303,7 +303,7 @@ public:
     inline
     iterator begin()
     {
-        return (iterator(m_buffer, 0));
+        return (iterator(buffer_, 0));
     }
 
     /*!
@@ -313,7 +313,7 @@ public:
     inline
     iterator end()
     {
-        return (iterator(m_buffer, m_bufferSize));
+        return (iterator(buffer_, size_));
     }
 
     /*!
@@ -341,13 +341,13 @@ private:
             const FastBuffer&) = delete;
 
     //! @brief Pointer to the stream of bytes that contains the serialized data.
-    char* m_buffer;
+    char* buffer_ { nullptr };
 
     //! @brief The total size of the user's buffer.
-    size_t m_bufferSize;
+    size_t size_ { 0 };
 
     //! @brief This variable indicates if the managed buffer is internal or is from the user.
-    bool m_internalBuffer;
+    bool m_internalBuffer { true };
 };
 }     //namespace fastcdr
 } //namespace eprosima

@@ -24,39 +24,32 @@
 
 using namespace eprosima::fastcdr;
 
-FastBuffer::FastBuffer()
-    : m_buffer(nullptr)
-    , m_bufferSize(0)
-    , m_internalBuffer(true)
-{
-}
-
 FastBuffer::FastBuffer(
         char* const buffer,
         const size_t bufferSize)
-    : m_buffer(buffer)
-    , m_bufferSize(bufferSize)
+    : buffer_(buffer)
+    , size_(bufferSize)
     , m_internalBuffer(false)
 {
 }
 
 FastBuffer::~FastBuffer()
 {
-    if (m_internalBuffer && m_buffer != nullptr)
+    if (m_internalBuffer && buffer_ != nullptr)
     {
-        free(m_buffer);
+        free(buffer_);
     }
 }
 
 bool FastBuffer::reserve(
         size_t size)
 {
-    if (m_internalBuffer && m_buffer == NULL)
+    if (m_internalBuffer && buffer_ == NULL)
     {
-        m_buffer = reinterpret_cast<char*>(malloc(size));
-        if (m_buffer)
+        buffer_ = reinterpret_cast<char*>(malloc(size));
+        if (buffer_)
         {
-            m_bufferSize = size;
+            size_ = size;
             return true;
         }
     }
@@ -75,24 +68,24 @@ bool FastBuffer::resize(
             incBufferSize = minSizeInc;
         }
 
-        if (m_buffer == NULL)
+        if (buffer_ == NULL)
         {
-            m_bufferSize = incBufferSize;
+            size_ = incBufferSize;
 
-            m_buffer = reinterpret_cast<char*>(malloc(m_bufferSize));
+            buffer_ = reinterpret_cast<char*>(malloc(size_));
 
-            if (m_buffer != NULL)
+            if (buffer_ != NULL)
             {
                 return true;
             }
         }
         else
         {
-            m_bufferSize += incBufferSize;
+            size_ += incBufferSize;
 
-            m_buffer = reinterpret_cast<char*>(realloc(m_buffer, m_bufferSize));
+            buffer_ = reinterpret_cast<char*>(realloc(buffer_, size_));
 
-            if (m_buffer != NULL)
+            if (buffer_ != NULL)
             {
                 return true;
             }

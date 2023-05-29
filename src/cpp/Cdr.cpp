@@ -2822,7 +2822,62 @@ void Cdr::xcdr1_end_short_member_header(
     jump(sizeof(uint16_t));
     uint16_t size = static_cast<uint16_t>(member_serialized_size);
     serialize(size);
+}
 
+void Cdr::xcdr1_serialize_long_member_header(
+        const MemberId& member_id)
+{
+    assert(0x10000000 > member_id.id);
+
+    makeAlign(alignment(4));
+
+    uint16_t flags_and_extended_pid = (member_id.must_understand ? 0x4000 : 0x0) | static_cast<uint16_t>(0x3F01);
+    serialize(flags_and_extended_pid);
+    uint16_t size = 8;
+    serialize(size);
+    uint32_t id = (member_id.must_understand ? 0x40000000 : 0x0) | member_id.id;
+    serialize(id);
+    uint32_t msize = 0;
+    serialize(msize);
+    resetAlignment();
+}
+
+void Cdr::xcdr1_end_long_member_header(
+        size_t member_serialized_size)
+{
+    makeAlign(alignment(4));
+    jump(sizeof(uint16_t) + sizeof(uint32_t));
+    uint32_t msize = static_cast<uint32_t>(member_serialized_size);
+    serialize(msize);
+}
+
+void Cdr::xcdr1_change_to_short_member_header(
+        size_t member_serialized_size)
+{
+    makeAlign(alignment(4));
+
+    uint16_t flags_and_member_id = (next_member_id_.must_understand ? 0x4000 : 0x0) |
+            static_cast<uint16_t>(next_member_id_.id);
+    serialize(flags_and_member_id);
+    uint16_t size = static_cast<uint16_t>(member_serialized_size);
+    serialize(size);
+    memmove(&offset_, &offset_ + 8, member_serialized_size);
+}
+
+void Cdr::xcdr1_change_to_long_member_header(
+        size_t member_serialized_size)
+{
+    makeAlign(alignment(4));
+
+    memmove(&offset_ + 12, &offset_ + 4, member_serialized_size);
+    uint16_t flags_and_extended_pid = (next_member_id_.must_understand ? 0x4000 : 0x0) | static_cast<uint16_t>(0x3F01);
+    serialize(flags_and_extended_pid);
+    uint16_t size = 8;
+    serialize(size);
+    uint32_t id = (next_member_id_.must_understand ? 0x40000000 : 0x0) | next_member_id_.id;
+    serialize(id);
+    uint32_t msize = static_cast<uint32_t>(member_serialized_size);
+    serialize(msize);
 }
 
 void Cdr::xcdr1_deserialize_member_header(
@@ -2832,7 +2887,7 @@ void Cdr::xcdr1_deserialize_member_header(
     makeAlign(alignment(4));
     uint16_t flags_and_member_id = 0;
     deserialize(flags_and_member_id);
-    member_id.must_understand = (flags_and_member_id & 0x400);
+    member_id.must_understand = (flags_and_member_id & 0x4000);
     uint16_t id = (flags_and_member_id & 0x3FFF);
 
     if (0x3F01 > id)
@@ -2848,8 +2903,24 @@ void Cdr::xcdr1_deserialize_member_header(
         uint16_t size = 0;
         deserialize(size);
         current_state.member_size_ = size;
-        resetAlignment();
     }
+    else if (0x3F01 == id) // PID_EXTENDED
+    {
+        uint16_t size = 0;
+        deserialize(size);
+        assert(8 == size); // TODO Throw exception
+        uint32_t eid = 0;
+        deserialize(eid);
+        assert((flags_and_member_id & 0x4000) == (0x40000000 & eid)); // TODO Throw exception
+        deserialize(current_state.member_size_);
+
+    }
+    else
+    {
+        // TODO throw exception?
+    }
+
+    resetAlignment();
 }
 
 Cdr& Cdr::begin_serialize_member(
@@ -2872,10 +2943,12 @@ Cdr& Cdr::begin_serialize_member(
                     case XCdrHeaderSelection::SHORT_HEADER:
                     case XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT:
                         xcdr1_serialize_short_member_header(member_id);
+                        current_state.header_serialized_ = XCdrHeaderSelection::SHORT_HEADER;
                         break;
                     case XCdrHeaderSelection::LONG_HEADER:
                     case XCdrHeaderSelection::AUTO_WITH_LONG_HEADER_BY_DEFAULT:
-                        // long header
+                        xcdr1_serialize_long_member_header(member_id);
+                        current_state.header_serialized_ = XCdrHeaderSelection::LONG_HEADER;
                         break;
                 }
             }
@@ -2886,11 +2959,12 @@ Cdr& Cdr::begin_serialize_member(
                     case XCdrHeaderSelection::LONG_HEADER:
                     case XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT:
                     case XCdrHeaderSelection::AUTO_WITH_LONG_HEADER_BY_DEFAULT:
-                        // long header
+                        xcdr1_serialize_long_member_header(member_id);
+                        current_state.header_serialized_ = XCdrHeaderSelection::LONG_HEADER;
                         break;
                     default:
                         throw BadParamException(
-                                  "Cannot encode XCDR1 ShortMemberHeader when member_id is bigger than 2^14");
+                                  "Cannot encode XCDR1 ShortMemberHeader when member_id is bigger than 0x3F00");
                 }
             }
             current_state.header_selection_ = header_selection;
@@ -2910,12 +2984,16 @@ Cdr& Cdr::begin_serialize_member(
             throw BadParamException("Unexpected current encoding in Cdr::begin_serialize_member");
     }
 
+    next_member_id_ = member_id;
+
     return *this;
 }
 
 Cdr& Cdr::end_serialize_member(
         const Cdr::state& current_state)
 {
+    assert(MEMBER_ID_INVALID != next_member_id_);
+
     switch (current_encoding_)
     {
         case EncodingAlgorithmFlag::PLAIN_CDR:
@@ -2927,19 +3005,45 @@ Cdr& Cdr::end_serialize_member(
                 set_state(current_state);
                 if ( member_serialized_size > std::numeric_limits<uint16_t>::max())
                 {
+                    switch (current_state.header_serialized_)
+                    {
+                        case XCdrHeaderSelection::SHORT_HEADER:
+                            if (AUTO_WITH_SHORT_HEADER_BY_DEFAULT == current_state.header_selection_)
+                            {
+                                xcdr1_change_to_long_member_header(member_serialized_size);
+                            }
+                            else
+                            {
+                                assert(false); // TODO throw exception
+                            }
+                            break;
+                        case XCdrHeaderSelection::LONG_HEADER:
+                            xcdr1_end_long_member_header(member_serialized_size);
+                            break;
+                        default:
+                            assert(false); // header_serialized_ must have only SHORT_HEADER or LONG_HEADER
+                    }
                 }
                 else
                 {
-                    switch (current_state.header_selection_)
+                    switch (current_state.header_serialized_)
                     {
                         case XCdrHeaderSelection::SHORT_HEADER:
-                        case XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT:
                             xcdr1_end_short_member_header(member_serialized_size);
                             break;
                         case XCdrHeaderSelection::LONG_HEADER:
-                        case XCdrHeaderSelection::AUTO_WITH_LONG_HEADER_BY_DEFAULT:
-                            //resize
+                            if (LONG_HEADER == current_state.header_selection_ ||
+                                    0x3F00 < next_member_id_.id)
+                            {
+                                xcdr1_end_long_member_header(member_serialized_size);
+                            }
+                            else if (AUTO_WITH_LONG_HEADER_BY_DEFAULT == current_state.header_selection_)
+                            {
+                                xcdr1_change_to_short_member_header(member_serialized_size);
+                            }
                             break;
+                        default:
+                            assert(false); // header_serialized_ must have only SHORT_HEADER or LONG_HEADER
                     }
                 }
                 jump(member_serialized_size);
@@ -2972,6 +3076,8 @@ Cdr& Cdr::end_serialize_member(
         default:
             throw BadParamException("Unexpected current encoding in Cdr::begin_serialize_member");
     }
+
+    next_member_id_ = MEMBER_ID_INVALID;
 
     return *this;
 }

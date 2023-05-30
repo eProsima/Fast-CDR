@@ -2835,7 +2835,7 @@ void Cdr::xcdr1_serialize_long_member_header(
     serialize(flags_and_extended_pid);
     uint16_t size = 8;
     serialize(size);
-    uint32_t id = (member_id.must_understand ? 0x40000000 : 0x0) | member_id.id;
+    uint32_t id = member_id.id;
     serialize(id);
     uint32_t msize = 0;
     serialize(msize);
@@ -2874,7 +2874,7 @@ void Cdr::xcdr1_change_to_long_member_header(
     serialize(flags_and_extended_pid);
     uint16_t size = 8;
     serialize(size);
-    uint32_t id = (next_member_id_.must_understand ? 0x40000000 : 0x0) | next_member_id_.id;
+    uint32_t id = next_member_id_.id;
     serialize(id);
     uint32_t msize = static_cast<uint32_t>(member_serialized_size);
     serialize(msize);
@@ -2909,11 +2909,8 @@ void Cdr::xcdr1_deserialize_member_header(
         uint16_t size = 0;
         deserialize(size);
         assert(8 == size); // TODO Throw exception
-        uint32_t eid = 0;
-        deserialize(eid);
-        assert((flags_and_member_id & 0x4000) == (0x40000000 & eid)); // TODO Throw exception
+        deserialize(member_id.id);
         deserialize(current_state.member_size_);
-
     }
     else
     {

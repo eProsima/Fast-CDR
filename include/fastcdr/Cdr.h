@@ -49,10 +49,14 @@ public:
     typedef enum
     {
         //! @brief Common CORBA CDR serialization.
-        CORBA_CDR,
+        CORBA_CDR = 0,
         //! @brief DDS CDR serialization.
-        DDS_CDR
-    } CdrType;
+        DDS_CDR = 1,
+        //!
+        XCDRv1 = 2,
+        //!
+        XCDRv2 = 3
+    } CdrVersion;
 
     //! @brief This enumeration represents the supported XCDR encoding algorithms.
     typedef enum : uint8_t
@@ -149,12 +153,12 @@ public:
      *
      * @param cdrBuffer A reference to the buffer that contains (or will contain) the CDR representation.
      * @param endianness The initial endianness that will be used. The default value is the endianness of the system.
-     * @param cdrType Represents the type of CDR that will be used in serialization/deserialization. The default value is CORBA CDR.
+     * @param cdr_version Represents the type of CDR that will be used in serialization/deserialization. The default value is CORBA CDR.
      */
     Cdr(
             FastBuffer& cdrBuffer,
             const Endianness endianness = DEFAULT_ENDIAN,
-            const CdrType cdrType = CORBA_CDR);
+            const CdrVersion cdr_version = XCDRv2);
 
     /*!
      * @brief This function reads the encapsulation of the CDR stream.
@@ -3620,11 +3624,17 @@ private:
             MemberId& member_id,
             Cdr::state& current_state);
 
+    void xcdr2_serialize_short_member_header(
+            const MemberId& member_id);
+
+    void xcdr2_serialize_long_member_header(
+            const MemberId& member_id);
+
     //! @brief Reference to the buffer that will be serialized/deserialized.
     FastBuffer& m_cdrBuffer;
 
     //! @brief The type of CDR that will be use in serialization/deserialization.
-    CdrType m_cdrType {CdrType::CORBA_CDR};
+    CdrVersion cdr_version_ {CdrVersion::XCDRv2};
 
     //! @brief Using eprosima::fastcdr::DDS_CDR type, this attribute stores the encoding algorithm.
     EncodingAlgorithmFlag encoding_flag_ {EncodingAlgorithmFlag::PLAIN_CDR};

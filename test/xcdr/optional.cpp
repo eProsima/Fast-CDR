@@ -15,6 +15,26 @@ using XCdrStreamValues =
 
 class XCdrOptionalTest : public ::testing::TestWithParam< std::tuple<Cdr::EncodingAlgorithmFlag, Cdr::Endianness>>
 {
+public:
+
+    Cdr::CdrVersion get_version_from_algorithm(
+            Cdr::EncodingAlgorithmFlag ef)
+    {
+        Cdr::CdrVersion cdr_version { Cdr::CdrVersion::XCDRv2 };
+
+        switch (ef)
+        {
+            case Cdr::EncodingAlgorithmFlag::PLAIN_CDR:
+            case Cdr::EncodingAlgorithmFlag::PL_CDR:
+                cdr_version = Cdr::CdrVersion::XCDRv1;
+                break;
+            default:
+                break;
+        }
+
+        return cdr_version;
+    }
+
 };
 
 TEST_P(XCdrOptionalTest, not_serialize_the_value)
@@ -71,7 +91,7 @@ TEST_P(XCdrOptionalTest, not_serialize_the_value)
             std::unique_ptr<char, void (*)(
         void*)>{reinterpret_cast<char*>(malloc(expected_streams[tested_stream].size())), free};
     FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, Cdr::CdrType::DDS_CDR);
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
     //}
 
     //{ Encode optional not present.
@@ -167,7 +187,7 @@ TEST_P(XCdrOptionalTest, octet)
             std::unique_ptr<char, void (*)(
         void*)>{reinterpret_cast<char*>(malloc(expected_streams[tested_stream].size())), free};
     FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, Cdr::CdrType::DDS_CDR);
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
     //}
 
     //{ Encode optional not present.

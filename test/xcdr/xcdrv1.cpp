@@ -61,7 +61,7 @@ TEST_P(XCdrv1Test, pl_octet_member)
             std::unique_ptr<char, void (*)(
         void*)>{reinterpret_cast<char*>(malloc(expected_streams[tested_stream].size())), free};
     FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, Cdr::CdrType::DDS_CDR);
+    Cdr cdr(fast_buffer, endianness, Cdr::CdrVersion::XCDRv1);
     //}
 
     //{ Encode optional not present.

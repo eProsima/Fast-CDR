@@ -70,9 +70,9 @@ bool Cdr::state::operator ==(
 Cdr::Cdr(
         FastBuffer& cdrBuffer,
         const Endianness endianness,
-        const CdrType cdrType)
+        const CdrVersion cdr_version)
     : m_cdrBuffer(cdrBuffer)
-    , m_cdrType(cdrType)
+    , cdr_version_(cdr_version)
     , m_endianness(endianness)
     , m_swapBytes(endianness == DEFAULT_ENDIAN ? false : true)
     , offset_(cdrBuffer.begin())
@@ -89,7 +89,7 @@ Cdr& Cdr::read_encapsulation()
     try
     {
         // If it is DDS_CDR, the first step is to get the dummy byte.
-        if (m_cdrType == DDS_CDR)
+        if (CdrVersion::CORBA_CDR < cdr_version_)
         {
             (*this) >> dummy;
             if (0 != dummy)
@@ -114,27 +114,37 @@ Cdr& Cdr::read_encapsulation()
         const uint8_t encoding_flag = encapsulation & ~0x1_8u;
         switch (encoding_flag)
         {
-            case EncodingAlgorithmFlag::PL_CDR:
             case EncodingAlgorithmFlag::PLAIN_CDR2:
             case EncodingAlgorithmFlag::DELIMIT_CDR2:
             case EncodingAlgorithmFlag::PL_CDR2:
-                if (CdrType::CORBA_CDR == m_cdrType)
+                if (CdrVersion::XCDRv2 != cdr_version_)
                 {
                     throw BadParamException(
-                              "Unexpected encoding algorithm received in Cdr::read_encapsulation for CORBA CDR");
+                              "Unexpected encoding algorithm received in Cdr::read_encapsulation. XCDRv2 should be selected.");
                 }
-                encoding_flag_ = static_cast<EncodingAlgorithmFlag>(encoding_flag);
+                break;
+            case EncodingAlgorithmFlag::PL_CDR:
+                if (CdrVersion::XCDRv1 != cdr_version_)
+                {
+                    throw BadParamException(
+                              "Unexpected encoding algorithm received in Cdr::read_encapsulation. XCDRv1 should be selected");
+                }
                 break;
             case EncodingAlgorithmFlag::PLAIN_CDR:
-                encoding_flag_ = static_cast<EncodingAlgorithmFlag>(encoding_flag);
+                if (CdrVersion::XCDRv1 < cdr_version_)
+                {
+                    throw BadParamException(
+                              "Unexpected encoding algorithm received in Cdr::read_encapsulation. XCDRv2 shouldn't be selected");
+                }
                 break;
             default:
                 throw BadParamException("Unexpected encoding algorithm received in Cdr::read_encapsulation for DDS CDR");
         }
 
+        encoding_flag_ = static_cast<EncodingAlgorithmFlag>(encoding_flag);
         current_encoding_ = encoding_flag_;
 
-        if (m_cdrType == DDS_CDR)
+        if (CdrVersion::CORBA_CDR < cdr_version_)
         {
             (*this) >> m_options;
         }
@@ -157,7 +167,7 @@ Cdr& Cdr::serialize_encapsulation()
     try
     {
         // If it is DDS_CDR, the first step is to serialize the dummy byte.
-        if (m_cdrType == DDS_CDR)
+        if (CdrVersion::CORBA_CDR < cdr_version_)
         {
             (*this) << dummy;
         }
@@ -178,7 +188,7 @@ Cdr& Cdr::serialize_encapsulation()
 
     try
     {
-        if (m_cdrType == DDS_CDR)
+        if (CdrVersion::CORBA_CDR < cdr_version_)
         {
             (*this) << m_options;
         }
@@ -2827,8 +2837,6 @@ void Cdr::xcdr1_end_short_member_header(
 void Cdr::xcdr1_serialize_long_member_header(
         const MemberId& member_id)
 {
-    assert(0x10000000 > member_id.id);
-
     makeAlign(alignment(4));
 
     uint16_t flags_and_extended_pid = (member_id.must_understand ? 0x4000 : 0x0) | static_cast<uint16_t>(0x3F01);
@@ -2920,6 +2928,26 @@ void Cdr::xcdr1_deserialize_member_header(
     resetAlignment();
 }
 
+void Cdr::xcdr2_serialize_short_member_header(
+        const MemberId& member_id)
+{
+    assert(0x10000000 > member_id.id);
+
+    uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | static_cast<uint32_t>(member_id.id);
+    serialize(flags_and_member_id);
+}
+
+void Cdr::xcdr2_serialize_long_member_header(
+        const MemberId& member_id)
+{
+    assert(0x10000000 > member_id.id);
+
+    uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | static_cast<uint32_t>(member_id.id);
+    serialize(flags_and_member_id);
+    uint32_t size = 0;
+    serialize(size);
+}
+
 Cdr& Cdr::begin_serialize_member(
         const MemberId& member_id,
         Cdr::state& current_state,
@@ -2974,7 +3002,20 @@ Cdr& Cdr::begin_serialize_member(
         }
         break;
         case EncodingAlgorithmFlag::PL_CDR2:
-            (void)member_id;
+            assert(0x10000000 > member_id.id);
+            switch (header_selection)
+            {
+                case XCdrHeaderSelection::SHORT_HEADER:
+                case XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT:
+                    xcdr2_serialize_short_member_header(member_id);
+                    current_state.header_serialized_ = XCdrHeaderSelection::SHORT_HEADER;
+                    break;
+                case XCdrHeaderSelection::LONG_HEADER:
+                case XCdrHeaderSelection::AUTO_WITH_LONG_HEADER_BY_DEFAULT:
+                    xcdr2_serialize_long_member_header(member_id);
+                    current_state.header_serialized_ = XCdrHeaderSelection::LONG_HEADER;
+                    break;
+            }
             current_state.header_selection_ = header_selection;
             break;
         default:
@@ -3068,7 +3109,6 @@ Cdr& Cdr::end_serialize_member(
         }
         break;
         case EncodingAlgorithmFlag::PL_CDR2:
-            (void)current_state;
             break;
         default:
             throw BadParamException("Unexpected current encoding in Cdr::begin_serialize_member");

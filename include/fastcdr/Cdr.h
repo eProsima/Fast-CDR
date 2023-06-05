@@ -18,6 +18,7 @@
 #include <array>
 #include <cassert>
 #include <cstdint>
+#include <functional>
 #include <iostream>
 #include <map>
 #include <string>
@@ -3450,21 +3451,34 @@ public:
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// XCDR extensions
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    Cdr& begin_serialize_member(
+    Cdr& begin_serialize_opt_member(
             const MemberId& member_id,
+            bool is_present,
             Cdr::state& current_state,
-            XCdrHeaderSelection header_selection = XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT);
+            XCdrHeaderSelection header_selection = XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT)
+    {
+        return (this->*begin_serialize_opt_member_)(member_id, is_present, current_state, header_selection);
+    }
 
-    Cdr& end_serialize_member(
-            const Cdr::state& current_state);
+    Cdr& end_serialize_opt_member(
+            const Cdr::state& current_state)
+    {
+        return (this->*end_serialize_opt_member_)(current_state);
+    }
 
-    Cdr& begin_deserialize_member(
+    Cdr& begin_deserialize_opt_member(
             MemberId& member_id,
-            Cdr::state& current_state,
-            bool& is_present);
+            bool& is_present,
+            Cdr::state& current_state)
+    {
+        return (this->*begin_deserialize_opt_member_)(member_id, is_present, current_state);
+    }
 
-    Cdr& end_deserialize_member(
-            const Cdr::state& current_state);
+    Cdr& end_deserialize_opt_member(
+            const Cdr::state& current_state)
+    {
+        return (this->*end_deserialize_opt_member_)(current_state);
+    }
 
     template<class _T = MemberId>
     inline Cdr& operator << (
@@ -3627,8 +3641,78 @@ private:
     void xcdr2_serialize_short_member_header(
             const MemberId& member_id);
 
+    void xcdr2_end_short_member_header(
+            size_t member_serialized_size);
+
     void xcdr2_serialize_long_member_header(
             const MemberId& member_id);
+
+    void xcdr2_end_long_member_header(
+            size_t member_serialized_size);
+
+    void xcdr2_change_to_short_member_header(
+            size_t member_serialized_size);
+
+    void xcdr2_change_to_long_member_header(
+            size_t member_serialized_size);
+
+    void xcdr2_deserialize_member_header(
+            MemberId& member_id,
+            Cdr::state& current_state);
+
+    Cdr& xcdr1_begin_serialize_opt_member(
+            const MemberId& member_id,
+            bool is_present,
+            Cdr::state& current_state,
+            XCdrHeaderSelection header_selection);
+
+    Cdr& xcdr1_end_serialize_opt_member(
+            const Cdr::state& current_state);
+
+    Cdr& xcdr2_begin_serialize_opt_member(
+            const MemberId& member_id,
+            bool is_present,
+            Cdr::state& current_state,
+            XCdrHeaderSelection header_selection);
+
+    Cdr& xcdr2_end_serialize_opt_member(
+            const Cdr::state& current_state);
+
+    Cdr& xcdr1_begin_deserialize_opt_member(
+            MemberId& member_id,
+            bool& is_present,
+            Cdr::state& current_state);
+
+    Cdr& xcdr1_end_deserialize_opt_member(
+            const Cdr::state& current_state);
+
+    Cdr& xcdr2_begin_deserialize_opt_member(
+            MemberId& member_id,
+            bool& is_present,
+            Cdr::state& current_state);
+
+    Cdr& xcdr2_end_deserialize_opt_member(
+            const Cdr::state& current_state);
+
+    using begin_serialize_opt_member_functor = Cdr& (Cdr::*)(
+        const MemberId&,
+        bool,
+        Cdr::state&,
+        XCdrHeaderSelection);
+    begin_serialize_opt_member_functor begin_serialize_opt_member_ { nullptr };
+
+    using end_serialize_opt_member_functor = Cdr& (Cdr::*)(
+        const Cdr::state&);
+    end_serialize_opt_member_functor end_serialize_opt_member_ { nullptr };
+
+    using begin_deserialize_opt_member_functor = Cdr& (Cdr::*)(
+        MemberId&,
+        bool&,
+        Cdr::state&);
+    begin_deserialize_opt_member_functor begin_deserialize_opt_member_ { nullptr };
+    using end_deserialize_opt_member_functor = Cdr& (Cdr::*)(
+        const Cdr::state&);
+    end_deserialize_opt_member_functor end_deserialize_opt_member_ { nullptr };
 
     //! @brief Reference to the buffer that will be serialized/deserialized.
     FastBuffer& m_cdrBuffer;

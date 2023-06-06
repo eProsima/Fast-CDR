@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+#ifndef _FASTCDR_XCDR_MEMBERID_HPP_
+#define _FASTCDR_XCDR_MEMBERID_HPP_
 
 #include <cstdint>
 
@@ -64,3 +66,5 @@ static constexpr MemberId MEMBER_ID_INVALID {};
 
 } // namespace fastcdr
 } // namespace eprosima
+
+#endif //_FASTCDR_XCDR_MEMBERID_HPP_

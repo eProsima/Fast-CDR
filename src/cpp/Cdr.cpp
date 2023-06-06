@@ -2943,7 +2943,16 @@ void Cdr::xcdr1_deserialize_member_header(
         uint16_t size = 0;
         deserialize(size);
         assert(8 == size); // TODO Throw exception
-        deserialize(member_id.id);
+        uint32_t mid = 0;
+        deserialize(mid);
+        if (MEMBER_ID_INVALID == member_id)
+        {
+            member_id.id = mid;
+        }
+        else
+        {
+            assert(member_id.id == mid);
+        }
         deserialize(current_state.member_size_);
         current_state.header_serialized_ = XCdrHeaderSelection::LONG_HEADER;
     }
@@ -3275,7 +3284,15 @@ void Cdr::xcdr2_deserialize_member_header(
     uint32_t flags_and_member_id = 0;
     deserialize(flags_and_member_id);
     member_id.must_understand = (flags_and_member_id & 0x80000000);
-    member_id.id = (flags_and_member_id & 0x0FFFFFFF);
+    uint32_t mid = (flags_and_member_id & 0x0FFFFFFF);
+    if (MEMBER_ID_INVALID == member_id)
+    {
+        member_id.id = mid;
+    }
+    else
+    {
+        assert(member_id.id == mid);
+    }
     uint32_t lc = (flags_and_member_id & 0x70000000) >> 28;
 
     if (4 > lc)

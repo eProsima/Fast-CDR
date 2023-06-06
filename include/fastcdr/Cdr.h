@@ -28,6 +28,7 @@
 #include "FastBuffer.h"
 #include "exceptions/NotEnoughMemoryException.h"
 #include "xcdr/MemberId.hpp"
+#include "xcdr/optional.hpp"
 
 #if !__APPLE__ && !__FreeBSD__ && !__VXWORKS__
 #include <malloc.h>
@@ -3480,13 +3481,73 @@ public:
         return (this->*end_deserialize_opt_member_)(current_state);
     }
 
+    template<class _T>
+    Cdr& serialize(
+            const optional<_T>& opt_value)
+    {
+        Cdr::state enc_state(*this);
+        begin_serialize_opt_member(next_member_id_, opt_value.has_value(), enc_state);
+        if (opt_value.has_value())
+        {
+            serialize(*opt_value);
+        }
+        end_serialize_opt_member(enc_state);
+        return *this;
+    }
+
     template<class _T = MemberId>
     inline Cdr& operator << (
-            const MemberId& type_t)
+            const MemberId& member_id)
     {
         assert(next_member_id_ == MEMBER_ID_INVALID);
-        next_member_id_ = type_t;
+        next_member_id_ = member_id;
         return *this;
+    }
+
+    template<class _T>
+    inline Cdr& operator << (
+            const optional<_T>& opt_value)
+    {
+        return serialize(opt_value);
+    }
+
+    template<class _T>
+    Cdr& deserialize(
+            optional<_T>& opt_value)
+    {
+        if (MEMBER_ID_INVALID == next_member_id_)
+        {
+            Cdr::state dec_state(*this);
+            bool is_present = false;
+            begin_deserialize_opt_member(next_member_id_, is_present, dec_state);
+            opt_value.reset(is_present);
+            if (is_present)
+            {
+                deserialize(*opt_value);
+            }
+            end_deserialize_opt_member(dec_state);
+        }
+        else
+        {
+            //TODO
+        }
+        return *this;
+    }
+
+    template<class _T = MemberId>
+    inline Cdr& operator >> (
+            MemberId& member_id)
+    {
+        //TODO read and safe state
+        member_id = next_member_id_;
+        return *this;
+    }
+
+    template<class _T>
+    inline Cdr& operator >> (
+            optional<_T>& opt_value)
+    {
+        return deserialize(opt_value);
     }
 
 private:

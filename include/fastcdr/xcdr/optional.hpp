@@ -99,7 +99,7 @@ public:
     optional(
             const optional<T>& val) noexcept
     {
-        storage_.val_ = val.storage_.val;
+        storage_.val_ = val.storage_.val_;
         storage_.engaged_ = val.storage_.engaged_;
     }
 
@@ -123,7 +123,7 @@ public:
     void reset(
             bool initial_engaged = false)
     {
-        if ( storage_.engaged_)
+        if (storage_.engaged_)
         {
             storage_.val_.~T();
         }
@@ -158,30 +158,40 @@ public:
     optional& operator =(
             const optional& opt)
     {
-        storage_ = opt.storage_;
+        reset();
+        storage_.engaged_ = opt.storage_.engaged_;
+        if (opt.storage_.engaged_)
+        {
+            storage_.val_ = opt.storage_.val_;
+        }
+        return *this;
     }
 
     optional& operator =(
             optional&& opt)
     {
-        storage_ = std::move(opt.storage_);
+        reset();
+        storage_.engaged_ = opt.storage_.engaged_;
+        if (opt.storage_.engaged_)
+        {
+            storage_.val_ = std::move(opt.storage_.val_);
+        }
+        return *this;
     }
 
     optional& operator =(
             const T& val)
     {
-        reset();
+        reset(true);
         storage_.val_ = val;
-        storage_.engaged_ = true;
         return *this;
     }
 
     optional& operator =(
             T&& val)
     {
-        reset();
+        reset(true);
         storage_.val_ = std::move(val);
-        storage_.engaged_ = true;
         return *this;
     }
 
@@ -192,7 +202,7 @@ public:
         return *this;
     }
 
-    optional& operator ==(
+    bool operator ==(
             const optional& opt_val) const
     {
         return opt_val.storage_.engaged_ == storage_.engaged_ &&

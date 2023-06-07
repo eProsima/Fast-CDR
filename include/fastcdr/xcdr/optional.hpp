@@ -77,28 +77,28 @@ public:
 
     optional() = default;
 
-    constexpr optional(
+    optional(
             const T& val) noexcept
     {
         storage_.val_ = val;
         storage_.engaged_ = true;
     }
 
-    constexpr optional(
+    optional(
             T&& val) noexcept
     {
         storage_.val_ = std::move(val);
         storage_.engaged_ = true;
     }
 
-    constexpr optional(
+    optional(
             const optional<T>& val) noexcept
     {
         storage_.val_ = val.storage_.val;
         storage_.engaged_ = val.storage_.engaged_;
     }
 
-    constexpr optional(
+    optional(
             optional<T>&& val) noexcept
     {
         storage_.val_ = std::move(val.storage_.val);
@@ -187,32 +187,32 @@ public:
         return *this;
     }
 
-    constexpr T& operator *() & noexcept
+    T& operator *() & noexcept
     {
         return storage_.val_;
     }
 
-    constexpr const T& operator *() const& noexcept
+    const T& operator *() const& noexcept
     {
         return storage_.val_;
     }
 
-    constexpr T&& operator *() && noexcept
+    T&& operator *() && noexcept
     {
         return std::move(storage_.val_);
     }
 
-    constexpr const T&& operator *() const&& noexcept
+    const T&& operator *() const&& noexcept
     {
         return std::move(storage_.val_);
     }
 
-    constexpr T* operator ->() noexcept
+    T* operator ->() noexcept
     {
         return std::addressof(storage_.val_);
     }
 
-    constexpr const T* operator ->() const noexcept
+    const T* operator ->() const noexcept
     {
         return std::addressof(storage_.val_);
     }

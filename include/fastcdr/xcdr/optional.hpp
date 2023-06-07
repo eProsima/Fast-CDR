@@ -29,11 +29,14 @@ struct optional_storage
 {
     union
     {
-        char dummy_;
-        T val_;
+        char dummy_; T val_;
     };
 
     bool engaged_ { false };
+
+    optional_storage()
+    {
+    }
 
     ~optional_storage()
     {
@@ -55,6 +58,8 @@ struct optional_storage<T, typename std::enable_if<std::is_trivially_destructibl
     };
 
     bool engaged_ { false };
+
+    optional_storage() = default;
 
     ~optional_storage() = default;
 };
@@ -185,6 +190,13 @@ public:
     {
         reset();
         return *this;
+    }
+
+    optional& operator ==(
+            const optional& opt_val) const
+    {
+        return opt_val.storage_.engaged_ == storage_.engaged_ &&
+               (storage_.engaged_ ? opt_val.storage_.val_ == storage_.val_ : true);
     }
 
     T& operator *() & noexcept

@@ -85,28 +85,28 @@ public:
     optional(
             const T& val) noexcept
     {
-        storage_.val_ = val;
+        ::new(&storage_.val_)T(val);
         storage_.engaged_ = true;
     }
 
     optional(
             T&& val) noexcept
     {
-        storage_.val_ = std::move(val);
+        ::new(&storage_.val_)T(std::move(val));
         storage_.engaged_ = true;
     }
 
     optional(
             const optional<T>& val) noexcept
     {
-        storage_.val_ = val.storage_.val_;
+        ::new(&storage_.val_)T(val.storage_.val_);
         storage_.engaged_ = val.storage_.engaged_;
     }
 
     optional(
             optional<T>&& val) noexcept
     {
-        storage_.val_ = std::move(val.storage_.val);
+        ::new(&storage_.val_)T(std::move(val.storage_.val_));
         storage_.engaged_ = val.storage_.engaged_;
     }
 
@@ -162,7 +162,7 @@ public:
         storage_.engaged_ = opt.storage_.engaged_;
         if (opt.storage_.engaged_)
         {
-            storage_.val_ = opt.storage_.val_;
+            ::new(&storage_.val_)T(opt.storage_.val_);
         }
         return *this;
     }
@@ -174,7 +174,7 @@ public:
         storage_.engaged_ = opt.storage_.engaged_;
         if (opt.storage_.engaged_)
         {
-            storage_.val_ = std::move(opt.storage_.val_);
+            ::new(&storage_.val_)T(std::move(opt.storage_.val_));
         }
         return *this;
     }
@@ -183,7 +183,7 @@ public:
             const T& val)
     {
         reset(true);
-        storage_.val_ = val;
+        ::new(&storage_.val_)T(val);
         return *this;
     }
 
@@ -191,7 +191,7 @@ public:
             T&& val)
     {
         reset(true);
-        storage_.val_ = std::move(val);
+        ::new(&storage_.val_)T(std::move(val));
         return *this;
     }
 

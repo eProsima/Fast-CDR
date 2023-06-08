@@ -31,12 +31,12 @@ Community members may provide assistance with these platforms.
 
 ## Platforms
 
-|Architecture|Ubuntu Focal (20.04)|MacOS Mojave (10.14)|Windows 10 (VS2019)|Debian Buster (10)|
-|------------|--------------------|--------------------|-------------------|------------------|
-|amd64       |Tier 1 [a][s]       |Tier 1 [s]          |Tier 1 [a][s]      |Tier 3 [s]        |
-|amd32       |                    |                    |Tier 1 [a][s]      |                  |
-|arm64       |Tier 1 [a][s]       |                    |                   |Tier 3 [s]        |
-|arm32       |Tier 3 [s]          |                    |                   |Tier 3 [s]        |
+|Architecture|Ubuntu Jammy (22.04)|MacOS Mojave (10.14)|Windows 10 (VS2019)|Ubuntu Focal (20.04)|Debian Buster (10)|
+|------------|--------------------|--------------------|-------------------|--------------------|------------------|
+|amd64       |Tier 1 [a][s]       |Tier 1 [s]          |Tier 1 [a][s]      |Tier 3 [a][s]       |Tier 3 [s]        |
+|amd32       |                    |                    |Tier 1 [a][s]      |                    |                  |
+|arm64       |Tier 1 [a][s]       |                    |                   |Tier 3 [a][s]       |Tier 3 [s]        |
+|arm32       |Tier 3 [s]          |                    |                   |Tier 3 [s]          |Tier 3 [s]        |
 
 " [a] " Binary releases are provided as a single archive per platform.\
 " [s] " Compilation from source.
@@ -46,3 +46,4 @@ Other Tier 3 OS:
 * FreeBSD
 * VxWorks
 * QNX
+* Android 11

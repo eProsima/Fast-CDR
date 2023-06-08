@@ -16,8 +16,8 @@ One is the standard CDR serialization mechanism, while the other is a faster imp
 
 ## Build
 
-**eProsima Fast CDR** provides [CMake][cmake] scripts to build and install it.
-Also in [eProsima][eprosima] you can find packages for Linux using autotools and binaries for Windows.
+**eProsima Fast CDR** provides [CMake][cmake] scripts to build and install it (please read the [installation guide](https://fast-dds.docs.eprosima.com/en/latest/installation/sources/sources_linux.html#cmake-installation) for more details).
+Also, in [eProsima][eprosima] you can find packages for Linux using autotools and binaries for Windows.
 
 [cmake]: http://www.cmake.org
 [eprosima]: http://www.eprosima.com

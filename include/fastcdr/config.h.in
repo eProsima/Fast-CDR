@@ -25,22 +25,6 @@
 #define HAVE_CXX11 @HAVE_CXX11@
 #endif
 
-// C++0x support defines
-#ifndef HAVE_CXX0X
-#define HAVE_CXX0X @HAVE_CXX0X@
-#endif
-
-// C++ constexpr support
-#ifndef HAVE_CXX_CONSTEXPR
-#define HAVE_CXX_CONSTEXPR @HAVE_CXX_CONSTEXPR@
-#endif
-
-#if HAVE_CXX_CONSTEXPR
-#define CONSTEXPR constexpr
-#else
-#define CONSTEXPR const
-#endif
-
 // Endianness defines
 #ifndef FASTCDR_IS_BIG_ENDIAN_TARGET
 #define FASTCDR_IS_BIG_ENDIAN_TARGET @FASTCDR_IS_BIG_ENDIAN_TARGET@

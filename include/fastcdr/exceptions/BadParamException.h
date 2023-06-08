@@ -44,7 +44,6 @@ public:
     Cdr_DllAPI BadParamException(
             const BadParamException& ex) noexcept;
 
-#if HAVE_CXX0X
     /*!
      * @brief Default move constructor.
      *
@@ -52,7 +51,6 @@ public:
      */
     Cdr_DllAPI BadParamException(
             BadParamException&& ex) noexcept;
-#endif // if HAVE_CXX0X
 
     /*!
      * @brief Assigment operation.
@@ -62,7 +60,6 @@ public:
     Cdr_DllAPI BadParamException& operator =(
             const BadParamException& ex) noexcept;
 
-#if HAVE_CXX0X
     /*!
      * @brief Assigment operation.
      *
@@ -70,7 +67,6 @@ public:
      */
     BadParamException& operator =(
             BadParamException&& ex) noexcept;
-#endif // if HAVE_CXX0X
 
     //! @brief Default constructor
     virtual Cdr_DllAPI ~BadParamException() noexcept;

@@ -28,9 +28,7 @@
 #include <stdlib.h>
 #endif // if !__APPLE__ && !__FreeBSD__ && !__VXWORKS__
 
-#if HAVE_CXX0X
 #include <array>
-#endif // if HAVE_CXX0X
 
 namespace eprosima {
 namespace fastcdr {
@@ -338,7 +336,6 @@ public:
         return serialize(string_t);
     }
 
-#if HAVE_CXX0X
     /*!
      * @brief This operator template is used to serialize arrays.
      * @param array_t The array that will be serialized in the buffer.
@@ -351,8 +348,6 @@ public:
     {
         return serialize<_T, _Size>(array_t);
     }
-
-#endif // if HAVE_CXX0X
 
     /*!
      * @brief This operator template is used to serialize sequences.
@@ -589,7 +584,6 @@ public:
         return deserialize(string_t);
     }
 
-#if HAVE_CXX0X
     /*!
      * @brief This operator template is used to deserialize arrays.
      * @param array_t The variable that will store the array read from the buffer.
@@ -602,8 +596,6 @@ public:
     {
         return deserialize<_T, _Size>(array_t);
     }
-
-#endif // if HAVE_CXX0X
 
     /*!
      * @brief This operator template is used to deserialize sequences.
@@ -912,7 +904,6 @@ public:
         return serialize(string_t.c_str());
     }
 
-#if HAVE_CXX0X
     /*!
      * @brief This function template serializes an array.
      * @param array_t The array that will be serialized in the buffer.
@@ -926,9 +917,6 @@ public:
         return serializeArray(array_t.data(), array_t.size());
     }
 
-#endif // if HAVE_CXX0X
-
-#if !defined(_MSC_VER) && HAVE_CXX0X
     /*!
      * @brief This function template serializes a sequence of booleans.
      * @param vector_t The sequence that will be serialized in the buffer.
@@ -941,8 +929,6 @@ public:
     {
         return serializeBoolSequence(vector_t);
     }
-
-#endif // if !defined(_MSC_VER) && HAVE_CXX0X
 
     /*!
      * @brief This function template serializes a sequence.
@@ -1574,7 +1560,6 @@ public:
         return *this;
     }
 
-#if HAVE_CXX0X
     /*!
      * @brief This function template deserializes an array.
      * @param array_t The variable that will store the array read from the buffer.
@@ -1588,9 +1573,6 @@ public:
         return deserializeArray(array_t.data(), array_t.size());
     }
 
-#endif // if HAVE_CXX0X
-
-#if !defined(_MSC_VER) && HAVE_CXX0X
     /*!
      * @brief This function template deserializes a sequence of booleans.
      * @param vector_t The variable that will store the sequence read from the buffer.
@@ -1603,8 +1585,6 @@ public:
     {
         return deserializeBoolSequence(vector_t);
     }
-
-#endif // if !defined(_MSC_VER) && HAVE_CXX0X
 
     /*!
      * @brief This function template deserializes a sequence.
@@ -1915,7 +1895,6 @@ public:
         return *this;
     }
 
-#if !defined(_MSC_VER) && HAVE_CXX0X
     /*!
      * @brief This function template deserializes a string sequence.
      * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
@@ -1949,8 +1928,6 @@ public:
     {
         return deserializeWStringSequence(sequence_t, numElements);
     }
-
-#endif // if !defined(_MSC_VER) && HAVE_CXX0X
 
     /*!
      * @brief This function template deserializes a raw sequence.
@@ -2047,7 +2024,6 @@ private:
             std::wstring*& sequence_t,
             size_t& numElements);
 
-#if HAVE_CXX0X
     /*!
      * @brief This function template detects the content type of the STD container array and serializes the array.
      * @param array_t The array that will be serialized in the buffer.
@@ -2077,8 +2053,6 @@ private:
     {
         return deserializeArray(array_t->data(), numElements * array_t->size());
     }
-
-#endif // if HAVE_CXX0X
 
     bool resize(
             size_t minSizeInc);

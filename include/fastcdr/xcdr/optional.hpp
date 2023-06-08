@@ -128,6 +128,10 @@ public:
             storage_.val_.~T();
         }
         storage_.engaged_ = initial_engaged;
+        if (storage_.engaged_)
+        {
+            ::new(&storage_.val_)T();
+        }
     }
 
     T& value()&
@@ -182,16 +186,18 @@ public:
     optional& operator =(
             const T& val)
     {
-        reset(true);
+        reset();
         ::new(&storage_.val_)T(val);
+        storage_.engaged_ = true;
         return *this;
     }
 
     optional& operator =(
             T&& val)
     {
-        reset(true);
+        reset();
         ::new(&storage_.val_)T(std::move(val));
+        storage_.engaged_ = true;
         return *this;
     }
 

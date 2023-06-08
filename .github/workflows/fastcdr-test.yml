@@ -27,6 +27,7 @@ on:
   pull_request:
     branches:
       - 'master'
+      - 1.0.x
     paths-ignore:
       - '**.md'
       - '**.txt'

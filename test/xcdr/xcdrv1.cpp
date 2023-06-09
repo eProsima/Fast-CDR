@@ -59,7 +59,7 @@ TEST_P(XCdrv1Test, pl_octet_opt_member)
     uint8_t tested_stream = 0 + static_cast<uint8_t>(GetParam());
     auto buffer =
             std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(malloc(expected_streams[tested_stream].size())), free};
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
     FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
     Cdr cdr(fast_buffer, endianness, Cdr::CdrVersion::XCDRv1);
     //}

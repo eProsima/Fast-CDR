@@ -28,8 +28,6 @@ const Cdr::Endianness Cdr::DEFAULT_ENDIAN = BIG_ENDIANNESS;
 const Cdr::Endianness Cdr::DEFAULT_ENDIAN = LITTLE_ENDIANNESS;
 #endif // if FASTCDR_IS_BIG_ENDIAN_TARGET
 
-constexpr size_t ALIGNMENT_LONG_DOUBLE = 8;
-
 constexpr uint8_t operator ""_8u(
         unsigned long long int value)
 {
@@ -86,6 +84,7 @@ Cdr::Cdr(
             end_serialize_opt_member_ = &Cdr::xcdr2_end_serialize_opt_member;
             begin_deserialize_opt_member_ = &Cdr::xcdr2_begin_deserialize_opt_member;
             end_deserialize_opt_member_ = &Cdr::xcdr2_end_deserialize_opt_member;
+            align64_ = 4;
             break;
         case CdrVersion::XCDRv1:
             begin_serialize_opt_member_ = &Cdr::xcdr1_begin_serialize_opt_member;
@@ -460,13 +459,13 @@ Cdr& Cdr::serialize(
 Cdr& Cdr::serialize(
         const int64_t longlong_t)
 {
-    size_t align = alignment(sizeof(longlong_t));
+    size_t align = alignment(align64_);
     size_t sizeAligned = sizeof(longlong_t) + align;
 
     if (((end_ - offset_) >= sizeAligned) || resize(sizeAligned))
     {
         // Save last datasize.
-        m_lastDataSize = sizeof(longlong_t);
+        m_lastDataSize = align64_;
 
         // Align.
         makeAlign(align);
@@ -576,13 +575,13 @@ Cdr& Cdr::serialize(
 Cdr& Cdr::serialize(
         const double double_t)
 {
-    size_t align = alignment(sizeof(double_t));
+    size_t align = alignment(align64_);
     size_t sizeAligned = sizeof(double_t) + align;
 
     if (((end_ - offset_) >= sizeAligned) || resize(sizeAligned))
     {
         // Save last datasize.
-        m_lastDataSize = sizeof(double_t);
+        m_lastDataSize = align64_;
 
         // Align.
         makeAlign(align);
@@ -636,13 +635,13 @@ Cdr& Cdr::serialize(
 Cdr& Cdr::serialize(
         const long double ldouble_t)
 {
-    size_t align = alignment(ALIGNMENT_LONG_DOUBLE);
+    size_t align = alignment(align64_);
     size_t sizeAligned = sizeof(ldouble_t) + align;
 
     if (((end_ - offset_) >= sizeAligned) || resize(sizeAligned))
     {
         // Save last datasize.
-        m_lastDataSize = 16; // sizeof(ldouble_t);
+        m_lastDataSize = align64_;
 
         // Align.
         makeAlign(align);
@@ -1138,14 +1137,14 @@ Cdr& Cdr::serializeArray(
         return *this;
     }
 
-    size_t align = alignment(sizeof(*longlong_t));
+    size_t align = alignment(align64_);
     size_t totalSize = sizeof(*longlong_t) * numElements;
     size_t sizeAligned = totalSize + align;
 
     if (((end_ - offset_) >= sizeAligned) || resize(sizeAligned))
     {
         // Save last datasize.
-        m_lastDataSize = sizeof(*longlong_t);
+        m_lastDataSize = align64_;
 
         // Align if there are any elements
         if (numElements)
@@ -1284,14 +1283,14 @@ Cdr& Cdr::serializeArray(
         return *this;
     }
 
-    size_t align = alignment(sizeof(*double_t));
+    size_t align = alignment(align64_);
     size_t totalSize = sizeof(*double_t) * numElements;
     size_t sizeAligned = totalSize + align;
 
     if (((end_ - offset_) >= sizeAligned) || resize(sizeAligned))
     {
         // Save last datasize.
-        m_lastDataSize = sizeof(*double_t);
+        m_lastDataSize = align64_;
 
         // Align if there are any elements
         if (numElements)
@@ -1359,7 +1358,7 @@ Cdr& Cdr::serializeArray(
         return *this;
     }
 
-    size_t align = alignment(ALIGNMENT_LONG_DOUBLE);
+    size_t align = alignment(align64_);
     // Fix for Windows ( long doubles only store 8 bytes )
     size_t totalSize = 16 * numElements; // sizeof(*ldouble_t)
     size_t sizeAligned = totalSize + align;
@@ -1367,7 +1366,7 @@ Cdr& Cdr::serializeArray(
     if (((end_ - offset_) >= sizeAligned) || resize(sizeAligned))
     {
         // Save last datasize.
-        m_lastDataSize = 16;
+        m_lastDataSize = align64_;
 
         // Align if there are any elements
         if (numElements)
@@ -1623,13 +1622,13 @@ Cdr& Cdr::deserialize(
 Cdr& Cdr::deserialize(
         int64_t& longlong_t)
 {
-    size_t align = alignment(sizeof(longlong_t));
+    size_t align = alignment(align64_);
     size_t sizeAligned = sizeof(longlong_t) + align;
 
     if ((end_ - offset_) >= sizeAligned)
     {
         // Save last datasize.
-        m_lastDataSize = sizeof(longlong_t);
+        m_lastDataSize = align64_;
 
         // Align.
         makeAlign(align);
@@ -1739,13 +1738,13 @@ Cdr& Cdr::deserialize(
 Cdr& Cdr::deserialize(
         double& double_t)
 {
-    size_t align = alignment(sizeof(double_t));
+    size_t align = alignment(align64_);
     size_t sizeAligned = sizeof(double_t) + align;
 
     if ((end_ - offset_) >= sizeAligned)
     {
         // Save last datasize.
-        m_lastDataSize = sizeof(double_t);
+        m_lastDataSize = align64_;
 
         // Align.
         makeAlign(align);
@@ -1799,13 +1798,13 @@ Cdr& Cdr::deserialize(
 Cdr& Cdr::deserialize(
         long double& ldouble_t)
 {
-    size_t align = alignment(ALIGNMENT_LONG_DOUBLE);
+    size_t align = alignment(align64_);
     size_t sizeAligned = sizeof(ldouble_t) + align;
 
     if ((end_ - offset_) >= sizeAligned)
     {
         // Save last datasize.
-        m_lastDataSize = 16; // sizeof(ldouble_t);
+        m_lastDataSize = align64_;
 
         // Align.
         makeAlign(align);
@@ -2344,14 +2343,14 @@ Cdr& Cdr::deserializeArray(
         return *this;
     }
 
-    size_t align = alignment(sizeof(*longlong_t));
+    size_t align = alignment(align64_);
     size_t totalSize = sizeof(*longlong_t) * numElements;
     size_t sizeAligned = totalSize + align;
 
     if ((end_ - offset_) >= sizeAligned)
     {
         // Save last datasize.
-        m_lastDataSize = sizeof(*longlong_t);
+        m_lastDataSize = align64_;
 
         // Align if there are any elements
         if (numElements)
@@ -2490,14 +2489,14 @@ Cdr& Cdr::deserializeArray(
         return *this;
     }
 
-    size_t align = alignment(sizeof(*double_t));
+    size_t align = alignment(align64_);
     size_t totalSize = sizeof(*double_t) * numElements;
     size_t sizeAligned = totalSize + align;
 
     if ((end_ - offset_) >= sizeAligned)
     {
         // Save last datasize.
-        m_lastDataSize = sizeof(*double_t);
+        m_lastDataSize = align64_;
 
         // Align if there are any elements
         if (numElements)
@@ -2565,7 +2564,7 @@ Cdr& Cdr::deserializeArray(
         return *this;
     }
 
-    size_t align = alignment(ALIGNMENT_LONG_DOUBLE);
+    size_t align = alignment(align64_);
     // Fix for Windows ( long doubles only store 8 bytes )
     size_t totalSize = 16 * numElements;
     size_t sizeAligned = totalSize + align;
@@ -2573,7 +2572,7 @@ Cdr& Cdr::deserializeArray(
     if ((end_ - offset_) >= sizeAligned)
     {
         // Save last datasize.
-        m_lastDataSize = 16;
+        m_lastDataSize = align64_;
 
         // Align if there are any elements
         if (numElements)
@@ -2976,7 +2975,7 @@ void Cdr::xcdr2_serialize_short_member_header(
 void Cdr::xcdr2_end_short_member_header(
         size_t member_serialized_size)
 {
-    assert(4 >= member_serialized_size);
+    assert(8 >= member_serialized_size);
 
     uint32_t lc = 0;
     switch (member_serialized_size)
@@ -2984,10 +2983,10 @@ void Cdr::xcdr2_end_short_member_header(
         case 2:
             lc = 0x10000000;
             break;
-        case 3:
+        case 4:
             lc = 0x20000000;
             break;
-        case 4:
+        case 8:
             lc = 0x30000000;
             break;
         default:
@@ -3021,7 +3020,7 @@ void Cdr::xcdr2_end_long_member_header(
 void Cdr::xcdr2_change_to_short_member_header(
         size_t member_serialized_size)
 {
-    assert(4 >= member_serialized_size);
+    assert(8 >= member_serialized_size);
 
     uint32_t lc = ((member_serialized_size - 1) << 28) & 0x70000000;
     uint32_t flags_and_member_id = (next_member_id_.must_understand ? 0x80000000 : 0x0) | lc | next_member_id_.id;
@@ -3227,7 +3226,7 @@ Cdr& Cdr::xcdr2_end_serialize_opt_member(
         const size_t member_serialized_size = offset_ - origin_ -
                 (current_state.header_serialized_ == XCdrHeaderSelection::SHORT_HEADER ? 4 : 8);
         set_state(current_state);
-        if (4 < member_serialized_size)
+        if (8 < member_serialized_size)
         {
             switch (current_state.header_serialized_)
             {
@@ -3297,7 +3296,23 @@ void Cdr::xcdr2_deserialize_member_header(
 
     if (4 > lc)
     {
-        current_state.member_size_ = lc + 1;
+        switch (lc)
+        {
+            case 0:
+                current_state.member_size_ = 1;
+                break;
+            case 1:
+                current_state.member_size_ = 2;
+                break;
+            case 2:
+                current_state.member_size_ = 4;
+                break;
+            case 3:
+                current_state.member_size_ = 8;
+                break;
+            default:
+                break;
+        }
         current_state.header_serialized_ = XCdrHeaderSelection::SHORT_HEADER;
     }
     else

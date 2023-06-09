@@ -3914,6 +3914,9 @@ private:
     //!
     EncodingAlgorithmFlag current_encoding_ {EncodingAlgorithmFlag::PLAIN_CDR};
 
+    //!
+    size_t align64_ {8};
+
 };
 
 }     //namespace fastcdr

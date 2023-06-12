@@ -34,6 +34,14 @@ constexpr uint8_t operator ""_8u(
     return static_cast<uint8_t>(value);
 }
 
+inline size_t alignment_on_state(
+        const FastBuffer::iterator& origin,
+        const FastBuffer::iterator& offset,
+        size_t dataSize)
+{
+    return (dataSize - ((offset - origin) % dataSize)) & (dataSize - 1);
+}
+
 Cdr::state::state(
         const Cdr& cdr)
     : offset_(cdr.offset_)
@@ -3223,9 +3231,11 @@ Cdr& Cdr::xcdr2_end_serialize_opt_member(
 
     if (0 < current_state.member_size_ && EncodingAlgorithmFlag::PL_CDR2 == current_encoding_)
     {
-        const size_t member_serialized_size = offset_ - origin_ -
-                (current_state.header_serialized_ == XCdrHeaderSelection::SHORT_HEADER ? 4 : 8);
+        auto last_offset = offset_;
         set_state(current_state);
+        makeAlign(alignment(sizeof(uint32_t)));
+        const size_t member_serialized_size = last_offset - offset_ -
+                (current_state.header_serialized_ == XCdrHeaderSelection::SHORT_HEADER ? 4 : 8);
         if (8 < member_serialized_size)
         {
             switch (current_state.header_serialized_)
@@ -3593,6 +3603,7 @@ Cdr& Cdr::xcdr2_end_deserialize_opt_member(
                 (0 < current_state.member_size_ &&
                 current_state.member_size_ ==
                 offset_ - current_state.offset_ -
+                alignment_on_state(current_state.origin_, current_state.offset_, sizeof(uint32_t)) -
                 (XCdrHeaderSelection::SHORT_HEADER == current_state.header_serialized_ ? 4 : 8)));
     }
 

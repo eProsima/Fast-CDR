@@ -1715,6 +1715,755 @@ TEST_P(XCdrOptionalTest, wchar_serialize_the_value)
     //}
 }
 
+TEST_P(XCdrOptionalTest, null_align_1_serialize_the_value)
+{
+    const uint8_t align_value = 0xAB;
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00, 0x00, 0x00,       // Alignment
+        0x00, 0x01, 0x00, 0x00  // ShortMemberHeader
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00, 0x00, 0x00,       // Alignment
+        0x01, 0x00, 0x00, 0x00  // ShortMemberHeader
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x02, 0x00, 0x00, // Encapsulation
+        align_value             // Alignment
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x03, 0x00, 0x00, // Encapsulation
+        align_value             // Alignment
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00                    // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00                    // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00                    // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00                    // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x0a, 0x00, 0x00, // Encapsulation
+        align_value             // Alignment
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x0b, 0x00, 0x00, // Encapsulation
+        align_value             // Alignment
+    };
+    //}
+
+    //{ Prepare buffer
+    Cdr::EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode optional not present.
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    cdr << align_value;
+    Cdr::state enc_state(cdr);
+    cdr.begin_serialize_opt_member(MemberId(1), false, enc_state);
+    cdr.end_serialize_opt_member(enc_state);
+    Cdr::state enc_state_end(cdr);
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding optional not present
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    uint8_t dalign_value = 0;
+    cdr >> dalign_value;
+    ASSERT_EQ(align_value, dalign_value);
+    Cdr::state dec_state(cdr);
+    MemberId member_id;
+    bool is_present = false;
+    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
+    ASSERT_FALSE(is_present);
+    cdr.end_deserialize_opt_member(dec_state);
+    Cdr::state dec_state_end(cdr);
+    ASSERT_EQ(enc_state_end, dec_state_end);
+    //}
+}
+
+TEST_P(XCdrOptionalTest, null_align_2_serialize_the_value)
+{
+    const uint16_t align_value = 0xABBA;
+    constexpr uint8_t ival = 0xAB;
+    constexpr uint8_t fval = 0xBA;
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        ival, fval,
+        0x00, 0x00,             // Alignment
+        0x00, 0x01, 0x00, 0x00  // ShortMemberHeader
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        fval, ival,
+        0x00, 0x00,             // Alignment
+        0x01, 0x00, 0x00, 0x00  // ShortMemberHeader
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x02, 0x00, 0x00, // Encapsulation
+        ival, fval
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x03, 0x00, 0x00, // Encapsulation
+        fval, ival
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        ival, fval,
+        0x00                    // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        fval, ival,
+        0x00              // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        ival, fval,
+        0x00              // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        fval, ival,
+        0x00              // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x0a, 0x00, 0x00, // Encapsulation
+        ival, fval
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x0b, 0x00, 0x00, // Encapsulation
+        fval, ival
+    };
+    //}
+
+    //{ Prepare buffer
+    Cdr::EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode optional not present.
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    cdr << align_value;
+    Cdr::state enc_state(cdr);
+    cdr.begin_serialize_opt_member(MemberId(1), false, enc_state);
+    cdr.end_serialize_opt_member(enc_state);
+    Cdr::state enc_state_end(cdr);
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding optional not present
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    uint16_t dalign_value = 0;
+    cdr >> dalign_value;
+    ASSERT_EQ(align_value, dalign_value);
+    Cdr::state dec_state(cdr);
+    MemberId member_id;
+    bool is_present = false;
+    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
+    ASSERT_FALSE(is_present);
+    cdr.end_deserialize_opt_member(dec_state);
+    Cdr::state dec_state_end(cdr);
+    ASSERT_EQ(enc_state_end, dec_state_end);
+    //}
+}
+
+TEST_P(XCdrOptionalTest, null_align_4_serialize_the_value)
+{
+    const uint32_t align_value = 0xABABABBA;
+    constexpr uint8_t ival = 0xAB;
+    constexpr uint8_t fval = 0xBA;
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        ival, ival, ival, fval,
+        0x00, 0x01, 0x00, 0x00  // ShortMemberHeader
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        fval, ival, ival, ival,
+        0x01, 0x00, 0x00, 0x00  // ShortMemberHeader
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x02, 0x00, 0x00, // Encapsulation
+        ival, ival, ival, fval
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x03, 0x00, 0x00, // Encapsulation
+        fval, ival, ival, ival
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        ival, ival, ival, fval,
+        0x00                    // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        fval, ival, ival, ival,
+        0x00              // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        ival, ival, ival, fval,
+        0x00              // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        fval, ival, ival, ival,
+        0x00              // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x0a, 0x00, 0x00, // Encapsulation
+        ival, ival, ival, fval
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x0b, 0x00, 0x00, // Encapsulation
+        fval, ival, ival, ival
+    };
+    //}
+
+    //{ Prepare buffer
+    Cdr::EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode optional not present.
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    cdr << align_value;
+    Cdr::state enc_state(cdr);
+    cdr.begin_serialize_opt_member(MemberId(1), false, enc_state);
+    cdr.end_serialize_opt_member(enc_state);
+    Cdr::state enc_state_end(cdr);
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding optional not present
+    cdr.reset();
+    cdr.read_encapsulation();
+    uint32_t dalign_value = 0;
+    cdr >> dalign_value;
+    ASSERT_EQ(align_value, dalign_value);
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    Cdr::state dec_state(cdr);
+    MemberId member_id;
+    bool is_present = false;
+    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
+    ASSERT_FALSE(is_present);
+    cdr.end_deserialize_opt_member(dec_state);
+    Cdr::state dec_state_end(cdr);
+    ASSERT_EQ(enc_state_end, dec_state_end);
+    //}
+}
+
+TEST_P(XCdrOptionalTest, short_align_1_serialize_the_value)
+{
+    const uint8_t align_value = 0xAB;
+    const int16_t short_value = static_cast<int16_t>(0xCDDC);
+    constexpr uint8_t ival = 0xCD;
+    constexpr uint8_t fval = 0xDC;
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00, 0x00, 0x00,       // Alignment
+        0x00, 0x01, 0x00, 0x02, // ShortMemberHeader
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00, 0x00, 0x00,       // Alignment
+        0x01, 0x00, 0x02, 0x00, // ShortMemberHeader
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x02, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00, 0x00, 0x00,       // Alignment
+        0x00, 0x01, 0x00, 0x02, // ShortMemberHeader
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x03, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00, 0x00, 0x00,       // Alignment
+        0x01, 0x00, 0x02, 0x00, // ShortMemberHeader
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x01,                   // Present
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x01,                   // Present
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x01,                   // Present
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x01,                   // Present
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x0a, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00, 0x00, 0x00,       // Alignment
+        0x10, 0x00, 0x00, 0x01, // EMHEADER1(M) without NEXTINT
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x0b, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00, 0x00, 0x00,       // Alignment
+        0x01, 0x00, 0x00, 0x10, // EMHEADER1(M) without NEXTINT
+        fval, ival              // Short
+    };
+    //}
+
+    //{ Prepare buffer
+    Cdr::EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode optional not present.
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    cdr << align_value;
+    Cdr::state enc_state(cdr);
+    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
+    cdr.serialize(short_value);
+    cdr.end_serialize_opt_member(enc_state);
+    Cdr::state enc_state_end(cdr);
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding optional not present
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    uint8_t dalign_value = 0;
+    cdr >> dalign_value;
+    ASSERT_EQ(align_value, dalign_value);
+    Cdr::state dec_state(cdr);
+    MemberId member_id;
+    bool is_present = false;
+    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
+    ASSERT_TRUE(is_present);
+    int16_t short_dec_value = 0;
+    cdr.deserialize(short_dec_value);
+    ASSERT_EQ(short_value, short_dec_value);
+    cdr.end_deserialize_opt_member(dec_state);
+    Cdr::state dec_state_end(cdr);
+    ASSERT_EQ(enc_state_end, dec_state_end);
+    //}
+}
+
+TEST_P(XCdrOptionalTest, short_align_2_serialize_the_value)
+{
+    const uint16_t align_value = 0xABBA;
+    constexpr uint8_t iava = 0xAB;
+    constexpr uint8_t fava = 0xBA;
+    const int16_t short_value = static_cast<int16_t>(0xCDDC);
+    constexpr uint8_t ival = 0xCD;
+    constexpr uint8_t fval = 0xDC;
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        iava, fava,
+        0x00, 0x00,             // Alignment
+        0x00, 0x01, 0x00, 0x02, // ShortMemberHeader
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        fava, iava,
+        0x00, 0x00,             // Alignment
+        0x01, 0x00, 0x02, 0x00, // ShortMemberHeader
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x02, 0x00, 0x00, // Encapsulation
+        iava, fava,
+        0x00, 0x00,             // Alignment
+        0x00, 0x01, 0x00, 0x02, // ShortMemberHeader
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x03, 0x00, 0x00, // Encapsulation
+        fava, iava,
+        0x00, 0x00,             // Alignment
+        0x01, 0x00, 0x02, 0x00, // ShortMemberHeader
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        iava, fava,
+        0x01,                   // Present
+        0x00,                   // Alignment
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        fava, iava,
+        0x01,                   // Present
+        0x00,                   // Alignment
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        iava, fava,
+        0x01,                   // Present
+        0x00,                   // Alignment
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        fava, iava,
+        0x01,                   // Present
+        0x00,                   // Alignment
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x0a, 0x00, 0x00, // Encapsulation
+        iava, fava,
+        0x00, 0x00,             // Alignment
+        0x10, 0x00, 0x00, 0x01, // EMHEADER1(M) without NEXTINT
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x0b, 0x00, 0x00, // Encapsulation
+        fava, iava,
+        0x00, 0x00,             // Alignment
+        0x01, 0x00, 0x00, 0x10, // EMHEADER1(M) without NEXTINT
+        fval, ival              // Short
+    };
+    //}
+
+    //{ Prepare buffer
+    Cdr::EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode optional not present.
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    cdr << align_value;
+    Cdr::state enc_state(cdr);
+    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
+    cdr.serialize(short_value);
+    cdr.end_serialize_opt_member(enc_state);
+    Cdr::state enc_state_end(cdr);
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding optional not present
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    uint16_t dalign_value = 0;
+    cdr >> dalign_value;
+    ASSERT_EQ(align_value, dalign_value);
+    Cdr::state dec_state(cdr);
+    MemberId member_id;
+    bool is_present = false;
+    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
+    ASSERT_TRUE(is_present);
+    int16_t short_dec_value = 0;
+    cdr.deserialize(short_dec_value);
+    ASSERT_EQ(short_value, short_dec_value);
+    cdr.end_deserialize_opt_member(dec_state);
+    Cdr::state dec_state_end(cdr);
+    ASSERT_EQ(enc_state_end, dec_state_end);
+    //}
+}
+
+TEST_P(XCdrOptionalTest, short_align_4_serialize_the_value)
+{
+    const uint32_t align_value = 0xABABABBA;
+    constexpr uint8_t iava = 0xAB;
+    constexpr uint8_t fava = 0xBA;
+    const int16_t short_value = static_cast<int16_t>(0xCDDC);
+    constexpr uint8_t ival = 0xCD;
+    constexpr uint8_t fval = 0xDC;
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        iava, iava, iava, fava,
+        0x00, 0x01, 0x00, 0x02, // ShortMemberHeader
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        fava, iava, iava, iava,
+        0x01, 0x00, 0x02, 0x00, // ShortMemberHeader
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x02, 0x00, 0x00, // Encapsulation
+        iava, iava, iava, fava,
+        0x00, 0x01, 0x00, 0x02, // ShortMemberHeader
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x03, 0x00, 0x00, // Encapsulation
+        fava, iava, iava, iava,
+        0x01, 0x00, 0x02, 0x00, // ShortMemberHeader
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        iava, iava, iava, fava,
+        0x01,                   // Present
+        0x00,                   // Alignment
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        fava, iava, iava, iava,
+        0x01,                   // Present
+        0x00,                   // Alignment
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        iava, iava, iava, fava,
+        0x01,                   // Present
+        0x00,                   // Alignment
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        fava, iava, iava, iava,
+        0x01,                   // Present
+        0x00,                   // Alignment
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x0a, 0x00, 0x00, // Encapsulation
+        iava, iava, iava, fava,
+        0x10, 0x00, 0x00, 0x01, // EMHEADER1(M) without NEXTINT
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x0b, 0x00, 0x00, // Encapsulation
+        fava, iava, iava, iava,
+        0x01, 0x00, 0x00, 0x10, // EMHEADER1(M) without NEXTINT
+        fval, ival              // Short
+    };
+    //}
+
+    //{ Prepare buffer
+    Cdr::EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode optional not present.
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    cdr << align_value;
+    Cdr::state enc_state(cdr);
+    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
+    cdr.serialize(short_value);
+    cdr.end_serialize_opt_member(enc_state);
+    Cdr::state enc_state_end(cdr);
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding optional not present
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    uint32_t dalign_value = 0;
+    cdr >> dalign_value;
+    ASSERT_EQ(align_value, dalign_value);
+    Cdr::state dec_state(cdr);
+    MemberId member_id;
+    bool is_present = false;
+    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
+    ASSERT_TRUE(is_present);
+    int16_t short_dec_value = 0;
+    cdr.deserialize(short_dec_value);
+    ASSERT_EQ(short_value, short_dec_value);
+    cdr.end_deserialize_opt_member(dec_state);
+    Cdr::state dec_state_end(cdr);
+    ASSERT_EQ(enc_state_end, dec_state_end);
+    //}
+}
+
 TEST_P(XCdrOptionalTest, null_optional)
 {
     //{ Defining expected XCDR streams
@@ -3250,6 +3999,692 @@ TEST_P(XCdrOptionalTest, wchar_optional)
     ASSERT_EQ(cdr.get_encoding_flag(), encoding);
     ASSERT_EQ(cdr.endianness(), endianness);
     cdr >> dvalue;
+    ASSERT_TRUE(dvalue.has_value());
+    ASSERT_EQ(*value, *dvalue);
+    //}
+}
+
+TEST_P(XCdrOptionalTest, null_align_1_optional)
+{
+    const uint8_t align_value = 0xAB;
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00, 0x00, 0x00,       // Alignment
+        0x00, 0x01, 0x00, 0x00  // ShortMemberHeader
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00, 0x00, 0x00,       // Alignment
+        0x01, 0x00, 0x00, 0x00  // ShortMemberHeader
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x02, 0x00, 0x00, // Encapsulation
+        align_value
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x03, 0x00, 0x00, // Encapsulation
+        align_value
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00                    // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00                    // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00                    // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00                    // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x0a, 0x00, 0x00, // Encapsulation
+        align_value
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x0b, 0x00, 0x00, // Encapsulation
+        align_value
+    };
+    //}
+
+    //{ Prepare buffer
+    Cdr::EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode optional not present.
+    optional<uint8_t> value;
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    cdr << align_value << MemberId(1) << value;
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding optional not present
+    optional<uint8_t> dvalue;
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    uint8_t dalign_value = 0;
+    cdr >> dalign_value >> dvalue;
+    ASSERT_EQ(align_value, dalign_value);
+    ASSERT_FALSE(dvalue.has_value());
+    //}
+}
+
+TEST_P(XCdrOptionalTest, null_align_2_optional)
+{
+    const uint16_t align_value = 0xABBA;
+    constexpr uint8_t ival = 0xAB;
+    constexpr uint8_t fval = 0xBA;
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        ival, fval,
+        0x00, 0x00,             // Alignment
+        0x00, 0x01, 0x00, 0x00  // ShortMemberHeader
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        fval, ival,
+        0x00, 0x00,             // Alignment
+        0x01, 0x00, 0x00, 0x00  // ShortMemberHeader
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x02, 0x00, 0x00, // Encapsulation
+        ival, fval
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x03, 0x00, 0x00, // Encapsulation
+        fval, ival
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        ival, fval,
+        0x00                    // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        fval, ival,
+        0x00                    // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        ival, fval,
+        0x00                    // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        fval, ival,
+        0x00                    // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x0a, 0x00, 0x00, // Encapsulation
+        ival, fval
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x0b, 0x00, 0x00, // Encapsulation
+        fval, ival
+    };
+    //}
+
+    //{ Prepare buffer
+    Cdr::EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode optional not present.
+    optional<uint8_t> value;
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    cdr << align_value << MemberId(1) << value;
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding optional not present
+    optional<uint8_t> dvalue;
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    uint16_t dalign_value = 0;
+    cdr >> dalign_value >> dvalue;
+    ASSERT_EQ(align_value, dalign_value);
+    ASSERT_FALSE(dvalue.has_value());
+    //}
+}
+
+TEST_P(XCdrOptionalTest, null_align_4_optional)
+{
+    const uint32_t align_value = 0xABABABBA;
+    constexpr uint8_t ival = 0xAB;
+    constexpr uint8_t fval = 0xBA;
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        ival, ival, ival, fval,
+        0x00, 0x01, 0x00, 0x00  // ShortMemberHeader
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        fval, ival, ival, ival,
+        0x01, 0x00, 0x00, 0x00  // ShortMemberHeader
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x02, 0x00, 0x00, // Encapsulation
+        ival, ival, ival, fval
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x03, 0x00, 0x00, // Encapsulation
+        fval, ival, ival, ival
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        ival, ival, ival, fval,
+        0x00                    // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        fval, ival, ival, ival,
+        0x00                    // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        ival, ival, ival, fval,
+        0x00                    // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        fval, ival, ival, ival,
+        0x00                    // Not present
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x0a, 0x00, 0x00, // Encapsulation
+        ival, ival, ival, fval
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x0b, 0x00, 0x00, // Encapsulation
+        fval, ival, ival, ival
+    };
+    //}
+
+    //{ Prepare buffer
+    Cdr::EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode optional not present.
+    optional<uint8_t> value;
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    cdr << align_value << MemberId(1) << value;
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding optional not present
+    optional<uint8_t> dvalue;
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    uint32_t dalign_value = 0;
+    cdr >> dalign_value >> dvalue;
+    ASSERT_EQ(align_value, dalign_value);
+    ASSERT_FALSE(dvalue.has_value());
+    //}
+}
+
+TEST_P(XCdrOptionalTest, short_align_1_optional)
+{
+    const uint8_t align_value = 0xAB;
+    const int16_t short_value = static_cast<int16_t>(0xCDDC);
+    constexpr uint8_t ival = 0xCD;
+    constexpr uint8_t fval = 0xDC;
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00, 0x00, 0x00,       // Alignment
+        0x00, 0x01, 0x00, 0x02, // ShortMemberHeader
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00, 0x00, 0x00,       // Alignment
+        0x01, 0x00, 0x02, 0x00, // ShortMemberHeader
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x02, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00, 0x00, 0x00,       // Alignment
+        0x00, 0x01, 0x00, 0x02, // ShortMemberHeader
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x03, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00, 0x00, 0x00,       // Alignment
+        0x01, 0x00, 0x02, 0x00, // ShortMemberHeader
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x01,                   // Present
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x01,                   // Present
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x01,                   // Present
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x01,                   // Present
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x0a, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00, 0x00, 0x00,       // Alignment
+        0x10, 0x00, 0x00, 0x01, // EMHEADER1(M) without NEXTINT
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x0b, 0x00, 0x00, // Encapsulation
+        align_value,
+        0x00, 0x00, 0x00,       // Alignment
+        0x01, 0x00, 0x00, 0x10, // EMHEADER1(M) without NEXTINT
+        fval, ival              // Short
+    };
+    //}
+
+    //{ Prepare buffer
+    Cdr::EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode optional not present.
+    optional<int16_t> value {short_value};
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    cdr << align_value << MemberId(1) << value;
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding optional not present
+    uint8_t dalign_value = 0;
+    optional<int16_t> dvalue;
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    cdr >> dalign_value >> dvalue;
+    ASSERT_EQ(align_value, dalign_value);
+    ASSERT_TRUE(dvalue.has_value());
+    ASSERT_EQ(*value, *dvalue);
+    //}
+}
+
+TEST_P(XCdrOptionalTest, short_align_2_optional)
+{
+    const uint16_t align_value = 0xABBA;
+    constexpr uint8_t iava = 0xAB;
+    constexpr uint8_t fava = 0xBA;
+    const int16_t short_value = static_cast<int16_t>(0xCDDC);
+    constexpr uint8_t ival = 0xCD;
+    constexpr uint8_t fval = 0xDC;
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        iava, fava,
+        0x00, 0x00,             // Alignment
+        0x00, 0x01, 0x00, 0x02, // ShortMemberHeader
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        fava, iava,
+        0x00, 0x00,             // Alignment
+        0x01, 0x00, 0x02, 0x00, // ShortMemberHeader
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x02, 0x00, 0x00, // Encapsulation
+        iava, fava,
+        0x00, 0x00,             // Alignment
+        0x00, 0x01, 0x00, 0x02, // ShortMemberHeader
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x03, 0x00, 0x00, // Encapsulation
+        fava, iava,
+        0x00, 0x00,             // Alignment
+        0x01, 0x00, 0x02, 0x00, // ShortMemberHeader
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        iava, fava,
+        0x01,                   // Present
+        0x00,                   // Alignment
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        fava, iava,
+        0x01,                   // Present
+        0x00,                   // Alignment
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        iava, fava,
+        0x01,                   // Present
+        0x00,                   // Alignment
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        fava, iava,
+        0x01,                   // Present
+        0x00,                   // Alignment
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x0a, 0x00, 0x00, // Encapsulation
+        iava, fava,
+        0x00, 0x00,             // Alignment
+        0x10, 0x00, 0x00, 0x01, // EMHEADER1(M) without NEXTINT
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x0b, 0x00, 0x00, // Encapsulation
+        fava, iava,
+        0x00, 0x00,             // Alignment
+        0x01, 0x00, 0x00, 0x10, // EMHEADER1(M) without NEXTINT
+        fval, ival              // Short
+    };
+    //}
+
+    //{ Prepare buffer
+    Cdr::EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode optional not present.
+    optional<int16_t> value {short_value};
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    cdr << align_value << MemberId(1) << value;
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding optional not present
+    uint16_t dalign_value = 0;
+    optional<int16_t> dvalue;
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    cdr >> dalign_value >> dvalue;
+    ASSERT_EQ(align_value, dalign_value);
+    ASSERT_TRUE(dvalue.has_value());
+    ASSERT_EQ(*value, *dvalue);
+    //}
+}
+
+TEST_P(XCdrOptionalTest, short_align_4_optional)
+{
+    const uint32_t align_value = 0xABABABBA;
+    constexpr uint8_t iava = 0xAB;
+    constexpr uint8_t fava = 0xBA;
+    const int16_t short_value = static_cast<int16_t>(0xCDDC);
+    constexpr uint8_t ival = 0xCD;
+    constexpr uint8_t fval = 0xDC;
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        iava, iava, iava, fava,
+        0x00, 0x01, 0x00, 0x02, // ShortMemberHeader
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        fava, iava, iava, iava,
+        0x01, 0x00, 0x02, 0x00, // ShortMemberHeader
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x02, 0x00, 0x00, // Encapsulation
+        iava, iava, iava, fava,
+        0x00, 0x01, 0x00, 0x02, // ShortMemberHeader
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x03, 0x00, 0x00, // Encapsulation
+        fava, iava, iava, iava,
+        0x01, 0x00, 0x02, 0x00, // ShortMemberHeader
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        iava, iava, iava, fava,
+        0x01,                   // Present
+        0x00,                   // Alignment
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        fava, iava, iava, iava,
+        0x01,                   // Present
+        0x00,                   // Alignment
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        iava, iava, iava, fava,
+        0x01,                   // Present
+        0x00,                   // Alignment
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        fava, iava, iava, iava,
+        0x01,                   // Present
+        0x00,                   // Alignment
+        fval, ival              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x0a, 0x00, 0x00, // Encapsulation
+        iava, iava, iava, fava,
+        0x10, 0x00, 0x00, 0x01, // EMHEADER1(M) without NEXTINT
+        ival, fval              // Short
+    };
+    expected_streams[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x0b, 0x00, 0x00, // Encapsulation
+        fava, iava, iava, iava,
+        0x01, 0x00, 0x00, 0x10, // EMHEADER1(M) without NEXTINT
+        fval, ival              // Short
+    };
+    //}
+
+    //{ Prepare buffer
+    Cdr::EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode optional not present.
+    optional<int16_t> value {short_value};
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    cdr << align_value << MemberId(1) << value;
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding optional not present
+    uint32_t dalign_value = 0;
+    optional<int16_t> dvalue;
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    cdr >> dalign_value >> dvalue;
+    ASSERT_EQ(align_value, dalign_value);
     ASSERT_TRUE(dvalue.has_value());
     ASSERT_EQ(*value, *dvalue);
     //}

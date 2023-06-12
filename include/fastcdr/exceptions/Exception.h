@@ -83,7 +83,7 @@ protected:
      * @param ex Exception that will be moved.
      */
     Cdr_DllAPI Exception& operator =(
-            Exception&&) noexcept;
+            Exception&& ex) noexcept;
 
 private:
 

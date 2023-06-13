@@ -144,6 +144,9 @@ public:
         uint32_t member_size_ {0};
 
         //!
+        MemberId next_member_id_;
+
+        //!
         XCdrHeaderSelection header_selection_ {XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT};
 
         //!
@@ -3810,18 +3813,22 @@ private:
             const MemberId& member_id);
 
     void xcdr1_end_short_member_header(
+            const MemberId& member_id,
             size_t member_serialized_size);
 
     void xcdr1_serialize_long_member_header(
             const MemberId& member_id);
 
     void xcdr1_end_long_member_header(
+            const MemberId& member_id,
             size_t member_serialized_size);
 
     void xcdr1_change_to_short_member_header(
+            const MemberId& member_id,
             size_t member_serialized_size);
 
     void xcdr1_change_to_long_member_header(
+            const MemberId& member_id,
             size_t member_serialized_size);
 
     void xcdr1_deserialize_member_header(
@@ -3832,18 +3839,22 @@ private:
             const MemberId& member_id);
 
     void xcdr2_end_short_member_header(
+            const MemberId& member_id,
             size_t member_serialized_size);
 
     void xcdr2_serialize_long_member_header(
             const MemberId& member_id);
 
     void xcdr2_end_long_member_header(
+            const MemberId& member_id,
             size_t member_serialized_size);
 
     void xcdr2_change_to_short_member_header(
+            const MemberId& member_id,
             size_t member_serialized_size);
 
     void xcdr2_change_to_long_member_header(
+            const MemberId& member_id,
             size_t member_serialized_size);
 
     void xcdr2_deserialize_member_header(

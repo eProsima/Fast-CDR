@@ -1988,6 +1988,19 @@ public:
         return *this;
     }
 
+    /*! TODO */
+    template<class _K, class _T>
+    Cdr& serializeArray(
+            const std::map<_K, _T>* map_t,
+            size_t numElements)
+    {
+        for (size_t count = 0; count < numElements; ++count)
+        {
+            serialize(map_t[count]);
+        }
+        return *this;
+    }
+
     /*!
      * @brief This function template serializes an array of maps of objects.
      * @param map_t The array of maps of objects that will be serialized in the buffer.
@@ -3337,6 +3350,19 @@ public:
         for (size_t count = 0; count < numElements; ++count)
         {
             deserialize(vector_t[count]);
+        }
+        return *this;
+    }
+
+    /*! TODO */
+    template<class _K, class _T>
+    Cdr& deserializeArray(
+            std::map<_K, _T>* map_t,
+            size_t numElements)
+    {
+        for (size_t count = 0; count < numElements; ++count)
+        {
+            deserialize(map_t[count]);
         }
         return *this;
     }

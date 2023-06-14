@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <algorithm>
 #include <array>
 #include <memory>
 #include <vector>
@@ -33,7 +34,7 @@ TEST_P(XCdrv1Test, pl_octet_opt_member)
         0x00, 0x03, 0x00, 0x00, // Encapsulation
         0x01, 0x3F, 0x08, 0x00, // LongMemberHeader
         0x01, 0x00, 0x00, 0x00, // Member ID and flags
-        0x01, 0x00, 0x00, 0x00, // Member ID and flags
+        0x01, 0x00, 0x00, 0x00, // Size
         octet_value             // Octet
     };
     expected_streams[0 + Cdr::XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT] =
@@ -75,6 +76,8 @@ TEST_P(XCdrv1Test, pl_octet_opt_member)
     //}
 
     //{ Test encoded content
+    auto it = std::find(expected_streams[tested_stream].begin(), expected_streams[tested_stream].end(), octet_value);
+    ASSERT_EQ(cdr.getSerializedDataLength(), std::distance(expected_streams[tested_stream].begin(), ++it));
     ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
     //}
 

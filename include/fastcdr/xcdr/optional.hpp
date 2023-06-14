@@ -215,6 +215,12 @@ public:
                (storage_.engaged_ ? opt_val.storage_.val_ == storage_.val_ : true);
     }
 
+    bool operator !=(
+            const optional& opt_val) const
+    {
+        return !operator ==(opt_val);
+    }
+
     T& operator *() & noexcept
     {
         return storage_.val_;

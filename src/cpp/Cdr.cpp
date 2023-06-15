@@ -101,8 +101,12 @@ Cdr::Cdr(
             end_serialize_opt_member_ = &Cdr::xcdr1_end_serialize_opt_member;
             begin_deserialize_opt_member_ = &Cdr::xcdr1_begin_deserialize_opt_member;
             end_deserialize_opt_member_ = &Cdr::xcdr1_end_deserialize_opt_member;
+            encoding_flag_ = EncodingAlgorithmFlag::PLAIN_CDR;
+            current_encoding_ = EncodingAlgorithmFlag::PLAIN_CDR;
             break;
         default:
+            encoding_flag_ = EncodingAlgorithmFlag::PLAIN_CDR;
+            current_encoding_ = EncodingAlgorithmFlag::PLAIN_CDR;
             break;
     }
 }
@@ -229,13 +233,13 @@ Cdr& Cdr::serialize_encapsulation()
     return *this;
 }
 
-Cdr::EncodingAlgorithmFlag Cdr::get_encoding_flag() const
+EncodingAlgorithmFlag Cdr::get_encoding_flag() const
 {
     return encoding_flag_;
 }
 
 void Cdr::set_encoding_flag(
-        Cdr::EncodingAlgorithmFlag encoding_flag)
+        EncodingAlgorithmFlag encoding_flag)
 {
     encoding_flag_ = encoding_flag;
 }
@@ -307,8 +311,9 @@ void Cdr::reset()
     origin_ = m_cdrBuffer.begin();
     m_swapBytes = m_endianness == DEFAULT_ENDIAN ? false : true;
     m_lastDataSize = 0;
-    encoding_flag_ = EncodingAlgorithmFlag::PLAIN_CDR;
-    current_encoding_ = EncodingAlgorithmFlag::PLAIN_CDR;
+    encoding_flag_ = CdrVersion::XCDRv2 ==
+            cdr_version_ ? EncodingAlgorithmFlag::PLAIN_CDR2 : EncodingAlgorithmFlag::PLAIN_CDR;
+    current_encoding_ = encoding_flag_;
     next_member_id_ = MEMBER_ID_INVALID;
     m_options = 0;
 }

@@ -1910,7 +1910,7 @@ public:
     {
         for (size_t count = 0; count < numElements; ++count)
         {
-            type_t[count].serialize(*this);
+            *this << type_t[count];
         }
         return *this;
     }
@@ -3198,7 +3198,7 @@ public:
     {
         for (size_t count = 0; count < numElements; ++count)
         {
-            type_t[count].deserialize(*this);
+            *this >> type_t[count];
         }
         return *this;
     }

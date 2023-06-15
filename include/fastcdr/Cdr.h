@@ -1897,6 +1897,25 @@ public:
     }
 
     /*!
+     * @brief This function template serializes an array of maps of objects.
+     * @param map_t The array of maps of objects that will be serialized in the buffer.
+     * @param numElements Number of the elements in the array.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+     */
+    template<class _K, class _T>
+    Cdr& serializeArray(
+            const std::map<_K, _T>* map_t,
+            size_t numElements)
+    {
+        for (size_t count = 0; count < numElements; ++count)
+        {
+            serialize(map_t[count]);
+        }
+        return *this;
+    }
+
+    /*!
      * @brief This function template serializes an array of non-basic objects.
      * @param type_t The array of objects that will be serialized in the buffer.
      * @param numElements Number of the elements in the array.
@@ -3180,6 +3199,25 @@ public:
         for (size_t count = 0; count < numElements; ++count)
         {
             deserialize(vector_t[count]);
+        }
+        return *this;
+    }
+
+    /*!
+     * @brief This function deserializes an array of maps of objects.
+     * @param map_t The variable that will store the array of maps of objects read from the buffer.
+     * @param numElements Number of the elements in the array.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+     */
+    template<class _K, class _T>
+    Cdr& deserializeArray(
+            std::map<_K, _T>* map_t,
+            size_t numElements)
+    {
+        for (size_t count = 0; count < numElements; ++count)
+        {
+            deserialize(map_t[count]);
         }
         return *this;
     }

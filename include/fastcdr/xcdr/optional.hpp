@@ -80,6 +80,8 @@ class optional
 {
 public:
 
+    using type = T;
+
     optional() = default;
 
     optional(

@@ -55,14 +55,14 @@ TEST_P(XCdrv1Test, pl_octet_opt_member)
     //}
 
     //{ Prepare buffer
-    Cdr::EncodingAlgorithmFlag encoding = Cdr::EncodingAlgorithmFlag::PL_CDR;
+    EncodingAlgorithmFlag encoding = EncodingAlgorithmFlag::PL_CDR;
     Cdr::Endianness endianness = Cdr::Endianness::LITTLE_ENDIANNESS;
     uint8_t tested_stream = 0 + static_cast<uint8_t>(GetParam());
     auto buffer =
             std::unique_ptr<char, void (*)(
         void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
     FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, Cdr::CdrVersion::XCDRv1);
+    Cdr cdr(fast_buffer, endianness, CdrVersion::XCDRv1);
     //}
 
     //{ Encode optional not present.

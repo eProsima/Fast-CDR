@@ -24,6 +24,7 @@
 #include <string>
 #include <vector>
 
+#include "CdrEncoding.hpp"
 #include "fastcdr_dll.h"
 #include "FastBuffer.h"
 #include "exceptions/NotEnoughMemoryException.h"
@@ -47,34 +48,6 @@ namespace fastcdr {
 class Cdr_DllAPI Cdr
 {
 public:
-
-    //! @brief This enumeration represents the two kinds of CDR serialization supported by eprosima::fastcdr::CDR.
-    typedef enum
-    {
-        //! @brief Common CORBA CDR serialization.
-        CORBA_CDR = 0,
-        //! @brief DDS CDR serialization.
-        DDS_CDR = 1,
-        //!
-        XCDRv1 = 2,
-        //!
-        XCDRv2 = 3
-    } CdrVersion;
-
-    //! @brief This enumeration represents the supported XCDR encoding algorithms.
-    typedef enum : uint8_t
-    {
-        //! @brief Specifies that the content is PLAIN_CDR.
-        PLAIN_CDR = 0x0,
-        //! @brief Specifies that the content is PL_CDR,
-        PL_CDR = 0x2,
-        //! @brief Specifies that the content is PLAIN_CDR2.
-        PLAIN_CDR2 = 0x6,
-        //! @brief Specifies that the content is DELIMIT_CDR2.
-        DELIMIT_CDR2 = 0x8,
-        //! @brief Specifies that the content is PL_CDR2.
-        PL_CDR2 = 0xa
-    } EncodingAlgorithmFlag;
 
     /*!
      * @brief This enumeration represents endianness types.
@@ -3922,7 +3895,10 @@ private:
     CdrVersion cdr_version_ {CdrVersion::XCDRv2};
 
     //! @brief Using eprosima::fastcdr::DDS_CDR type, this attribute stores the encoding algorithm.
-    EncodingAlgorithmFlag encoding_flag_ {EncodingAlgorithmFlag::PLAIN_CDR};
+    EncodingAlgorithmFlag encoding_flag_ {EncodingAlgorithmFlag::PLAIN_CDR2};
+
+    //!
+    EncodingAlgorithmFlag current_encoding_ {EncodingAlgorithmFlag::PLAIN_CDR2};
 
     //! @brief This attribute stores the option flags when the CDR type is DDS_CDR;
     uint16_t m_options {0};
@@ -3947,9 +3923,6 @@ private:
 
     //!
     MemberId next_member_id_;
-
-    //!
-    EncodingAlgorithmFlag current_encoding_ {EncodingAlgorithmFlag::PLAIN_CDR};
 
     //!
     size_t align64_ {8};

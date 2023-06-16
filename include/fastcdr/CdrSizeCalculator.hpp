@@ -15,11 +15,15 @@
 #ifndef _FASTCDR_CDRSIZECALCULATOR_HPP_
 #define _FASTCDR_CDRSIZECALCULATOR_HPP_
 
+#include <array>
 #include <cstdint>
 #include <limits>
+#include <map>
+#include <vector>
 
 #include "CdrEncoding.hpp"
 #include "fastcdr_dll.h"
+#include "cdr/fixed_size_string.hpp"
 #include "xcdr/MemberId.hpp"
 #include "xcdr/optional.hpp"
 
@@ -50,7 +54,7 @@ public:
         current_encoding_ = encoding;
     }
 
-    template<class _T>
+    template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr>
     inline size_t calculate_serialized_size(
             const _T& data,
             size_t current_alignment = 0) const
@@ -58,15 +62,69 @@ public:
         return _T::calculate_serialized_size(*this, data, current_alignment);
     }
 
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, int32_t>::value>::type* = nullptr>
+    inline size_t calculate_serialized_size(
+            const _T& data,
+            size_t current_alignment = 0) const
+    {
+        return calculate_serialized_size(static_cast<int32_t>(data), current_alignment);
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, uint32_t>::value>::type* = nullptr>
+    inline size_t calculate_serialized_size(
+            const _T& data,
+            size_t current_alignment = 0) const
+    {
+        return calculate_serialized_size(static_cast<uint32_t>(data), current_alignment);
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, int16_t>::value>::type* = nullptr>
+    inline size_t calculate_serialized_size(
+            const _T& data,
+            size_t current_alignment = 0) const
+    {
+        return calculate_serialized_size(static_cast<int16_t>(data), current_alignment);
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, uint16_t>::value>::type* = nullptr>
+    inline size_t calculate_serialized_size(
+            const _T& data,
+            size_t current_alignment = 0) const
+    {
+        return calculate_serialized_size(static_cast<uint16_t>(data), current_alignment);
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, int8_t>::value>::type* = nullptr>
+    inline size_t calculate_serialized_size(
+            const _T& data,
+            size_t current_alignment = 0) const
+    {
+        return calculate_serialized_size(static_cast<int8_t>(data), current_alignment);
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, uint8_t>::value>::type* = nullptr>
+    inline size_t calculate_serialized_size(
+            const _T& data,
+            size_t current_alignment = 0) const
+    {
+        return calculate_serialized_size(static_cast<uint8_t>(data), current_alignment);
+    }
+
     inline constexpr size_t calculate_serialized_size(
-            const uint8_t&,
+            const int8_t&,
             size_t = 0) const
     {
         return 1;
     }
 
     inline constexpr size_t calculate_serialized_size(
-            const int8_t&,
+            const uint8_t&,
             size_t = 0) const
     {
         return 1;
@@ -156,6 +214,99 @@ public:
         return 16 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
     }
 
+    inline size_t calculate_serialized_size(
+            const std::string& data,
+            size_t current_alignment = 0) const
+    {
+        size_t initial_alignment = current_alignment;
+
+        current_alignment += 4 + alignment(current_alignment, 4) + data.size() + 1;
+
+        return current_alignment - initial_alignment;
+    }
+
+    inline size_t calculate_serialized_size(
+            const std::wstring& data,
+            size_t current_alignment = 0) const
+    {
+        size_t initial_alignment = current_alignment;
+
+        current_alignment += 4 + alignment(current_alignment, 4) + data.size() * 4;
+
+        return current_alignment - initial_alignment;
+    }
+
+    template <size_t MAX_CHARS>
+    inline size_t calculate_serialized_size(
+            const fixed_string<MAX_CHARS>& data,
+            size_t current_alignment = 0) const
+    {
+        size_t initial_alignment = current_alignment;
+
+        current_alignment += 4 + alignment(current_alignment, 4) + data.size() + 1;
+
+        return current_alignment - initial_alignment;
+    }
+
+#if !defined(_MSC_VER)
+    template<class _T = bool>
+    inline size_t calculate_serialized_size(
+            const std::vector<bool>& data,
+            size_t current_alignment = 0) const
+    {
+        size_t initial_alignment = current_alignment;
+
+        current_alignment += data.size() + 4 + alignment(current_alignment, 4);
+
+        return current_alignment - initial_alignment;
+    }
+
+#endif // if !defined(_MSC_VER)
+
+    template<class _T>
+    inline size_t calculate_serialized_size(
+            const std::vector<_T>& data,
+            size_t current_alignment = 0) const
+    {
+        size_t initial_alignment = current_alignment;
+
+        current_alignment += 4 + alignment(current_alignment, 4);
+
+        current_alignment += calculate_array_serialized_size(data.data(), data.size(), current_alignment);
+
+        return current_alignment - initial_alignment;
+    }
+
+    template<class _T, size_t _Size>
+    inline size_t calculate_serialized_size(
+            const std::array<_T, _Size>& data,
+            size_t current_alignment = 0) const
+    {
+        size_t initial_alignment = current_alignment;
+
+        current_alignment += calculate_array_serialized_size(data.data(), data.size(), current_alignment);
+
+        return current_alignment - initial_alignment;
+    }
+
+    template<class _K, class _V>
+    inline size_t calculate_serialized_size(
+            const std::map<_K, _V>& data,
+            size_t current_alignment = 0) const
+    {
+        size_t initial_alignment = current_alignment;
+
+        current_alignment += 4 + alignment(current_alignment, 4);
+
+        for (auto it = data.begin(); it != data.end(); ++it)
+        {
+            current_alignment += calculate_serialized_size(it->first, current_alignment);
+            current_alignment += calculate_serialized_size(it->second, current_alignment);
+        }
+
+        return current_alignment - initial_alignment;
+    }
+
     template<class _T>
     inline size_t calculate_serialized_size(
             const MemberId& id,
@@ -212,6 +363,139 @@ public:
 
 
         return (current_alignment  + calculated_size) - initial_alignment;
+    }
+
+    template<class _T>
+    inline size_t calculate_array_serialized_size(
+            const _T* data,
+            size_t num_elements,
+            size_t current_alignment = 0) const
+    {
+        size_t initial_alignment = current_alignment;
+
+        for (size_t count = 0; count < num_elements; ++count)
+        {
+            current_alignment += calculate_serialized_size(data[count], current_alignment);
+        }
+
+        return current_alignment - initial_alignment;
+    }
+
+    inline constexpr size_t calculate_array_serialized_size(
+            const int8_t*,
+            size_t num_elements,
+            size_t = 0) const
+    {
+
+        return num_elements;
+    }
+
+    inline constexpr size_t calculate_array_serialized_size(
+            const uint8_t*,
+            size_t num_elements,
+            size_t = 0) const
+    {
+
+        return num_elements;
+    }
+
+    inline constexpr size_t calculate_array_serialized_size(
+            const char*,
+            size_t num_elements,
+            size_t = 0) const
+    {
+
+        return num_elements;
+    }
+
+    inline size_t calculate_array_serialized_size(
+            const wchar_t*,
+            size_t num_elements,
+            size_t current_alignment = 0) const
+    {
+
+        return num_elements * 4 + alignment(current_alignment, 4);
+    }
+
+    inline size_t calculate_array_serialized_size(
+            const int16_t*,
+            size_t num_elements,
+            size_t current_alignment = 0) const
+    {
+
+        return num_elements * 2 + alignment(current_alignment, 2);
+    }
+
+    inline size_t calculate_array_serialized_size(
+            const uint16_t*,
+            size_t num_elements,
+            size_t current_alignment = 0) const
+    {
+
+        return num_elements * 2 + alignment(current_alignment, 2);
+    }
+
+    inline size_t calculate_array_serialized_size(
+            const int32_t*,
+            size_t num_elements,
+            size_t current_alignment = 0) const
+    {
+
+        return num_elements * 4 + alignment(current_alignment, 4);
+    }
+
+    inline size_t calculate_array_serialized_size(
+            const uint32_t*,
+            size_t num_elements,
+            size_t current_alignment = 0) const
+    {
+
+        return num_elements * 4 + alignment(current_alignment, 4);
+    }
+
+    inline size_t calculate_array_serialized_size(
+            const int64_t*,
+            size_t num_elements,
+            size_t current_alignment = 0) const
+    {
+
+        return num_elements * 8 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
+    }
+
+    inline size_t calculate_array_serialized_size(
+            const uint64_t*,
+            size_t num_elements,
+            size_t current_alignment = 0) const
+    {
+
+        return num_elements * 8 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
+    }
+
+    inline size_t calculate_array_serialized_size(
+            const float*,
+            size_t num_elements,
+            size_t current_alignment = 0) const
+    {
+
+        return num_elements * 4 + alignment(current_alignment, 4);
+    }
+
+    inline size_t calculate_array_serialized_size(
+            const double*,
+            size_t num_elements,
+            size_t current_alignment = 0) const
+    {
+
+        return num_elements * 8 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
+    }
+
+    inline size_t calculate_array_serialized_size(
+            const long double*,
+            size_t num_elements,
+            size_t current_alignment = 0) const
+    {
+
+        return num_elements * 16 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
     }
 
 private:

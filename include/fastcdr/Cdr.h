@@ -548,12 +548,60 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    template<class _T>
+    template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr>
     inline Cdr& operator <<(
             const _T& type_t)
     {
         type_t.serialize(*this);
         return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, int32_t>::value>::type* = nullptr>
+    inline Cdr& operator <<(
+            const _T& enum_t)
+    {
+        return serialize(static_cast<int32_t>(enum_t));
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, uint32_t>::value>::type* = nullptr>
+    inline Cdr& operator <<(
+            const _T& enum_t)
+    {
+        return serialize(static_cast<uint32_t>(enum_t));
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, int16_t>::value>::type* = nullptr>
+    inline Cdr& operator <<(
+            const _T& enum_t)
+    {
+        return serialize(static_cast<int16_t>(enum_t));
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, uint16_t>::value>::type* = nullptr>
+    inline Cdr& operator <<(
+            const _T& enum_t)
+    {
+        return serialize(static_cast<uint16_t>(enum_t));
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, int8_t>::value>::type* = nullptr>
+    inline Cdr& operator <<(
+            const _T& enum_t)
+    {
+        return serialize(static_cast<int8_t>(enum_t));
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, uint8_t>::value>::type* = nullptr>
+    inline Cdr& operator <<(
+            const _T& enum_t)
+    {
+        return serialize(static_cast<uint8_t>(enum_t));
     }
 
     /*!
@@ -823,11 +871,77 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    template<class _T>
+    template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr>
     inline Cdr& operator >>(
             _T& type_t)
     {
         type_t.deserialize(*this);
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, int32_t>::value>::type* = nullptr>
+    inline Cdr& operator >>(
+            _T& enum_t)
+    {
+        int32_t value {0};
+        deserialize(value);
+        enum_t = static_cast<_T>(value);
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, uint32_t>::value>::type* = nullptr>
+    inline Cdr& operator >>(
+            _T& enum_t)
+    {
+        uint32_t value {0};
+        deserialize(value);
+        enum_t = static_cast<_T>(value);
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, int16_t>::value>::type* = nullptr>
+    inline Cdr& operator >>(
+            _T& enum_t)
+    {
+        int16_t value {0};
+        deserialize(value);
+        enum_t = static_cast<_T>(value);
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, uint16_t>::value>::type* = nullptr>
+    inline Cdr& operator >>(
+            _T& enum_t)
+    {
+        uint16_t value {0};
+        deserialize(value);
+        enum_t = static_cast<_T>(value);
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, int8_t>::value>::type* = nullptr>
+    inline Cdr& operator >>(
+            _T& enum_t)
+    {
+        int8_t value {0};
+        deserialize(value);
+        enum_t = static_cast<_T>(value);
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, uint8_t>::value>::type* = nullptr>
+    inline Cdr& operator >>(
+            _T& enum_t)
+    {
+        uint8_t value {0};
+        deserialize(value);
+        enum_t = static_cast<_T>(value);
         return *this;
     }
 
@@ -1881,6 +1995,19 @@ public:
         return *this;
     }
 
+    template<size_t MAX_CHARS>
+    inline
+    Cdr& serializeArray(
+            const fixed_string<MAX_CHARS>* string_t,
+            size_t numElements)
+    {
+        for (size_t count = 0; count < numElements; ++count)
+        {
+            serialize(string_t[count].c_str());
+        }
+        return *this;
+    }
+
     /*!
      * @brief This function serializes an array of strings with a different endianness.
      * @param string_t The array of strings that will be serialized in the buffer.
@@ -1924,6 +2051,31 @@ public:
     inline
     Cdr& serializeArray(
             const std::wstring* string_t,
+            size_t numElements,
+            Endianness endianness)
+    {
+        bool auxSwap = m_swapBytes;
+        m_swapBytes = (m_swapBytes && (static_cast<Endianness>(m_endianness) == endianness)) ||
+                (!m_swapBytes && (static_cast<Endianness>(m_endianness) != endianness));
+
+        try
+        {
+            serializeArray(string_t, numElements);
+            m_swapBytes = auxSwap;
+        }
+        catch (eprosima::fastcdr::exception::Exception& ex)
+        {
+            m_swapBytes = auxSwap;
+            ex.raise();
+        }
+
+        return *this;
+    }
+
+    template <size_t MAX_CHARS>
+    inline
+    Cdr& serializeArray(
+            const fixed_string<MAX_CHARS>* string_t,
             size_t numElements,
             Endianness endianness)
     {
@@ -2003,7 +2155,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    template<class _T>
+    template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr>
     Cdr& serializeArray(
             const _T* type_t,
             size_t numElements)
@@ -2011,6 +2163,84 @@ public:
         for (size_t count = 0; count < numElements; ++count)
         {
             *this << type_t[count];
+        }
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, int32_t>::value>::type* = nullptr>
+    Cdr& serializeArray(
+            const _T* enum_t,
+            size_t numElements)
+    {
+        for (size_t count = 0; count < numElements; ++count)
+        {
+            serialize(static_cast<int32_t>(enum_t[count]));
+        }
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, uint32_t>::value>::type* = nullptr>
+    Cdr& serializeArray(
+            const _T* enum_t,
+            size_t numElements)
+    {
+        for (size_t count = 0; count < numElements; ++count)
+        {
+            serialize(static_cast<uint32_t>(enum_t[count]));
+        }
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, int16_t>::value>::type* = nullptr>
+    Cdr& serializeArray(
+            const _T* enum_t,
+            size_t numElements)
+    {
+        for (size_t count = 0; count < numElements; ++count)
+        {
+            serialize(static_cast<int16_t>(enum_t[count]));
+        }
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, uint16_t>::value>::type* = nullptr>
+    Cdr& serializeArray(
+            const _T* enum_t,
+            size_t numElements)
+    {
+        for (size_t count = 0; count < numElements; ++count)
+        {
+            serialize(static_cast<uint16_t>(enum_t[count]));
+        }
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, int8_t>::value>::type* = nullptr>
+    Cdr& serializeArray(
+            const _T* enum_t,
+            size_t numElements)
+    {
+        for (size_t count = 0; count < numElements; ++count)
+        {
+            serialize(static_cast<int8_t>(enum_t[count]));
+        }
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, uint8_t>::value>::type* = nullptr>
+    Cdr& serializeArray(
+            const _T* enum_t,
+            size_t numElements)
+    {
+        for (size_t count = 0; count < numElements; ++count)
+        {
+            serialize(static_cast<uint8_t>(enum_t[count]));
         }
         return *this;
     }
@@ -3247,6 +3477,19 @@ public:
         return *this;
     }
 
+    template<size_t MAX_CHARS>
+    inline
+    Cdr& deserializeArray(
+            fixed_string<MAX_CHARS>* string_t,
+            size_t numElements)
+    {
+        for (size_t count = 0; count < numElements; ++count)
+        {
+            deserialize(string_t[count]);
+        }
+        return *this;
+    }
+
     /*!
      * @brief This function deserializes an array of strings with a different endianness.
      * @param string_t The variable that will store the array of strings read from the buffer.
@@ -3290,6 +3533,31 @@ public:
     inline
     Cdr& deserializeArray(
             std::wstring* string_t,
+            size_t numElements,
+            Endianness endianness)
+    {
+        bool auxSwap = m_swapBytes;
+        m_swapBytes = (m_swapBytes && (static_cast<Endianness>(m_endianness) == endianness)) ||
+                (!m_swapBytes && (static_cast<Endianness>(m_endianness) != endianness));
+
+        try
+        {
+            deserializeArray(string_t, numElements);
+            m_swapBytes = auxSwap;
+        }
+        catch (eprosima::fastcdr::exception::Exception& ex)
+        {
+            m_swapBytes = auxSwap;
+            ex.raise();
+        }
+
+        return *this;
+    }
+
+    template<size_t MAX_CHARS>
+    inline
+    Cdr& deserializeArray(
+            fixed_string<MAX_CHARS>* string_t,
             size_t numElements,
             Endianness endianness)
     {
@@ -3369,7 +3637,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    template<class _T>
+    template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr>
     Cdr& deserializeArray(
             _T* type_t,
             size_t numElements)
@@ -3377,6 +3645,96 @@ public:
         for (size_t count = 0; count < numElements; ++count)
         {
             *this >> type_t[count];
+        }
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, int32_t>::value>::type* = nullptr>
+    Cdr& deserializeArray(
+            _T* enum_t,
+            size_t numElements)
+    {
+        for (size_t count = 0; count < numElements; ++count)
+        {
+            int32_t value;
+            deserialize(value);
+            enum_t[count] = static_cast<_T>(value);
+        }
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, uint32_t>::value>::type* = nullptr>
+    Cdr& deserializeArray(
+            _T* enum_t,
+            size_t numElements)
+    {
+        for (size_t count = 0; count < numElements; ++count)
+        {
+            uint32_t value;
+            deserialize(value);
+            enum_t[count] = static_cast<_T>(value);
+        }
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, int16_t>::value>::type* = nullptr>
+    Cdr& deserializeArray(
+            _T* enum_t,
+            size_t numElements)
+    {
+        for (size_t count = 0; count < numElements; ++count)
+        {
+            int16_t value;
+            deserialize(value);
+            enum_t[count] = static_cast<_T>(value);
+        }
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, uint16_t>::value>::type* = nullptr>
+    Cdr& deserializeArray(
+            _T* enum_t,
+            size_t numElements)
+    {
+        for (size_t count = 0; count < numElements; ++count)
+        {
+            uint16_t value;
+            deserialize(value);
+            enum_t[count] = static_cast<_T>(value);
+        }
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, int8_t>::value>::type* = nullptr>
+    Cdr& deserializeArray(
+            _T* enum_t,
+            size_t numElements)
+    {
+        for (size_t count = 0; count < numElements; ++count)
+        {
+            int8_t value;
+            deserialize(value);
+            enum_t[count] = static_cast<_T>(value);
+        }
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, uint8_t>::value>::type* = nullptr>
+    Cdr& deserializeArray(
+            _T* enum_t,
+            size_t numElements)
+    {
+        for (size_t count = 0; count < numElements; ++count)
+        {
+            uint8_t value;
+            deserialize(value);
+            enum_t[count] = static_cast<_T>(value);
         }
         return *this;
     }

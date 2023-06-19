@@ -3370,6 +3370,8 @@ Cdr& Cdr::xcdr1_begin_deserialize_opt_member(
             is_present = true;
         }
     }
+    current_state.next_member_id_ = member_id;
+    next_member_id_ = MEMBER_ID_INVALID;
 
     return *this;
 }
@@ -3420,6 +3422,8 @@ Cdr& Cdr::xcdr2_begin_deserialize_opt_member(
             }
         }
     }
+    current_state.next_member_id_ = member_id;
+    next_member_id_ = MEMBER_ID_INVALID;
 
     return *this;
 }

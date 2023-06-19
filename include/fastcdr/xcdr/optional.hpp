@@ -59,7 +59,9 @@ struct optional_storage<T, typename std::enable_if<std::is_trivially_destructibl
 
     bool engaged_ { false };
 
-    optional_storage() = default;
+    optional_storage()
+    {
+    }
 
     ~optional_storage() = default;
 };

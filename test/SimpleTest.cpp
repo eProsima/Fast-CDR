@@ -403,13 +403,13 @@ TEST(CDRTests, DDSEncapsulation)
 {
     char encapsulation[4]{ 0, 0, 0, 0 };
     eprosima::fastcdr::FastBuffer buffer(encapsulation, 4);
-    eprosima::fastcdr::Cdr cdr(buffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::Cdr::DDS_CDR);
 
     // First encapsulation byte should be 0
     {
+        eprosima::fastcdr::Cdr cdr(buffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN,
+                eprosima::fastcdr::CdrVersion::DDS_CDR);
         for (uint16_t i = 1; i < 256; ++i)
         {
-            cdr.reset();
             encapsulation[0] = static_cast<char>(i & 0xFF);
             EXPECT_THROW(cdr.read_encapsulation(), eprosima::fastcdr::exception::BadParamException);
         }
@@ -419,26 +419,26 @@ TEST(CDRTests, DDSEncapsulation)
         EXPECT_NO_THROW(cdr.read_encapsulation());
     }
 
-    std::array<bool, 256> valid_encapsulations;
-    valid_encapsulations.fill(false);
+    std::array<std::pair<bool, eprosima::fastcdr::CdrVersion>, 256> valid_encapsulations;
+    valid_encapsulations.fill({false, eprosima::fastcdr::CdrVersion::DDS_CDR});
 
     // Valid representation identifiers from table 10.3
-    valid_encapsulations[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR] = true;  // PLAIN_CDR_BE
-    valid_encapsulations[1 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR] = true;   // PLAIN_CDR_LE
-    valid_encapsulations[0 + Cdr::EncodingAlgorithmFlag::PL_CDR] = true;  // PL_CDR_BE
-    valid_encapsulations[1 + Cdr::EncodingAlgorithmFlag::PL_CDR] = true;   // PL_CDR_LE
-    valid_encapsulations[0 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2] = true;  // PLAIN_CDR2_BE
-    valid_encapsulations[1 + Cdr::EncodingAlgorithmFlag::PLAIN_CDR2] = true;   // PLAIN_CDR2_LE
-    valid_encapsulations[0 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2] = true;  // DELIMIT_CDR2_BE
-    valid_encapsulations[1 + Cdr::EncodingAlgorithmFlag::DELIMIT_CDR2] = true;   // DELIMIT_CDR2_LE
-    valid_encapsulations[0 + Cdr::EncodingAlgorithmFlag::PL_CDR2] = true;  // PL_CDR2_BE
-    valid_encapsulations[1 + Cdr::EncodingAlgorithmFlag::PL_CDR2] = true;   // PL_CDR2_LE
+    valid_encapsulations[0 + EncodingAlgorithmFlag::PLAIN_CDR] = {true, eprosima::fastcdr::CdrVersion::XCDRv1};  // PLAIN_CDR_BE
+    valid_encapsulations[1 + EncodingAlgorithmFlag::PLAIN_CDR] = {true, eprosima::fastcdr::CdrVersion::XCDRv1};
+    valid_encapsulations[0 + EncodingAlgorithmFlag::PL_CDR] = {true, eprosima::fastcdr::CdrVersion::XCDRv1};
+    valid_encapsulations[1 + EncodingAlgorithmFlag::PL_CDR] = {true, eprosima::fastcdr::CdrVersion::XCDRv1};   // PL_CDR_LE
+    valid_encapsulations[0 + EncodingAlgorithmFlag::PLAIN_CDR2] = {true, eprosima::fastcdr::CdrVersion::XCDRv2};  // PLAIN_CDR2_BE
+    valid_encapsulations[1 + EncodingAlgorithmFlag::PLAIN_CDR2] = {true, eprosima::fastcdr::CdrVersion::XCDRv2};  // PLAIN_CDR2_BE
+    valid_encapsulations[0 + EncodingAlgorithmFlag::DELIMIT_CDR2] = {true, eprosima::fastcdr::CdrVersion::XCDRv2};  // DELIMIT_CDR2_BE
+    valid_encapsulations[1 + EncodingAlgorithmFlag::DELIMIT_CDR2] = {true, eprosima::fastcdr::CdrVersion::XCDRv2};   // DELIMIT_CDR2_LE
+    valid_encapsulations[0 + EncodingAlgorithmFlag::PL_CDR2] = {true, eprosima::fastcdr::CdrVersion::XCDRv2};
+    valid_encapsulations[1 + EncodingAlgorithmFlag::PL_CDR2] = {true, eprosima::fastcdr::CdrVersion::XCDRv2};
 
     for (uint16_t i = 0; i < 256; ++i)
     {
-        cdr.reset();
+        eprosima::fastcdr::Cdr cdr(buffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, valid_encapsulations[i].second);
         encapsulation[1] = static_cast<char>(i & 0xFF);
-        if (valid_encapsulations[i])
+        if (valid_encapsulations[i].first)
         {
             EXPECT_NO_THROW(cdr.read_encapsulation());
         }
@@ -453,7 +453,8 @@ TEST(CDRTests, CorbaEncapsulation)
 {
     char encapsulation[1]{ 0 };
     eprosima::fastcdr::FastBuffer buffer(encapsulation, 1);
-    eprosima::fastcdr::Cdr cdr(buffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::Cdr::CORBA_CDR);
+    eprosima::fastcdr::Cdr cdr(buffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN,
+            eprosima::fastcdr::CdrVersion::CORBA_CDR);
 
     std::array<bool, 256> valid_encapsulations;
     valid_encapsulations.fill(false);

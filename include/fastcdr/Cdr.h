@@ -124,6 +124,9 @@ public:
 
         //!
         XCdrHeaderSelection header_serialized_ {XCdrHeaderSelection::SHORT_HEADER};
+
+        //!
+        EncodingAlgorithmFlag previous_enconding_ {EncodingAlgorithmFlag::PLAIN_CDR2};
     };
 
     /*!
@@ -3944,6 +3947,26 @@ public:
         return (this->*end_deserialize_opt_member_)(current_state);
     }
 
+    Cdr& begin_serialize_type(
+            Cdr::state& current_state,
+            EncodingAlgorithmFlag type_encoding)
+    {
+        return (this->*begin_serialize_type_)(current_state, type_encoding);
+    }
+
+    Cdr& end_serialize_type(
+            Cdr::state& current_state)
+    {
+        return (this->*end_serialize_type_)(current_state);
+    }
+
+    Cdr& deserialize_type(
+            EncodingAlgorithmFlag type_encoding,
+            std::function<bool (Cdr&, const MemberId&, bool sequential_id)> functor)
+    {
+        return (this->*deserialize_type_)(type_encoding, functor);
+    }
+
     template<class _T>
     Cdr& serialize(
             const optional<_T>& opt_value)
@@ -3994,15 +4017,6 @@ public:
         {
             //TODO
         }
-        return *this;
-    }
-
-    template<class _T = MemberId>
-    inline Cdr& operator >> (
-            MemberId& member_id)
-    {
-        //TODO read and safe state
-        member_id = next_member_id_;
         return *this;
     }
 
@@ -4162,7 +4176,7 @@ private:
             const MemberId& member_id,
             size_t member_serialized_size);
 
-    void xcdr1_deserialize_member_header(
+    bool xcdr1_deserialize_member_header(
             MemberId& member_id,
             Cdr::state& current_state);
 
@@ -4226,6 +4240,28 @@ private:
     Cdr& xcdr2_end_deserialize_opt_member(
             const Cdr::state& current_state);
 
+    Cdr& xcdr1_begin_serialize_type(
+            Cdr::state& current_state,
+            EncodingAlgorithmFlag type_encoding);
+
+    Cdr& xcdr1_end_serialize_type(
+            const Cdr::state& current_state);
+
+    Cdr& xcdr2_begin_serialize_type(
+            Cdr::state& current_state,
+            EncodingAlgorithmFlag type_encoding);
+
+    Cdr& xcdr2_end_serialize_type(
+            const Cdr::state& current_state);
+
+    Cdr& xcdr1_deserialize_type(
+            EncodingAlgorithmFlag type_encoding,
+            std::function<bool (Cdr&, const MemberId&, bool sequential_id)> functor);
+
+    Cdr& xcdr2_deserialize_type(
+            EncodingAlgorithmFlag type_encoding,
+            std::function<bool (Cdr&, const MemberId&, bool sequential_id)> functor);
+
     using begin_serialize_opt_member_functor = Cdr& (Cdr::*)(
         const MemberId&,
         bool,
@@ -4245,6 +4281,20 @@ private:
     using end_deserialize_opt_member_functor = Cdr& (Cdr::*)(
         const Cdr::state&);
     end_deserialize_opt_member_functor end_deserialize_opt_member_ { nullptr };
+
+    using begin_serialize_type_functor = Cdr& (Cdr::*)(
+        Cdr::state&,
+        EncodingAlgorithmFlag);
+    begin_serialize_type_functor begin_serialize_type_ { nullptr };
+
+    using end_serialize_type_functor = Cdr& (Cdr::*)(
+        const Cdr::state&);
+    end_serialize_type_functor end_serialize_type_ { nullptr };
+
+    using deserialize_type_functor = Cdr& (Cdr::*)(
+        EncodingAlgorithmFlag,
+        std::function<bool (Cdr&, const MemberId&, bool sequential_id)>);
+    deserialize_type_functor deserialize_type_ { nullptr };
 
     //! @brief Reference to the buffer that will be serialized/deserialized.
     FastBuffer& m_cdrBuffer;

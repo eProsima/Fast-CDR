@@ -212,6 +212,12 @@ public:
         return other_iterator.current_position_ == current_position_;
     }
 
+    bool operator !=(
+            const _FastBuffer_iterator& other_iterator) const
+    {
+        return other_iterator.current_position_ != current_position_;
+    }
+
 private:
 
     //! Pointer to the raw buffer.

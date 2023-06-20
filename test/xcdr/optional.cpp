@@ -16,27 +16,415 @@ using XCdrStreamValues =
 
 class XCdrOptionalTest : public ::testing::TestWithParam< std::tuple<EncodingAlgorithmFlag, Cdr::Endianness>>
 {
-public:
+};
 
-    CdrVersion get_version_from_algorithm(
-            EncodingAlgorithmFlag ef)
+CdrVersion get_version_from_algorithm(
+        EncodingAlgorithmFlag ef)
+{
+    CdrVersion cdr_version { CdrVersion::XCDRv2 };
+
+    switch (ef)
     {
-        CdrVersion cdr_version { CdrVersion::XCDRv2 };
-
-        switch (ef)
-        {
-            case EncodingAlgorithmFlag::PLAIN_CDR:
-            case EncodingAlgorithmFlag::PL_CDR:
-                cdr_version = CdrVersion::XCDRv1;
-                break;
-            default:
-                break;
-        }
-
-        return cdr_version;
+        case EncodingAlgorithmFlag::PLAIN_CDR:
+        case EncodingAlgorithmFlag::PL_CDR:
+            cdr_version = CdrVersion::XCDRv1;
+            break;
+        default:
+            break;
     }
 
-};
+    return cdr_version;
+}
+
+template<class _T>
+void serialize_the_value(
+        const XCdrStreamValues& expected_streams,
+        EncodingAlgorithmFlag encoding,
+        Cdr::Endianness endianness,
+        _T value)
+{
+    //{ Prepare buffer
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode optional not present.
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    Cdr::state enc_state(cdr);
+    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
+    cdr.serialize(value);
+    cdr.end_serialize_opt_member(enc_state);
+    Cdr::state enc_state_end(cdr);
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding optional not present
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    Cdr::state dec_state(cdr);
+    MemberId member_id;
+    bool is_present = false;
+    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
+    ASSERT_TRUE(is_present);
+    _T dec_value {0};
+    cdr.deserialize(dec_value);
+    ASSERT_EQ(value, dec_value);
+    cdr.end_deserialize_opt_member(dec_state);
+    Cdr::state dec_state_end(cdr);
+    ASSERT_EQ(enc_state_end, dec_state_end);
+    //}
+}
+
+template<class _T>
+void align_1_serialize_the_value(
+        const XCdrStreamValues& expected_streams,
+        EncodingAlgorithmFlag encoding,
+        Cdr::Endianness endianness,
+        _T value)
+{
+    const uint8_t align_value {0xAB};
+
+    //{ Prepare buffer
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode optional not present.
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    cdr << align_value;
+    Cdr::state enc_state(cdr);
+    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
+    cdr.serialize(value);
+    cdr.end_serialize_opt_member(enc_state);
+    Cdr::state enc_state_end(cdr);
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding optional not present
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    uint8_t dalign_value {0};
+    cdr >> dalign_value;
+    ASSERT_EQ(align_value, dalign_value);
+    Cdr::state dec_state(cdr);
+    MemberId member_id;
+    bool is_present = false;
+    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
+    ASSERT_TRUE(is_present);
+    _T dec_value {0};
+    cdr.deserialize(dec_value);
+    ASSERT_EQ(value, dec_value);
+    cdr.end_deserialize_opt_member(dec_state);
+    Cdr::state dec_state_end(cdr);
+    ASSERT_EQ(enc_state_end, dec_state_end);
+    //}
+}
+
+template<class _T>
+void align_2_serialize_the_value(
+        const XCdrStreamValues& expected_streams,
+        EncodingAlgorithmFlag encoding,
+        Cdr::Endianness endianness,
+        _T value)
+{
+    const uint16_t align_value {0xABBA};
+
+    //{ Prepare buffer
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode optional not present.
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    cdr << align_value;
+    Cdr::state enc_state(cdr);
+    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
+    cdr.serialize(value);
+    cdr.end_serialize_opt_member(enc_state);
+    Cdr::state enc_state_end(cdr);
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding optional not present
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    uint16_t dalign_value {0};
+    cdr >> dalign_value;
+    ASSERT_EQ(align_value, dalign_value);
+    Cdr::state dec_state(cdr);
+    MemberId member_id;
+    bool is_present = false;
+    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
+    ASSERT_TRUE(is_present);
+    _T dec_value {0};
+    cdr.deserialize(dec_value);
+    ASSERT_EQ(value, dec_value);
+    cdr.end_deserialize_opt_member(dec_state);
+    Cdr::state dec_state_end(cdr);
+    ASSERT_EQ(enc_state_end, dec_state_end);
+    //}
+}
+
+template<class _T>
+void align_4_serialize_the_value(
+        const XCdrStreamValues& expected_streams,
+        EncodingAlgorithmFlag encoding,
+        Cdr::Endianness endianness,
+        _T value)
+{
+    const uint32_t align_value {0xABABABBA};
+
+    //{ Prepare buffer
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode optional not present.
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    cdr << align_value;
+    Cdr::state enc_state(cdr);
+    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
+    cdr.serialize(value);
+    cdr.end_serialize_opt_member(enc_state);
+    Cdr::state enc_state_end(cdr);
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding optional not present
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    uint32_t dalign_value {0};
+    cdr >> dalign_value;
+    ASSERT_EQ(align_value, dalign_value);
+    Cdr::state dec_state(cdr);
+    MemberId member_id;
+    bool is_present = false;
+    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
+    ASSERT_TRUE(is_present);
+    _T dec_value {0};
+    cdr.deserialize(dec_value);
+    ASSERT_EQ(value, dec_value);
+    cdr.end_deserialize_opt_member(dec_state);
+    Cdr::state dec_state_end(cdr);
+    ASSERT_EQ(enc_state_end, dec_state_end);
+    //}
+}
+
+template<class _T>
+void serialize_optional(
+        const XCdrStreamValues& expected_streams,
+        EncodingAlgorithmFlag encoding,
+        Cdr::Endianness endianness,
+        _T value)
+{
+    //{ Prepare buffer
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode optional not present.
+    optional<_T> opt_value {value};
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    cdr << MemberId(1) << opt_value;
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding optional not present
+    optional<_T> dopt_value;
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    cdr >> dopt_value;
+    ASSERT_TRUE(dopt_value.has_value());
+    ASSERT_EQ(*opt_value, *dopt_value);
+    //}
+}
+
+template<class _T>
+void align_1_serialize_optional(
+        const XCdrStreamValues& expected_streams,
+        EncodingAlgorithmFlag encoding,
+        Cdr::Endianness endianness,
+        _T value)
+{
+    const uint8_t align_value {0xAB};
+
+    //{ Prepare buffer
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode optional not present.
+    optional<_T> opt_value {value};
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    cdr << align_value << MemberId(1) << opt_value;
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding optional not present
+    uint8_t dalign_value {0};
+    optional<_T> dopt_value;
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    cdr >> dalign_value >> dopt_value;
+    ASSERT_EQ(align_value, dalign_value);
+    ASSERT_TRUE(dopt_value.has_value());
+    ASSERT_EQ(*opt_value, *dopt_value);
+    //}
+}
+
+template<class _T>
+void align_2_serialize_optional(
+        const XCdrStreamValues& expected_streams,
+        EncodingAlgorithmFlag encoding,
+        Cdr::Endianness endianness,
+        _T value)
+{
+    const uint16_t align_value {0xABBA};
+
+    //{ Prepare buffer
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode optional not present.
+    optional<_T> opt_value {value};
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    cdr << align_value << MemberId(1) << opt_value;
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding optional not present
+    uint16_t dalign_value {0};
+    optional<_T> dopt_value;
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    cdr >> dalign_value >> dopt_value;
+    ASSERT_EQ(align_value, dalign_value);
+    ASSERT_TRUE(dopt_value.has_value());
+    ASSERT_EQ(*opt_value, *dopt_value);
+    //}
+}
+
+template<class _T>
+void align_4_serialize_optional(
+        const XCdrStreamValues& expected_streams,
+        EncodingAlgorithmFlag encoding,
+        Cdr::Endianness endianness,
+        _T value)
+{
+    const uint32_t align_value {0xABABABBA};
+
+    //{ Prepare buffer
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode optional not present.
+    optional<_T> opt_value {value};
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    cdr << align_value << MemberId(1) << opt_value;
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding optional not present
+    uint32_t dalign_value {0};
+    optional<_T> dopt_value;
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    cdr >> dalign_value >> dopt_value;
+    ASSERT_EQ(align_value, dalign_value);
+    ASSERT_TRUE(dopt_value.has_value());
+    ASSERT_EQ(*opt_value, *dopt_value);
+    //}
+}
 
 TEST_P(XCdrOptionalTest, null_serialize_the_value)
 {
@@ -201,49 +589,10 @@ TEST_P(XCdrOptionalTest, short_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(short_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    int16_t short_dec_value {0};
-    cdr.deserialize(short_dec_value);
-    ASSERT_EQ(short_value, short_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    serialize_the_value(expected_streams, encoding, endianness, short_value);
 }
 
 TEST_P(XCdrOptionalTest, ushort_serialize_the_value)
@@ -316,49 +665,10 @@ TEST_P(XCdrOptionalTest, ushort_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(ushort_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    uint16_t ushort_dec_value {0};
-    cdr.deserialize(ushort_dec_value);
-    ASSERT_EQ(ushort_value, ushort_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    serialize_the_value(expected_streams, encoding, endianness, ushort_value);
 }
 
 TEST_P(XCdrOptionalTest, long_serialize_the_value)
@@ -435,49 +745,10 @@ TEST_P(XCdrOptionalTest, long_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(long_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    int32_t long_dec_value {0};
-    cdr.deserialize(long_dec_value);
-    ASSERT_EQ(long_value, long_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    serialize_the_value(expected_streams, encoding, endianness, long_value);
 }
 
 TEST_P(XCdrOptionalTest, ulong_serialize_the_value)
@@ -554,49 +825,10 @@ TEST_P(XCdrOptionalTest, ulong_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(ulong_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    uint32_t ulong_dec_value {0};
-    cdr.deserialize(ulong_dec_value);
-    ASSERT_EQ(ulong_value, ulong_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    serialize_the_value(expected_streams, encoding, endianness, ulong_value);
 }
 
 TEST_P(XCdrOptionalTest, longlong_serialize_the_value)
@@ -683,49 +915,10 @@ TEST_P(XCdrOptionalTest, longlong_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(longlong_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    int64_t longlong_dec_value {0};
-    cdr.deserialize(longlong_dec_value);
-    ASSERT_EQ(longlong_value, longlong_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    serialize_the_value(expected_streams, encoding, endianness, longlong_value);
 }
 
 TEST_P(XCdrOptionalTest, ulonglong_serialize_the_value)
@@ -812,49 +1005,10 @@ TEST_P(XCdrOptionalTest, ulonglong_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(ulonglong_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    uint64_t ulonglong_dec_value {0};
-    cdr.deserialize(ulonglong_dec_value);
-    ASSERT_EQ(ulonglong_value, ulonglong_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    serialize_the_value(expected_streams, encoding, endianness, ulonglong_value);
 }
 
 TEST_P(XCdrOptionalTest, float_serialize_the_value)
@@ -931,49 +1085,10 @@ TEST_P(XCdrOptionalTest, float_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(float_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    float float_dec_value {0};
-    cdr.deserialize(float_dec_value);
-    ASSERT_EQ(float_value, float_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    serialize_the_value(expected_streams, encoding, endianness, float_value);
 }
 
 TEST_P(XCdrOptionalTest, double_serialize_the_value)
@@ -1060,49 +1175,10 @@ TEST_P(XCdrOptionalTest, double_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(double_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    double double_dec_value {0};
-    cdr.deserialize(double_dec_value);
-    ASSERT_EQ(double_value, double_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    serialize_the_value(expected_streams, encoding, endianness, double_value);
 }
 
 TEST_P(XCdrOptionalTest, longdouble_serialize_the_value)
@@ -1328,46 +1404,8 @@ TEST_P(XCdrOptionalTest, boolean_serialize_the_value)
     //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(boolean_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    uint8_t boolean_dec_value {0};
-    cdr.deserialize(boolean_dec_value);
-    ASSERT_EQ(boolean_value, boolean_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    serialize_the_value(expected_streams, encoding, endianness, boolean_value);
 }
 
 TEST_P(XCdrOptionalTest, octet_serialize_the_value)
@@ -1438,49 +1476,10 @@ TEST_P(XCdrOptionalTest, octet_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(octet_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    uint8_t octet_dec_value {0};
-    cdr.deserialize(octet_dec_value);
-    ASSERT_EQ(octet_value, octet_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    serialize_the_value(expected_streams, encoding, endianness, octet_value);
 }
 
 TEST_P(XCdrOptionalTest, char_serialize_the_value)
@@ -1551,49 +1550,10 @@ TEST_P(XCdrOptionalTest, char_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(char_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    char char_dec_value {0};
-    cdr.deserialize(char_dec_value);
-    ASSERT_EQ(char_value, char_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    serialize_the_value(expected_streams, encoding, endianness, char_value);
 }
 
 TEST_P(XCdrOptionalTest, wchar_serialize_the_value)
@@ -1670,49 +1630,10 @@ TEST_P(XCdrOptionalTest, wchar_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(wchar_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    wchar_t wchar_dec_value {0};
-    cdr.deserialize(wchar_dec_value);
-    ASSERT_EQ(wchar_value, wchar_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    serialize_the_value(expected_streams, encoding, endianness, wchar_value);
 }
 
 TEST_P(XCdrOptionalTest, null_align_1_serialize_the_value)
@@ -2137,58 +2058,14 @@ TEST_P(XCdrOptionalTest, short_align_1_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(short_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint8_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    int16_t short_dec_value {0};
-    cdr.deserialize(short_dec_value);
-    ASSERT_EQ(short_value, short_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_1_serialize_the_value(expected_streams, encoding, endianness, short_value);
 }
 
 TEST_P(XCdrOptionalTest, short_align_2_serialize_the_value)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const int16_t short_value {static_cast<int16_t>(0xCDDC)};
@@ -2279,58 +2156,14 @@ TEST_P(XCdrOptionalTest, short_align_2_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(short_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint16_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    int16_t short_dec_value {0};
-    cdr.deserialize(short_dec_value);
-    ASSERT_EQ(short_value, short_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_2_serialize_the_value(expected_streams, encoding, endianness, short_value);
 }
 
 TEST_P(XCdrOptionalTest, short_align_4_serialize_the_value)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const int16_t short_value {static_cast<int16_t>(0xCDDC)};
@@ -2418,50 +2251,8 @@ TEST_P(XCdrOptionalTest, short_align_4_serialize_the_value)
     //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(short_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint32_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    int16_t short_dec_value {0};
-    cdr.deserialize(short_dec_value);
-    ASSERT_EQ(short_value, short_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_4_serialize_the_value(expected_streams, encoding, endianness, short_value);
 }
 
 TEST_P(XCdrOptionalTest, ushort_align_1_serialize_the_value)
@@ -2551,58 +2342,14 @@ TEST_P(XCdrOptionalTest, ushort_align_1_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(ushort_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint8_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    uint16_t ushort_dec_value {0};
-    cdr.deserialize(ushort_dec_value);
-    ASSERT_EQ(ushort_value, ushort_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_1_serialize_the_value(expected_streams, encoding, endianness, ushort_value);
 }
 
 TEST_P(XCdrOptionalTest, ushort_align_2_serialize_the_value)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const uint16_t ushort_value {static_cast<uint16_t>(0xCDDC)};
@@ -2693,58 +2440,14 @@ TEST_P(XCdrOptionalTest, ushort_align_2_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(ushort_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint16_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    uint16_t ushort_dec_value {0};
-    cdr.deserialize(ushort_dec_value);
-    ASSERT_EQ(ushort_value, ushort_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_2_serialize_the_value(expected_streams, encoding, endianness, ushort_value);
 }
 
 TEST_P(XCdrOptionalTest, ushort_align_4_serialize_the_value)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const uint16_t ushort_value {static_cast<uint16_t>(0xCDDC)};
@@ -2829,53 +2532,10 @@ TEST_P(XCdrOptionalTest, ushort_align_4_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(ushort_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint32_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    uint16_t ushort_dec_value {0};
-    cdr.deserialize(ushort_dec_value);
-    ASSERT_EQ(ushort_value, ushort_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_4_serialize_the_value(expected_streams, encoding, endianness, ushort_value);
 }
 
 TEST_P(XCdrOptionalTest, long_align_1_serialize_the_value)
@@ -2969,58 +2629,14 @@ TEST_P(XCdrOptionalTest, long_align_1_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(long_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint8_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    int32_t long_dec_value {0};
-    cdr.deserialize(long_dec_value);
-    ASSERT_EQ(long_value, long_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_1_serialize_the_value(expected_streams, encoding, endianness, long_value);
 }
 
 TEST_P(XCdrOptionalTest, long_align_2_serialize_the_value)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const int32_t long_value {static_cast<int32_t>(0xCDCDCDDC)};
@@ -3111,58 +2727,14 @@ TEST_P(XCdrOptionalTest, long_align_2_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(long_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint16_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    int32_t long_dec_value {0};
-    cdr.deserialize(long_dec_value);
-    ASSERT_EQ(long_value, long_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_2_serialize_the_value(expected_streams, encoding, endianness, long_value);
 }
 
 TEST_P(XCdrOptionalTest, long_align_4_serialize_the_value)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const int32_t long_value {static_cast<int32_t>(0xCDCDCDDC)};
@@ -3247,53 +2819,10 @@ TEST_P(XCdrOptionalTest, long_align_4_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(long_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint32_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    int32_t long_dec_value {0};
-    cdr.deserialize(long_dec_value);
-    ASSERT_EQ(long_value, long_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_4_serialize_the_value(expected_streams, encoding, endianness, long_value);
 }
 
 TEST_P(XCdrOptionalTest, ulong_align_1_serialize_the_value)
@@ -3387,58 +2916,14 @@ TEST_P(XCdrOptionalTest, ulong_align_1_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(ulong_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint8_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    uint32_t ulong_dec_value {0};
-    cdr.deserialize(ulong_dec_value);
-    ASSERT_EQ(ulong_value, ulong_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_1_serialize_the_value(expected_streams, encoding, endianness, ulong_value);
 }
 
 TEST_P(XCdrOptionalTest, ulong_align_2_serialize_the_value)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const uint32_t ulong_value {0xCDCDCDDC};
@@ -3529,58 +3014,14 @@ TEST_P(XCdrOptionalTest, ulong_align_2_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(ulong_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint16_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    uint32_t ulong_dec_value {0};
-    cdr.deserialize(ulong_dec_value);
-    ASSERT_EQ(ulong_value, ulong_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_2_serialize_the_value(expected_streams, encoding, endianness, ulong_value);
 }
 
 TEST_P(XCdrOptionalTest, ulong_align_4_serialize_the_value)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const uint32_t ulong_value {0xCDCDCDDC};
@@ -3665,53 +3106,10 @@ TEST_P(XCdrOptionalTest, ulong_align_4_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(ulong_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint32_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    uint32_t ulong_dec_value {0};
-    cdr.deserialize(ulong_dec_value);
-    ASSERT_EQ(ulong_value, ulong_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_4_serialize_the_value(expected_streams, encoding, endianness, ulong_value);
 }
 
 TEST_P(XCdrOptionalTest, longlong_align_1_serialize_the_value)
@@ -3815,58 +3213,14 @@ TEST_P(XCdrOptionalTest, longlong_align_1_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(longlong_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint8_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    int64_t longlong_dec_value {0};
-    cdr.deserialize(longlong_dec_value);
-    ASSERT_EQ(longlong_value, longlong_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_1_serialize_the_value(expected_streams, encoding, endianness, longlong_value);
 }
 
 TEST_P(XCdrOptionalTest, longlong_align_2_serialize_the_value)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const int64_t longlong_value {static_cast<int64_t>(0xCDCDCDCDCDCDCDDCll)};
@@ -3967,58 +3321,14 @@ TEST_P(XCdrOptionalTest, longlong_align_2_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(longlong_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint16_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    int64_t longlong_dec_value {0};
-    cdr.deserialize(longlong_dec_value);
-    ASSERT_EQ(longlong_value, longlong_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_2_serialize_the_value(expected_streams, encoding, endianness, longlong_value);
 }
 
 TEST_P(XCdrOptionalTest, longlong_align_4_serialize_the_value)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const int64_t longlong_value {static_cast<int64_t>(0xCDCDCDCDCDCDCDDCll)};
@@ -4113,53 +3423,10 @@ TEST_P(XCdrOptionalTest, longlong_align_4_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(longlong_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint32_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    int64_t longlong_dec_value {0};
-    cdr.deserialize(longlong_dec_value);
-    ASSERT_EQ(longlong_value, longlong_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_4_serialize_the_value(expected_streams, encoding, endianness, longlong_value);
 }
 
 TEST_P(XCdrOptionalTest, ulonglong_align_1_serialize_the_value)
@@ -4263,58 +3530,14 @@ TEST_P(XCdrOptionalTest, ulonglong_align_1_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(ulonglong_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint8_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    uint64_t ulonglong_dec_value {0};
-    cdr.deserialize(ulonglong_dec_value);
-    ASSERT_EQ(ulonglong_value, ulonglong_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_1_serialize_the_value(expected_streams, encoding, endianness, ulonglong_value);
 }
 
 TEST_P(XCdrOptionalTest, ulonglong_align_2_serialize_the_value)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const uint64_t ulonglong_value {0xCDCDCDCDCDCDCDDCll};
@@ -4415,58 +3638,14 @@ TEST_P(XCdrOptionalTest, ulonglong_align_2_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(ulonglong_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint16_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    uint64_t ulonglong_dec_value {0};
-    cdr.deserialize(ulonglong_dec_value);
-    ASSERT_EQ(ulonglong_value, ulonglong_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_2_serialize_the_value(expected_streams, encoding, endianness, ulonglong_value);
 }
 
 TEST_P(XCdrOptionalTest, ulonglong_align_4_serialize_the_value)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const uint64_t ulonglong_value {0xCDCDCDCDCDCDCDDCll};
@@ -4561,53 +3740,10 @@ TEST_P(XCdrOptionalTest, ulonglong_align_4_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(ulonglong_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint32_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    uint64_t ulonglong_dec_value {0};
-    cdr.deserialize(ulonglong_dec_value);
-    ASSERT_EQ(ulonglong_value, ulonglong_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_4_serialize_the_value(expected_streams, encoding, endianness, ulonglong_value);
 }
 
 TEST_P(XCdrOptionalTest, float_align_1_serialize_the_value)
@@ -4701,58 +3837,14 @@ TEST_P(XCdrOptionalTest, float_align_1_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(float_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint8_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    float float_dec_value {0};
-    cdr.deserialize(float_dec_value);
-    ASSERT_EQ(float_value, float_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_1_serialize_the_value(expected_streams, encoding, endianness, float_value);
 }
 
 TEST_P(XCdrOptionalTest, float_align_2_serialize_the_value)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const float float_value {13.0};
@@ -4843,58 +3935,14 @@ TEST_P(XCdrOptionalTest, float_align_2_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(float_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint16_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    float float_dec_value {0};
-    cdr.deserialize(float_dec_value);
-    ASSERT_EQ(float_value, float_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_2_serialize_the_value(expected_streams, encoding, endianness, float_value);
 }
 
 TEST_P(XCdrOptionalTest, float_align_4_serialize_the_value)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const float float_value {13.0};
@@ -4979,53 +4027,10 @@ TEST_P(XCdrOptionalTest, float_align_4_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(float_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint32_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    float float_dec_value {0};
-    cdr.deserialize(float_dec_value);
-    ASSERT_EQ(float_value, float_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_4_serialize_the_value(expected_streams, encoding, endianness, float_value);
 }
 
 TEST_P(XCdrOptionalTest, double_align_1_serialize_the_value)
@@ -5129,58 +4134,14 @@ TEST_P(XCdrOptionalTest, double_align_1_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(double_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint8_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    double double_dec_value {0};
-    cdr.deserialize(double_dec_value);
-    ASSERT_EQ(double_value, double_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_1_serialize_the_value(expected_streams, encoding, endianness, double_value);
 }
 
 TEST_P(XCdrOptionalTest, double_align_2_serialize_the_value)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const double double_value {13.0};
@@ -5284,55 +4245,12 @@ TEST_P(XCdrOptionalTest, double_align_2_serialize_the_value)
     //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(double_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint16_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    double double_dec_value {0};
-    cdr.deserialize(double_dec_value);
-    ASSERT_EQ(double_value, double_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_2_serialize_the_value(expected_streams, encoding, endianness, double_value);
 }
 
 TEST_P(XCdrOptionalTest, double_align_4_serialize_the_value)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const double double_value {13.0};
@@ -5427,53 +4345,10 @@ TEST_P(XCdrOptionalTest, double_align_4_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(double_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint32_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    double double_dec_value {0};
-    cdr.deserialize(double_dec_value);
-    ASSERT_EQ(double_value, double_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_4_serialize_the_value(expected_streams, encoding, endianness, double_value);
 }
 
 TEST_P(XCdrOptionalTest, longdouble_align_1_serialize_the_value)
@@ -6076,58 +4951,14 @@ TEST_P(XCdrOptionalTest, boolean_align_1_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(boolean_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint8_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    uint8_t boolean_dec_value {0};
-    cdr.deserialize(boolean_dec_value);
-    ASSERT_EQ(boolean_value, boolean_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_1_serialize_the_value(expected_streams, encoding, endianness, boolean_value);
 }
 
 TEST_P(XCdrOptionalTest, boolean_align_2_serialize_the_value)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const bool boolean_value = true;
@@ -6216,55 +5047,12 @@ TEST_P(XCdrOptionalTest, boolean_align_2_serialize_the_value)
     //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(boolean_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint16_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    uint8_t boolean_dec_value {0};
-    cdr.deserialize(boolean_dec_value);
-    ASSERT_EQ(boolean_value, boolean_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_2_serialize_the_value(expected_streams, encoding, endianness, boolean_value);
 }
 
 TEST_P(XCdrOptionalTest, boolean_align_4_serialize_the_value)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const bool boolean_value = true;
@@ -6344,53 +5132,10 @@ TEST_P(XCdrOptionalTest, boolean_align_4_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(boolean_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint32_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    uint8_t boolean_dec_value {0};
-    cdr.deserialize(boolean_dec_value);
-    ASSERT_EQ(boolean_value, boolean_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_4_serialize_the_value(expected_streams, encoding, endianness, boolean_value);
 }
 
 TEST_P(XCdrOptionalTest, octet_align_1_serialize_the_value)
@@ -6478,58 +5223,14 @@ TEST_P(XCdrOptionalTest, octet_align_1_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(octet_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint8_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    uint8_t octet_dec_value {0};
-    cdr.deserialize(octet_dec_value);
-    ASSERT_EQ(octet_value, octet_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_1_serialize_the_value(expected_streams, encoding, endianness, octet_value);
 }
 
 TEST_P(XCdrOptionalTest, octet_align_2_serialize_the_value)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const uint8_t octet_value {0xCD};
@@ -6617,55 +5318,12 @@ TEST_P(XCdrOptionalTest, octet_align_2_serialize_the_value)
     //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(octet_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint16_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    uint8_t octet_dec_value {0};
-    cdr.deserialize(octet_dec_value);
-    ASSERT_EQ(octet_value, octet_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_2_serialize_the_value(expected_streams, encoding, endianness, octet_value);
 }
 
 TEST_P(XCdrOptionalTest, octet_align_4_serialize_the_value)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const uint8_t octet_value {0xCD};
@@ -6744,53 +5402,10 @@ TEST_P(XCdrOptionalTest, octet_align_4_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(octet_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint32_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    uint8_t octet_dec_value {0};
-    cdr.deserialize(octet_dec_value);
-    ASSERT_EQ(octet_value, octet_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_4_serialize_the_value(expected_streams, encoding, endianness, octet_value);
 }
 
 TEST_P(XCdrOptionalTest, char_align_1_serialize_the_value)
@@ -6878,58 +5493,14 @@ TEST_P(XCdrOptionalTest, char_align_1_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(char_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint8_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    char char_dec_value {0};
-    cdr.deserialize(char_dec_value);
-    ASSERT_EQ(char_value, char_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_1_serialize_the_value(expected_streams, encoding, endianness, char_value);
 }
 
 TEST_P(XCdrOptionalTest, char_align_2_serialize_the_value)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const char char_value {'}'};
@@ -7017,55 +5588,12 @@ TEST_P(XCdrOptionalTest, char_align_2_serialize_the_value)
     //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(char_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint16_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    char char_dec_value {0};
-    cdr.deserialize(char_dec_value);
-    ASSERT_EQ(char_value, char_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_2_serialize_the_value(expected_streams, encoding, endianness, char_value);
 }
 
 TEST_P(XCdrOptionalTest, char_align_4_serialize_the_value)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const char char_value {'}'};
@@ -7144,53 +5672,10 @@ TEST_P(XCdrOptionalTest, char_align_4_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(char_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint32_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    char char_dec_value {0};
-    cdr.deserialize(char_dec_value);
-    ASSERT_EQ(char_value, char_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_4_serialize_the_value(expected_streams, encoding, endianness, char_value);
 }
 
 TEST_P(XCdrOptionalTest, wchar_align_1_serialize_the_value)
@@ -7284,58 +5769,14 @@ TEST_P(XCdrOptionalTest, wchar_align_1_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(wchar_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint8_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    wchar_t wchar_dec_value {0};
-    cdr.deserialize(wchar_dec_value);
-    ASSERT_EQ(wchar_value, wchar_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_1_serialize_the_value(expected_streams, encoding, endianness, wchar_value);
 }
 
 TEST_P(XCdrOptionalTest, wchar_align_2_serialize_the_value)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const wchar_t wchar_value {static_cast<wchar_t>(0xCDCDCDDC)};
@@ -7426,58 +5867,14 @@ TEST_P(XCdrOptionalTest, wchar_align_2_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(wchar_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint16_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    wchar_t wchar_dec_value {0};
-    cdr.deserialize(wchar_dec_value);
-    ASSERT_EQ(wchar_value, wchar_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_2_serialize_the_value(expected_streams, encoding, endianness, wchar_value);
 }
 
 TEST_P(XCdrOptionalTest, wchar_align_4_serialize_the_value)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const wchar_t wchar_value {static_cast<wchar_t>(0xCDCDCDDC)};
@@ -7562,56 +5959,12 @@ TEST_P(XCdrOptionalTest, wchar_align_4_serialize_the_value)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value;
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
-    cdr.serialize(wchar_value);
-    cdr.end_serialize_opt_member(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    uint32_t dalign_value {0};
-    cdr >> dalign_value;
-    ASSERT_EQ(align_value, dalign_value);
-    Cdr::state dec_state(cdr);
-    MemberId member_id;
-    bool is_present = false;
-    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
-    ASSERT_TRUE(is_present);
-    wchar_t wchar_dec_value {0};
-    cdr.deserialize(wchar_dec_value);
-    ASSERT_EQ(wchar_value, wchar_dec_value);
-    cdr.end_deserialize_opt_member(dec_state);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
+    align_4_serialize_the_value(expected_streams, encoding, endianness, wchar_value);
 }
 
-// TODO This test will work when implemented mutable structures.
 TEST_P(XCdrOptionalTest, two_inner_null_serialize_the_value)
 {
     //{ Defining expected XCDR streams
@@ -7631,45 +5984,54 @@ TEST_P(XCdrOptionalTest, two_inner_null_serialize_the_value)
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
     {
         0x00, 0x02, 0x00, 0x00, // Encapsulation
-        0x00, 0x01, 0x00, 0x00, // ShortMemberHeader
+        0x00, 0x01, 0x00, 0x04, // ShortMemberHeader
+        0x3F, 0x02, 0x00, 0x00, // Sentinel
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
         0x00, 0x03, 0x00, 0x00, // Encapsulation
-        0x01, 0x00, 0x00, 0x00, // ShortMemberHeader
+        0x01, 0x00, 0x04, 0x00, // ShortMemberHeader
+        0x02, 0x3F, 0x00, 0x00, // Sentinel
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
         0x00, 0x06, 0x00, 0x00, // Encapsulation
-        0x01,                   // Not present
+        0x01,                   // Present
         0x00                    // Not present
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
         0x00, 0x07, 0x00, 0x00, // Encapsulation
-        0x01,                   // Not present
+        0x01,                   // Present
         0x00                    // Not present
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
         0x00, 0x08, 0x00, 0x00, // Encapsulation
-        0x01,                   // Not present
+        0x01,                   // Present
+        0x00, 0x00, 0x00,       // Alignment
+        0x00, 0x00, 0x00, 0x01, // DHEADER
         0x00                    // Not present
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
         0x00, 0x09, 0x00, 0x00, // Encapsulation
-        0x01,                   // Not present
+        0x01,                   // Present
+        0x00, 0x00, 0x00,       // Alignment
+        0x01, 0x00, 0x00, 0x00, // DHEADER
         0x00                    // Not present
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
         0x00, 0x0a, 0x00, 0x00, // Encapsulation
-        0x01, 0x00, 0x00, 0x20, // EMHEADER1(M) without NEXTINT
+        0x20, 0x00, 0x00, 0x01, // EMHEADER1(M) without NEXTINT
+        0x00, 0x00, 0x00, 0x00, // DHEADER
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
         0x00, 0x0b, 0x00, 0x00, // Encapsulation
+        0x01, 0x00, 0x00, 0x20, // EMHEADER1(M) without NEXTINT
+        0x00, 0x00, 0x00, 0x00, // DHEADER
     };
     //}
 
@@ -7689,9 +6051,12 @@ TEST_P(XCdrOptionalTest, two_inner_null_serialize_the_value)
     cdr.serialize_encapsulation();
     Cdr::state enc_state(cdr);
     cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
+    Cdr::state enc_state_inner_type(cdr);
+    cdr.begin_serialize_type(enc_state_inner_type, encoding);
     Cdr::state enc_state_inner(cdr);
     cdr.begin_serialize_opt_member(MemberId(3), false, enc_state_inner);
     cdr.end_serialize_opt_member(enc_state_inner);
+    cdr.end_serialize_type(enc_state_inner_type);
     cdr.end_serialize_opt_member(enc_state);
     Cdr::state enc_state_end(cdr);
     //}
@@ -7711,11 +6076,177 @@ TEST_P(XCdrOptionalTest, two_inner_null_serialize_the_value)
     bool is_present = false;
     cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
     ASSERT_TRUE(is_present);
-    Cdr::state dec_state_inner(cdr);
-    MemberId member_id_inner;
-    cdr.begin_deserialize_opt_member(member_id_inner, is_present, dec_state_inner);
-    ASSERT_FALSE(is_present);
-    cdr.end_deserialize_opt_member(dec_state_inner);
+    cdr.deserialize_type(encoding, [encoding](Cdr& cdr_inner, const MemberId& mid, bool sequence_id) -> bool
+            {
+                assert(((EncodingAlgorithmFlag::PL_CDR == encoding || EncodingAlgorithmFlag::PL_CDR2 == encoding) &&
+                !sequence_id) ||
+                (EncodingAlgorithmFlag::PL_CDR != encoding && EncodingAlgorithmFlag::PL_CDR2 != encoding && sequence_id));
+                bool is_present_inner = false;
+                Cdr::state dec_state_inner(cdr_inner);
+                MemberId member_id_inner = sequence_id ? MEMBER_ID_INVALID : mid;
+                cdr_inner.begin_deserialize_opt_member(member_id_inner, is_present_inner, dec_state_inner);
+                assert(!is_present_inner);
+                cdr_inner.end_deserialize_opt_member(dec_state_inner);
+                return sequence_id ? false : true;
+            });
+    cdr.end_deserialize_opt_member(dec_state);
+    Cdr::state dec_state_end(cdr);
+    ASSERT_EQ(enc_state_end, dec_state_end);
+    //}
+}
+
+TEST_P(XCdrOptionalTest, two_inner_short_serialize_the_value)
+{
+    const int16_t short_value {static_cast<int16_t>(0xCDDC)};
+    constexpr uint8_t ival {0xCD};
+    constexpr uint8_t fval {0xDC};
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        0x00, 0x01, 0x00, 0x06, // ShortMemberHeader
+        0x00, 0x03, 0x00, 0x02, // ShortMemberHeader
+        ival, fval              // Short
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        0x01, 0x00, 0x06, 0x00, // ShortMemberHeader
+        0x03, 0x00, 0x02, 0x00, // ShortMemberHeader
+        fval, ival              // Short
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x02, 0x00, 0x00, // Encapsulation
+        0x00, 0x01, 0x00, 0x0c, // ShortMemberHeader
+        0x00, 0x03, 0x00, 0x02, // ShortMemberHeader
+        ival, fval,             // Short
+        0x00, 0x00,             // Alignment
+        0x3F, 0x02, 0x00, 0x00, // Sentinel
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x03, 0x00, 0x00, // Encapsulation
+        0x01, 0x00, 0x0c, 0x00, // ShortMemberHeader
+        0x03, 0x00, 0x02, 0x00, // ShortMemberHeader
+        fval, ival,             // Short
+        0x00, 0x00,             // Alignment
+        0x02, 0x3F, 0x00, 0x00, // Sentinel
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        0x01,                   // Present
+        0x01,                   // Present
+        ival, fval              // Short
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        0x01,                   // Present
+        0x01,                   // Present
+        fval, ival              // Short
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        0x01,                   // Present
+        0x00, 0x00, 0x00,       // Alignment
+        0x00, 0x00, 0x00, 0x04, // DHEADER
+        0x01,                   // Present
+        0x00,                   // Alignment
+        ival, fval              // Short
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        0x01,                   // Present
+        0x00, 0x00, 0x00,       // Alignment
+        0x04, 0x00, 0x00, 0x00, // DHEADER
+        0x01,                   // Present
+        0x00,                   // Alignment
+        fval, ival              // Short
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x0a, 0x00, 0x00, // Encapsulation
+        0x40, 0x00, 0x00, 0x01, // EMHEADER1(M) with NEXTINT
+        0x00, 0x00, 0x00, 0x0a, // NEXTINT
+        0x00, 0x00, 0x00, 0x06, // DHEADER
+        0x10, 0x00, 0x00, 0x03, // EMHEADER1(M) without NEXTINT
+        ival, fval              // Short
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x0b, 0x00, 0x00, // Encapsulation
+        0x01, 0x00, 0x00, 0x40, // EMHEADER1(M) without NEXTINT
+        0x0a, 0x00, 0x00, 0x00, // NEXTINT
+        0x06, 0x00, 0x00, 0x00, // DHEADER
+        0x03, 0x00, 0x00, 0x10, // EMHEADER1(M) without NEXTINT
+        fval, ival              // Short
+    };
+    //}
+
+    //{ Prepare buffer
+    EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode optional not present.
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    Cdr::state enc_state(cdr);
+    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state);
+    Cdr::state enc_state_inner_type(cdr);
+    cdr.begin_serialize_type(enc_state_inner_type, encoding);
+    Cdr::state enc_state_inner(cdr);
+    cdr.begin_serialize_opt_member(MemberId(3), true, enc_state_inner);
+    cdr.serialize(short_value);
+    cdr.end_serialize_opt_member(enc_state_inner);
+    cdr.end_serialize_type(enc_state_inner_type);
+    cdr.end_serialize_opt_member(enc_state);
+    Cdr::state enc_state_end(cdr);
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding optional not present
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    Cdr::state dec_state(cdr);
+    MemberId member_id;
+    bool is_present = false;
+    cdr.begin_deserialize_opt_member(member_id, is_present, dec_state);
+    ASSERT_TRUE(is_present);
+    int16_t dvalue {0};
+    cdr.deserialize_type(encoding, [encoding, &dvalue](Cdr& cdr_inner, const MemberId& mid, bool sequence_id) -> bool
+            {
+                assert(((EncodingAlgorithmFlag::PL_CDR == encoding || EncodingAlgorithmFlag::PL_CDR2 == encoding) &&
+                !sequence_id) ||
+                (EncodingAlgorithmFlag::PL_CDR != encoding && EncodingAlgorithmFlag::PL_CDR2 != encoding && sequence_id));
+                bool is_present_inner = false;
+                Cdr::state dec_state_inner(cdr_inner);
+                MemberId member_id_inner = sequence_id ? MEMBER_ID_INVALID : mid;
+                cdr_inner.begin_deserialize_opt_member(member_id_inner, is_present_inner, dec_state_inner);
+                assert(is_present_inner);
+                cdr_inner.deserialize(dvalue);
+                cdr_inner.end_deserialize_opt_member(dec_state_inner);
+                return sequence_id ? false : true;
+            });
+    ASSERT_EQ(short_value, dvalue);
     cdr.end_deserialize_opt_member(dec_state);
     Cdr::state dec_state_end(cdr);
     ASSERT_EQ(enc_state_end, dec_state_end);
@@ -7878,39 +6409,10 @@ TEST_P(XCdrOptionalTest, short_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<int16_t> value {short_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    optional<int16_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dvalue;
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    serialize_optional(expected_streams, encoding, endianness, short_value);
 }
 
 TEST_P(XCdrOptionalTest, ushort_optional)
@@ -7983,39 +6485,10 @@ TEST_P(XCdrOptionalTest, ushort_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<uint16_t> value {ushort_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    optional<uint16_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dvalue;
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    serialize_optional(expected_streams, encoding, endianness, ushort_value);
 }
 
 TEST_P(XCdrOptionalTest, long_optional)
@@ -8092,39 +6565,10 @@ TEST_P(XCdrOptionalTest, long_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<int32_t> value {long_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    optional<int32_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dvalue;
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    serialize_optional(expected_streams, encoding, endianness, long_value);
 }
 
 TEST_P(XCdrOptionalTest, ulong_optional)
@@ -8201,39 +6645,10 @@ TEST_P(XCdrOptionalTest, ulong_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<uint32_t> value {ulong_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    optional<uint32_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dvalue;
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    serialize_optional(expected_streams, encoding, endianness, ulong_value);
 }
 
 TEST_P(XCdrOptionalTest, longlong_optional)
@@ -8320,39 +6735,10 @@ TEST_P(XCdrOptionalTest, longlong_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<int64_t> value {longlong_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    optional<int64_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dvalue;
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    serialize_optional(expected_streams, encoding, endianness, longlong_value);
 }
 
 TEST_P(XCdrOptionalTest, ulonglong_optional)
@@ -8439,39 +6825,10 @@ TEST_P(XCdrOptionalTest, ulonglong_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<uint64_t> value {ulonglong_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    optional<uint64_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dvalue;
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    serialize_optional(expected_streams, encoding, endianness, ulonglong_value);
 }
 
 TEST_P(XCdrOptionalTest, float_optional)
@@ -8548,39 +6905,10 @@ TEST_P(XCdrOptionalTest, float_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<float> value {float_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    optional<float> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dvalue;
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    serialize_optional(expected_streams, encoding, endianness, float_value);
 }
 
 TEST_P(XCdrOptionalTest, double_optional)
@@ -8667,39 +6995,10 @@ TEST_P(XCdrOptionalTest, double_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<double> value {double_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    optional<double> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dvalue;
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    serialize_optional(expected_streams, encoding, endianness, double_value);
 }
 
 TEST_P(XCdrOptionalTest, longdouble_optional)
@@ -8912,39 +7211,10 @@ TEST_P(XCdrOptionalTest, boolean_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<bool> value {boolean_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    optional<bool> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dvalue;
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    serialize_optional(expected_streams, encoding, endianness, boolean_value);
 }
 
 TEST_P(XCdrOptionalTest, octet_optional)
@@ -9015,39 +7285,10 @@ TEST_P(XCdrOptionalTest, octet_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<uint8_t> value {octet_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    optional<uint8_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dvalue;
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    serialize_optional(expected_streams, encoding, endianness, octet_value);
 }
 
 TEST_P(XCdrOptionalTest, char_optional)
@@ -9118,39 +7359,10 @@ TEST_P(XCdrOptionalTest, char_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<char> value {char_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    optional<char> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dvalue;
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    serialize_optional(expected_streams, encoding, endianness, char_value);
 }
 
 TEST_P(XCdrOptionalTest, wchar_optional)
@@ -9227,39 +7439,10 @@ TEST_P(XCdrOptionalTest, wchar_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<wchar_t> value {wchar_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    optional<wchar_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dvalue;
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    serialize_optional(expected_streams, encoding, endianness, wchar_value);
 }
 
 TEST_P(XCdrOptionalTest, null_align_1_optional)
@@ -9657,46 +7840,14 @@ TEST_P(XCdrOptionalTest, short_align_1_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<int16_t> value {short_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint8_t dalign_value {0};
-    optional<int16_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_1_serialize_optional(expected_streams, encoding, endianness, short_value);
 }
 
 TEST_P(XCdrOptionalTest, short_align_2_optional)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const int16_t short_value {static_cast<int16_t>(0xCDDC)};
@@ -9787,46 +7938,14 @@ TEST_P(XCdrOptionalTest, short_align_2_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<int16_t> value {short_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint16_t dalign_value {0};
-    optional<int16_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_2_serialize_optional(expected_streams, encoding, endianness, short_value);
 }
 
 TEST_P(XCdrOptionalTest, short_align_4_optional)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const int16_t short_value {static_cast<int16_t>(0xCDDC)};
@@ -9911,41 +8030,10 @@ TEST_P(XCdrOptionalTest, short_align_4_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<int16_t> value {short_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint32_t dalign_value {0};
-    optional<int16_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_4_serialize_optional(expected_streams, encoding, endianness, short_value);
 }
 
 TEST_P(XCdrOptionalTest, ushort_align_1_optional)
@@ -10035,46 +8123,14 @@ TEST_P(XCdrOptionalTest, ushort_align_1_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<uint16_t> value {ushort_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint8_t dalign_value {0};
-    optional<uint16_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_1_serialize_optional(expected_streams, encoding, endianness, ushort_value);
 }
 
 TEST_P(XCdrOptionalTest, ushort_align_2_optional)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const uint16_t ushort_value {static_cast<uint16_t>(0xCDDC)};
@@ -10165,46 +8221,14 @@ TEST_P(XCdrOptionalTest, ushort_align_2_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<uint16_t> value {ushort_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint16_t dalign_value {0};
-    optional<uint16_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_2_serialize_optional(expected_streams, encoding, endianness, ushort_value);
 }
 
 TEST_P(XCdrOptionalTest, ushort_align_4_optional)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     const uint16_t ushort_value {static_cast<uint16_t>(0xCDDC)};
@@ -10289,41 +8313,10 @@ TEST_P(XCdrOptionalTest, ushort_align_4_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<uint16_t> value {ushort_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint32_t dalign_value {0};
-    optional<uint16_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_4_serialize_optional(expected_streams, encoding, endianness, ushort_value);
 }
 
 TEST_P(XCdrOptionalTest, long_align_1_optional)
@@ -10417,46 +8410,14 @@ TEST_P(XCdrOptionalTest, long_align_1_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<int32_t> value {long_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint8_t dalign_value {0};
-    optional<int32_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_1_serialize_optional(expected_streams, encoding, endianness, long_value);
 }
 
 TEST_P(XCdrOptionalTest, long_align_2_optional)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     constexpr int32_t long_value {static_cast<int32_t>(0xCDCDCDDC)};
@@ -10547,46 +8508,14 @@ TEST_P(XCdrOptionalTest, long_align_2_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<int32_t> value {long_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint16_t dalign_value {0};
-    optional<int32_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_2_serialize_optional(expected_streams, encoding, endianness, long_value);
 }
 
 TEST_P(XCdrOptionalTest, long_align_4_optional)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     constexpr int32_t long_value {static_cast<int32_t>(0xCDCDCDDC)};
@@ -10671,41 +8600,10 @@ TEST_P(XCdrOptionalTest, long_align_4_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<int32_t> value {long_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint32_t dalign_value {0};
-    optional<int32_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_4_serialize_optional(expected_streams, encoding, endianness, long_value);
 }
 
 TEST_P(XCdrOptionalTest, ulong_align_1_optional)
@@ -10799,46 +8697,14 @@ TEST_P(XCdrOptionalTest, ulong_align_1_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<uint32_t> value {ulong_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint8_t dalign_value {0};
-    optional<uint32_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_1_serialize_optional(expected_streams, encoding, endianness, ulong_value);
 }
 
 TEST_P(XCdrOptionalTest, ulong_align_2_optional)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     constexpr uint32_t ulong_value {0xCDCDCDDC};
@@ -10929,46 +8795,14 @@ TEST_P(XCdrOptionalTest, ulong_align_2_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<uint32_t> value {ulong_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint16_t dalign_value {0};
-    optional<uint32_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_2_serialize_optional(expected_streams, encoding, endianness, ulong_value);
 }
 
 TEST_P(XCdrOptionalTest, ulong_align_4_optional)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     constexpr uint32_t ulong_value {0xCDCDCDDC};
@@ -11053,41 +8887,10 @@ TEST_P(XCdrOptionalTest, ulong_align_4_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<uint32_t> value {ulong_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint32_t dalign_value {0};
-    optional<uint32_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_4_serialize_optional(expected_streams, encoding, endianness, ulong_value);
 }
 
 TEST_P(XCdrOptionalTest, longlong_align_1_optional)
@@ -11191,46 +8994,14 @@ TEST_P(XCdrOptionalTest, longlong_align_1_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<int64_t> value {longlong_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint8_t dalign_value {0};
-    optional<int64_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_1_serialize_optional(expected_streams, encoding, endianness, longlong_value);
 }
 
 TEST_P(XCdrOptionalTest, longlong_align_2_optional)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     constexpr int64_t longlong_value {static_cast<int64_t>(0xCDCDCDCDCDCDCDDCll)};
@@ -11331,46 +9102,14 @@ TEST_P(XCdrOptionalTest, longlong_align_2_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<int64_t> value {longlong_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint16_t dalign_value {0};
-    optional<int64_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_2_serialize_optional(expected_streams, encoding, endianness, longlong_value);
 }
 
 TEST_P(XCdrOptionalTest, longlong_align_4_optional)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     constexpr int64_t longlong_value {static_cast<int64_t>(0xCDCDCDCDCDCDCDDCll)};
@@ -11465,41 +9204,10 @@ TEST_P(XCdrOptionalTest, longlong_align_4_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<int64_t> value {longlong_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint32_t dalign_value {0};
-    optional<int64_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_4_serialize_optional(expected_streams, encoding, endianness, longlong_value);
 }
 
 TEST_P(XCdrOptionalTest, ulonglong_align_1_optional)
@@ -11603,46 +9311,14 @@ TEST_P(XCdrOptionalTest, ulonglong_align_1_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<uint64_t> value {ulonglong_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint8_t dalign_value {0};
-    optional<uint64_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_1_serialize_optional(expected_streams, encoding, endianness, ulonglong_value);
 }
 
 TEST_P(XCdrOptionalTest, ulonglong_align_2_optional)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     constexpr uint64_t ulonglong_value {0xCDCDCDCDCDCDCDDCll};
@@ -11743,46 +9419,14 @@ TEST_P(XCdrOptionalTest, ulonglong_align_2_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<uint64_t> value {ulonglong_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint16_t dalign_value {0};
-    optional<uint64_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_2_serialize_optional(expected_streams, encoding, endianness, ulonglong_value);
 }
 
 TEST_P(XCdrOptionalTest, ulonglong_align_4_optional)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     constexpr uint64_t ulonglong_value {0xCDCDCDCDCDCDCDDCll};
@@ -11877,41 +9521,10 @@ TEST_P(XCdrOptionalTest, ulonglong_align_4_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<uint64_t> value {ulonglong_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint32_t dalign_value {0};
-    optional<uint64_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_4_serialize_optional(expected_streams, encoding, endianness, ulonglong_value);
 }
 
 TEST_P(XCdrOptionalTest, float_align_1_optional)
@@ -12005,46 +9618,14 @@ TEST_P(XCdrOptionalTest, float_align_1_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<float> value {float_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint8_t dalign_value {0};
-    optional<float> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_1_serialize_optional(expected_streams, encoding, endianness, float_value);
 }
 
 TEST_P(XCdrOptionalTest, float_align_2_optional)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     constexpr float float_value {13.0};
@@ -12135,46 +9716,14 @@ TEST_P(XCdrOptionalTest, float_align_2_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<float> value {float_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint16_t dalign_value {0};
-    optional<float> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_2_serialize_optional(expected_streams, encoding, endianness, float_value);
 }
 
 TEST_P(XCdrOptionalTest, float_align_4_optional)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     constexpr float float_value {13.0};
@@ -12259,41 +9808,10 @@ TEST_P(XCdrOptionalTest, float_align_4_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<float> value {float_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint32_t dalign_value {0};
-    optional<float> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_4_serialize_optional(expected_streams, encoding, endianness, float_value);
 }
 
 TEST_P(XCdrOptionalTest, double_align_1_optional)
@@ -12397,46 +9915,14 @@ TEST_P(XCdrOptionalTest, double_align_1_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<double> value {double_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint8_t dalign_value {0};
-    optional<double> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_1_serialize_optional(expected_streams, encoding, endianness, double_value);
 }
 
 TEST_P(XCdrOptionalTest, double_align_2_optional)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     constexpr double double_value {13.0};
@@ -12537,46 +10023,14 @@ TEST_P(XCdrOptionalTest, double_align_2_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<double> value {double_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint16_t dalign_value {0};
-    optional<double> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_2_serialize_optional(expected_streams, encoding, endianness, double_value);
 }
 
 TEST_P(XCdrOptionalTest, double_align_4_optional)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     constexpr double double_value {13.0};
@@ -12671,41 +10125,10 @@ TEST_P(XCdrOptionalTest, double_align_4_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<double> value {double_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint32_t dalign_value {0};
-    optional<double> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_4_serialize_optional(expected_streams, encoding, endianness, double_value);
 }
 
 TEST_P(XCdrOptionalTest, longdouble_align_1_optional)
@@ -13272,46 +10695,14 @@ TEST_P(XCdrOptionalTest, boolean_align_1_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<bool> value {boolean_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint8_t dalign_value {0};
-    optional<bool> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_1_serialize_optional(expected_streams, encoding, endianness, boolean_value);
 }
 
 TEST_P(XCdrOptionalTest, boolean_align_2_optional)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     constexpr bool boolean_value = true;
@@ -13397,46 +10788,14 @@ TEST_P(XCdrOptionalTest, boolean_align_2_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<bool> value {boolean_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint16_t dalign_value {0};
-    optional<bool> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_2_serialize_optional(expected_streams, encoding, endianness, boolean_value);
 }
 
 TEST_P(XCdrOptionalTest, boolean_align_4_optional)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     constexpr bool boolean_value = true;
@@ -13516,41 +10875,10 @@ TEST_P(XCdrOptionalTest, boolean_align_4_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<bool> value {boolean_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint32_t dalign_value {0};
-    optional<bool> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_4_serialize_optional(expected_streams, encoding, endianness, boolean_value);
 }
 
 TEST_P(XCdrOptionalTest, octet_align_1_optional)
@@ -13638,46 +10966,14 @@ TEST_P(XCdrOptionalTest, octet_align_1_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<uint8_t> value {octet_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint8_t dalign_value {0};
-    optional<uint8_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_1_serialize_optional(expected_streams, encoding, endianness, octet_value);
 }
 
 TEST_P(XCdrOptionalTest, octet_align_2_optional)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     constexpr uint8_t octet_value {0xCD};
@@ -13762,46 +11058,14 @@ TEST_P(XCdrOptionalTest, octet_align_2_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<uint8_t> value {octet_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint16_t dalign_value {0};
-    optional<uint8_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_2_serialize_optional(expected_streams, encoding, endianness, octet_value);
 }
 
 TEST_P(XCdrOptionalTest, octet_align_4_optional)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     constexpr uint8_t octet_value {0xCD};
@@ -13880,41 +11144,10 @@ TEST_P(XCdrOptionalTest, octet_align_4_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<uint8_t> value {octet_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint32_t dalign_value {0};
-    optional<uint8_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_4_serialize_optional(expected_streams, encoding, endianness, octet_value);
 }
 
 TEST_P(XCdrOptionalTest, char_align_1_optional)
@@ -14002,46 +11235,14 @@ TEST_P(XCdrOptionalTest, char_align_1_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<char> value {char_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint8_t dalign_value {0};
-    optional<char> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_1_serialize_optional(expected_streams, encoding, endianness, char_value);
 }
 
 TEST_P(XCdrOptionalTest, char_align_2_optional)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     constexpr char char_value {'}'};
@@ -14126,46 +11327,14 @@ TEST_P(XCdrOptionalTest, char_align_2_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<char> value {char_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint16_t dalign_value {0};
-    optional<char> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_2_serialize_optional(expected_streams, encoding, endianness, char_value);
 }
 
 TEST_P(XCdrOptionalTest, char_align_4_optional)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     constexpr char char_value {'}'};
@@ -14244,41 +11413,10 @@ TEST_P(XCdrOptionalTest, char_align_4_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<char> value {char_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint32_t dalign_value {0};
-    optional<char> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_4_serialize_optional(expected_streams, encoding, endianness, char_value);
 }
 
 TEST_P(XCdrOptionalTest, wchar_align_1_optional)
@@ -14372,46 +11510,14 @@ TEST_P(XCdrOptionalTest, wchar_align_1_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<wchar_t> value {wchar_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint8_t dalign_value {0};
-    optional<wchar_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_1_serialize_optional(expected_streams, encoding, endianness, wchar_value);
 }
 
 TEST_P(XCdrOptionalTest, wchar_align_2_optional)
 {
-    const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     constexpr wchar_t wchar_value {static_cast<wchar_t>(0xCDCDCDDC)};
@@ -14502,46 +11608,14 @@ TEST_P(XCdrOptionalTest, wchar_align_2_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<wchar_t> value {wchar_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint16_t dalign_value {0};
-    optional<wchar_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_2_serialize_optional(expected_streams, encoding, endianness, wchar_value);
 }
 
 TEST_P(XCdrOptionalTest, wchar_align_4_optional)
 {
-    const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     constexpr wchar_t wchar_value {static_cast<wchar_t>(0xCDCDCDDC)};
@@ -14626,41 +11700,10 @@ TEST_P(XCdrOptionalTest, wchar_align_4_optional)
     };
     //}
 
-    //{ Prepare buffer
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
 
-    //{ Encode optional not present.
-    optional<wchar_t> value {wchar_value};
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    cdr << align_value << MemberId(1) << value;
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    uint32_t dalign_value {0};
-    optional<wchar_t> dvalue;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr >> dalign_value >> dvalue;
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ(*value, *dvalue);
-    //}
+    align_4_serialize_optional(expected_streams, encoding, endianness, wchar_value);
 }
 
 INSTANTIATE_TEST_SUITE_P(

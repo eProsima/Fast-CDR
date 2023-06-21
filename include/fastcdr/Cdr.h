@@ -4001,22 +4001,15 @@ public:
     Cdr& deserialize(
             optional<_T>& opt_value)
     {
-        if (MEMBER_ID_INVALID == next_member_id_)
+        Cdr::state dec_state(*this);
+        bool is_present = false;
+        begin_deserialize_opt_member(next_member_id_, is_present, dec_state);
+        opt_value.reset(is_present);
+        if (is_present)
         {
-            Cdr::state dec_state(*this);
-            bool is_present = false;
-            begin_deserialize_opt_member(next_member_id_, is_present, dec_state);
-            opt_value.reset(is_present);
-            if (is_present)
-            {
-                deserialize(*opt_value);
-            }
-            end_deserialize_opt_member(dec_state);
+            deserialize(*opt_value);
         }
-        else
-        {
-            //TODO
-        }
+        end_deserialize_opt_member(dec_state);
         return *this;
     }
 

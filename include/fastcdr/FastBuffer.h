@@ -160,6 +160,13 @@ public:
         current_position_ += numBytes;
     }
 
+    inline
+    void operator -=(
+            size_t numBytes)
+    {
+        current_position_ -= numBytes;
+    }
+
     /*!
      * @brief This operator returns the subtraction of the current interator's position and the source iterator's position.
      * @param it Source iterator whose position is subtracted to the current iterator's position.

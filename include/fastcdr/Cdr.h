@@ -4195,6 +4195,10 @@ private:
             const MemberId& member_id,
             size_t member_serialized_size);
 
+    void xcdr2_shrink_to_long_member_header(
+            const MemberId& member_id,
+            const FastBuffer::iterator& offset);
+
     void xcdr2_deserialize_member_header(
             MemberId& member_id,
             Cdr::state& current_state);
@@ -4327,6 +4331,8 @@ private:
 
     //!
     size_t align64_ {8};
+
+    bool serialized_dheader_ {false};
 
 };
 

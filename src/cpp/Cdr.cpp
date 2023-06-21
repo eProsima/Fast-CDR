@@ -52,6 +52,7 @@ Cdr::state::state(
     , m_swapBytes(cdr.m_swapBytes)
     , m_lastDataSize(cdr.m_lastDataSize)
     , next_member_id_(cdr.next_member_id_)
+    , previous_enconding_(cdr.current_encoding_)
 {
 }
 
@@ -62,6 +63,7 @@ Cdr::state::state(
     , m_swapBytes(current_state.m_swapBytes)
     , m_lastDataSize(current_state.m_lastDataSize)
     , next_member_id_(current_state.next_member_id_)
+    , previous_enconding_(current_state.previous_enconding_)
 {
 }
 
@@ -3037,11 +3039,14 @@ void Cdr::xcdr2_end_long_member_header(
         const MemberId& member_id,
         size_t member_serialized_size)
 {
-    uint32_t lc = 0x40000000;
+    uint32_t lc = 0 == member_serialized_size ? 0x50000000 : 0x40000000;
     uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | lc | member_id.id;
     serialize(flags_and_member_id);
-    uint32_t size = static_cast<uint32_t>(member_serialized_size);
-    serialize(size);
+    if (0 < member_serialized_size)
+    {
+        uint32_t size = static_cast<uint32_t>(member_serialized_size);
+        serialize(size);
+    }
 }
 
 void Cdr::xcdr2_change_to_short_member_header(
@@ -3073,6 +3078,16 @@ void Cdr::xcdr2_change_to_long_member_header(
     serialize(flags_and_member_id);
     uint32_t size = static_cast<uint32_t>(member_serialized_size);
     serialize(size);
+}
+
+void Cdr::xcdr2_shrink_to_long_member_header(
+        const MemberId& member_id,
+        const FastBuffer::iterator& offset)
+{
+    memmove(&offset_ + 4, &offset_ + 8, offset - offset_ - 8);
+    uint32_t lc = 0x50000000;
+    uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | lc | member_id.id;
+    serialize(flags_and_member_id);
 }
 
 Cdr& Cdr::xcdr1_begin_serialize_opt_member(
@@ -3257,16 +3272,66 @@ Cdr& Cdr::xcdr2_end_serialize_opt_member(
         auto last_offset = offset_;
         set_state(current_state);
         makeAlign(alignment(sizeof(uint32_t)));
-        const size_t member_serialized_size = last_offset - offset_ -
-                (current_state.header_serialized_ == XCdrHeaderSelection::SHORT_HEADER ? 4 : 8);
-        if (8 < member_serialized_size)
+        if (!serialized_dheader_)
         {
+            const size_t member_serialized_size = last_offset - offset_ -
+                    (current_state.header_serialized_ == XCdrHeaderSelection::SHORT_HEADER ? 4 : 8);
+            if (8 < member_serialized_size)
+            {
+                switch (current_state.header_serialized_)
+                {
+                    case XCdrHeaderSelection::SHORT_HEADER:
+                        if (AUTO_WITH_SHORT_HEADER_BY_DEFAULT == current_state.header_selection_)
+                        {
+                            xcdr2_change_to_long_member_header(current_state.next_member_id_, member_serialized_size);
+                        }
+                        else
+                        {
+                            assert(false);     // TODO throw exception
+                        }
+                        break;
+                    case XCdrHeaderSelection::LONG_HEADER:
+                        xcdr2_end_long_member_header(current_state.next_member_id_, member_serialized_size);
+                        break;
+                    default:
+                        assert(false);     // header_serialized_ must have only SHORT_HEADER or LONG_HEADER
+                }
+            }
+            else
+            {
+                switch (current_state.header_serialized_)
+                {
+                    case XCdrHeaderSelection::SHORT_HEADER:
+                        xcdr2_end_short_member_header(current_state.next_member_id_, member_serialized_size);
+                        break;
+                    case XCdrHeaderSelection::LONG_HEADER:
+                        if (AUTO_WITH_LONG_HEADER_BY_DEFAULT == current_state.header_selection_)
+                        {
+                            xcdr2_change_to_short_member_header(current_state.next_member_id_, member_serialized_size);
+                        }
+                        else
+                        {
+                            xcdr2_end_long_member_header(current_state.next_member_id_, member_serialized_size);
+                        }
+                        break;
+                    default:
+                        assert(false);     // header_serialized_ must have only SHORT_HEADER or LONG_HEADER
+                }
+            }
+
+            jump(member_serialized_size);
+        }
+        else
+        {
+            serialized_dheader_ = false;
+            // Use inner type DHEADER as NEXTINT
             switch (current_state.header_serialized_)
             {
                 case XCdrHeaderSelection::SHORT_HEADER:
                     if (AUTO_WITH_SHORT_HEADER_BY_DEFAULT == current_state.header_selection_)
                     {
-                        xcdr2_change_to_long_member_header(current_state.next_member_id_, member_serialized_size);
+                        xcdr2_end_long_member_header(current_state.next_member_id_, 0);
+                        offset_ = last_offset;
                     }
                     else
                     {
@@ -3274,35 +3339,19 @@ Cdr& Cdr::xcdr2_end_serialize_opt_member(
                     }
                     break;
                 case XCdrHeaderSelection::LONG_HEADER:
-                    xcdr2_end_long_member_header(current_state.next_member_id_, member_serialized_size);
+                    xcdr2_shrink_to_long_member_header(current_state.next_member_id_, last_offset);
+                    offset_ = last_offset;
+                    offset_ -= sizeof(uint32_t);
                     break;
                 default:
                     assert(false);         // header_serialized_ must have only SHORT_HEADER or LONG_HEADER
             }
+
+            m_lastDataSize = 0;
         }
-        else
-        {
-            switch (current_state.header_serialized_)
-            {
-                case XCdrHeaderSelection::SHORT_HEADER:
-                    xcdr2_end_short_member_header(current_state.next_member_id_, member_serialized_size);
-                    break;
-                case XCdrHeaderSelection::LONG_HEADER:
-                    if (AUTO_WITH_LONG_HEADER_BY_DEFAULT == current_state.header_selection_)
-                    {
-                        xcdr2_change_to_short_member_header(current_state.next_member_id_, member_serialized_size);
-                    }
-                    else
-                    {
-                        xcdr2_end_long_member_header(current_state.next_member_id_, member_serialized_size);
-                    }
-                    break;
-                default:
-                    assert(false);         // header_serialized_ must have only SHORT_HEADER or LONG_HEADER
-            }
-        }
-        jump(member_serialized_size);
     }
+
+    next_member_id_ = MEMBER_ID_INVALID;
 
     return *this;
 }
@@ -3341,12 +3390,20 @@ void Cdr::xcdr2_deserialize_member_header(
         }
         current_state.header_serialized_ = XCdrHeaderSelection::SHORT_HEADER;
     }
-    else
+    else if (4 == lc)
     {
         uint32_t size = 0;
         deserialize(size);
         current_state.member_size_ = size;
         current_state.header_serialized_ = XCdrHeaderSelection::LONG_HEADER;
+    }
+    else
+    {
+        uint32_t size = 0;
+        deserialize(size);
+        current_state.member_size_ = size + 4;
+        current_state.header_serialized_ = XCdrHeaderSelection::SHORT_HEADER;
+        offset_ -= sizeof(uint32_t);
     }
 }
 
@@ -3402,6 +3459,7 @@ Cdr& Cdr::xcdr1_end_deserialize_opt_member(
         auto last_offset = offset_;
         set_state(current_state);
         offset_ = last_offset;
+        m_lastDataSize = 0;
     }
 
     return *this;
@@ -3549,6 +3607,7 @@ Cdr& Cdr::xcdr2_end_serialize_type(
         const size_t member_serialized_size = last_offset - offset_ /*DHEADER ->*/ - 4 - alignment(4);
         serialize(static_cast<uint32_t>(member_serialized_size));
         jump(member_serialized_size);
+        serialized_dheader_ = true;
     }
     current_encoding_ = current_state.previous_enconding_;
     return *this;
@@ -3577,6 +3636,7 @@ Cdr& Cdr::xcdr1_deserialize_type(
             auto last_offset = offset_;
             set_state(current_state);
             offset_ = last_offset;
+            m_lastDataSize = 0;
         }
     }
     else

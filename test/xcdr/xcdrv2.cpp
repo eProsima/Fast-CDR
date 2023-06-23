@@ -64,12 +64,10 @@ TEST_P(XCdrv2Test, pl_octet_opt_member)
     //}
 
     //{ Encode optional not present.
+    optional<uint8_t> opt_value {octet_value};
     cdr.set_encoding_flag(encoding);
     cdr.serialize_encapsulation();
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_opt_member(MemberId(1), true, enc_state, GetParam());
-    cdr.serialize(octet_value);
-    cdr.end_serialize_opt_member(enc_state);
+    cdr.serialize_member(MemberId(1), opt_value, GetParam());
     Cdr::state enc_state_end(cdr);
     //}
 

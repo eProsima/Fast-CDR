@@ -278,274 +278,6 @@ public:
     }
 
     /*!
-     * @brief This operator serializes an octet.
-     * @param octet_t The value of the octet that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator <<(
-            const uint8_t octet_t)
-    {
-        return serialize(octet_t);
-    }
-
-    /*!
-     * @brief This operator serializes a character.
-     * @param char_t The value of the character that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator <<(
-            const char char_t)
-    {
-        return serialize(char_t);
-    }
-
-    /*!
-     * @brief This operator serializes a int8_t.
-     * @param int8 The value of the int8_t that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator <<(
-            const int8_t int8)
-    {
-        return serialize(int8);
-    }
-
-    /*!
-     * @brief This operator serializes an unsigned short.
-     * @param ushort_t The value of the unsigned short that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator <<(
-            const uint16_t ushort_t)
-    {
-        return serialize(ushort_t);
-    }
-
-    /*!
-     * @brief This operator serializes a short.
-     * @param short_t The value of the short that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator <<(
-            const int16_t short_t)
-    {
-        return serialize(short_t);
-    }
-
-    /*!
-     * @brief This operator serializes an unsigned long.
-     * @param ulong_t The value of the unsigned long that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator <<(
-            const uint32_t ulong_t)
-    {
-        return serialize(ulong_t);
-    }
-
-    /*!
-     * @brief This operator serializes a long.
-     * @param long_t The value of the long that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator <<(
-            const int32_t long_t)
-    {
-        return serialize(long_t);
-    }
-
-    /*!
-     * @brief This operator serializes a wide-char.
-     * @param wchar The value of the wide-char that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator <<(
-            const wchar_t wchar)
-    {
-        return serialize(wchar);
-    }
-
-    /*!
-     * @brief This operator serializes an unsigned long long.
-     * @param ulonglong_t The value of the unsigned long long that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator <<(
-            const uint64_t ulonglong_t)
-    {
-        return serialize(ulonglong_t);
-    }
-
-    /*!
-     * @brief This operator serializes a long long.
-     * @param longlong_t The value of the long long that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator <<(
-            const int64_t longlong_t)
-    {
-        return serialize(longlong_t);
-    }
-
-    /*!
-     * @brief This operator serializes a float.
-     * @param float_t The value of the float that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator <<(
-            const float float_t)
-    {
-        return serialize(float_t);
-    }
-
-    /*!
-     * @brief This operator serializes a double.
-     * @param double_t The value of the double that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator <<(
-            const double double_t)
-    {
-        return serialize(double_t);
-    }
-
-    /*!
-     * @brief This operator serializes a long double.
-     * @param ldouble_t The value of the long double that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator <<(
-            const long double ldouble_t)
-    {
-        return serialize(ldouble_t);
-    }
-
-    /*!
-     * @brief This operator serializes a boolean.
-     * @param bool_t The value of the boolean that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator <<(
-            const bool bool_t)
-    {
-        return serialize(bool_t);
-    }
-
-    /*!
-     * @brief This operator serializes a null-terminated c-string.
-     * @param string_t Pointer to the begining of the string that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator <<(
-            const char* string_t)
-    {
-        return serialize(string_t);
-    }
-
-    /*!
-     * @brief This operator serializes a null-terminated c-string.
-     * @param string_t Pointer to the begining of the string that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator <<(
-            char* string_t)
-    {
-        return serialize(string_t);
-    }
-
-    /*!
-     * @brief This operator serializes a string.
-     * @param string_t The string that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator <<(
-            const std::string& string_t)
-    {
-        return serialize(string_t);
-    }
-
-    /*!
-     * @brief This operator serializes a wstring.
-     * @param string_t The wstring that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator <<(
-            const std::wstring& string_t)
-    {
-        return serialize(string_t);
-    }
-
-    /*!
-     * @brief This operator serializes a string.
-     * @param string_t The string that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    template <size_t MAX_CHARS>
-    inline Cdr& operator <<(
-            const fixed_string<MAX_CHARS>& string_t)
-    {
-        return serialize(string_t);
-    }
-
-    /*!
-     * @brief This operator template is used to serialize arrays.
-     * @param array_t The array that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    template<class _T, size_t _Size>
-    inline Cdr& operator <<(
-            const std::array<_T, _Size>& array_t)
-    {
-        return serialize<_T, _Size>(array_t);
-    }
-
-    /*!
-     * @brief This operator template is used to serialize sequences.
-     * @param vector_t The sequence that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    template<class _T>
-    inline Cdr& operator <<(
-            const std::vector<_T>& vector_t)
-    {
-        return serialize<_T>(vector_t);
-    }
-
-    /*!
-     * @brief This operator template is used to serialize maps.
-     * @param map_t The map that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    template<class _K, class _T>
-    inline Cdr& operator <<(
-            const std::map<_K, _T>& map_t)
-    {
-        return serialize<_K, _T>(map_t);
-    }
-
-    /*!
      * @brief This operator template is used to serialize any other non-basic type.
      * @param type_t A reference to the object that will be serialized in the buffer.
      * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -608,264 +340,25 @@ public:
     }
 
     /*!
-     * @brief This operator deserializes an octet.
-     * @param octet_t The variable that will store the octet read from the buffer.
+     * @brief This operator template is used to serialize any other non-basic type.
+     * @param type_t A reference to the object that will be serialized in the buffer.
      * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator >>(
-            uint8_t& octet_t)
-    {
-        return deserialize(octet_t);
-    }
-
-    /*!
-     * @brief This operator deserializes a character.
-     * @param char_t The variable that will store the character read from the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator >>(
-            char& char_t)
-    {
-        return deserialize(char_t);
-    }
-
-    /*!
-     * @brief This operator deserializes a int8_t.
-     * @param int8 The variable that will store the int8_t read from the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator >>(
-            int8_t& int8)
-    {
-        return deserialize(int8);
-    }
-
-    /*!
-     * @brief This operator deserializes an unsigned short.
-     * @param ushort_t The variable that will store the unsigned short read from the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator >>(
-            uint16_t& ushort_t)
-    {
-        return deserialize(ushort_t);
-    }
-
-    /*!
-     * @brief This operator deserializes a short.
-     * @param short_t The variable that will store the short read from the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator >>(
-            int16_t& short_t)
-    {
-        return deserialize(short_t);
-    }
-
-    /*!
-     * @brief This operator deserializes an unsigned long.
-     * @param ulong_t The variable that will store the unsigned long read from the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator >>(
-            uint32_t& ulong_t)
-    {
-        return deserialize(ulong_t);
-    }
-
-    /*!
-     * @brief This operator deserializes a long.
-     * @param long_t The variable that will store the long read from the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator >>(
-            int32_t& long_t)
-    {
-        return deserialize(long_t);
-    }
-
-    // TODO in FastCdr
-    /*!
-     * @brief This operator deserializes a wide-char.
-     * @param wchar The variable that will store the wide-char read from the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator >>(
-            wchar_t& wchar)
-    {
-        return deserialize(wchar);
-    }
-
-    /*!
-     * @brief This operator deserializes a unsigned long long.
-     * @param ulonglong_t The variable that will store the unsigned long long read from the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator >>(
-            uint64_t& ulonglong_t)
-    {
-        return deserialize(ulonglong_t);
-    }
-
-    /*!
-     * @brief This operator deserializes a long long.
-     * @param longlong_t The variable that will store the long long read from the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator >>(
-            int64_t& longlong_t)
-    {
-        return deserialize(longlong_t);
-    }
-
-    /*!
-     * @brief This operator deserializes a float.
-     * @param float_t The variable that will store the float read from the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator >>(
-            float& float_t)
-    {
-        return deserialize(float_t);
-    }
-
-    /*!
-     * @brief This operator deserializes a double.
-     * @param double_t The variable that will store the double read from the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator >>(
-            double& double_t)
-    {
-        return deserialize(double_t);
-    }
-
-    /*!
-     * @brief This operator deserializes a long double.
-     * @param ldouble_t The variable that will store the long double read from the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator >>(
-            long double& ldouble_t)
-    {
-        return deserialize(ldouble_t);
-    }
-
-    /*!
-     * @brief This operator deserializes a boolean.
-     * @param bool_t The variable that will store the boolean read from the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
-     * @exception exception::BadParamException This exception is thrown when trying to deserialize an invalid value.
-     */
-    inline Cdr& operator >>(
-            bool& bool_t)
-    {
-        return deserialize(bool_t);
-    }
-
-    /*!
-     * @brief This operator deserializes a null-terminated c-string.
-     * @param string_t The variable that will store the c-string read from the buffer.
-     *                 Please note that a newly allocated string will be returned.
-     *                 The caller should free the returned pointer when appropiate.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
-     * @exception exception::BadParamException This exception is thrown when trying to deserialize an invalid value.
-     */
-    inline Cdr& operator >>(
-            char*& string_t)
-    {
-        return deserialize(string_t);
-    }
-
-    /*!
-     * @brief This operator deserializes a string.
-     * @param string_t The variable that will store the string read from the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator >>(
-            std::string& string_t)
-    {
-        return deserialize(string_t);
-    }
-
-    /*!
-     * @brief This operator deserializes a string.
-     * @param string_t The variable that will store the string read from the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
-     */
-    inline Cdr& operator >>(
-            std::wstring& string_t)
-    {
-        return deserialize(string_t);
-    }
-
-    /*!
-     * @brief This operator deserializes a string.
-     * @param string_t The variable that will store the string read from the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
-     */
-    template <size_t MAX_CHARS>
-    inline Cdr& operator >>(
-            fixed_string<MAX_CHARS>& string_t)
-    {
-        return deserialize(string_t);
-    }
-
-    /*!
-     * @brief This operator template is used to deserialize arrays.
-     * @param array_t The variable that will store the array read from the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
-     */
-    template<class _T, size_t _Size>
-    inline Cdr& operator >>(
-            std::array<_T, _Size>& array_t)
-    {
-        return deserialize<_T, _Size>(array_t);
-    }
-
-    /*!
-     * @brief This operator template is used to deserialize sequences.
-     * @param vector_t The variable that will store the sequence read from the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
     template<class _T>
-    inline Cdr& operator >>(
-            std::vector<_T>& vector_t)
+    inline Cdr& operator <<(
+            const _T& value)
     {
-        return deserialize<_T>(vector_t);
-    }
+        if (MEMBER_ID_INVALID == next_member_id_)
+        {
+            serialize(value);
+        }
+        else
+        {
+            serialize_member(next_member_id_, value);
+        }
 
-    /*!
-     * @brief This operator template is used to deserialize maps.
-     * @param map_t The variable that will store the map read from the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
-     */
-    template<class _K, class _T>
-    inline Cdr& operator >>(
-            std::map<_K, _T>& map_t)
-    {
-        return deserialize<_K, _T>(map_t);
+        return *this;
     }
 
     /*!
@@ -876,75 +369,16 @@ public:
      */
     template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr>
     inline Cdr& operator >>(
-            _T& type_t)
+            _T& value)
     {
-        type_t.deserialize(*this);
-        return *this;
-    }
-
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, int32_t>::value>::type* = nullptr>
-    inline Cdr& operator >>(
-            _T& enum_t)
-    {
-        int32_t value {0};
-        deserialize(value);
-        enum_t = static_cast<_T>(value);
-        return *this;
-    }
-
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, uint32_t>::value>::type* = nullptr>
-    inline Cdr& operator >>(
-            _T& enum_t)
-    {
-        uint32_t value {0};
-        deserialize(value);
-        enum_t = static_cast<_T>(value);
-        return *this;
-    }
-
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, int16_t>::value>::type* = nullptr>
-    inline Cdr& operator >>(
-            _T& enum_t)
-    {
-        int16_t value {0};
-        deserialize(value);
-        enum_t = static_cast<_T>(value);
-        return *this;
-    }
-
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, uint16_t>::value>::type* = nullptr>
-    inline Cdr& operator >>(
-            _T& enum_t)
-    {
-        uint16_t value {0};
-        deserialize(value);
-        enum_t = static_cast<_T>(value);
-        return *this;
-    }
-
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, int8_t>::value>::type* = nullptr>
-    inline Cdr& operator >>(
-            _T& enum_t)
-    {
-        int8_t value {0};
-        deserialize(value);
-        enum_t = static_cast<_T>(value);
-        return *this;
-    }
-
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, uint8_t>::value>::type* = nullptr>
-    inline Cdr& operator >>(
-            _T& enum_t)
-    {
-        uint8_t value {0};
-        deserialize(value);
-        enum_t = static_cast<_T>(value);
+        if (MEMBER_ID_INVALID == next_member_id_)
+        {
+            deserialize(value);
+        }
+        else
+        {
+            deserialize_member(value);
+        }
         return *this;
     }
 
@@ -1564,12 +998,60 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    template<class _T>
+    template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr>
     inline Cdr& serialize(
             const _T& type_t)
     {
         type_t.serialize(*this);
         return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, int32_t>::value>::type* = nullptr>
+    inline Cdr& serialize(
+            const _T& enum_t)
+    {
+        return serialize(static_cast<int32_t>(enum_t));
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, uint32_t>::value>::type* = nullptr>
+    inline Cdr& serialize(
+            const _T& enum_t)
+    {
+        return serialize(static_cast<uint32_t>(enum_t));
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, int16_t>::value>::type* = nullptr>
+    inline Cdr& serialize(
+            const _T& enum_t)
+    {
+        return serialize(static_cast<int16_t>(enum_t));
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, uint16_t>::value>::type* = nullptr>
+    inline Cdr& serialize(
+            const _T& enum_t)
+    {
+        return serialize(static_cast<uint16_t>(enum_t));
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, int8_t>::value>::type* = nullptr>
+    inline Cdr& serialize(
+            const _T& enum_t)
+    {
+        return serialize(static_cast<int8_t>(enum_t));
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, uint8_t>::value>::type* = nullptr>
+    inline Cdr& serialize(
+            const _T& enum_t)
+    {
+        return serialize(static_cast<uint8_t>(enum_t));
     }
 
     /*!
@@ -3048,11 +2530,77 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    template<class _T>
+    template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr>
     inline Cdr& deserialize(
             _T& type_t)
     {
         type_t.deserialize(*this);
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, int32_t>::value>::type* = nullptr>
+    inline Cdr& deserialize(
+            _T& enum_t)
+    {
+        int32_t value {0};
+        deserialize(value);
+        enum_t = static_cast<_T>(value);
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, uint32_t>::value>::type* = nullptr>
+    inline Cdr& deserialize(
+            _T& enum_t)
+    {
+        uint32_t value {0};
+        deserialize(value);
+        enum_t = static_cast<_T>(value);
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, int16_t>::value>::type* = nullptr>
+    inline Cdr& deserialize(
+            _T& enum_t)
+    {
+        int16_t value {0};
+        deserialize(value);
+        enum_t = static_cast<_T>(value);
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, uint16_t>::value>::type* = nullptr>
+    inline Cdr& deserialize(
+            _T& enum_t)
+    {
+        uint16_t value {0};
+        deserialize(value);
+        enum_t = static_cast<_T>(value);
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, int8_t>::value>::type* = nullptr>
+    inline Cdr& deserialize(
+            _T& enum_t)
+    {
+        int8_t value {0};
+        deserialize(value);
+        enum_t = static_cast<_T>(value);
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
+            std::is_same<typename std::underlying_type<_T>::type, uint8_t>::value>::type* = nullptr>
+    inline Cdr& deserialize(
+            _T& enum_t)
+    {
+        uint8_t value {0};
+        deserialize(value);
+        enum_t = static_cast<_T>(value);
         return *this;
     }
 
@@ -3601,19 +3149,6 @@ public:
         return *this;
     }
 
-    /*! TODO */
-    template<class _K, class _T>
-    Cdr& deserializeArray(
-            std::map<_K, _T>* map_t,
-            size_t numElements)
-    {
-        for (size_t count = 0; count < numElements; ++count)
-        {
-            deserialize(map_t[count]);
-        }
-        return *this;
-    }
-
     /*!
      * @brief This function deserializes an array of maps of objects.
      * @param map_t The variable that will store the array of maps of objects read from the buffer.
@@ -3918,19 +3453,66 @@ public:
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// XCDR extensions
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    Cdr& begin_serialize_opt_member(
+
+    template<class _T>
+    Cdr& serialize_member(
             const MemberId& member_id,
-            bool is_present,
-            Cdr::state& current_state,
+            const _T& value,
             XCdrHeaderSelection header_selection = XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT)
     {
-        return (this->*begin_serialize_opt_member_)(member_id, is_present, current_state, header_selection);
+        Cdr::state current_state(*this);
+        (this->*begin_serialize_member_)(member_id, true, current_state, header_selection);
+        serialize(value);
+        (this->*end_serialize_member_)(current_state);
+        return *this;
     }
 
-    Cdr& end_serialize_opt_member(
-            const Cdr::state& current_state)
+    template<class _T>
+    Cdr& serialize_member(
+            const MemberId& member_id,
+            const optional<_T>& value,
+            XCdrHeaderSelection header_selection = XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT)
     {
-        return (this->*end_serialize_opt_member_)(current_state);
+        Cdr::state current_state(*this);
+        (this->*begin_serialize_opt_member_)(member_id, value.has_value(), current_state, header_selection);
+        serialize(value);
+        (this->*end_serialize_opt_member_)(current_state);
+        return *this;
+    }
+
+    template<class _T>
+    Cdr& deserialize_member(
+            _T& value)
+    {
+        deserialize(value);
+        return *this;
+    }
+
+    template<class _T>
+    Cdr& deserialize_member(
+            optional<_T>& value)
+    {
+        if (EncodingAlgorithmFlag::PLAIN_CDR == current_encoding_)
+        {
+            Cdr::state current_state(*this);
+            MemberId member_id;
+            xcdr1_deserialize_member_header(member_id, current_state);
+            if (0 < current_state.member_size_)
+            {
+                deserialize(value);
+            }
+            assert(current_state.member_size_ == offset_ - origin_);
+            // Reset state to POP(origin=0) because before serializing member the algorithm did PUSH(origin=0).
+            auto last_offset = offset_;
+            set_state(current_state);
+            offset_ = last_offset;
+            m_lastDataSize = 0;
+        }
+        else
+        {
+            deserialize(value);
+        }
+        return *this;
     }
 
     Cdr& begin_deserialize_opt_member(
@@ -3962,7 +3544,7 @@ public:
 
     Cdr& deserialize_type(
             EncodingAlgorithmFlag type_encoding,
-            std::function<bool (Cdr&, const MemberId&, bool sequential_id)> functor)
+            std::function<bool (Cdr&, const MemberId&)> functor)
     {
         return (this->*deserialize_type_)(type_encoding, functor);
     }
@@ -3971,13 +3553,15 @@ public:
     Cdr& serialize(
             const optional<_T>& opt_value)
     {
-        Cdr::state enc_state(*this);
-        begin_serialize_opt_member(next_member_id_, opt_value.has_value(), enc_state);
+        if (CdrVersion::XCDRv2 == cdr_version_ && EncodingAlgorithmFlag::PL_CDR2 != current_encoding_)
+        {
+            serialize(opt_value.has_value());
+        }
+
         if (opt_value.has_value())
         {
             serialize(*opt_value);
         }
-        end_serialize_opt_member(enc_state);
         return *this;
     }
 
@@ -3991,33 +3575,20 @@ public:
     }
 
     template<class _T>
-    inline Cdr& operator << (
-            const optional<_T>& opt_value)
-    {
-        return serialize(opt_value);
-    }
-
-    template<class _T>
     Cdr& deserialize(
             optional<_T>& opt_value)
     {
-        Cdr::state dec_state(*this);
-        bool is_present = false;
-        begin_deserialize_opt_member(next_member_id_, is_present, dec_state);
+        bool is_present = true;
+        if (CdrVersion::XCDRv2 == cdr_version_ && EncodingAlgorithmFlag::PL_CDR2 != current_encoding_)
+        {
+            deserialize(is_present);
+        }
         opt_value.reset(is_present);
         if (is_present)
         {
             deserialize(*opt_value);
         }
-        end_deserialize_opt_member(dec_state);
         return *this;
-    }
-
-    template<class _T>
-    inline Cdr& operator >> (
-            optional<_T>& opt_value)
-    {
-        return deserialize(opt_value);
     }
 
 private:
@@ -4203,6 +3774,15 @@ private:
             MemberId& member_id,
             Cdr::state& current_state);
 
+    Cdr& xcdr1_begin_serialize_member(
+            const MemberId& member_id,
+            bool is_present,
+            Cdr::state& current_state,
+            XCdrHeaderSelection header_selection);
+
+    Cdr& xcdr1_end_serialize_member(
+            const Cdr::state& current_state);
+
     Cdr& xcdr1_begin_serialize_opt_member(
             const MemberId& member_id,
             bool is_present,
@@ -4212,13 +3792,13 @@ private:
     Cdr& xcdr1_end_serialize_opt_member(
             const Cdr::state& current_state);
 
-    Cdr& xcdr2_begin_serialize_opt_member(
+    Cdr& xcdr2_begin_serialize_member(
             const MemberId& member_id,
             bool is_present,
             Cdr::state& current_state,
             XCdrHeaderSelection header_selection);
 
-    Cdr& xcdr2_end_serialize_opt_member(
+    Cdr& xcdr2_end_serialize_member(
             const Cdr::state& current_state);
 
     Cdr& xcdr1_begin_deserialize_opt_member(
@@ -4253,11 +3833,22 @@ private:
 
     Cdr& xcdr1_deserialize_type(
             EncodingAlgorithmFlag type_encoding,
-            std::function<bool (Cdr&, const MemberId&, bool sequential_id)> functor);
+            std::function<bool (Cdr&, const MemberId&)> functor);
 
     Cdr& xcdr2_deserialize_type(
             EncodingAlgorithmFlag type_encoding,
-            std::function<bool (Cdr&, const MemberId&, bool sequential_id)> functor);
+            std::function<bool (Cdr&, const MemberId&)> functor);
+
+    using begin_serialize_member_functor = Cdr& (Cdr::*)(
+        const MemberId&,
+        bool,
+        Cdr::state&,
+        XCdrHeaderSelection);
+    begin_serialize_member_functor begin_serialize_member_ { nullptr };
+
+    using end_serialize_member_functor = Cdr& (Cdr::*)(
+        const Cdr::state&);
+    end_serialize_member_functor end_serialize_member_ { nullptr };
 
     using begin_serialize_opt_member_functor = Cdr& (Cdr::*)(
         const MemberId&,
@@ -4266,9 +3857,9 @@ private:
         XCdrHeaderSelection);
     begin_serialize_opt_member_functor begin_serialize_opt_member_ { nullptr };
 
-    using end_serialize_opt_member_functor = Cdr& (Cdr::*)(
+    using end_serialize_memberopt__functor = Cdr& (Cdr::*)(
         const Cdr::state&);
-    end_serialize_opt_member_functor end_serialize_opt_member_ { nullptr };
+    end_serialize_member_functor end_serialize_opt_member_ { nullptr };
 
     using begin_deserialize_opt_member_functor = Cdr& (Cdr::*)(
         MemberId&,
@@ -4290,7 +3881,7 @@ private:
 
     using deserialize_type_functor = Cdr& (Cdr::*)(
         EncodingAlgorithmFlag,
-        std::function<bool (Cdr&, const MemberId&, bool sequential_id)>);
+        std::function<bool (Cdr&, const MemberId&)>);
     deserialize_type_functor deserialize_type_ { nullptr };
 
     //! @brief Reference to the buffer that will be serialized/deserialized.

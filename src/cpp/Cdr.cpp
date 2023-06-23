@@ -95,8 +95,10 @@ Cdr::Cdr(
     switch (cdr_version_)
     {
         case CdrVersion::XCDRv2:
-            begin_serialize_opt_member_ = &Cdr::xcdr2_begin_serialize_opt_member;
-            end_serialize_opt_member_ = &Cdr::xcdr2_end_serialize_opt_member;
+            begin_serialize_member_ = &Cdr::xcdr2_begin_serialize_member;
+            end_serialize_member_ = &Cdr::xcdr2_end_serialize_member;
+            begin_serialize_opt_member_ = &Cdr::xcdr2_begin_serialize_member;
+            end_serialize_opt_member_ = &Cdr::xcdr2_end_serialize_member;
             begin_deserialize_opt_member_ = &Cdr::xcdr2_begin_deserialize_opt_member;
             end_deserialize_opt_member_ = &Cdr::xcdr2_end_deserialize_opt_member;
             begin_serialize_type_ = &Cdr::xcdr2_begin_serialize_type;
@@ -105,6 +107,8 @@ Cdr::Cdr(
             align64_ = 4;
             break;
         case CdrVersion::XCDRv1:
+            begin_serialize_member_ = &Cdr::xcdr1_begin_serialize_member;
+            end_serialize_member_ = &Cdr::xcdr1_end_serialize_member;
             begin_serialize_opt_member_ = &Cdr::xcdr1_begin_serialize_opt_member;
             end_serialize_opt_member_ = &Cdr::xcdr1_end_serialize_opt_member;
             begin_deserialize_opt_member_ = &Cdr::xcdr1_begin_deserialize_opt_member;
@@ -2948,7 +2952,6 @@ bool Cdr::xcdr1_deserialize_member_header(
         MemberId& member_id,
         Cdr::state& current_state)
 {
-    assert(MEMBER_ID_INVALID == member_id);
     bool ret_value = true;
     makeAlign(alignment(4));
     uint16_t flags_and_member_id = 0;
@@ -3090,6 +3093,123 @@ void Cdr::xcdr2_shrink_to_long_member_header(
     serialize(flags_and_member_id);
 }
 
+Cdr& Cdr::xcdr1_begin_serialize_member(
+        const MemberId& member_id,
+        bool is_present,
+        Cdr::state& current_state,
+        Cdr::XCdrHeaderSelection header_selection)
+{
+    static_cast<void>(current_state);
+    assert(is_present);
+    assert(MEMBER_ID_INVALID != member_id);
+    assert(MEMBER_ID_INVALID == next_member_id_ || member_id == next_member_id_);
+    assert(current_state == Cdr::state(*this));
+    assert(EncodingAlgorithmFlag::PLAIN_CDR == current_encoding_ ||
+            EncodingAlgorithmFlag::PL_CDR == current_encoding_);
+
+    if (EncodingAlgorithmFlag::PL_CDR == current_encoding_)
+    {
+        if (0x3F00 >= member_id.id)
+        {
+            switch (header_selection)
+            {
+                case XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT:
+                case XCdrHeaderSelection::SHORT_HEADER:
+                    xcdr1_serialize_short_member_header(member_id);
+                    current_state.header_serialized_ = XCdrHeaderSelection::SHORT_HEADER;
+                    break;
+                case XCdrHeaderSelection::AUTO_WITH_LONG_HEADER_BY_DEFAULT:
+                case XCdrHeaderSelection::LONG_HEADER:
+                    xcdr1_serialize_long_member_header(member_id);
+                    current_state.header_serialized_ = XCdrHeaderSelection::LONG_HEADER;
+                    break;
+            }
+        }
+        else
+        {
+            switch (header_selection)
+            {
+                case XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT:
+                case XCdrHeaderSelection::AUTO_WITH_LONG_HEADER_BY_DEFAULT:
+                case XCdrHeaderSelection::LONG_HEADER:
+                    xcdr1_serialize_long_member_header(member_id);
+                    current_state.header_serialized_ = XCdrHeaderSelection::LONG_HEADER;
+                    break;
+                default:
+                    throw BadParamException(
+                              "Cannot encode XCDR1 ShortMemberHeader when member_id is bigger than 0x3F00");
+            }
+        }
+        current_state.header_selection_ = header_selection;
+    }
+    current_state.next_member_id_ = member_id;
+    next_member_id_ = MEMBER_ID_INVALID;
+
+    return *this;
+}
+
+Cdr& Cdr::xcdr1_end_serialize_member(
+        const Cdr::state& current_state)
+{
+    assert(MEMBER_ID_INVALID != current_state.next_member_id_);
+    assert(EncodingAlgorithmFlag::PLAIN_CDR == current_encoding_ ||
+            EncodingAlgorithmFlag::PL_CDR == current_encoding_);
+
+    if (EncodingAlgorithmFlag::PL_CDR == current_encoding_)
+    {
+        const size_t member_serialized_size = offset_ - origin_;
+        set_state(current_state);
+        if (member_serialized_size > std::numeric_limits<uint16_t>::max())
+        {
+            switch (current_state.header_serialized_)
+            {
+                case XCdrHeaderSelection::SHORT_HEADER:
+                    if (AUTO_WITH_SHORT_HEADER_BY_DEFAULT == current_state.header_selection_)
+                    {
+                        xcdr1_change_to_long_member_header(current_state.next_member_id_, member_serialized_size);
+                    }
+                    else
+                    {
+                        assert(false);         // TODO throw exception
+                    }
+                    break;
+                case XCdrHeaderSelection::LONG_HEADER:
+                    xcdr1_end_long_member_header(current_state.next_member_id_, member_serialized_size);
+                    break;
+                default:
+                    assert(false);         // header_serialized_ must have only SHORT_HEADER or LONG_HEADER
+            }
+        }
+        else
+        {
+            switch (current_state.header_serialized_)
+            {
+                case XCdrHeaderSelection::SHORT_HEADER:
+                    xcdr1_end_short_member_header(current_state.next_member_id_, member_serialized_size);
+                    break;
+                case XCdrHeaderSelection::LONG_HEADER:
+                    if (LONG_HEADER == current_state.header_selection_ ||
+                            0x3F00 < current_state.next_member_id_.id)
+                    {
+                        xcdr1_end_long_member_header(current_state.next_member_id_, member_serialized_size);
+                    }
+                    else if (AUTO_WITH_LONG_HEADER_BY_DEFAULT == current_state.header_selection_)
+                    {
+                        xcdr1_change_to_short_member_header(current_state.next_member_id_, member_serialized_size);
+                    }
+                    break;
+                default:
+                    assert(false);         // header_serialized_ must have only SHORT_HEADER or LONG_HEADER
+            }
+        }
+        jump(member_serialized_size);
+    }
+
+    next_member_id_ = MEMBER_ID_INVALID;
+
+    return *this;
+}
+
 Cdr& Cdr::xcdr1_begin_serialize_opt_member(
         const MemberId& member_id,
         bool is_present,
@@ -3209,10 +3329,12 @@ Cdr& Cdr::xcdr1_end_serialize_opt_member(
         offset_ = offset;
     }
 
+    next_member_id_ = MEMBER_ID_INVALID;
+
     return *this;
 }
 
-Cdr& Cdr::xcdr2_begin_serialize_opt_member(
+Cdr& Cdr::xcdr2_begin_serialize_member(
         const MemberId& member_id,
         bool is_present,
         Cdr::state& current_state,
@@ -3226,30 +3348,23 @@ Cdr& Cdr::xcdr2_begin_serialize_opt_member(
             EncodingAlgorithmFlag::DELIMIT_CDR2 == current_encoding_ ||
             EncodingAlgorithmFlag::PL_CDR2 == current_encoding_);
 
-    if (is_present || EncodingAlgorithmFlag::PL_CDR2 != current_encoding_)
+    if (is_present && EncodingAlgorithmFlag::PL_CDR2 == current_encoding_)
     {
-        if (EncodingAlgorithmFlag::PL_CDR2 != current_encoding_)
+        assert(0x10000000 > member_id.id);
+        switch (header_selection)
         {
-            serialize(is_present);
+            case XCdrHeaderSelection::SHORT_HEADER:
+            case XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT:
+                xcdr2_serialize_short_member_header(member_id);
+                current_state.header_serialized_ = XCdrHeaderSelection::SHORT_HEADER;
+                break;
+            case XCdrHeaderSelection::LONG_HEADER:
+            case XCdrHeaderSelection::AUTO_WITH_LONG_HEADER_BY_DEFAULT:
+                xcdr2_serialize_long_member_header(member_id);
+                current_state.header_serialized_ = XCdrHeaderSelection::LONG_HEADER;
+                break;
         }
-        else
-        {
-            assert(0x10000000 > member_id.id);
-            switch (header_selection)
-            {
-                case XCdrHeaderSelection::SHORT_HEADER:
-                case XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT:
-                    xcdr2_serialize_short_member_header(member_id);
-                    current_state.header_serialized_ = XCdrHeaderSelection::SHORT_HEADER;
-                    break;
-                case XCdrHeaderSelection::LONG_HEADER:
-                case XCdrHeaderSelection::AUTO_WITH_LONG_HEADER_BY_DEFAULT:
-                    xcdr2_serialize_long_member_header(member_id);
-                    current_state.header_serialized_ = XCdrHeaderSelection::LONG_HEADER;
-                    break;
-            }
-            current_state.header_selection_ = header_selection;
-        }
+        current_state.header_selection_ = header_selection;
     }
 
     current_state.member_size_ = is_present ? 1 : 0;
@@ -3259,7 +3374,7 @@ Cdr& Cdr::xcdr2_begin_serialize_opt_member(
     return *this;
 }
 
-Cdr& Cdr::xcdr2_end_serialize_opt_member(
+Cdr& Cdr::xcdr2_end_serialize_member(
         const Cdr::state& current_state)
 {
     assert(MEMBER_ID_INVALID != current_state.next_member_id_);
@@ -3360,7 +3475,6 @@ void Cdr::xcdr2_deserialize_member_header(
         MemberId& member_id,
         Cdr::state& current_state)
 {
-    assert(MEMBER_ID_INVALID == member_id);
     uint32_t flags_and_member_id = 0;
     deserialize(flags_and_member_id);
     member_id.must_understand = (flags_and_member_id & 0x80000000);
@@ -3615,7 +3729,7 @@ Cdr& Cdr::xcdr2_end_serialize_type(
 
 Cdr& Cdr::xcdr1_deserialize_type(
         EncodingAlgorithmFlag type_encoding,
-        std::function<bool (Cdr&, const MemberId&, bool sequential_id)> functor)
+        std::function<bool (Cdr&, const MemberId&)> functor)
 {
     assert(EncodingAlgorithmFlag::PLAIN_CDR == type_encoding ||
             EncodingAlgorithmFlag::PL_CDR == type_encoding);
@@ -3626,12 +3740,12 @@ Cdr& Cdr::xcdr1_deserialize_type(
         Cdr::state current_state(*this);
         while (xcdr1_deserialize_member_header(next_member_id_, current_state))
         {
-            if (!functor(*this, next_member_id_, false) && next_member_id_.must_understand)
+            if (!functor(*this, next_member_id_) && next_member_id_.must_understand)
             {
                 assert(false);
             }
 
-            assert(current_state.member_size_ == offset_ - origin_);
+            assert(current_state.member_size_ == offset_ - origin_); // TODO throw exception.
             // Reset state to POP(origin=0) because before serializing member the algorithm did PUSH(origin=0).
             auto last_offset = offset_;
             set_state(current_state);
@@ -3641,11 +3755,14 @@ Cdr& Cdr::xcdr1_deserialize_type(
     }
     else
     {
-        MemberId member_id {0};
-        while (functor(*this, member_id, true) && offset_ != end_) // TODO Tests with appendables with different length
+        next_member_id_ = MemberId(0);
+
+        while (functor(*this, next_member_id_) && offset_ != end_) // TODO Tests with appendables with different length
         {
-            ++member_id.id;
+            ++next_member_id_.id;
         }
+
+        next_member_id_ = MEMBER_ID_INVALID;
     }
 
     return *this;
@@ -3653,7 +3770,7 @@ Cdr& Cdr::xcdr1_deserialize_type(
 
 Cdr& Cdr::xcdr2_deserialize_type(
         EncodingAlgorithmFlag type_encoding,
-        std::function<bool (Cdr&, const MemberId&, bool sequential_id)> functor)
+        std::function<bool (Cdr&, const MemberId&)> functor)
 {
     assert(EncodingAlgorithmFlag::PLAIN_CDR2 == type_encoding ||
             EncodingAlgorithmFlag::DELIMIT_CDR2 == type_encoding ||
@@ -3671,41 +3788,51 @@ Cdr& Cdr::xcdr2_deserialize_type(
         {
             while (offset_ - current_state.offset_ != dheader)
             {
-                assert(offset_ - current_state.offset_ < dheader);
+                assert(offset_ - current_state.offset_ < dheader); // TODO throw exception
+                auto offset = offset_;
+                (void)offset;
+
                 xcdr2_deserialize_member_header(next_member_id_, current_state);
-                if (!functor(*this, next_member_id_, false) && next_member_id_.must_understand)
+                if (!functor(*this, next_member_id_) && next_member_id_.must_understand)
                 {
                     assert(false);
                 }
 
                 assert((0 == current_state.member_size_ &&
-                        0 == offset_ - current_state.offset_) ||
+                        0 == offset_ - offset) ||
                         (0 < current_state.member_size_ &&
-                        current_state.member_size_ ==
-                        offset_ - current_state.offset_ -
-                        alignment_on_state(current_state.origin_, current_state.offset_, sizeof(uint32_t)) -
+                        current_state.member_size_ == offset_ - offset -
+                        alignment_on_state(current_state.origin_, offset, sizeof(uint32_t)) -
                         (XCdrHeaderSelection::SHORT_HEADER == current_state.header_serialized_ ? 4 : 8)));
+
+                next_member_id_ = MEMBER_ID_INVALID;
             }
         }
         else
         {
-            MemberId member_id {0};
-            while (functor(*this, member_id, true) && offset_ - current_state.offset_ != dheader)
+            next_member_id_ = MemberId(0);
+
+            while (functor(*this, next_member_id_) && offset_ - current_state.offset_ != dheader)
             {
                 assert(offset_ - current_state.offset_ < dheader);
-                ++member_id.id;
+                ++next_member_id_.id;
             }
             size_t jump_size = dheader - (offset_ - current_state.offset_);
             jump(jump_size);
+
+            next_member_id_ = MEMBER_ID_INVALID;
         }
     }
     else
     {
-        MemberId member_id {0};
-        while (functor(*this, member_id, true))
+        next_member_id_ = MemberId(0);
+
+        while (functor(*this, next_member_id_) && offset_ != end_)
         {
-            ++member_id.id;
+            ++next_member_id_.id;
         }
+
+        next_member_id_ = MEMBER_ID_INVALID;
     }
 
     return *this;

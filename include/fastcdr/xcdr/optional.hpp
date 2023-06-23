@@ -77,6 +77,8 @@ struct nullopt_t
 
 };
 
+static constexpr nullopt_t nullopt {0};
+
 template<class T>
 class optional
 {

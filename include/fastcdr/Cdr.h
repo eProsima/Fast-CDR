@@ -3515,20 +3515,6 @@ public:
         return *this;
     }
 
-    Cdr& begin_deserialize_opt_member(
-            MemberId& member_id,
-            bool& is_present,
-            Cdr::state& current_state)
-    {
-        return (this->*begin_deserialize_opt_member_)(member_id, is_present, current_state);
-    }
-
-    Cdr& end_deserialize_opt_member(
-            const Cdr::state& current_state)
-    {
-        return (this->*end_deserialize_opt_member_)(current_state);
-    }
-
     Cdr& begin_serialize_type(
             Cdr::state& current_state,
             EncodingAlgorithmFlag type_encoding)
@@ -3801,22 +3787,6 @@ private:
     Cdr& xcdr2_end_serialize_member(
             const Cdr::state& current_state);
 
-    Cdr& xcdr1_begin_deserialize_opt_member(
-            MemberId& member_id,
-            bool& is_present,
-            Cdr::state& current_state);
-
-    Cdr& xcdr1_end_deserialize_opt_member(
-            const Cdr::state& current_state);
-
-    Cdr& xcdr2_begin_deserialize_opt_member(
-            MemberId& member_id,
-            bool& is_present,
-            Cdr::state& current_state);
-
-    Cdr& xcdr2_end_deserialize_opt_member(
-            const Cdr::state& current_state);
-
     Cdr& xcdr1_begin_serialize_type(
             Cdr::state& current_state,
             EncodingAlgorithmFlag type_encoding);
@@ -3860,15 +3830,6 @@ private:
     using end_serialize_memberopt__functor = Cdr& (Cdr::*)(
         const Cdr::state&);
     end_serialize_member_functor end_serialize_opt_member_ { nullptr };
-
-    using begin_deserialize_opt_member_functor = Cdr& (Cdr::*)(
-        MemberId&,
-        bool&,
-        Cdr::state&);
-    begin_deserialize_opt_member_functor begin_deserialize_opt_member_ { nullptr };
-    using end_deserialize_opt_member_functor = Cdr& (Cdr::*)(
-        const Cdr::state&);
-    end_deserialize_opt_member_functor end_deserialize_opt_member_ { nullptr };
 
     using begin_serialize_type_functor = Cdr& (Cdr::*)(
         Cdr::state&,

@@ -159,6 +159,11 @@ public:
      */
     Cdr& serialize_encapsulation();
 
+    CdrVersion get_cdr_version() const
+    {
+        return cdr_version_;
+    }
+
     /*!
      * @brief Returns the EncodingAlgorithmFlag set in the encapsulation when the CDR type is eprosima::fastcdr::DDS_CDR.
      * @return The specified flag in the encapsulation.
@@ -367,7 +372,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr>
+    template<class _T>
     inline Cdr& operator >>(
             _T& value)
     {

@@ -3595,10 +3595,10 @@ Cdr& Cdr::xcdr1_deserialize_type(
     assert(EncodingAlgorithmFlag::PLAIN_CDR == type_encoding ||
             EncodingAlgorithmFlag::PL_CDR == type_encoding);
     assert(offset_ == m_cdrBuffer.begin() ? current_encoding_ == type_encoding : true);
+    Cdr::state current_state(*this);
 
     if (EncodingAlgorithmFlag::PL_CDR == type_encoding)
     {
-        Cdr::state current_state(*this);
         while (xcdr1_deserialize_member_header(next_member_id_, current_state))
         {
             if (!functor(*this, next_member_id_) && next_member_id_.must_understand)
@@ -3623,7 +3623,7 @@ Cdr& Cdr::xcdr1_deserialize_type(
             ++next_member_id_.id;
         }
 
-        next_member_id_ = MEMBER_ID_INVALID;
+        next_member_id_ = current_state.next_member_id_;
     }
 
     return *this;
@@ -3637,6 +3637,7 @@ Cdr& Cdr::xcdr2_deserialize_type(
             EncodingAlgorithmFlag::DELIMIT_CDR2 == type_encoding ||
             EncodingAlgorithmFlag::PL_CDR2 == type_encoding);
     assert(offset_ == m_cdrBuffer.begin() ? current_encoding_ == type_encoding : true);
+
 
     if (EncodingAlgorithmFlag::PLAIN_CDR2 != type_encoding)
     {
@@ -3666,26 +3667,28 @@ Cdr& Cdr::xcdr2_deserialize_type(
                         alignment_on_state(current_state.origin_, offset, sizeof(uint32_t)) -
                         (XCdrHeaderSelection::SHORT_HEADER == current_state.header_serialized_ ? 4 : 8)));
 
-                next_member_id_ = MEMBER_ID_INVALID;
             }
+
+            next_member_id_ = current_state.next_member_id_;
         }
         else
         {
             next_member_id_ = MemberId(0);
 
-            while (functor(*this, next_member_id_) && offset_ - current_state.offset_ != dheader)
+            while (offset_ - current_state.offset_ < dheader && functor(*this, next_member_id_))
             {
-                assert(offset_ - current_state.offset_ < dheader);
                 ++next_member_id_.id;
             }
+            assert(offset_ - current_state.offset_ == dheader);
             size_t jump_size = dheader - (offset_ - current_state.offset_);
             jump(jump_size);
 
-            next_member_id_ = MEMBER_ID_INVALID;
+            next_member_id_ = current_state.next_member_id_;
         }
     }
     else
     {
+        Cdr::state current_state(*this);
         next_member_id_ = MemberId(0);
 
         while (functor(*this, next_member_id_) && offset_ != end_)
@@ -3693,7 +3696,7 @@ Cdr& Cdr::xcdr2_deserialize_type(
             ++next_member_id_.id;
         }
 
-        next_member_id_ = MEMBER_ID_INVALID;
+        next_member_id_ = current_state.next_member_id_;
     }
 
     return *this;

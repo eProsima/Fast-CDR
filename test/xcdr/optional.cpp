@@ -78,6 +78,7 @@ public:
                                 cdr_inner >> value;
                                 break;
                             default:
+                                ret_value = false;
                                 break;
                         }
 
@@ -88,9 +89,9 @@ public:
                         {
                             case 0:
                                 cdr_inner >> value;
-                                ret_value = false;
                                 break;
                             default:
+                                ret_value = false;
                                 break;
                         }
                     }
@@ -154,10 +155,9 @@ void null_align_serialize_the_value(
                         break;
                     case 1:
                         cdr_inner.deserialize_member(dopt_value);
-                        if (EncodingAlgorithmFlag::PL_CDR != encoding && EncodingAlgorithmFlag::PL_CDR2 != encoding)
-                        {
-                            ret_value = false;
-                        }
+                        break;
+                    default:
+                        ret_value = false;
                         break;
                 }
 
@@ -279,10 +279,9 @@ void align_serialize_the_value(
                         break;
                     case 1:
                         cdr_inner.deserialize_member(dopt_value);
-                        if (EncodingAlgorithmFlag::PL_CDR != encoding && EncodingAlgorithmFlag::PL_CDR2 != encoding)
-                        {
-                            ret_value = false;
-                        }
+                        break;
+                    default:
+                        ret_value = false;
                         break;
                 }
 
@@ -355,10 +354,9 @@ void longdouble_align_serialize_the_value(
                         break;
                     case 1:
                         cdr_inner.deserialize_member(dopt_value);
-                        if (EncodingAlgorithmFlag::PL_CDR != encoding && EncodingAlgorithmFlag::PL_CDR2 != encoding)
-                        {
-                            ret_value = false;
-                        }
+                        break;
+                    default:
+                        ret_value = false;
                         break;
                 }
 
@@ -479,10 +477,9 @@ void null_align_serialize_optional(
                         break;
                     case 1:
                         cdr_inner >> dopt_value;
-                        if (EncodingAlgorithmFlag::PL_CDR != encoding && EncodingAlgorithmFlag::PL_CDR2 != encoding)
-                        {
-                            ret_value = false;
-                        }
+                        break;
+                    default:
+                        ret_value = false;
                         break;
                 }
 
@@ -545,10 +542,9 @@ void align_serialize_optional(
                         break;
                     case 1:
                         cdr_inner >> dopt_value;
-                        if (EncodingAlgorithmFlag::PL_CDR != encoding && EncodingAlgorithmFlag::PL_CDR2 != encoding)
-                        {
-                            ret_value = false;
-                        }
+                        break;
+                    default:
+                        ret_value = false;
                         break;
                 }
 
@@ -621,10 +617,9 @@ void longdouble_align_serialize_optional(
                         break;
                     case 1:
                         cdr_inner >> dopt_value;
-                        if (EncodingAlgorithmFlag::PL_CDR != encoding && EncodingAlgorithmFlag::PL_CDR2 != encoding)
-                        {
-                            ret_value = false;
-                        }
+                        break;
+                    default:
+                        ret_value = false;
                         break;
                 }
 

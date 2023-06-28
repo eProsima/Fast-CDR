@@ -16,7 +16,9 @@
 # Unit tests for XCDR extensions
 ###############################################################################
 set(XCDR_TEST_SOURCE
+    basic_types.cpp
     optional.cpp
+    mutable.cpp
     xcdrv1.cpp
     xcdrv2.cpp
     )

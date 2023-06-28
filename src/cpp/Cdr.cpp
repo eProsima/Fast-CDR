@@ -3601,9 +3601,18 @@ Cdr& Cdr::xcdr1_deserialize_type(
     {
         while (xcdr1_deserialize_member_header(next_member_id_, current_state))
         {
-            if (!functor(*this, next_member_id_) && next_member_id_.must_understand)
+            bool deser_value = functor(*this, next_member_id_);
+
+            if (!deser_value)
             {
-                assert(false);
+                if (next_member_id_.must_understand)
+                {
+                    assert(false); // TODO throw exception
+                }
+                else
+                {
+                    jump(current_state.member_size_);
+                }
             }
 
             assert(current_state.member_size_ == offset_ - origin_); // TODO throw exception.
@@ -3618,7 +3627,7 @@ Cdr& Cdr::xcdr1_deserialize_type(
     {
         next_member_id_ = MemberId(0);
 
-        while (functor(*this, next_member_id_) && offset_ != end_) // TODO Tests with appendables with different length
+        while (offset_ != end_ && functor(*this, next_member_id_)) // TODO Tests with appendables with different length
         {
             ++next_member_id_.id;
         }
@@ -3655,9 +3664,17 @@ Cdr& Cdr::xcdr2_deserialize_type(
                 (void)offset;
 
                 xcdr2_deserialize_member_header(next_member_id_, current_state);
-                if (!functor(*this, next_member_id_) && next_member_id_.must_understand)
+                bool deser_value = functor(*this, next_member_id_);
+                if (!deser_value)
                 {
-                    assert(false);
+                    if (next_member_id_.must_understand)
+                    {
+                        assert(false); // TODO Throw exception
+                    }
+                    else
+                    {
+                        jump(current_state.member_size_);
+                    }
                 }
 
                 assert((0 == current_state.member_size_ &&
@@ -3691,7 +3708,7 @@ Cdr& Cdr::xcdr2_deserialize_type(
         Cdr::state current_state(*this);
         next_member_id_ = MemberId(0);
 
-        while (functor(*this, next_member_id_) && offset_ != end_)
+        while (offset_ != end_ && functor(*this, next_member_id_))
         {
             ++next_member_id_.id;
         }

@@ -684,8 +684,6 @@ Cdr& Cdr::serialize(
 Cdr& Cdr::serialize(
         const bool bool_t)
 {
-    uint8_t value = 0;
-
     if (((m_lastPosition - m_currentPosition) >= sizeof(uint8_t)) || resize(sizeof(uint8_t)))
     {
         // Save last datasize.
@@ -693,9 +691,12 @@ Cdr& Cdr::serialize(
 
         if (bool_t)
         {
-            value = 1;
+            m_currentPosition++ << static_cast<uint8_t>(1);
         }
-        m_currentPosition++ << value;
+        else
+        {
+            m_currentPosition++ << static_cast<uint8_t>(0);
+        }
 
         return *this;
     }

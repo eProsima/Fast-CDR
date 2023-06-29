@@ -3889,7 +3889,14 @@ private:
     //!
     size_t align64_ {8};
 
-    bool serialized_dheader_ {false};
+
+    enum
+    {
+        NO_SERIALIZED_MEMBER_SIZE,
+        SERIALIZED_MEMBER_SIZE,
+        SERIALIZED_MEMBER_SIZE_4,
+    }
+    serialized_member_size_ {NO_SERIALIZED_MEMBER_SIZE};
 
 };
 

@@ -827,6 +827,8 @@ Cdr& Cdr::serialize(
         serialize(length);
     }
 
+    serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
+
     return *this;
 }
 
@@ -885,6 +887,8 @@ Cdr& Cdr::serialize(
     {
         serialize(bytesLength);
     }
+
+    serialized_member_size_ = SERIALIZED_MEMBER_SIZE_4;
 
     return *this;
 }
@@ -3038,7 +3042,9 @@ void Cdr::xcdr2_end_long_member_header(
         const MemberId& member_id,
         size_t member_serialized_size)
 {
-    uint32_t lc = 0 == member_serialized_size ? 0x50000000 : 0x40000000;
+    uint32_t lc = 0 == member_serialized_size ?
+            (SERIALIZED_MEMBER_SIZE_4 == serialized_member_size_ ? 0x60000000  : 0x50000000)
+        : 0x40000000;
     uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | lc | member_id.id;
     serialize(flags_and_member_id);
     if (0 < member_serialized_size)
@@ -3084,7 +3090,7 @@ void Cdr::xcdr2_shrink_to_long_member_header(
         const FastBuffer::iterator& offset)
 {
     memmove(&offset_ + 4, &offset_ + 8, offset - offset_ - 8);
-    uint32_t lc = 0x50000000;
+    uint32_t lc = SERIALIZED_MEMBER_SIZE_4 == serialized_member_size_ ? 0x60000000  : 0x50000000;
     uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | lc | member_id.id;
     serialize(flags_and_member_id);
 }
@@ -3383,7 +3389,7 @@ Cdr& Cdr::xcdr2_end_serialize_member(
         auto last_offset = offset_;
         set_state(current_state);
         makeAlign(alignment(sizeof(uint32_t)));
-        if (!serialized_dheader_)
+        if (NO_SERIALIZED_MEMBER_SIZE == serialized_member_size_)
         {
             const size_t member_serialized_size = last_offset - offset_ -
                     (current_state.header_serialized_ == XCdrHeaderSelection::SHORT_HEADER ? 4 : 8);
@@ -3434,7 +3440,6 @@ Cdr& Cdr::xcdr2_end_serialize_member(
         }
         else
         {
-            serialized_dheader_ = false;
             // Use inner type DHEADER as NEXTINT
             switch (current_state.header_serialized_)
             {
@@ -3463,6 +3468,7 @@ Cdr& Cdr::xcdr2_end_serialize_member(
     }
 
     next_member_id_ = MEMBER_ID_INVALID;
+    serialized_member_size_ = NO_SERIALIZED_MEMBER_SIZE;
 
     return *this;
 }
@@ -3511,7 +3517,7 @@ void Cdr::xcdr2_deserialize_member_header(
     {
         uint32_t size = 0;
         deserialize(size);
-        current_state.member_size_ = size + 4;
+        current_state.member_size_ = 4 + (size * (5 == lc ? 1 : (6 == lc ? 4 : 8)));
         current_state.header_serialized_ = XCdrHeaderSelection::SHORT_HEADER;
         offset_ -= sizeof(uint32_t);
     }
@@ -3582,7 +3588,7 @@ Cdr& Cdr::xcdr2_end_serialize_type(
         const size_t member_serialized_size = last_offset - offset_ /*DHEADER ->*/ - 4 - alignment(4);
         serialize(static_cast<uint32_t>(member_serialized_size));
         jump(member_serialized_size);
-        serialized_dheader_ = true;
+        serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
     }
     current_encoding_ = current_state.previous_enconding_;
     return *this;
@@ -3696,7 +3702,6 @@ Cdr& Cdr::xcdr2_deserialize_type(
             {
                 ++next_member_id_.id;
             }
-            assert(offset_ - current_state.offset_ == dheader);
             size_t jump_size = dheader - (offset_ - current_state.offset_);
             jump(jump_size);
 

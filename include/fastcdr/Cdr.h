@@ -41,6 +41,30 @@
 namespace eprosima {
 namespace fastcdr {
 
+struct extensibility_t
+{
+    constexpr explicit extensibility_t(
+            int v)
+        : v_(v)
+    {
+    }
+
+    friend constexpr bool operator ==(
+            extensibility_t e1,
+            extensibility_t e2) noexcept
+    {
+        return e1.v_ == e2.v_;
+    }
+
+private:
+
+    int v_;
+
+};
+
+static constexpr extensibility_t finale {0};
+static constexpr extensibility_t appendable {1};
+
 /*!
  * @brief This class offers an interface to serialize/deserialize some basic types using CDR protocol inside an eprosima::fastcdr::FastBuffer.
  * @ingroup FASTCDRAPIREFERENCE
@@ -360,7 +384,15 @@ public:
         }
         else
         {
-            serialize_member(next_member_id_, value);
+            if (appendable == next_extensibility_)
+            {
+                serialize_appendable_member(next_member_id_, value);
+            }
+            else
+            {
+                serialize_member(next_member_id_, value);
+            }
+
         }
 
         return *this;
@@ -382,7 +414,14 @@ public:
         }
         else
         {
-            deserialize_member(value);
+            if (appendable == next_extensibility_)
+            {
+                deserialize_appendable_member(value);
+            }
+            else
+            {
+                deserialize_member(value);
+            }
         }
         return *this;
     }
@@ -940,7 +979,6 @@ public:
                 *this << it_pair->first;
                 *this << it_pair->second;
             }
-            //return serializeArray(map_t.data(), map_t.size());
         }
         catch (eprosima::fastcdr::exception::Exception& ex)
         {
@@ -3481,8 +3519,100 @@ public:
         Cdr::state current_state(*this);
         (this->*begin_serialize_opt_member_)(member_id, value.has_value(), current_state, header_selection);
         serialize(value);
-        (this->*end_serialize_opt_member_)(current_state);
-        return *this;
+        return (this->*end_serialize_opt_member_)(current_state);
+    }
+
+    template<class _T, size_t _Size, typename std::enable_if<!std::is_enum<_T>::value &&
+            !std::is_arithmetic<_T>::value>::type* = nullptr>
+    Cdr& serialize_member(
+            const MemberId& member_id,
+            const std::array<_T, _Size>& value,
+            XCdrHeaderSelection header_selection = XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT)
+    {
+        Cdr::state current_state(*this);
+        (this->*begin_serialize_member_)(member_id, true, current_state, header_selection);
+
+        Cdr::state dheader_state(*this);
+
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            // Serialize DHEADER
+            uint32_t dheader {0};
+            serialize(dheader);
+        }
+
+        serialize(value);
+
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            size_t dheader = offset_ - dheader_state.offset_ - 4 /* DHEADER */;
+            Cdr::state state_after(*this);
+            set_state(dheader_state);
+            serialize(static_cast<uint32_t>(dheader));
+            set_state(state_after);
+            serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
+        }
+
+        return (this->*end_serialize_member_)(current_state);
+    }
+
+    template<class _T, size_t _Size, typename std::enable_if<std::is_enum<_T>::value ||
+            std::is_arithmetic<_T>::value>::type* = nullptr>
+    Cdr& serialize_member(
+            const MemberId& member_id,
+            const std::array<_T, _Size>& value,
+            XCdrHeaderSelection header_selection = XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT)
+    {
+        Cdr::state current_state(*this);
+        (this->*begin_serialize_member_)(member_id, true, current_state, header_selection);
+        serialize(value);
+        return (this->*end_serialize_member_)(current_state);
+    }
+
+    template<class _T>
+    Cdr& serialize_appendable_member(
+            const MemberId& member_id,
+            const _T& value,
+            XCdrHeaderSelection header_selection = XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT)
+    {
+        next_extensibility_ = finale;
+        return serialize_member(member_id, value, header_selection);
+    }
+
+    template<class _T, size_t _Size>
+    Cdr& serialize_appendable_member(
+            const MemberId& member_id,
+            const std::array<_T, _Size>& value,
+            XCdrHeaderSelection header_selection = XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT)
+    {
+        next_extensibility_ = finale;
+
+        Cdr::state current_state(*this);
+
+        (this->*begin_serialize_member_)(member_id, true, current_state, header_selection);
+
+        Cdr::state dheader_state(*this);
+
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            // Serialize DHEADER
+            uint32_t dheader {0};
+            serialize(dheader);
+        }
+
+        serialize(value);
+
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            size_t dheader = offset_ - dheader_state.offset_ - 4 /* DHEADER */;
+            Cdr::state state_after(*this);
+            set_state(dheader_state);
+            serialize(static_cast<uint32_t>(dheader));
+            set_state(state_after);
+            serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
+        }
+
+        return (this->*end_serialize_member_)(current_state);
     }
 
     template<class _T>
@@ -3517,6 +3647,78 @@ public:
         {
             deserialize(value);
         }
+        return *this;
+    }
+
+    template<class _T, size_t _Size, typename std::enable_if<!std::is_enum<_T>::value &&
+            !std::is_arithmetic<_T>::value>::type* = nullptr>
+    Cdr& deserialize_member(
+            std::array<_T, _Size>& value)
+    {
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            uint32_t dheader {0};
+            deserialize(dheader);
+
+            uint32_t count = 0;
+            auto offset = offset_;
+            while (offset_ - offset < dheader && count < _Size)
+            {
+                deserialize(value.data()[count]);
+                ++count;
+            }
+
+            assert(offset_ - offset == dheader);
+        }
+        else
+        {
+            deserialize(value);
+        }
+
+        return *this;
+    }
+
+    template<class _T, size_t _Size, typename std::enable_if<std::is_enum<_T>::value ||
+            std::is_arithmetic<_T>::value>::type* = nullptr>
+    Cdr& deserialize_member(
+            std::array<_T, _Size>& value)
+    {
+        return deserialize(value);
+    }
+
+    template<class _T>
+    Cdr& deserialize_appendable_member(
+            _T& value)
+    {
+        next_extensibility_ = finale;
+        return deserialize(value);
+    }
+
+    template<class _T, size_t _Size>
+    Cdr& deserialize_appendable_member(
+            std::array<_T, _Size>& value)
+    {
+        next_extensibility_ = finale;
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            uint32_t dheader {0};
+            deserialize(dheader);
+
+            uint32_t count = 0;
+            auto offset = offset_;
+            while (offset_ - offset < dheader && count < _Size)
+            {
+                deserialize(value.data()[count]);
+                ++count;
+            }
+
+            assert(offset_ - offset == dheader);
+        }
+        else
+        {
+            deserialize(value);
+        }
+
         return *this;
     }
 
@@ -3562,6 +3764,22 @@ public:
     {
         assert(next_member_id_ == MEMBER_ID_INVALID);
         next_member_id_ = member_id;
+        return *this;
+    }
+
+    template<class _T = extensibility_t>
+    inline Cdr& operator << (
+            const extensibility_t& extensibility)
+    {
+        next_extensibility_ = extensibility;
+        return *this;
+    }
+
+    template<class _T = extensibility_t>
+    inline Cdr& operator >> (
+            const extensibility_t& extensibility)
+    {
+        next_extensibility_ = extensibility;
         return *this;
     }
 
@@ -3885,6 +4103,9 @@ private:
 
     //!
     MemberId next_member_id_;
+
+    //!
+    extensibility_t next_extensibility_ {finale};
 
     //!
     size_t align64_ {8};

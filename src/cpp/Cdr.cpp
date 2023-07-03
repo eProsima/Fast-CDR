@@ -3570,6 +3570,7 @@ Cdr& Cdr::xcdr2_begin_serialize_type(
         uint32_t dheader {0};
         serialize(dheader);
     }
+    serialized_member_size_ = NO_SERIALIZED_MEMBER_SIZE; // Avoid error when serializen arrays, sequences, etc..
     current_state.previous_enconding_ = current_encoding_;
     current_encoding_ = type_encoding;
     return *this;

@@ -8852,7 +8852,7 @@ TEST_P(XCdrBasicTypesTest, one_inner_struct)
         //}
 
         //{ Encode
-        InnerBasicTypesShortStruct value { {ushort_value} };
+        InnerBasicTypesShortStruct value { ushort_value };
         cdr.set_encoding_flag(encoding);
         cdr.serialize_encapsulation();
         Cdr::state enc_state(cdr);
@@ -8931,7 +8931,7 @@ TEST_P(XCdrBasicTypesTest, one_inner_struct)
         //}
 
         //{ Encode
-        InnerBasicTypesShortStruct value { {ushort_value} };
+        InnerBasicTypesShortStruct value { ushort_value };
         cdr.set_encoding_flag(encoding);
         cdr.serialize_encapsulation();
         Cdr::state enc_state(cdr);
@@ -9226,7 +9226,7 @@ TEST_P(XCdrBasicTypesTest, two_inner_struct)
         //}
 
         //{ Encode
-        InnerBasicTypesStruct value { {ushort_value} };
+        InnerBasicTypesStruct value { ushort_value };
         cdr.set_encoding_flag(encoding);
         cdr.serialize_encapsulation();
         Cdr::state enc_state(cdr);
@@ -9305,7 +9305,7 @@ TEST_P(XCdrBasicTypesTest, two_inner_struct)
         //}
 
         //{ Encode
-        InnerBasicTypesStruct value { {ushort_value} };
+        InnerBasicTypesStruct value { ushort_value };
         cdr.set_encoding_flag(encoding);
         cdr.serialize_encapsulation();
         Cdr::state enc_state(cdr);

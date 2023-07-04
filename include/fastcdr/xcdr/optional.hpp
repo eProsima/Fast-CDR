@@ -18,7 +18,6 @@
 #include <new>
 #include <type_traits>
 
-#include "../fastcdr_dll.h"
 #include "../exceptions/BadParamException.h"
 
 namespace eprosima {
@@ -81,7 +80,7 @@ struct nullopt_t
 static constexpr nullopt_t nullopt {0};
 
 template<class T>
-class Cdr_DllAPI optional
+class optional
 {
 public:
 

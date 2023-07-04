@@ -79,7 +79,8 @@ TEST_P(XCdrv2Test, pl_octet_opt_member)
 
     //{ Test encoded content
     auto it = std::find(expected_streams[tested_stream].begin(), expected_streams[tested_stream].end(), octet_value);
-    ASSERT_EQ(cdr.getSerializedDataLength(), std::distance(expected_streams[tested_stream].begin(), ++it));
+    ASSERT_EQ(cdr.getSerializedDataLength(),
+            static_cast<size_t>(std::distance(expected_streams[tested_stream].begin(), ++it)));
     ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
     //}
 

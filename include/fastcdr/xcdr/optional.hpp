@@ -140,7 +140,7 @@ public:
         }
     }
 
-    T& value() &
+    T& value()&
     {
         return storage_.engaged_ ? storage_.val_ : throw exception::BadParamException("value not set");
     }

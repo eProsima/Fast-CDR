@@ -3569,6 +3569,53 @@ public:
         return (this->*end_serialize_member_)(current_state);
     }
 
+    template<class _T, typename std::enable_if<!std::is_enum<_T>::value &&
+            !std::is_arithmetic<_T>::value>::type* = nullptr>
+    Cdr& serialize_member(
+            const MemberId& member_id,
+            const std::vector<_T>& value,
+            XCdrHeaderSelection header_selection = XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT)
+    {
+        Cdr::state current_state(*this);
+        (this->*begin_serialize_member_)(member_id, true, current_state, header_selection);
+
+        Cdr::state dheader_state(*this);
+
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            // Serialize DHEADER
+            uint32_t dheader {0};
+            serialize(dheader);
+        }
+
+        serialize(value);
+
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            size_t dheader = offset_ - dheader_state.offset_ - 4 /* DHEADER */;
+            Cdr::state state_after(*this);
+            set_state(dheader_state);
+            serialize(static_cast<uint32_t>(dheader));
+            set_state(state_after);
+            serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
+        }
+
+        return (this->*end_serialize_member_)(current_state);
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value ||
+            std::is_arithmetic<_T>::value>::type* = nullptr>
+    Cdr& serialize_member(
+            const MemberId& member_id,
+            const std::vector<_T>& value,
+            XCdrHeaderSelection header_selection = XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT)
+    {
+        Cdr::state current_state(*this);
+        (this->*begin_serialize_member_)(member_id, true, current_state, header_selection);
+        serialize(value);
+        return (this->*end_serialize_member_)(current_state);
+    }
+
     template<class _T>
     Cdr& serialize_appendable_member(
             const MemberId& member_id,
@@ -3583,6 +3630,42 @@ public:
     Cdr& serialize_appendable_member(
             const MemberId& member_id,
             const std::array<_T, _Size>& value,
+            XCdrHeaderSelection header_selection = XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT)
+    {
+        next_extensibility_ = finale;
+
+        Cdr::state current_state(*this);
+
+        (this->*begin_serialize_member_)(member_id, true, current_state, header_selection);
+
+        Cdr::state dheader_state(*this);
+
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            // Serialize DHEADER
+            uint32_t dheader {0};
+            serialize(dheader);
+        }
+
+        serialize(value);
+
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            size_t dheader = offset_ - dheader_state.offset_ - 4 /* DHEADER */;
+            Cdr::state state_after(*this);
+            set_state(dheader_state);
+            serialize(static_cast<uint32_t>(dheader));
+            set_state(state_after);
+            serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
+        }
+
+        return (this->*end_serialize_member_)(current_state);
+    }
+
+    template<class _T>
+    Cdr& serialize_appendable_member(
+            const MemberId& member_id,
+            const std::vector<_T>& value,
             XCdrHeaderSelection header_selection = XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT)
     {
         next_extensibility_ = finale;
@@ -3660,7 +3743,7 @@ public:
             uint32_t dheader {0};
             deserialize(dheader);
 
-            uint32_t count = 0;
+            uint32_t count {0};
             auto offset = offset_;
             while (offset_ - offset < dheader && count < _Size)
             {
@@ -3686,6 +3769,56 @@ public:
         return deserialize(value);
     }
 
+    template<class _T, typename std::enable_if<!std::is_enum<_T>::value &&
+            !std::is_arithmetic<_T>::value>::type* = nullptr>
+    Cdr& deserialize_member(
+            std::vector<_T>& value)
+    {
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            uint32_t dheader {0};
+            deserialize(dheader);
+
+            auto offset = offset_;
+
+            uint32_t sequence_length {0};
+            deserialize(sequence_length);
+
+            if (0 == sequence_length)
+            {
+                value.clear();
+                return *this;
+            }
+            else
+            {
+                value.resize(sequence_length);
+            }
+
+            uint32_t count {0};
+            while (offset_ - offset < dheader && count < sequence_length)
+            {
+                deserialize(value.data()[count]);
+                ++count;
+            }
+
+            assert(offset_ - offset == dheader);
+        }
+        else
+        {
+            deserialize(value);
+        }
+
+        return *this;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value ||
+            std::is_arithmetic<_T>::value>::type* = nullptr>
+    Cdr& deserialize_member(
+            std::vector<_T>& value)
+    {
+        return deserialize(value);
+    }
+
     template<class _T>
     Cdr& deserialize_appendable_member(
             _T& value)
@@ -3704,9 +3837,51 @@ public:
             uint32_t dheader {0};
             deserialize(dheader);
 
-            uint32_t count = 0;
+            uint32_t count {0};
             auto offset = offset_;
             while (offset_ - offset < dheader && count < _Size)
+            {
+                deserialize(value.data()[count]);
+                ++count;
+            }
+
+            assert(offset_ - offset == dheader);
+        }
+        else
+        {
+            deserialize(value);
+        }
+
+        return *this;
+    }
+
+    template<class _T>
+    Cdr& deserialize_appendable_member(
+            std::vector<_T>& value)
+    {
+        next_extensibility_ = finale;
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            uint32_t dheader {0};
+            deserialize(dheader);
+
+            auto offset = offset_;
+
+            uint32_t sequence_length {0};
+            deserialize(sequence_length);
+
+            if (0 == sequence_length)
+            {
+                value.clear();
+                return *this;
+            }
+            else
+            {
+                value.resize(sequence_length);
+            }
+
+            uint32_t count {0};
+            while (offset_ - offset < dheader && count < sequence_length)
             {
                 deserialize(value.data()[count]);
                 ++count;

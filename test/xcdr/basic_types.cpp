@@ -2683,7 +2683,8 @@ TEST_P(XCdrBasicTypesTest, sequence_struct)
 
 TEST_P(XCdrBasicTypesTest, map_ulong)
 {
-    const std::map<uint16_t, uint32_t> map_value {{0xCDDC, 0xCDCDCDDC}, {0xDCCD, 0xCDCDCDDC}};
+    const std::map<uint16_t, uint32_t> map_value {{static_cast<uint16_t>(0xCDDC), 0xCDCDCDDCu},
+        {static_cast<uint16_t>(0xDCCD), 0xCDCDCDDCu}};
     constexpr uint8_t ival {0xCD};
     constexpr uint8_t fval {0xDC};
 
@@ -2823,7 +2824,9 @@ TEST_P(XCdrBasicTypesTest, map_ulong)
 
 TEST_P(XCdrBasicTypesTest, map_struct)
 {
-    const std::map<uint16_t, InnerBasicTypesShortStruct> map_value {{0xCDDC, {0xCDDC}}, { 0xDCCD, {0xDCCD}}};
+    const std::map<uint16_t, InnerBasicTypesShortStruct> map_value {
+        {static_cast<uint16_t>(0xCDDC), {0xCDDC}},
+        {static_cast<uint16_t>(0xDCCD), {0xDCCD}}};
     constexpr uint8_t ival {0xCD};
     constexpr uint8_t fval {0xDC};
 

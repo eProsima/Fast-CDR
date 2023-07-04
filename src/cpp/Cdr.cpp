@@ -144,7 +144,7 @@ Cdr& Cdr::read_encapsulation()
 
 
         // If it is a different endianness, make changes.
-        const bool endianness = encapsulation & 0x1_8u;
+        const uint8_t endianness = encapsulation & 0x1_8u;
         if (m_endianness != endianness)
         {
             m_swapBytes = !m_swapBytes;
@@ -3102,6 +3102,7 @@ Cdr& Cdr::xcdr1_begin_serialize_member(
         Cdr::XCdrHeaderSelection header_selection)
 {
     static_cast<void>(current_state);
+    static_cast<void>(is_present);
     assert(is_present);
     assert(MEMBER_ID_INVALID != member_id);
     assert(MEMBER_ID_INVALID == next_member_id_ || member_id == next_member_id_);

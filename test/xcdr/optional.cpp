@@ -4132,7 +4132,7 @@ TEST_P(XCdrOptionalTest, ulonglong_align_2_optional)
     const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
-    constexpr uint64_t ulonglong_value {0xCDCDCDCDCDCDCDDCll};
+    constexpr uint64_t ulonglong_value {0xCDCDCDCDCDCDCDDCull};
     constexpr uint8_t ival {0xCD};
     constexpr uint8_t fval {0xDC};
 
@@ -4253,7 +4253,7 @@ TEST_P(XCdrOptionalTest, ulonglong_align_4_optional)
     const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
-    constexpr uint64_t ulonglong_value {0xCDCDCDCDCDCDCDDCll};
+    constexpr uint64_t ulonglong_value {0xCDCDCDCDCDCDCDDCull};
     constexpr uint8_t ival {0xCD};
     constexpr uint8_t fval {0xDC};
 

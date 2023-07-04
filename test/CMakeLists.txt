@@ -13,7 +13,7 @@
 # limitations under the License.
 
 find_package(GTest CONFIG REQUIRED)
-include(GoogleTest)
+include(${PROJECT_SOURCE_DIR}/cmake/testing/GoogleTest.cmake)
 
 ###############################################################################
 # Unit tests

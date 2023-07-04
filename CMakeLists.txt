@@ -15,7 +15,7 @@
 ###############################################################################
 # CMake build rules for FastCDR                                               #
 ###############################################################################
-cmake_minimum_required(VERSION 3.16.3)
+cmake_minimum_required(VERSION 3.22)
 
 set(IS_TOP_LEVEL TRUE)
 if(PROJECT_SOURCE_DIR)

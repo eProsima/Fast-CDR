@@ -18,6 +18,7 @@
 #include <new>
 #include <type_traits>
 
+#include "../fastcdr_dll.h"
 #include "../exceptions/BadParamException.h"
 
 namespace eprosima {
@@ -80,7 +81,7 @@ struct nullopt_t
 static constexpr nullopt_t nullopt {0};
 
 template<class T>
-class optional
+class Cdr_DllAPI optional
 {
 public:
 
@@ -140,7 +141,7 @@ public:
         }
     }
 
-    T& value()&
+    T& value() &
     {
         return storage_.engaged_ ? storage_.val_ : throw exception::BadParamException("value not set");
     }

@@ -17,12 +17,14 @@
 
 #include <cstdint>
 
+#include "../fastcdr_dll.h"
+
 namespace eprosima {
 namespace fastcdr {
 
 class Cdr;
 
-class MemberId
+class Cdr_DllAPI MemberId
 {
 public:
 

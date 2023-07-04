@@ -4011,7 +4011,7 @@ TEST_P(XCdrOptionalTest, longlong_align_4_optional)
 TEST_P(XCdrOptionalTest, ulonglong_align_1_optional)
 {
     const uint8_t align_value {0xAB};
-    constexpr uint64_t ulonglong_value {0xCDCDCDCDCDCDCDDCll};
+    constexpr uint64_t ulonglong_value {0xCDCDCDCDCDCDCDDCull};
     constexpr uint8_t ival {0xCD};
     constexpr uint8_t fval {0xDC};
 

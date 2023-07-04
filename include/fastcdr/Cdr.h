@@ -288,68 +288,6 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr>
-    inline Cdr& operator <<(
-            const _T& type_t)
-    {
-        type_t.serialize(*this);
-        return *this;
-    }
-
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, int32_t>::value>::type* = nullptr>
-    inline Cdr& operator <<(
-            const _T& enum_t)
-    {
-        return serialize(static_cast<int32_t>(enum_t));
-    }
-
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, uint32_t>::value>::type* = nullptr>
-    inline Cdr& operator <<(
-            const _T& enum_t)
-    {
-        return serialize(static_cast<uint32_t>(enum_t));
-    }
-
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, int16_t>::value>::type* = nullptr>
-    inline Cdr& operator <<(
-            const _T& enum_t)
-    {
-        return serialize(static_cast<int16_t>(enum_t));
-    }
-
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, uint16_t>::value>::type* = nullptr>
-    inline Cdr& operator <<(
-            const _T& enum_t)
-    {
-        return serialize(static_cast<uint16_t>(enum_t));
-    }
-
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, int8_t>::value>::type* = nullptr>
-    inline Cdr& operator <<(
-            const _T& enum_t)
-    {
-        return serialize(static_cast<int8_t>(enum_t));
-    }
-
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, uint8_t>::value>::type* = nullptr>
-    inline Cdr& operator <<(
-            const _T& enum_t)
-    {
-        return serialize(static_cast<uint8_t>(enum_t));
-    }
-
-    /*!
-     * @brief This operator template is used to serialize any other non-basic type.
-     * @param type_t A reference to the object that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
     template<class _T>
     inline Cdr& operator <<(
             const _T& value)

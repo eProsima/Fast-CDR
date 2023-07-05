@@ -64,7 +64,7 @@ private:
 
 };
 
-static constexpr MemberId MEMBER_ID_INVALID {};
+static const MemberId MEMBER_ID_INVALID {};
 
 } // namespace fastcdr
 } // namespace eprosima

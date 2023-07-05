@@ -941,7 +941,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr>
+    template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr, typename = void>
     inline Cdr& serialize(
             const _T& type_t)
     {
@@ -949,48 +949,60 @@ public:
         return *this;
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, int32_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            int32_t>::value>::type* = nullptr>
     inline Cdr& serialize(
             const _T& enum_t)
     {
         return serialize(static_cast<int32_t>(enum_t));
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, uint32_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            uint32_t>::value>::type* = nullptr>
     inline Cdr& serialize(
             const _T& enum_t)
     {
         return serialize(static_cast<uint32_t>(enum_t));
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, int16_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            int16_t>::value>::type* = nullptr>
     inline Cdr& serialize(
             const _T& enum_t)
     {
         return serialize(static_cast<int16_t>(enum_t));
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, uint16_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            uint16_t>::value>::type* = nullptr>
     inline Cdr& serialize(
             const _T& enum_t)
     {
         return serialize(static_cast<uint16_t>(enum_t));
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, int8_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            int8_t>::value>::type* = nullptr>
     inline Cdr& serialize(
             const _T& enum_t)
     {
         return serialize(static_cast<int8_t>(enum_t));
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, uint8_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            uint8_t>::value>::type* = nullptr>
     inline Cdr& serialize(
             const _T& enum_t)
     {
@@ -1570,7 +1582,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr>
+    template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr, typename = void>
     Cdr& serializeArray(
             const _T* type_t,
             size_t numElements)
@@ -1582,8 +1594,10 @@ public:
         return *this;
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, int32_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            int32_t>::value>::type* = nullptr>
     Cdr& serializeArray(
             const _T* enum_t,
             size_t numElements)
@@ -1595,8 +1609,10 @@ public:
         return *this;
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, uint32_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            uint32_t>::value>::type* = nullptr>
     Cdr& serializeArray(
             const _T* enum_t,
             size_t numElements)
@@ -1608,8 +1624,10 @@ public:
         return *this;
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, int16_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            int16_t>::value>::type* = nullptr>
     Cdr& serializeArray(
             const _T* enum_t,
             size_t numElements)
@@ -1621,8 +1639,10 @@ public:
         return *this;
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, uint16_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            uint16_t>::value>::type* = nullptr>
     Cdr& serializeArray(
             const _T* enum_t,
             size_t numElements)
@@ -1634,8 +1654,10 @@ public:
         return *this;
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, int8_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            int8_t>::value>::type* = nullptr>
     Cdr& serializeArray(
             const _T* enum_t,
             size_t numElements)
@@ -1647,8 +1669,10 @@ public:
         return *this;
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, uint8_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            uint8_t>::value>::type* = nullptr>
     Cdr& serializeArray(
             const _T* enum_t,
             size_t numElements)
@@ -2460,7 +2484,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr>
+    template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr, typename = void>
     inline Cdr& deserialize(
             _T& type_t)
     {
@@ -2468,8 +2492,10 @@ public:
         return *this;
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, int32_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            int32_t>::value>::type* = nullptr>
     inline Cdr& deserialize(
             _T& enum_t)
     {
@@ -2479,8 +2505,10 @@ public:
         return *this;
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, uint32_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            uint32_t>::value>::type* = nullptr>
     inline Cdr& deserialize(
             _T& enum_t)
     {
@@ -2490,8 +2518,10 @@ public:
         return *this;
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, int16_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            int16_t>::value>::type* = nullptr>
     inline Cdr& deserialize(
             _T& enum_t)
     {
@@ -2501,8 +2531,10 @@ public:
         return *this;
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, uint16_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            uint16_t>::value>::type* = nullptr>
     inline Cdr& deserialize(
             _T& enum_t)
     {
@@ -2512,8 +2544,10 @@ public:
         return *this;
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, int8_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            int8_t>::value>::type* = nullptr>
     inline Cdr& deserialize(
             _T& enum_t)
     {
@@ -2523,8 +2557,10 @@ public:
         return *this;
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, uint8_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            uint8_t>::value>::type* = nullptr>
     inline Cdr& deserialize(
             _T& enum_t)
     {
@@ -3105,7 +3141,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr>
+    template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr, typename = void>
     Cdr& deserializeArray(
             _T* type_t,
             size_t numElements)
@@ -3117,8 +3153,10 @@ public:
         return *this;
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, int32_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            int32_t>::value>::type* = nullptr>
     Cdr& deserializeArray(
             _T* enum_t,
             size_t numElements)
@@ -3132,8 +3170,10 @@ public:
         return *this;
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, uint32_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            uint32_t>::value>::type* = nullptr>
     Cdr& deserializeArray(
             _T* enum_t,
             size_t numElements)
@@ -3147,8 +3187,10 @@ public:
         return *this;
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, int16_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            int16_t>::value>::type* = nullptr>
     Cdr& deserializeArray(
             _T* enum_t,
             size_t numElements)
@@ -3162,8 +3204,10 @@ public:
         return *this;
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, uint16_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            uint16_t>::value>::type* = nullptr>
     Cdr& deserializeArray(
             _T* enum_t,
             size_t numElements)
@@ -3177,8 +3221,10 @@ public:
         return *this;
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, int8_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            int8_t>::value>::type* = nullptr>
     Cdr& deserializeArray(
             _T* enum_t,
             size_t numElements)
@@ -3192,8 +3238,10 @@ public:
         return *this;
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, uint8_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            uint8_t>::value>::type* = nullptr>
     Cdr& deserializeArray(
             _T* enum_t,
             size_t numElements)

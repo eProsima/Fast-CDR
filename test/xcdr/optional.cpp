@@ -1921,6 +1921,7 @@ TEST_P(XCdrOptionalTest, octet_optional)
 TEST_P(XCdrOptionalTest, char_optional)
 {
     constexpr char char_value {'}'};
+    constexpr uint8_t valu {static_cast<uint8_t>(char_value)};
 
     //{ Defining expected XCDR streams
     XCdrStreamValues expected_streams;
@@ -1928,19 +1929,19 @@ TEST_P(XCdrOptionalTest, char_optional)
     {
         0x00, 0x00, 0x00, 0x00, // Encapsulation
         0x00, 0x01, 0x00, 0x01, // ShortMemberHeader
-        char_value              // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
         0x00, 0x01, 0x00, 0x00, // Encapsulation
         0x01, 0x00, 0x01, 0x00, // ShortMemberHeader
-        char_value              // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
     {
         0x00, 0x02, 0x00, 0x00, // Encapsulation
         0x00, 0x01, 0x00, 0x01, // ShortMemberHeader
-        char_value,             // Char
+        valu,                   // Char
         0x00, 0x00, 0x00,       // Alignment
         0x3F, 0x02, 0x00, 0x00  // Sentinel
     };
@@ -1948,7 +1949,7 @@ TEST_P(XCdrOptionalTest, char_optional)
     {
         0x00, 0x03, 0x00, 0x00, // Encapsulation
         0x01, 0x00, 0x01, 0x00, // ShortMemberHeader
-        char_value,             // Char
+        valu,                   // Char
         0x00, 0x00, 0x00,       // Alignment
         0x02, 0x3F, 0x00, 0x00  // Sentinel
     };
@@ -1956,41 +1957,41 @@ TEST_P(XCdrOptionalTest, char_optional)
     {
         0x00, 0x06, 0x00, 0x00, // Encapsulation
         0x01,                   // Present
-        char_value              // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
         0x00, 0x07, 0x00, 0x00, // Encapsulation
         0x01,                   // Present
-        char_value              // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
         0x00, 0x08, 0x00, 0x00, // Encapsulation
         0x00, 0x00, 0x00, 0x02, // DHEADER
         0x01,                   // Present
-        char_value              // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
         0x00, 0x09, 0x00, 0x00, // Encapsulation
         0x02, 0x00, 0x00, 0x00, // DHEADER
         0x01,                   // Present
-        char_value              // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
         0x00, 0x0a, 0x00, 0x00, // Encapsulation
         0x00, 0x00, 0x00, 0x05, // DHEADER
         0x00, 0x00, 0x00, 0x01, // EMHEADER1(M) without NEXTINT
-        char_value              // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
         0x00, 0x0b, 0x00, 0x00, // Encapsulation
         0x05, 0x00, 0x00, 0x00, // DHEADER
         0x01, 0x00, 0x00, 0x00, // EMHEADER1(M) without NEXTINT
-        char_value              // Char
+        valu                    // Char
     };
     //}
 
@@ -6067,6 +6068,7 @@ TEST_P(XCdrOptionalTest, char_align_1_optional)
 {
     const uint8_t align_value {0xAB};
     constexpr char char_value {'}'};
+    constexpr uint8_t valu {static_cast<uint8_t>(char_value)};
 
     //{ Defining expected XCDR streams
     XCdrStreamValues expected_streams;
@@ -6076,7 +6078,7 @@ TEST_P(XCdrOptionalTest, char_align_1_optional)
         align_value,
         0x00, 0x00, 0x00,       // Alignment
         0x00, 0x01, 0x00, 0x01, // ShortMemberHeader
-        char_value              // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
@@ -6084,7 +6086,7 @@ TEST_P(XCdrOptionalTest, char_align_1_optional)
         align_value,
         0x00, 0x00, 0x00,       // Alignment
         0x01, 0x00, 0x01, 0x00, // ShortMemberHeader
-        char_value              // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
     {
@@ -6093,7 +6095,7 @@ TEST_P(XCdrOptionalTest, char_align_1_optional)
         align_value,
         0x00, 0x00, 0x00,       // Alignment
         0x00, 0x01, 0x00, 0x01, // ShortMemberHeader
-        char_value,             // Char
+        valu,                   // Char
         0x00, 0x00, 0x00,       // Alignment
         0x3F, 0x02, 0x00, 0x00  // Sentinel
     };
@@ -6104,7 +6106,7 @@ TEST_P(XCdrOptionalTest, char_align_1_optional)
         align_value,
         0x00, 0x00, 0x00,       // Alignment
         0x01, 0x00, 0x01, 0x00, // ShortMemberHeader
-        char_value,             // Char
+        valu,                   // Char
         0x00, 0x00, 0x00,       // Alignment
         0x02, 0x3F, 0x00, 0x00  // Sentinel
     };
@@ -6113,14 +6115,14 @@ TEST_P(XCdrOptionalTest, char_align_1_optional)
         0x00, 0x06, 0x00, 0x00, // Encapsulation
         align_value,
         0x01,                   // Present
-        char_value              // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
         0x00, 0x07, 0x00, 0x00, // Encapsulation
         align_value,
         0x01,                   // Present
-        char_value              // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
@@ -6128,7 +6130,7 @@ TEST_P(XCdrOptionalTest, char_align_1_optional)
         0x00, 0x00, 0x00, 0x03, // DHEADER
         align_value,
         0x01,                   // Present
-        char_value              // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
@@ -6136,7 +6138,7 @@ TEST_P(XCdrOptionalTest, char_align_1_optional)
         0x03, 0x00, 0x00, 0x00, // DHEADER
         align_value,
         0x01,                   // Present
-        char_value              // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
@@ -6146,7 +6148,7 @@ TEST_P(XCdrOptionalTest, char_align_1_optional)
         align_value,
         0x00, 0x00, 0x00,       // Alignment
         0x00, 0x00, 0x00, 0x01, // EMHEADER1(M) without NEXTINT
-        char_value              // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
@@ -6156,7 +6158,7 @@ TEST_P(XCdrOptionalTest, char_align_1_optional)
         align_value,
         0x00, 0x00, 0x00,       // Alignment
         0x01, 0x00, 0x00, 0x00, // EMHEADER1(M) without NEXTINT
-        char_value              // Char
+        valu                    // Char
     };
     //}
 
@@ -6174,6 +6176,7 @@ TEST_P(XCdrOptionalTest, char_align_2_optional)
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     constexpr char char_value {'}'};
+    constexpr uint8_t valu {static_cast<uint8_t>(char_value)};
 
     //{ Defining expected XCDR streams
     XCdrStreamValues expected_streams;
@@ -6183,7 +6186,7 @@ TEST_P(XCdrOptionalTest, char_align_2_optional)
         iava, fava,
         0x00, 0x00,             // Alignment
         0x00, 0x01, 0x00, 0x01, // ShortMemberHeader
-        char_value              // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
@@ -6191,7 +6194,7 @@ TEST_P(XCdrOptionalTest, char_align_2_optional)
         fava, iava,
         0x00, 0x00,             // Alignment
         0x01, 0x00, 0x01, 0x00, // ShortMemberHeader
-        char_value             // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
     {
@@ -6200,7 +6203,7 @@ TEST_P(XCdrOptionalTest, char_align_2_optional)
         iava, fava,
         0x00, 0x00,             // Alignment
         0x00, 0x01, 0x00, 0x01, // ShortMemberHeader
-        char_value,            // Char
+        valu,                   // Char
         0x00, 0x00, 0x00,       // Alignment
         0x3F, 0x02, 0x00, 0x00  // Sentinel
     };
@@ -6211,7 +6214,7 @@ TEST_P(XCdrOptionalTest, char_align_2_optional)
         fava, iava,
         0x00, 0x00,             // Alignment
         0x01, 0x00, 0x01, 0x00, // ShortMemberHeader
-        char_value,            // Char
+        valu,                   // Char
         0x00, 0x00, 0x00,       // Alignment
         0x02, 0x3F, 0x00, 0x00  // Sentinel
     };
@@ -6220,14 +6223,14 @@ TEST_P(XCdrOptionalTest, char_align_2_optional)
         0x00, 0x06, 0x00, 0x00, // Encapsulation
         iava, fava,
         0x01,                   // Present
-        char_value             // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
         0x00, 0x07, 0x00, 0x00, // Encapsulation
         fava, iava,
         0x01,                   // Present
-        char_value             // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
@@ -6235,7 +6238,7 @@ TEST_P(XCdrOptionalTest, char_align_2_optional)
         0x00, 0x00, 0x00, 0x04, // DHEADER
         iava, fava,
         0x01,                   // Present
-        char_value             // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
@@ -6243,7 +6246,7 @@ TEST_P(XCdrOptionalTest, char_align_2_optional)
         0x04, 0x00, 0x00, 0x00, // DHEADER
         fava, iava,
         0x01,                   // Present
-        char_value             // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
@@ -6253,7 +6256,7 @@ TEST_P(XCdrOptionalTest, char_align_2_optional)
         iava, fava,
         0x00, 0x00,             // Alignment
         0x00, 0x00, 0x00, 0x01, // EMHEADER1(M) without NEXTINT
-        char_value             // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
@@ -6263,7 +6266,7 @@ TEST_P(XCdrOptionalTest, char_align_2_optional)
         fava, iava,
         0x00, 0x00,             // Alignment
         0x01, 0x00, 0x00, 0x00, // EMHEADER1(M) without NEXTINT
-        char_value             // Char
+        valu                    // Char
     };
     //}
 
@@ -6281,6 +6284,7 @@ TEST_P(XCdrOptionalTest, char_align_4_optional)
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
     constexpr char char_value {'}'};
+    constexpr uint8_t valu {static_cast<uint8_t>(char_value)};
 
     //{ Defining expected XCDR streams
     XCdrStreamValues expected_streams;
@@ -6289,14 +6293,14 @@ TEST_P(XCdrOptionalTest, char_align_4_optional)
         0x00, 0x00, 0x00, 0x00, // Encapsulation
         iava, iava, iava, fava,
         0x00, 0x01, 0x00, 0x01, // ShortMemberHeader
-        char_value             // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
         0x00, 0x01, 0x00, 0x00, // Encapsulation
         fava, iava, iava, iava,
         0x01, 0x00, 0x01, 0x00, // ShortMemberHeader
-        char_value             // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
     {
@@ -6304,7 +6308,7 @@ TEST_P(XCdrOptionalTest, char_align_4_optional)
         0x00, 0x00, 0x00, 0x04, // ShortMemberHeader
         iava, iava, iava, fava,
         0x00, 0x01, 0x00, 0x01, // ShortMemberHeader
-        char_value,            // Char
+        valu,                   // Char
         0x00, 0x00, 0x00,       // Alignment
         0x3F, 0x02, 0x00, 0x00  // Sentinel
     };
@@ -6314,7 +6318,7 @@ TEST_P(XCdrOptionalTest, char_align_4_optional)
         0x00, 0x00, 0x04, 0x00, // ShortMemberHeader
         fava, iava, iava, iava,
         0x01, 0x00, 0x01, 0x00, // ShortMemberHeader
-        char_value,            // Char
+        valu,                   // Char
         0x00, 0x00, 0x00,       // Alignment
         0x02, 0x3F, 0x00, 0x00  // Sentinel
     };
@@ -6323,14 +6327,14 @@ TEST_P(XCdrOptionalTest, char_align_4_optional)
         0x00, 0x06, 0x00, 0x00, // Encapsulation
         iava, iava, iava, fava,
         0x01,                   // Present
-        char_value             // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
         0x00, 0x07, 0x00, 0x00, // Encapsulation
         fava, iava, iava, iava,
         0x01,                   // Present
-        char_value             // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
@@ -6338,7 +6342,7 @@ TEST_P(XCdrOptionalTest, char_align_4_optional)
         0x00, 0x00, 0x00, 0x06, // DHEADER
         iava, iava, iava, fava,
         0x01,                   // Present
-        char_value             // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
@@ -6346,7 +6350,7 @@ TEST_P(XCdrOptionalTest, char_align_4_optional)
         0x06, 0x00, 0x00, 0x00, // DHEADER
         fava, iava, iava, iava,
         0x01,                   // Present
-        char_value             // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
@@ -6355,7 +6359,7 @@ TEST_P(XCdrOptionalTest, char_align_4_optional)
         0x20, 0x00, 0x00, 0x00, // EMHEADER1(M) without NEXTINT
         iava, iava, iava, fava,
         0x00, 0x00, 0x00, 0x01, // EMHEADER1(M) without NEXTINT
-        char_value             // Char
+        valu                    // Char
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
@@ -6364,7 +6368,7 @@ TEST_P(XCdrOptionalTest, char_align_4_optional)
         0x00, 0x00, 0x00, 0x20, // EMHEADER1(M) without NEXTINT
         fava, iava, iava, iava,
         0x01, 0x00, 0x00, 0x00, // EMHEADER1(M) without NEXTINT
-        char_value             // Char
+        valu                    // Char
     };
     //}
 

@@ -579,7 +579,7 @@ void longdouble_align_serialize(
 
 TEST_P(XCdrBasicTypesTest, short)
 {
-    constexpr int16_t short_value {static_cast<int16_t>(0xCDDC)};
+    const int16_t short_value {static_cast<int16_t>(0xCDDC)};
     constexpr uint8_t ival {0xCD};
     constexpr uint8_t fval {0xDC};
 

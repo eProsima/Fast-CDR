@@ -152,7 +152,7 @@ Cdr& Cdr::read_encapsulation()
         }
 
         // Check encapsulationKind correctness
-        const uint8_t encoding_flag = encapsulation & ~0x1_8u;
+        const uint8_t encoding_flag = encapsulation & static_cast<uint8_t>(~0x1_8u);
         switch (encoding_flag)
         {
             case EncodingAlgorithmFlag::PLAIN_CDR2:

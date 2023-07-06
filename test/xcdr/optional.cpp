@@ -798,8 +798,8 @@ TEST_P(XCdrOptionalTest, null_optional)
 
 TEST_P(XCdrOptionalTest, short_optional)
 {
-    constexpr int16_t short_value {static_cast<int16_t>(0xCDDC)};
-    constexpr uint8_t ival {0xCD};
+    constexpr int16_t short_value {0x7DDC};
+    constexpr uint8_t ival {0x7D};
     constexpr uint8_t fval {0xDC};
 
     //{ Defining expected XCDR streams
@@ -2353,8 +2353,8 @@ TEST_P(XCdrOptionalTest, null_align_4_optional)
 TEST_P(XCdrOptionalTest, short_align_1_optional)
 {
     const uint8_t align_value {0xAB};
-    const int16_t short_value {static_cast<int16_t>(0xCDDC)};
-    constexpr uint8_t ival {0xCD};
+    const int16_t short_value {0x7DDC};
+    constexpr uint8_t ival {0x7D};
     constexpr uint8_t fval {0xDC};
 
     //{ Defining expected XCDR streams
@@ -2462,8 +2462,8 @@ TEST_P(XCdrOptionalTest, short_align_2_optional)
     const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
-    const int16_t short_value {static_cast<int16_t>(0xCDDC)};
-    constexpr uint8_t ival {0xCD};
+    const int16_t short_value {0x7DDC};
+    constexpr uint8_t ival {0x7D};
     constexpr uint8_t fval {0xDC};
 
     //{ Defining expected XCDR streams
@@ -2575,8 +2575,8 @@ TEST_P(XCdrOptionalTest, short_align_4_optional)
     const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
-    const int16_t short_value {static_cast<int16_t>(0xCDDC)};
-    constexpr uint8_t ival {0xCD};
+    const int16_t short_value {0x7DDC};
+    constexpr uint8_t ival {0x7D};
     constexpr uint8_t fval {0xDC};
 
     //{ Defining expected XCDR streams
@@ -6893,8 +6893,8 @@ TEST_P(XCdrOptionalTest, two_inner_null_optional)
 
 TEST_P(XCdrOptionalTest, two_inner_short_optional)
 {
-    const int16_t short_value {static_cast<int16_t>(0xCDDC)};
-    constexpr uint8_t ival {0xCD};
+    const int16_t short_value {0x7DDC};
+    constexpr uint8_t ival {0x7D};
     constexpr uint8_t fval {0xDC};
 
     //{ Defining expected XCDR streams

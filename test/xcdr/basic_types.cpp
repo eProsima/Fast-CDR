@@ -3018,8 +3018,8 @@ TEST_P(XCdrBasicTypesTest, map_struct)
 TEST_P(XCdrBasicTypesTest, short_align_1)
 {
     const uint8_t align_value {0xAB};
-    const int16_t short_value {static_cast<int16_t>(0xCDDC)};
-    constexpr uint8_t ival {0xCD};
+    const int16_t short_value {0x7DDC};
+    constexpr uint8_t ival {0x7D};
     constexpr uint8_t fval {0xDC};
 
     //{ Defining expected XCDR streams
@@ -3125,8 +3125,8 @@ TEST_P(XCdrBasicTypesTest, short_align_2)
     const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
-    const int16_t short_value {static_cast<int16_t>(0xCDDC)};
-    constexpr uint8_t ival {0xCD};
+    const int16_t short_value {0x7DDC};
+    constexpr uint8_t ival {0x7D};
     constexpr uint8_t fval {0xDC};
 
     //{ Defining expected XCDR streams
@@ -3226,8 +3226,8 @@ TEST_P(XCdrBasicTypesTest, short_align_4)
     const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
-    const int16_t short_value {static_cast<int16_t>(0xCDDC)};
-    constexpr uint8_t ival {0xCD};
+    const int16_t short_value {0x7DDC};
+    constexpr uint8_t ival {0x7D};
     constexpr uint8_t fval {0xDC};
 
     //{ Defining expected XCDR streams

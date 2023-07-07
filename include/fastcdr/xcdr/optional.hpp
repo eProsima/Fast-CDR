@@ -68,6 +68,7 @@ struct optional_storage<T, typename std::enable_if<std::is_trivially_destructibl
 /* *INDENT-ON* */
 } // namespace detail
 
+//! An empty class type used to indicate optional type with uninitialized state.
 struct nullopt_t
 {
     constexpr explicit nullopt_t(
@@ -77,8 +78,14 @@ struct nullopt_t
 
 };
 
+/*!
+ * @brief nullopt is a constant of type nullopt_t that is used to indicate optional type with uninitialized state.
+ */
 static constexpr nullopt_t nullopt {0};
 
+/*!
+ * @brief This class template manages an optional contained value, i.e. a value that may or may not be present.
+ */
 template<class T>
 class optional
 {
@@ -86,8 +93,10 @@ public:
 
     using type = T;
 
+    //! Default constructor
     optional() = default;
 
+    //! Copy constructor from an instance of the templated class.
     optional(
             const T& val) noexcept
     {
@@ -95,6 +104,7 @@ public:
         storage_.engaged_ = true;
     }
 
+    //! Move constructor from an instance of the templated class.
     optional(
             T&& val) noexcept
     {
@@ -102,6 +112,7 @@ public:
         storage_.engaged_ = true;
     }
 
+    //! Copy constructor.
     optional(
             const optional<T>& val) noexcept
     {
@@ -109,6 +120,7 @@ public:
         storage_.engaged_ = val.storage_.engaged_;
     }
 
+    //! Move constructor.
     optional(
             optional<T>&& val) noexcept
     {
@@ -116,8 +128,14 @@ public:
         storage_.engaged_ = val.storage_.engaged_;
     }
 
+    //! Destructor
     ~optional() = default;
 
+    /*!
+     * @brief Constructs the contained value in-place
+     *
+     * @param[in] _args The arguments to pass to the constructor.
+     */
     template<class ... Args> void emplace(
             Args&&... _args)
     {
@@ -126,6 +144,12 @@ public:
         storage_.engaged_ = true;
     }
 
+    /*!
+     * @brief Reset the state of the optional
+     *
+     * @param[in] initial_engaged True value initializes the state with a default instance of the templated class.
+     * False value leaves the optional in a uninitialized state.
+     */
     void reset(
             bool initial_engaged = false)
     {
@@ -140,35 +164,65 @@ public:
         }
     }
 
+    /*!
+     * @brief Returns the contained value.
+     *
+     * @return The contained value.
+     * @exception exception::BadOptionalAccessException This exception is thrown when the optional is uninitialized.
+     */
     T& value()&
     {
         return storage_.engaged_ ? storage_.val_ : throw exception::BadOptionalAccessException(
                          "Bad optional accesss: value not set");
     }
 
+    /*!
+     * @brief Returns the contained value.
+     *
+     * @return The contained value.
+     * @exception exception::BadOptionalAccessException This exception is thrown when the optional is uninitialized.
+     */
     const T& value() const&
     {
         return storage_.engaged_ ? storage_.val_ : throw exception::BadOptionalAccessException(
                          "Bad optional accesss: value not set");
     }
 
+    /*!
+     * @brief Returns the contained value.
+     *
+     * @return The contained value.
+     * @exception exception::BadOptionalAccessException This exception is thrown when the optional is uninitialized.
+     */
     T&& value() &&
     {
         return storage_.engaged_ ? std::move(storage_.val_) : throw exception::BadOptionalAccessException(
                          "Bad optional accesss: value not set");
     }
 
+    /*!
+     * @brief Returns the contained value.
+     *
+     * @return The contained value.
+     * @exception exception::BadOptionalAccessException This exception is thrown when the optional is uninitialized.
+     */
     const T&& value() const&&
     {
         return storage_.engaged_ ? std::move(storage_.val_) : throw exception::BadOptionalAccessException(
                          "Bad optional accesss: value not set");
     }
 
+    /*!
+     * @brief Checks whether the optional contains a value.
+     *
+     * @return Whether the optional contains a value.
+     */
     bool has_value() const
     {
         return storage_.engaged_;
     }
 
+    //! Assigns content from an optional.
     optional& operator =(
             const optional& opt)
     {
@@ -181,6 +235,7 @@ public:
         return *this;
     }
 
+    //! Assigns content from an optional.
     optional& operator =(
             optional&& opt)
     {
@@ -193,6 +248,7 @@ public:
         return *this;
     }
 
+    //! Assigns content from an instance of the templated class.
     optional& operator =(
             const T& val)
     {
@@ -202,6 +258,7 @@ public:
         return *this;
     }
 
+    //! Assigns content from an instance of the templated class.
     optional& operator =(
             T&& val)
     {
@@ -211,6 +268,7 @@ public:
         return *this;
     }
 
+    //! Unintialize the optional.
     optional& operator = (
             nullopt_t) noexcept
     {
@@ -218,6 +276,7 @@ public:
         return *this;
     }
 
+    //! Compares optional values.
     bool operator ==(
             const optional& opt_val) const
     {
@@ -225,42 +284,86 @@ public:
                (storage_.engaged_ ? opt_val.storage_.val_ == storage_.val_ : true);
     }
 
+    //! Compares optional values.
     bool operator !=(
             const optional& opt_val) const
     {
         return !operator ==(opt_val);
     }
 
+    /*!
+     * @brief Accesses the contained value.
+     *
+     * The behavior is undefined if *this does not contain a value.
+     *
+     * @return The contained value.
+     */
     T& operator *() & noexcept
     {
         return storage_.val_;
     }
 
+    /*!
+     * @brief Accesses the contained value.
+     *
+     * The behavior is undefined if *this does not contain a value.
+     *
+     * @return The contained value.
+     */
     const T& operator *() const& noexcept
     {
         return storage_.val_;
     }
 
+    /*!
+     * @brief Accesses the contained value.
+     *
+     * The behavior is undefined if *this does not contain a value.
+     *
+     * @return The contained value.
+     */
     T&& operator *() && noexcept
     {
         return std::move(storage_.val_);
     }
 
+    /*!
+     * @brief Accesses the contained value.
+     *
+     * The behavior is undefined if *this does not contain a value.
+     *
+     * @return The contained value.
+     */
     const T&& operator *() const&& noexcept
     {
         return std::move(storage_.val_);
     }
 
+    /*!
+     * @brief Accesses the contained value.
+     *
+     * The behavior is undefined if *this does not contain a value.
+     *
+     * @return The contained value.
+     */
     T* operator ->() noexcept
     {
         return std::addressof(storage_.val_);
     }
 
+    /*!
+     * @brief Accesses the contained value.
+     *
+     * The behavior is undefined if *this does not contain a value.
+     *
+     * @return The contained value.
+     */
     const T* operator ->() const noexcept
     {
         return std::addressof(storage_.val_);
     }
 
+    //! Checks whether the optional contains a value.
     explicit operator bool() const noexcept
     {
         return storage_.engaged_;
@@ -269,9 +372,9 @@ public:
 private:
 
     detail::optional_storage<T> storage_;
-};// namespace fastcdr
+};       // namespace fastcdr
 
-} // namespace fastcdr
-} // namespace eprosima
+}        // namespace fastcdr
+}        // namespace eprosima
 
-#endif //_FASTCDR_XCDR_OPTIONAL_HPP_
+     #endif //_FASTCDR_XCDR_OPTIONAL_HPP_

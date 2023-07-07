@@ -18,7 +18,7 @@
 #include <new>
 #include <type_traits>
 
-#include "../exceptions/BadParamException.h"
+#include "../exceptions/BadOptionalAccessException.hpp"
 
 namespace eprosima {
 namespace fastcdr {
@@ -142,22 +142,26 @@ public:
 
     T& value()&
     {
-        return storage_.engaged_ ? storage_.val_ : throw exception::BadParamException("value not set");
+        return storage_.engaged_ ? storage_.val_ : throw exception::BadOptionalAccessException(
+                         "Bad optional accesss: value not set");
     }
 
     const T& value() const&
     {
-        return storage_.engaged_ ? storage_.val_ : throw exception::BadParamException("value not set");
+        return storage_.engaged_ ? storage_.val_ : throw exception::BadOptionalAccessException(
+                         "Bad optional accesss: value not set");
     }
 
     T&& value() &&
     {
-        return storage_.engaged_ ? std::move(storage_.val_) : throw exception::BadParamException("value not set");
+        return storage_.engaged_ ? std::move(storage_.val_) : throw exception::BadOptionalAccessException(
+                         "Bad optional accesss: value not set");
     }
 
     const T&& value() const&&
     {
-        return storage_.engaged_ ? std::move(storage_.val_) : throw exception::BadParamException("value not set");
+        return storage_.engaged_ ? std::move(storage_.val_) : throw exception::BadOptionalAccessException(
+                         "Bad optional accesss: value not set");
     }
 
     bool has_value() const

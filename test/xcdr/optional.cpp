@@ -633,6 +633,13 @@ void longdouble_align_serialize_optional(
     //}
 }
 
+TEST(XCdrOptionalTest, bad_optional_access)
+{
+    optional<int32_t> opt;
+
+    ASSERT_THROW(opt.value(), exception::BadOptionalAccessException);
+}
+
 TEST_P(XCdrOptionalTest, null_optional)
 {
     //{ Defining expected XCDR streams

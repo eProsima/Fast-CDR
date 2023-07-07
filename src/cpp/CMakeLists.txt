@@ -20,9 +20,10 @@ set_sources(
     Cdr.cpp
     FastCdr.cpp
     FastBuffer.cpp
+    exceptions/BadOptionalAccessException.cpp
+    exceptions/BadParamException.cpp
     exceptions/Exception.cpp
     exceptions/NotEnoughMemoryException.cpp
-    exceptions/BadParamException.cpp
     FastCdr.rc
 )
 

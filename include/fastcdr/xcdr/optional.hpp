@@ -172,8 +172,13 @@ public:
      */
     T& value()&
     {
-        return storage_.engaged_ ? storage_.val_ : throw exception::BadOptionalAccessException(
-                         "Bad optional accesss: value not set");
+        if (!storage_.engaged_)
+        {
+            throw exception::BadOptionalAccessException(
+                      "Bad optional accesss: value not set");
+        }
+
+        return storage_.val_;
     }
 
     /*!
@@ -184,8 +189,13 @@ public:
      */
     const T& value() const&
     {
-        return storage_.engaged_ ? storage_.val_ : throw exception::BadOptionalAccessException(
-                         "Bad optional accesss: value not set");
+        if (!storage_.engaged_)
+        {
+            throw exception::BadOptionalAccessException(
+                      "Bad optional accesss: value not set");
+        }
+
+        return storage_.val_;
     }
 
     /*!
@@ -196,8 +206,13 @@ public:
      */
     T&& value() &&
     {
-        return storage_.engaged_ ? std::move(storage_.val_) : throw exception::BadOptionalAccessException(
-                         "Bad optional accesss: value not set");
+        if (!storage_.engaged_)
+        {
+            throw exception::BadOptionalAccessException(
+                      "Bad optional accesss: value not set");
+        }
+
+        return std::move(storage_.val_);
     }
 
     /*!
@@ -208,8 +223,13 @@ public:
      */
     const T&& value() const&&
     {
-        return storage_.engaged_ ? std::move(storage_.val_) : throw exception::BadOptionalAccessException(
-                         "Bad optional accesss: value not set");
+        if (!storage_.engaged_)
+        {
+            throw exception::BadOptionalAccessException(
+                      "Bad optional accesss: value not set");
+        }
+
+        return std::move(storage_.val_);
     }
 
     /*!

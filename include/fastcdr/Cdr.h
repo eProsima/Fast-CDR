@@ -49,9 +49,7 @@ class Cdr_DllAPI Cdr
 {
 public:
 
-    /*!
-     * @brief This enumeration represents endianness types.
-     */
+    //! Represents endianness types.
     typedef enum : uint8_t
     {
         //! @brief Big endianness.
@@ -60,14 +58,22 @@ public:
         LITTLE_ENDIANNESS = 0x1
     } Endianness;
 
-    //! @brief Default endiness in the system.
+    //! Default endianess in the system.
     static const Endianness DEFAULT_ENDIAN;
 
+    /*!
+     * Used to decide, in encoding algorithms where member headers support a short header version and a long header
+     * version, which one will be used.
+     */
     typedef enum
     {
+        //! Initially a short member header is allocated and cannot be changed. This option may cause an exception.
         SHORT_HEADER,
+        //! Initially a long member header is allocated and cannot be changed.
         LONG_HEADER,
+        //! Initially a short member header is allocated but can be changed to the longer version.
         AUTO_WITH_SHORT_HEADER_BY_DEFAULT,
+        //! Initially a long member header is allocated but can be changed to the shorten version.
         AUTO_WITH_LONG_HEADER_BY_DEFAULT
     } XCdrHeaderSelection;
 
@@ -80,19 +86,16 @@ public:
 
     public:
 
-        /*!
-         * @brief Default constructor.
-         */
+        //! @brief Default constructor.
         state(
                 const Cdr& cdr);
 
-        /*!
-         * @brief Copy constructor.
-         */
+        //! @brief Copy constructor.
         state(
                 const state& state);
 
 
+        //! Compares two states.
         bool operator ==(
                 const state& other_state) const;
 
@@ -101,41 +104,41 @@ public:
         state& operator =(
                 const state& state) = delete;
 
-        //! @brief The position in the buffer when the state was created.
+        //! The position in the buffer when the state was created.
         const FastBuffer::iterator offset_;
 
-        //! @brief The position from the aligment is calculated,  when the state was created..
+        //! The position from the alignment is calculated, when the state was created..
         const FastBuffer::iterator origin_;
 
-        //! @brief This attribute specified if it is needed to swap the bytes when the state was created..
+        //! This attribute specified if it is needed to swap the bytes when the state was created..
         bool m_swapBytes {false};
 
-        //! @brief Stores the last datasize serialized/deserialized when the state was created.
+        //! Stores the last datasize serialized/deserialized when the state was created.
         size_t m_lastDataSize {0};
 
-        //!
-        uint32_t member_size_ {0};
-
-        //!
+        //! Next member id which will be encoded.
         MemberId next_member_id_;
 
-        //!
+        //! Not related with the state. Used by encoding algorithms to set the encoded member size.
+        uint32_t member_size_ {0};
+
+        //! Not related with the state. Used by encoding algorithms to store the selected member header version.
         XCdrHeaderSelection header_selection_ {XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT};
 
-        //!
+        //! Not related with the state. Used by encoding algorithms to store the allocated member header version.
         XCdrHeaderSelection header_serialized_ {XCdrHeaderSelection::SHORT_HEADER};
 
-        //!
+        //! Not related with the state. Used by encoding algorithms to store the previous encoding algorithm.
         EncodingAlgorithmFlag previous_enconding_ {EncodingAlgorithmFlag::PLAIN_CDR2};
     };
 
     /*!
      * @brief This constructor creates an eprosima::fastcdr::Cdr object that can serialize/deserialize
      * the assigned buffer.
-     *
      * @param cdrBuffer A reference to the buffer that contains (or will contain) the CDR representation.
      * @param endianness The initial endianness that will be used. The default value is the endianness of the system.
-     * @param cdr_version Represents the type of CDR that will be used in serialization/deserialization. The default value is CORBA CDR.
+     * @param cdr_version Represents the type of encoding algorithm that will be used in serialization/deserialization.
+     * The default value is CdrVersion::XCDRv2.
      */
     Cdr(
             FastBuffer& cdrBuffer,
@@ -159,20 +162,26 @@ public:
      */
     Cdr& serialize_encapsulation();
 
+    /*!
+     * @brief Retrieves the CdrVersion used by the instance.
+     * @return Configured CdrVersion.
+     */
     CdrVersion get_cdr_version() const
     {
         return cdr_version_;
     }
 
     /*!
-     * @brief Returns the EncodingAlgorithmFlag set in the encapsulation when the CDR type is eprosima::fastcdr::DDS_CDR.
+     * @brief Returns the EncodingAlgorithmFlag set in the encapsulation when the CDR type is
+     * CdrVersion::DDS_CDR, CdrVersion::XCDRv1 or CdrVersion::XCDRv2.
      * @return The specified flag in the encapsulation.
      */
     EncodingAlgorithmFlag get_encoding_flag() const;
 
     /*!
-     * @brief Sets the EncodingAlgorithmFlag for th encapsulation when the CDR type is eprosima::fastcdr::DDS_CDR.
-     * @param encoding_flag Value to be used in the encapsulation.
+     * @brief Sets the EncodingAlgorithmFlag for the encapsulation when the CDR type is
+     * CdrVersion::DDS_CDR, CdrVersion::XCDRv1 or CdrVersion::XCDRv2.
+     * @param[in] encoding_flag Value to be used in the encapsulation.
      */
     void set_encoding_flag(
             EncodingAlgorithmFlag encoding_flag);

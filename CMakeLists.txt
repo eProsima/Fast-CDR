@@ -32,57 +32,9 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 ###############################################################################
-# Version information                                                         #
-###############################################################################
-
-#If not set, copy over product version from configure.ac
-file(STRINGS
-    configure.ac
-    LIB_MAJOR_VERSION_TMP
-    REGEX "^m4_define\\(\\[?version_major\\]?, *\\[?[0-9]+\\]?\\)"
-    )
-file(STRINGS
-    configure.ac
-    LIB_MINOR_VERSION_TMP
-    REGEX "^m4_define\\(\\[?version_minor\\]?, *\\[?[0-9]+\\]?\\)"
-    )
-file(STRINGS
-    configure.ac
-    LIB_PATCH_VERSION_TMP
-    REGEX "^m4_define\\(\\[?version_micro\\]?, *\\[?[0-9]+\\]?\\)"
-    )
-
-string(REGEX REPLACE "m4_define\\(\\[?version_major\\]?, *\\[?([0-9]+)\\]?\\)"
-    "\\1"
-    LIB_MAJOR_VERSION
-    ${LIB_MAJOR_VERSION_TMP}
-    )
-string(REGEX REPLACE "m4_define\\(\\[?version_minor\\]?, *\\[?([0-9]+)\\]?\\)"
-    "\\1"
-    LIB_MINOR_VERSION
-    ${LIB_MINOR_VERSION_TMP}
-    )
-string(REGEX REPLACE "m4_define\\(\\[?version_micro\\]?, *\\[?([0-9]+)\\]?\\)"
-    "\\1"
-    LIB_PATCH_VERSION
-    ${LIB_PATCH_VERSION_TMP}
-    )
-
-set(LIB_VERSION_STR "${LIB_MAJOR_VERSION}.${LIB_MINOR_VERSION}.${LIB_PATCH_VERSION}")
-
-###############################################################################
 # Project                                                                     #
 ###############################################################################
-if(CMAKE_VERSION VERSION_LESS 3.0)
-    project(fastcdr CXX)
-    set(PROJECT_VERSION_MAJOR "${LIB_MAJOR_VERSION}")
-    set(PROJECT_VERSION_MINOR "${LIB_MINOR_VERSION}")
-    set(PROJECT_VERSION_PATCH "${LIB_PATCH_VERSION}")
-    set(PROJECT_VERSION "${LIB_VERSION_STR}")
-else()
-    cmake_policy(SET CMP0048 NEW)
-    project(fastcdr VERSION "${LIB_VERSION_STR}" LANGUAGES CXX)
-endif()
+project(fastcdr VERSION 2.0.0 LANGUAGES CXX)
 
 set(PROJECT_NAME_STYLED "FastCDR")
 set(PROJECT_NAME_LARGE "Fast CDR")
@@ -92,7 +44,6 @@ set(${PROJECT_NAME}_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} library provides
 
 message(STATUS "Configuring ${PROJECT_NAME_LARGE}")
 message(STATUS "Version: ${PROJECT_VERSION}")
-message(STATUS "To change the version modify the file configure.ac")
 
 ###############################################################################
 # Generation of windows installers.

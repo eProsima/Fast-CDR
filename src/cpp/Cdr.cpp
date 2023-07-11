@@ -95,6 +95,25 @@ Cdr::Cdr(
     switch (cdr_version_)
     {
         case CdrVersion::XCDRv2:
+            align64_ = 4;
+            break;
+        case CdrVersion::XCDRv1:
+            encoding_flag_ = EncodingAlgorithmFlag::PLAIN_CDR;
+            current_encoding_ = EncodingAlgorithmFlag::PLAIN_CDR;
+            break;
+        default:
+            encoding_flag_ = EncodingAlgorithmFlag::PLAIN_CDR;
+            current_encoding_ = EncodingAlgorithmFlag::PLAIN_CDR;
+            break;
+    }
+    reset_callbacks();
+}
+
+void Cdr::reset_callbacks()
+{
+    switch (cdr_version_)
+    {
+        case CdrVersion::XCDRv2:
             begin_serialize_member_ = &Cdr::xcdr2_begin_serialize_member;
             end_serialize_member_ = &Cdr::xcdr2_end_serialize_member;
             begin_serialize_opt_member_ = &Cdr::xcdr2_begin_serialize_member;
@@ -102,7 +121,6 @@ Cdr::Cdr(
             begin_serialize_type_ = &Cdr::xcdr2_begin_serialize_type;
             end_serialize_type_ = &Cdr::xcdr2_end_serialize_type;
             deserialize_type_ = &Cdr::xcdr2_deserialize_type;
-            align64_ = 4;
             break;
         case CdrVersion::XCDRv1:
             begin_serialize_member_ = &Cdr::xcdr1_begin_serialize_member;
@@ -112,12 +130,15 @@ Cdr::Cdr(
             begin_serialize_type_ = &Cdr::xcdr1_begin_serialize_type;
             end_serialize_type_ = &Cdr::xcdr1_end_serialize_type;
             deserialize_type_ = &Cdr::xcdr1_deserialize_type;
-            encoding_flag_ = EncodingAlgorithmFlag::PLAIN_CDR;
-            current_encoding_ = EncodingAlgorithmFlag::PLAIN_CDR;
             break;
         default:
-            encoding_flag_ = EncodingAlgorithmFlag::PLAIN_CDR;
-            current_encoding_ = EncodingAlgorithmFlag::PLAIN_CDR;
+            begin_serialize_member_ = nullptr;
+            end_serialize_member_ = nullptr;
+            begin_serialize_opt_member_ = nullptr;
+            end_serialize_opt_member_ = nullptr;
+            begin_serialize_type_ = nullptr;
+            end_serialize_type_ = nullptr;
+            deserialize_type_ = nullptr;
             break;
     }
 }
@@ -158,29 +179,40 @@ Cdr& Cdr::read_encapsulation()
             case EncodingAlgorithmFlag::PLAIN_CDR2:
             case EncodingAlgorithmFlag::DELIMIT_CDR2:
             case EncodingAlgorithmFlag::PL_CDR2:
-                if (CdrVersion::XCDRv2 != cdr_version_)
+                if (CdrVersion::XCDRv1 <= cdr_version_)
+                {
+                    cdr_version_ = CdrVersion::XCDRv2;
+                    align64_ = 4;
+                }
+                else
                 {
                     throw BadParamException(
                               "Unexpected encoding algorithm received in Cdr::read_encapsulation. XCDRv2 should be selected.");
                 }
                 break;
             case EncodingAlgorithmFlag::PL_CDR:
-                if (CdrVersion::XCDRv1 != cdr_version_)
+                if (CdrVersion::XCDRv1 <= cdr_version_)
+                {
+                    cdr_version_ = CdrVersion::XCDRv1;
+                    align64_ = 8;
+                }
+                else
                 {
                     throw BadParamException(
                               "Unexpected encoding algorithm received in Cdr::read_encapsulation. XCDRv1 should be selected");
                 }
                 break;
             case EncodingAlgorithmFlag::PLAIN_CDR:
-                if (CdrVersion::XCDRv1 < cdr_version_)
+                if (CdrVersion::XCDRv1 <= cdr_version_)
                 {
-                    throw BadParamException(
-                              "Unexpected encoding algorithm received in Cdr::read_encapsulation. XCDRv2 shouldn't be selected");
+                    cdr_version_ = CdrVersion::XCDRv1;
+                    align64_ = 8;
                 }
                 break;
             default:
                 throw BadParamException("Unexpected encoding algorithm received in Cdr::read_encapsulation for DDS CDR");
         }
+        reset_callbacks();
 
         encoding_flag_ = static_cast<EncodingAlgorithmFlag>(encoding_flag);
         current_encoding_ = encoding_flag_;

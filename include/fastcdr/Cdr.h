@@ -49,7 +49,6 @@ class Cdr_DllAPI Cdr
 {
 public:
 
-    //! Represents endianness types.
     typedef enum : uint8_t
     {
         //! @brief Big endianness.
@@ -4759,6 +4758,11 @@ private:
     Cdr& xcdr2_deserialize_type(
             EncodingAlgorithmFlag type_encoding,
             std::function<bool (Cdr&, const MemberId&)> functor);
+
+    /*!
+     * @brief Resets the internal callbacks depending on the current selected Cdr version.
+     */
+    void reset_callbacks();
 
     using begin_serialize_member_functor = Cdr& (Cdr::*)(
         const MemberId&,

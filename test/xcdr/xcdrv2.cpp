@@ -13,11 +13,66 @@ using XCdrStreamValues =
         std::array<std::vector<unsigned char>,
                 1 + Cdr::XCdrHeaderSelection::AUTO_WITH_LONG_HEADER_BY_DEFAULT>;
 
-class XCdrv2Test : public ::testing::TestWithParam< Cdr::XCdrHeaderSelection>
+class XCdrv2Test : public ::testing::TestWithParam<std::tuple<EncodingAlgorithmFlag, CdrVersion>>
 {
 };
 
-TEST_P(XCdrv2Test, pl_octet_opt_member)
+class XCdrv2PLTest : public ::testing::TestWithParam< Cdr::XCdrHeaderSelection>
+{
+};
+
+TEST_P(XCdrv2Test, auto_selection_on_decode)
+{
+    EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = Cdr::Endianness::LITTLE_ENDIANNESS;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(100, sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), 100);
+
+    //{ Encode a ushort and a ulong.
+    Cdr cdr(fast_buffer, endianness, CdrVersion::XCDRv2);
+    const uint16_t us {0x01FC};
+    const uint32_t ul {0x01FC1FCD};
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    Cdr::state enc_state(cdr);
+    cdr.begin_serialize_type(enc_state, encoding);
+    cdr << MemberId(0) << us;
+    cdr << MemberId(1) << ul;
+    cdr.end_serialize_type(enc_state);
+    //}
+
+    //{ Decode a ushort and a ulong.
+    Cdr dcdr(fast_buffer, endianness, std::get<1>(GetParam()));
+    uint16_t dus{0};
+    uint32_t dul{0};
+    dcdr.read_encapsulation();
+    ASSERT_EQ(dcdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(dcdr.endianness(), endianness);
+    dcdr.deserialize_type(encoding, [&](Cdr& dcdr_inner, const MemberId& mid) -> bool
+            {
+                bool ret_value = true;
+                switch (mid.id)
+                {
+                    case 0:
+                        dcdr_inner >> dus;
+                        break;
+                    case 1:
+                        dcdr_inner >> dul;
+                        break;
+                    default:
+                        ret_value = false;
+                        break;
+                }
+
+                return ret_value;
+            });
+    ASSERT_EQ(us, dus);
+    ASSERT_EQ(ul, dul);
+}
+
+TEST_P(XCdrv2PLTest, pl_octet_opt_member)
 {
     constexpr unsigned char octet_value = 0xCD;
 
@@ -109,6 +164,18 @@ TEST_P(XCdrv2Test, pl_octet_opt_member)
 INSTANTIATE_TEST_SUITE_P(
     XCdrTest,
     XCdrv2Test,
+    ::testing::Values(
+        std::make_tuple(EncodingAlgorithmFlag::PLAIN_CDR2, CdrVersion::XCDRv1),
+        std::make_tuple(EncodingAlgorithmFlag::PLAIN_CDR2, CdrVersion::XCDRv2),
+        std::make_tuple(EncodingAlgorithmFlag::DELIMIT_CDR2, CdrVersion::XCDRv1),
+        std::make_tuple(EncodingAlgorithmFlag::DELIMIT_CDR2, CdrVersion::XCDRv2),
+        std::make_tuple(EncodingAlgorithmFlag::PL_CDR2, CdrVersion::XCDRv1),
+        std::make_tuple(EncodingAlgorithmFlag::PL_CDR2, CdrVersion::XCDRv2)
+        ));
+
+INSTANTIATE_TEST_SUITE_P(
+    XCdrTest,
+    XCdrv2PLTest,
     ::testing::Values(
         Cdr::XCdrHeaderSelection::SHORT_HEADER,
         Cdr::XCdrHeaderSelection::LONG_HEADER,

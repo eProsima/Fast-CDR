@@ -63,7 +63,8 @@ public:
             const _T& data,
             size_t current_alignment = 0)
     {
-        return _T::calculate_serialized_size(*this, data, current_alignment);
+        extern size_t calculate_serialized_size(CdrSizeCalculator&, const _T&, size_t);
+        return calculate_serialized_size(*this, data, current_alignment);
     }
 
     template<class _T, typename std::enable_if<std::is_enum<_T>::value &&

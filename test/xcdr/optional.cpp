@@ -36,74 +36,80 @@ class XCdrOptionalTest : public ::testing::TestWithParam< std::tuple<EncodingAlg
 {
 };
 
-class InnserOptionalShortStruct
+struct InnerOptionalShortStruct
 {
 public:
 
-    InnserOptionalShortStruct() = default;
+    InnerOptionalShortStruct() = default;
 
-    InnserOptionalShortStruct(
+    InnerOptionalShortStruct(
             int16_t v)
     {
         value = v;
     }
 
     bool operator ==(
-            const InnserOptionalShortStruct& other) const
+            const InnerOptionalShortStruct& other) const
     {
         return value == other.value;
     }
 
-    void serialize(
-            Cdr& cdr) const
-    {
-        Cdr::state current_status(cdr);
-        cdr.begin_serialize_type(current_status, cdr.get_encoding_flag());
-        cdr << MemberId(3) << value;
-        cdr.end_serialize_type(current_status);
-    }
-
-    void deserialize(
-            Cdr& cdr)
-    {
-        cdr.deserialize_type(cdr.get_encoding_flag(), [this](Cdr& cdr_inner, const MemberId& mid) -> bool
-                {
-                    bool ret_value = true;
-                    if (EncodingAlgorithmFlag::PL_CDR == cdr_inner.get_encoding_flag() ||
-                    EncodingAlgorithmFlag::PL_CDR2 == cdr_inner.get_encoding_flag())
-                    {
-                        switch (mid.id)
-                        {
-                            case 3:
-                                cdr_inner >> value;
-                                break;
-                            default:
-                                ret_value = false;
-                                break;
-                        }
-
-                    }
-                    else
-                    {
-                        switch (mid.id)
-                        {
-                            case 0:
-                                cdr_inner >> value;
-                                break;
-                            default:
-                                ret_value = false;
-                                break;
-                        }
-                    }
-
-                    return ret_value;
-                });
-    }
-
-private:
-
     optional<int16_t> value;
 };
+
+namespace eprosima {
+namespace fastcdr {
+
+void serialize(
+        Cdr& cdr,
+        const InnerOptionalShortStruct& data)
+{
+    Cdr::state current_status(cdr);
+    cdr.begin_serialize_type(current_status, cdr.get_encoding_flag());
+    cdr << MemberId(3) << data.value;
+    cdr.end_serialize_type(current_status);
+}
+
+void deserialize(
+        Cdr& cdr,
+        InnerOptionalShortStruct& data)
+{
+    cdr.deserialize_type(cdr.get_encoding_flag(), [&data](Cdr& cdr_inner, const MemberId& mid) -> bool
+            {
+                bool ret_value = true;
+                if (EncodingAlgorithmFlag::PL_CDR == cdr_inner.get_encoding_flag() ||
+                EncodingAlgorithmFlag::PL_CDR2 == cdr_inner.get_encoding_flag())
+                {
+                    switch (mid.id)
+                    {
+                        case 3:
+                            cdr_inner >> data.value;
+                            break;
+                        default:
+                            ret_value = false;
+                            break;
+                    }
+
+                }
+                else
+                {
+                    switch (mid.id)
+                    {
+                        case 0:
+                            cdr_inner >> data.value;
+                            break;
+                        default:
+                            ret_value = false;
+                            break;
+                    }
+                }
+
+                return ret_value;
+            });
+}
+
+} // namespace fastcdr
+} // namespace eprosima
 
 template<class _Align>
 void null_align_serialize_the_optional_value(
@@ -6802,7 +6808,7 @@ TEST_P(XCdrOptionalTest, two_inner_null_optional)
         //}
 
         //{ Encode optional not present.
-        optional<InnserOptionalShortStruct> opt_value { {} };
+        optional<InnerOptionalShortStruct> opt_value { {} };
         cdr.set_encoding_flag(encoding);
         cdr.serialize_encapsulation();
         Cdr::state enc_state(cdr);
@@ -6819,7 +6825,7 @@ TEST_P(XCdrOptionalTest, two_inner_null_optional)
         //}
 
         //{ Decoding optional not present
-        optional<InnserOptionalShortStruct> dopt_value;
+        optional<InnerOptionalShortStruct> dopt_value;
         cdr.reset();
         cdr.read_encapsulation();
         ASSERT_EQ(cdr.get_encoding_flag(), encoding);
@@ -6855,7 +6861,7 @@ TEST_P(XCdrOptionalTest, two_inner_null_optional)
         //}
 
         //{ Encode optional not present.
-        optional<InnserOptionalShortStruct> opt_value { {} };
+        optional<InnerOptionalShortStruct> opt_value { {} };
         cdr.set_encoding_flag(encoding);
         cdr.serialize_encapsulation();
         Cdr::state enc_state(cdr);
@@ -6872,7 +6878,7 @@ TEST_P(XCdrOptionalTest, two_inner_null_optional)
         //}
 
         //{ Decoding optional not present
-        optional<InnserOptionalShortStruct> dopt_value;
+        optional<InnerOptionalShortStruct> dopt_value;
         cdr.reset();
         cdr.read_encapsulation();
         ASSERT_EQ(cdr.get_encoding_flag(), encoding);
@@ -7010,7 +7016,7 @@ TEST_P(XCdrOptionalTest, two_inner_short_optional)
         //}
 
         //{ Encode optional.
-        optional<InnserOptionalShortStruct> opt_value { {short_value} };
+        optional<InnerOptionalShortStruct> opt_value { {short_value} };
         cdr.set_encoding_flag(encoding);
         cdr.serialize_encapsulation();
         Cdr::state enc_state(cdr);
@@ -7027,7 +7033,7 @@ TEST_P(XCdrOptionalTest, two_inner_short_optional)
         //}
 
         //{ Decoding optional not present
-        optional<InnserOptionalShortStruct> dopt_value;
+        optional<InnerOptionalShortStruct> dopt_value;
         cdr.reset();
         cdr.read_encapsulation();
         ASSERT_EQ(cdr.get_encoding_flag(), encoding);
@@ -7063,7 +7069,7 @@ TEST_P(XCdrOptionalTest, two_inner_short_optional)
         //}
 
         //{ Encode optional.
-        optional<InnserOptionalShortStruct> opt_value { {short_value} };
+        optional<InnerOptionalShortStruct> opt_value { {short_value} };
         cdr.set_encoding_flag(encoding);
         cdr.serialize_encapsulation();
         Cdr::state enc_state(cdr);
@@ -7080,7 +7086,7 @@ TEST_P(XCdrOptionalTest, two_inner_short_optional)
         //}
 
         //{ Decoding optional not present
-        optional<InnserOptionalShortStruct> dopt_value;
+        optional<InnerOptionalShortStruct> dopt_value;
         cdr.reset();
         cdr.read_encapsulation();
         ASSERT_EQ(cdr.get_encoding_flag(), encoding);

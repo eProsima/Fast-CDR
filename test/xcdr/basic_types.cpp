@@ -52,86 +52,90 @@ class XCdrBasicTypesTest : public ::testing::TestWithParam< std::tuple<EncodingA
 {
 };
 
-class InnerBasicTypesShortStruct
+struct InnerBasicTypesShortStruct
 {
-public:
-
     InnerBasicTypesShortStruct() = default;
 
     InnerBasicTypesShortStruct(
             uint16_t v)
     {
-        value1_ = v;
-        value2_ = v;
+        value1 = v;
+        value2 = v;
     }
 
     bool operator ==(
             const InnerBasicTypesShortStruct& other) const
     {
-        return value1_ == other.value1_ && value2_ == other.value2_;
+        return value1 == other.value1 && value2 == other.value2;
     }
 
-    void serialize(
-            Cdr& cdr) const
-    {
-        Cdr::state current_status(cdr);
-        cdr.begin_serialize_type(current_status, cdr.get_encoding_flag());
-        cdr << MemberId(3) << value1_;
-        cdr << MemberId(0x3FFF) << value2_;
-        cdr.end_serialize_type(current_status);
-    }
+    uint16_t value1 {0};
 
-    void deserialize(
-            Cdr& cdr)
-    {
-        cdr.deserialize_type(cdr.get_encoding_flag(), [this](Cdr& cdr_inner, const MemberId& mid) -> bool
-                {
-                    bool ret_value = true;
-                    if (EncodingAlgorithmFlag::PL_CDR == cdr_inner.get_encoding_flag() ||
-                    EncodingAlgorithmFlag::PL_CDR2 == cdr_inner.get_encoding_flag())
-                    {
-                        switch (mid.id)
-                        {
-                            case 3:
-                                cdr_inner >> value1_;
-                                break;
-                            case 0x3FFF:
-                                cdr_inner >> value2_;
-                                break;
-                            default:
-                                ret_value = false;
-                                break;
-                        }
-
-                    }
-                    else
-                    {
-                        switch (mid.id)
-                        {
-                            case 0:
-                                cdr_inner >> value1_;
-                                break;
-                            case 1:
-                                cdr_inner >> value2_;
-                                break;
-                            default:
-                                ret_value = false;
-                                break;
-                        }
-                    }
-
-                    return ret_value;
-                });
-    }
-
-private:
-
-    uint16_t value1_ {0};
-
-    uint16_t value2_ {0};
+    uint16_t value2 {0};
 };
 
-class InnerBasicTypesStruct
+namespace eprosima {
+namespace fastcdr {
+void serialize(
+        Cdr& cdr,
+        const InnerBasicTypesShortStruct& data)
+
+{
+    Cdr::state current_status(cdr);
+    cdr.begin_serialize_type(current_status, cdr.get_encoding_flag());
+    cdr << MemberId(3) << data.value1;
+    cdr << MemberId(0x3FFF) << data.value2;
+    cdr.end_serialize_type(current_status);
+}
+
+void deserialize(
+        Cdr& cdr,
+        InnerBasicTypesShortStruct& data)
+{
+    cdr.deserialize_type(cdr.get_encoding_flag(), [&data](Cdr& cdr_inner, const MemberId& mid) -> bool
+            {
+                bool ret_value = true;
+                if (EncodingAlgorithmFlag::PL_CDR == cdr_inner.get_encoding_flag() ||
+                EncodingAlgorithmFlag::PL_CDR2 == cdr_inner.get_encoding_flag())
+                {
+                    switch (mid.id)
+                    {
+                        case 3:
+                            cdr_inner >> data.value1;
+                            break;
+                        case 0x3FFF:
+                            cdr_inner >> data.value2;
+                            break;
+                        default:
+                            ret_value = false;
+                            break;
+                    }
+
+                }
+                else
+                {
+                    switch (mid.id)
+                    {
+                        case 0:
+                            cdr_inner >> data.value1;
+                            break;
+                        case 1:
+                            cdr_inner >> data.value2;
+                            break;
+                        default:
+                            ret_value = false;
+                            break;
+                    }
+                }
+
+                return ret_value;
+            });
+}
+
+} // namespace fastcdr
+} // namespace eprosima
+
+struct InnerBasicTypesStruct
 {
 public:
 
@@ -140,55 +144,61 @@ public:
     InnerBasicTypesStruct(
             uint16_t v)
     {
-        value1_ = v;
-        value2_ = v;
+        value1 = v;
+        value2 = v;
     }
 
     bool operator ==(
             const InnerBasicTypesStruct& other) const
     {
-        return value1_ == other.value1_ && value2_ == other.value2_;
+        return value1 == other.value1 && value2 == other.value2;
     }
 
-    void serialize(
-            Cdr& cdr) const
-    {
-        Cdr::state current_status(cdr);
-        cdr.begin_serialize_type(current_status, cdr.get_encoding_flag());
-        cdr << MemberId(0) << value1_;
-        cdr << MemberId(1) << value2_;
-        cdr.end_serialize_type(current_status);
-    }
+    InnerBasicTypesShortStruct value1;
 
-    void deserialize(
-            Cdr& cdr)
-    {
-        cdr.deserialize_type(cdr.get_encoding_flag(), [this](Cdr& cdr_inner, const MemberId& mid) -> bool
-                {
-                    bool ret_value = true;
-                    switch (mid.id)
-                    {
-                        case 0:
-                            cdr_inner >> value1_;
-                            break;
-                        case 1:
-                            cdr_inner >> value2_;
-                            break;
-                        default:
-                            ret_value = false;
-                            break;
-                    }
-
-                    return ret_value;
-                });
-    }
-
-private:
-
-    InnerBasicTypesShortStruct value1_;
-
-    uint16_t value2_ {0};
+    uint16_t value2 {0};
 };
+
+namespace eprosima {
+namespace fastcdr {
+
+void serialize(
+        Cdr& cdr,
+        const InnerBasicTypesStruct& data)
+{
+    Cdr::state current_status(cdr);
+    cdr.begin_serialize_type(current_status, cdr.get_encoding_flag());
+    cdr << MemberId(0) << data.value1;
+    cdr << MemberId(1) << data.value2;
+    cdr.end_serialize_type(current_status);
+}
+
+void deserialize(
+        Cdr& cdr,
+        InnerBasicTypesStruct& data)
+{
+    cdr.deserialize_type(cdr.get_encoding_flag(), [&data](Cdr& cdr_inner, const MemberId& mid) -> bool
+            {
+                bool ret_value = true;
+                switch (mid.id)
+                {
+                    case 0:
+                        cdr_inner >> data.value1;
+                        break;
+                    case 1:
+                        cdr_inner >> data.value2;
+                        break;
+                    default:
+                        ret_value = false;
+                        break;
+                }
+
+                return ret_value;
+            });
+}
+
+} // namespace fastcdr
+} // namespace eprosima
 
 template<class _T>
 void serialize_the_value(
@@ -3013,6 +3023,331 @@ TEST_P(XCdrBasicTypesTest, map_struct)
     serialize_the_value(expected_streams, encoding, endianness, map_value);
 
     serialize(expected_streams, encoding, endianness, map_value);
+}
+
+TEST_P(XCdrBasicTypesTest, bitset_8)
+{
+    constexpr std::bitset<7> bitset_value {0x08};
+    constexpr uint8_t ival {0x08};
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        ival                    // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        ival                    // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x02, 0x00, 0x00, // Encapsulation
+        0x00, 0x01, 0x00, 0x01, // ShortMemberHeader
+        ival,                   // Bitset
+        0x00, 0x00, 0x00,       // Alignment
+        0x3F, 0x02, 0x00, 0x00  // Sentinel
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x03, 0x00, 0x00, // Encapsulation
+        0x01, 0x00, 0x01, 0x00, // ShortMemberHeader
+        ival,                   // Bitset
+        0x00, 0x00, 0x00,       // Alignment
+        0x02, 0x3F, 0x00, 0x00  // Sentinel
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        ival,                   // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        ival                    // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x01, // DHEADER
+        ival,                   // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        0x01, 0x00, 0x00, 0x00, // DHEADER
+        ival                    // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x0a, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x05, // DHEADER
+        0x00, 0x00, 0x00, 0x01, // EMHEADER1(M) without NEXTINT
+        ival,                   // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x0b, 0x00, 0x00, // Encapsulation
+        0x05, 0x00, 0x00, 0x00, // DHEADER
+        0x01, 0x00, 0x00, 0x00, // EMHEADER1(M) without NEXTINT
+        ival                    // Bitset
+    };
+    //}
+
+    EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+
+    serialize_the_value(expected_streams, encoding, endianness, bitset_value);
+
+    serialize(expected_streams, encoding, endianness, bitset_value);
+}
+
+TEST_P(XCdrBasicTypesTest, bitset_16)
+{
+    constexpr std::bitset<14> bitset_value {0x0088};
+    constexpr uint8_t ival {0x00};
+    constexpr uint8_t fval {0x88};
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        ival, fval              // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        fval, ival              // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x02, 0x00, 0x00, // Encapsulation
+        0x00, 0x01, 0x00, 0x02, // ShortMemberHeader
+        ival, fval,             // Bitset
+        0x00, 0x00,             // Alignment
+        0x3F, 0x02, 0x00, 0x00  // Sentinel
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x03, 0x00, 0x00, // Encapsulation
+        0x01, 0x00, 0x02, 0x00, // ShortMemberHeader
+        fval, ival,             // Bitset
+        0x00, 0x00,             // Alignment
+        0x02, 0x3F, 0x00, 0x00  // Sentinel
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        ival, fval              // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        fval, ival              // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x02, // DHEADER
+        ival, fval              // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        0x02, 0x00, 0x00, 0x00, // DHEADER
+        fval, ival              // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x0a, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x06, // DHEADER
+        0x10, 0x00, 0x00, 0x01, // EMHEADER1(M) without NEXTINT
+        ival, fval              // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x0b, 0x00, 0x00, // Encapsulation
+        0x06, 0x00, 0x00, 0x00, // DHEADER
+        0x01, 0x00, 0x00, 0x10, // EMHEADER1(M) without NEXTINT
+        fval, ival              // Bitset
+    };
+    //}
+
+    EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+
+    serialize_the_value(expected_streams, encoding, endianness, bitset_value);
+
+    serialize(expected_streams, encoding, endianness, bitset_value);
+}
+
+TEST_P(XCdrBasicTypesTest, bitset_32)
+{
+    constexpr std::bitset<30> bitset_value {0x0DDCDCDC};
+    constexpr uint8_t ival {0x0D};
+    constexpr uint8_t fval {0xDC};
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        ival, fval, fval, fval  // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        fval, fval, fval, ival  // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x02, 0x00, 0x00, // Encapsulation
+        0x00, 0x01, 0x00, 0x04, // ShortMemberHeader
+        ival, fval, fval, fval, // Bitset
+        0x3F, 0x02, 0x00, 0x00  // Sentinel
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x03, 0x00, 0x00, // Encapsulation
+        0x01, 0x00, 0x04, 0x00, // ShortMemberHeader
+        fval, fval, fval, ival, // Bitset
+        0x02, 0x3F, 0x00, 0x00  // Sentinel
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        ival, fval, fval, fval  // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        fval, fval, fval, ival  // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x04, // DHEADER
+        ival, fval, fval, fval  // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        0x04, 0x00, 0x00, 0x00, // DHEADER
+        fval, fval, fval, ival  // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x0a, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x08, // DHEADER
+        0x20, 0x00, 0x00, 0x01, // EMHEADER1(M) without NEXTINT
+        ival, fval, fval, fval  // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x0b, 0x00, 0x00, // Encapsulation
+        0x08, 0x00, 0x00, 0x00, // DHEADER
+        0x01, 0x00, 0x00, 0x20, // EMHEADER1(M) without NEXTINT
+        fval, fval, fval, ival  // Bitset
+    };
+    //}
+
+    EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+
+    serialize_the_value(expected_streams, encoding, endianness, bitset_value);
+
+    serialize(expected_streams, encoding, endianness, bitset_value);
+}
+
+TEST_P(XCdrBasicTypesTest, bitset_64)
+{
+    constexpr std::bitset<45> bitset_value {0x000000DCDCDCDCDCull};
+    constexpr uint8_t ival {0x00};
+    constexpr uint8_t fval {0xDC};
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        ival, ival, ival, fval, // Bitset
+        fval, fval, fval, fval  // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        fval, fval, fval, fval, // Bitset
+        fval, ival, ival, ival  // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x02, 0x00, 0x00, // Encapsulation
+        0x00, 0x01, 0x00, 0x08, // ShortMemberHeader
+        ival, ival, ival, fval, // Bitset
+        fval, fval, fval, fval, // Bitset
+        0x3F, 0x02, 0x00, 0x00  // Sentinel
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x03, 0x00, 0x00, // Encapsulation
+        0x01, 0x00, 0x08, 0x00, // ShortMemberHeader
+        fval, fval, fval, fval, // Bitset
+        fval, ival, ival, ival, // Bitset
+        0x02, 0x3F, 0x00, 0x00  // Sentinel
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        ival, ival, ival, fval, // Bitset
+        fval, fval, fval, fval  // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        fval, fval, fval, fval, // Bitset
+        fval, ival, ival, ival  // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x08, // DHEADER
+        ival, ival, ival, fval, // Bitset
+        fval, fval, fval, fval  // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        0x08, 0x00, 0x00, 0x00, // DHEADER
+        fval, fval, fval, fval, // Bitset
+        fval, ival, ival, ival  // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x0a, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x0c, // DHEADER
+        0x30, 0x00, 0x00, 0x01, // EMHEADER1(M) without NEXTINT
+        ival, ival, ival, fval, // Bitset
+        fval, fval, fval, fval  // Bitset
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x0b, 0x00, 0x00, // Encapsulation
+        0x0c, 0x00, 0x00, 0x00, // DHEADER
+        0x01, 0x00, 0x00, 0x30, // EMHEADER1(M) without NEXTINT
+        fval, fval, fval, fval, // Bitset
+        fval, ival, ival, ival  // Bitset
+    };
+    //}
+
+    EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+
+    serialize_the_value(expected_streams, encoding, endianness, bitset_value);
+
+    serialize(expected_streams, encoding, endianness, bitset_value);
 }
 
 TEST_P(XCdrBasicTypesTest, short_align_1)

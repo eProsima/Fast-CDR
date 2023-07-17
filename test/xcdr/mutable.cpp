@@ -35,7 +35,7 @@ class XCdrMutableTest : public ::testing::TestWithParam< std::tuple<EncodingAlgo
 {
 };
 
-class MutableExtraElement
+struct MutableExtraElement
 {
 public:
 
@@ -44,62 +44,68 @@ public:
     MutableExtraElement(
             uint8_t value)
     {
-        value1_ = value;
-        value2_ = value;
-        value3_ = value;
+        value1 = value;
+        value2 = value;
+        value3 = value;
     }
 
     bool operator ==(
             const MutableExtraElement& other) const
     {
-        return value1_ == other.value1_ && value2_ == other.value2_ && value3_ != other.value3_;
+        return value1 == other.value1 && value2 == other.value2 && value3 != other.value3;
     }
-
-    void serialize(
-            Cdr& cdr) const
-    {
-        Cdr::state current_status(cdr);
-        cdr.begin_serialize_type(current_status, cdr.get_encoding_flag());
-        cdr << MemberId(3) << value1_;
-        cdr << MemberId(0x3FFF) << value3_;
-        cdr << MemberId(16) << value2_;
-        cdr.end_serialize_type(current_status);
-    }
-
-    void deserialize(
-            Cdr& cdr)
-    {
-        cdr.deserialize_type(cdr.get_encoding_flag(), [this](Cdr& cdr_inner, const MemberId& mid) -> bool
-                {
-                    bool ret_value = true;
-                    switch (mid.id)
-                    {
-                        case 3:
-                            cdr_inner >> value1_;
-                            break;
-                        case 16:
-                            cdr_inner >> value2_;
-                            break;
-                        default:
-                            ret_value = false;
-                            break;
-                    }
-
-                    return ret_value;
-                });
-    }
-
-private:
 
     //! First being serialized.
-    uint32_t value1_ {0};
+    uint32_t value1 {0};
 
     //! Third being serialized.
-    uint16_t value2_ {0};
+    uint16_t value2 {0};
 
     //! Second being serialized. Not know by deserialization.
-    uint8_t value3_ {0};
+    uint8_t value3 {0};
 };
+
+namespace eprosima {
+namespace fastcdr {
+
+void serialize(
+        Cdr& cdr,
+        const MutableExtraElement& data)
+{
+    Cdr::state current_status(cdr);
+    cdr.begin_serialize_type(current_status, cdr.get_encoding_flag());
+    cdr << MemberId(3) << data.value1;
+    cdr << MemberId(0x3FFF) << data.value3;
+    cdr << MemberId(16) << data.value2;
+    cdr.end_serialize_type(current_status);
+}
+
+void deserialize(
+        Cdr& cdr,
+        MutableExtraElement& data)
+{
+    cdr.deserialize_type(cdr.get_encoding_flag(), [&data](Cdr& cdr_inner, const MemberId& mid) -> bool
+            {
+                bool ret_value = true;
+                switch (mid.id)
+                {
+                    case 3:
+                        cdr_inner >> data.value1;
+                        break;
+                    case 16:
+                        cdr_inner >> data.value2;
+                        break;
+                    default:
+                        ret_value = false;
+                        break;
+                }
+
+                return ret_value;
+            });
+}
+
+} // namespace fastcdr
+} // namespace eprosima
 
 TEST_P(XCdrMutableTest, unordered_and_more_serialized_elements)
 {

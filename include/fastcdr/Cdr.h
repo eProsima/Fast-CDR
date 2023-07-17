@@ -16,6 +16,7 @@
 #define _FASTCDR_CDR_H_
 
 #include <array>
+#include <bitset>
 #include <cassert>
 #include <cstdint>
 #include <functional>
@@ -948,6 +949,111 @@ public:
         try
         {
             serialize(vector_t);
+            m_swapBytes = auxSwap;
+        }
+        catch (eprosima::fastcdr::exception::Exception& ex)
+        {
+            m_swapBytes = auxSwap;
+            ex.raise();
+        }
+
+        return *this;
+    }
+
+    /*!
+     * @brief This function template serializes a map with a different endianness.
+     * @param vector_t The map that will be serialized in the buffer.
+     * @param endianness Endianness that will be used in the serialization of this value.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+     */
+    template<class _K, class _T>
+    Cdr& serialize(
+            const std::map<_K, _T>& value,
+            Endianness endianness)
+    {
+        bool auxSwap = m_swapBytes;
+        m_swapBytes = (m_swapBytes && (static_cast<Endianness>(m_endianness) == endianness)) ||
+                (!m_swapBytes && (static_cast<Endianness>(m_endianness) != endianness));
+
+        try
+        {
+            serialize(value);
+            m_swapBytes = auxSwap;
+        }
+        catch (eprosima::fastcdr::exception::Exception& ex)
+        {
+            m_swapBytes = auxSwap;
+            ex.raise();
+        }
+
+        return *this;
+    }
+
+    /*!
+     * @brief Encodes the value of a bitset into the buffer.
+     *
+     * @param[in] value A reference to the value which will be encoded in the buffer.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to encode into a buffer
+     * position that exceeds the internal memory size.
+     */
+    template<size_t N, typename std::enable_if < (N < 9) > ::type* = nullptr>
+    Cdr& serialize(
+            const std::bitset<N>& value)
+    {
+        state state_before_error(*this);
+
+        serialize(static_cast<uint8_t>(value.to_ulong()));
+
+        return *this;
+    }
+
+    template<size_t N, typename std::enable_if < (8 < N && N < 17) > ::type* = nullptr>
+    Cdr& serialize(
+            const std::bitset<N>& value)
+    {
+        state state_before_error(*this);
+
+        serialize(static_cast<uint16_t>(value.to_ulong()));
+
+        return *this;
+    }
+
+    template<size_t N, typename std::enable_if < (16 < N && N < 33) > ::type* = nullptr>
+    Cdr& serialize(
+            const std::bitset<N>& value)
+    {
+        state state_before_error(*this);
+
+        serialize(static_cast<uint32_t>(value.to_ulong()));
+
+        return *this;
+    }
+
+    template<size_t N, typename std::enable_if < (32 < N && N < 65) > ::type* = nullptr>
+    Cdr& serialize(
+            const std::bitset<N>& value)
+    {
+        state state_before_error(*this);
+
+        serialize(static_cast<uint64_t>(value.to_ullong()));
+
+        return *this;
+    }
+
+    template<size_t N>
+    Cdr& serialize(
+            const std::bitset<N>& value,
+            Endianness endianness)
+    {
+        bool auxSwap = m_swapBytes;
+        m_swapBytes = (m_swapBytes && (static_cast<Endianness>(m_endianness) == endianness)) ||
+                (!m_swapBytes && (static_cast<Endianness>(m_endianness) != endianness));
+
+        try
+        {
+            serialize(value);
             m_swapBytes = auxSwap;
         }
         catch (eprosima::fastcdr::exception::Exception& ex)
@@ -2618,6 +2724,113 @@ public:
         try
         {
             deserialize(vector_t);
+            m_swapBytes = auxSwap;
+        }
+        catch (exception::Exception& ex)
+        {
+            m_swapBytes = auxSwap;
+            ex.raise();
+        }
+
+        return *this;
+    }
+
+    /*!
+     * @brief This function template deserializes a map with a different endianness.
+     * @param vector_t The variable that will store the map read from the buffer.
+     * @param endianness Endianness that will be used in the serialization of this value.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+     */
+    template<class _K, class _T>
+    Cdr& deserialize(
+            std::map<_K, _T>& value,
+            Endianness endianness)
+    {
+        bool auxSwap = m_swapBytes;
+        m_swapBytes = (m_swapBytes && (static_cast<Endianness>(m_endianness) == endianness)) ||
+                (!m_swapBytes && (static_cast<Endianness>(m_endianness) != endianness));
+
+        try
+        {
+            deserialize(value);
+            m_swapBytes = auxSwap;
+        }
+        catch (exception::Exception& ex)
+        {
+            m_swapBytes = auxSwap;
+            ex.raise();
+        }
+
+        return *this;
+    }
+
+    /*!
+     * @brief Decodes a bitset from the buffer.
+     * @param[out] value Reference to the variable where the bitset will be stored after decoding from the buffer.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
+     * position that exceeds the internal memory size.
+     */
+    template<size_t N, typename std::enable_if < (N < 9) > ::type* = nullptr>
+    inline Cdr& deserialize(
+            std::bitset<N>& value)
+    {
+        uint8_t decode_value {0};
+        deserialize(decode_value);
+        value = decode_value;
+        return *this;
+    }
+
+    template<size_t N, typename std::enable_if < (8 < N && N < 17) > ::type* = nullptr>
+    inline Cdr& deserialize(
+            std::bitset<N>& value)
+    {
+        uint16_t decode_value {0};
+        deserialize(decode_value);
+        value = decode_value;
+        return *this;
+    }
+
+    template<size_t N, typename std::enable_if < (16 < N && N < 33) > ::type* = nullptr>
+    inline Cdr& deserialize(
+            std::bitset<N>& value)
+    {
+        uint32_t decode_value {0};
+        deserialize(decode_value);
+        value = decode_value;
+        return *this;
+    }
+
+    template<size_t N, typename std::enable_if < (32 < N && N < 65) > ::type* = nullptr>
+    inline Cdr& deserialize(
+            std::bitset<N>& value)
+    {
+        uint64_t decode_value {0};
+        deserialize(decode_value);
+        value = decode_value;
+        return *this;
+    }
+
+    /*!
+     * @brief This function template deserializes a bitset with a different endianness.
+     * @param vector_t The variable that will store the bitset read from the buffer.
+     * @param endianness Endianness that will be used in the serialization of this value.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+     */
+    template<size_t N>
+    Cdr& deserialize(
+            std::bitset<N>& value,
+            Endianness endianness)
+    {
+        bool auxSwap = m_swapBytes;
+        m_swapBytes = (m_swapBytes && (static_cast<Endianness>(m_endianness) == endianness)) ||
+                (!m_swapBytes && (static_cast<Endianness>(m_endianness) != endianness));
+
+        try
+        {
+            deserialize(value);
             m_swapBytes = auxSwap;
         }
         catch (exception::Exception& ex)

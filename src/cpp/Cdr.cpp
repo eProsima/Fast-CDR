@@ -2938,7 +2938,7 @@ void Cdr::xcdr1_end_long_member_header(
         size_t member_serialized_size)
 {
     makeAlign(alignment(4));
-    jump(sizeof(uint16_t) + sizeof(uint32_t));
+    jump(sizeof(uint16_t) + sizeof(uint16_t) + sizeof(uint32_t));
     uint32_t msize = static_cast<uint32_t>(member_serialized_size);
     serialize(msize);
 }

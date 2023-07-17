@@ -3993,9 +3993,10 @@ public:
 
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
-            size_t dheader = offset_ - dheader_state.offset_ - 4 /* DHEADER */;
+            auto offset = offset_;
             Cdr::state state_after(*this);
             set_state(dheader_state);
+            size_t dheader = offset - dheader_state.offset_ - (4 + alignment(sizeof(uint32_t)));/* DHEADER */
             serialize(static_cast<uint32_t>(dheader));
             set_state(state_after);
             serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
@@ -4060,9 +4061,10 @@ public:
 
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
-            size_t dheader = offset_ - dheader_state.offset_ - 4 /* DHEADER */;
+            auto offset = offset_;
             Cdr::state state_after(*this);
             set_state(dheader_state);
+            size_t dheader = offset - dheader_state.offset_ - (4 + alignment(sizeof(uint32_t)));/* DHEADER */
             serialize(static_cast<uint32_t>(dheader));
             set_state(state_after);
             serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
@@ -4127,9 +4129,10 @@ public:
 
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
-            size_t dheader = offset_ - dheader_state.offset_ - 4 /* DHEADER */;
+            auto offset = offset_;
             Cdr::state state_after(*this);
             set_state(dheader_state);
+            size_t dheader = offset - dheader_state.offset_ - (4 + alignment(sizeof(uint32_t)));/* DHEADER */
             serialize(static_cast<uint32_t>(dheader));
             set_state(state_after);
             serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
@@ -4577,7 +4580,7 @@ private:
     /*!
      * @brief This function returns the extra bytes regarding the allignment.
      * @param dataSize The size of the data that will be serialized.
-     * @return The size needed for the aligment.
+     * @return The size needed for the alignment.
      */
     inline size_t alignment(
             size_t dataSize) const
@@ -5066,7 +5069,7 @@ private:
     //! @brief The current position in the serialization/deserialization process.
     FastBuffer::iterator offset_;
 
-    //! @brief The position from where the aligment is calculated.
+    //! @brief The position from where the alignment is calculated.
     FastBuffer::iterator origin_;
 
     //! @brief The last position in the buffer;

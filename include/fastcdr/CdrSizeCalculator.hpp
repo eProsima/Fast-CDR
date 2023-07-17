@@ -268,7 +268,29 @@ public:
 
 #endif // if !defined(_MSC_VER)
 
-    template<class _T>
+    template<class _T, typename std::enable_if<!std::is_enum<_T>::value &&
+            !std::is_arithmetic<_T>::value>::type* = nullptr>
+    inline size_t calculate_serialized_size(
+            const std::vector<_T>& data,
+            size_t current_alignment = 0)
+    {
+        size_t initial_alignment = current_alignment;
+
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            // DHEADER
+            current_alignment += 4 + alignment(current_alignment, 4);
+        }
+
+        current_alignment += 4 + alignment(current_alignment, 4);
+
+        current_alignment += calculate_array_serialized_size(data.data(), data.size(), current_alignment);
+
+        return current_alignment - initial_alignment;
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value ||
+            std::is_arithmetic<_T>::value>::type* = nullptr>
     inline size_t calculate_serialized_size(
             const std::vector<_T>& data,
             size_t current_alignment = 0)
@@ -282,7 +304,27 @@ public:
         return current_alignment - initial_alignment;
     }
 
-    template<class _T, size_t _Size>
+    template<class _T, size_t _Size, typename std::enable_if<!std::is_enum<_T>::value &&
+            !std::is_arithmetic<_T>::value>::type* = nullptr>
+    inline size_t calculate_serialized_size(
+            const std::array<_T, _Size>& data,
+            size_t current_alignment = 0)
+    {
+        size_t initial_alignment = current_alignment;
+
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            // DHEADER
+            current_alignment += 4 + alignment(current_alignment, 4);
+        }
+
+        current_alignment += calculate_array_serialized_size(data.data(), data.size(), current_alignment);
+
+        return current_alignment - initial_alignment;
+    }
+
+    template<class _T, size_t _Size, typename std::enable_if<std::is_enum<_T>::value ||
+            std::is_arithmetic<_T>::value>::type* = nullptr>
     inline size_t calculate_serialized_size(
             const std::array<_T, _Size>& data,
             size_t current_alignment = 0)
@@ -294,7 +336,33 @@ public:
         return current_alignment - initial_alignment;
     }
 
-    template<class _K, class _V>
+    template<class _K, class _V, typename std::enable_if<!std::is_enum<_V>::value &&
+            !std::is_arithmetic<_V>::value>::type* = nullptr>
+    inline size_t calculate_serialized_size(
+            const std::map<_K, _V>& data,
+            size_t current_alignment = 0)
+    {
+        size_t initial_alignment = current_alignment;
+
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            // DHEADER
+            current_alignment += 4 + alignment(current_alignment, 4);
+        }
+
+        current_alignment += 4 + alignment(current_alignment, 4);
+
+        for (auto it = data.begin(); it != data.end(); ++it)
+        {
+            current_alignment += calculate_serialized_size(it->first, current_alignment);
+            current_alignment += calculate_serialized_size(it->second, current_alignment);
+        }
+
+        return current_alignment - initial_alignment;
+    }
+
+    template<class _K, class _V, typename std::enable_if<std::is_enum<_V>::value ||
+            std::is_arithmetic<_V>::value>::type* = nullptr>
     inline size_t calculate_serialized_size(
             const std::map<_K, _V>& data,
             size_t current_alignment = 0)

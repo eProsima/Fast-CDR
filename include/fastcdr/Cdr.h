@@ -973,7 +973,10 @@ public:
     inline Cdr& serialize(
             const _T& value)
     {
-        value.serialize(*this);
+        extern void serialize(
+            Cdr&,
+            const _T&);
+        serialize(*this, value);
         return *this;
     }
 
@@ -2640,7 +2643,10 @@ public:
     inline Cdr& deserialize(
             _T& value)
     {
-        value.deserialize(*this);
+        extern void deserialize(
+            Cdr&,
+            _T&);
+        deserialize(*this, value);
         return *this;
     }
 

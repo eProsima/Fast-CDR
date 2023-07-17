@@ -132,13 +132,13 @@ void Cdr::reset_callbacks()
             deserialize_type_ = &Cdr::xcdr1_deserialize_type;
             break;
         default:
-            begin_serialize_member_ = nullptr;
-            end_serialize_member_ = nullptr;
-            begin_serialize_opt_member_ = nullptr;
-            end_serialize_opt_member_ = nullptr;
-            begin_serialize_type_ = nullptr;
-            end_serialize_type_ = nullptr;
-            deserialize_type_ = nullptr;
+            begin_serialize_member_ = &Cdr::cdr_begin_serialize_member;
+            end_serialize_member_ = &Cdr::cdr_end_serialize_member;
+            begin_serialize_opt_member_ = &Cdr::cdr_begin_serialize_member;
+            end_serialize_opt_member_ = &Cdr::cdr_end_serialize_member;
+            begin_serialize_type_ = &Cdr::cdr_begin_serialize_type;
+            end_serialize_type_ = &Cdr::cdr_end_serialize_type;
+            deserialize_type_ = &Cdr::cdr_deserialize_type;
             break;
     }
 }
@@ -3790,6 +3790,62 @@ Cdr& Cdr::xcdr2_deserialize_type(
         next_member_id_ = current_state.next_member_id_;
     }
 
+    return *this;
+}
+
+Cdr& Cdr::cdr_begin_serialize_member(
+        const MemberId&,
+        bool,
+        Cdr::state&,
+        XCdrHeaderSelection )
+{
+    next_member_id_ = MEMBER_ID_INVALID;
+    return *this;
+}
+
+Cdr& Cdr::cdr_end_serialize_member(
+        const Cdr::state&)
+{
+    next_member_id_ = MEMBER_ID_INVALID;
+    return *this;
+}
+
+Cdr& Cdr::cdr_begin_serialize_type(
+        Cdr::state& current_state,
+        EncodingAlgorithmFlag type_encoding)
+{
+    static_cast<void>(type_encoding);
+    assert(EncodingAlgorithmFlag::PLAIN_CDR == type_encoding);
+    assert(offset_ == m_cdrBuffer.begin() ? current_encoding_ == type_encoding : true);
+    current_state.previous_encoding_ = current_encoding_;
+    current_encoding_ = type_encoding;
+    return *this;
+}
+
+Cdr& Cdr::cdr_end_serialize_type(
+        const Cdr::state& current_state)
+{
+    current_encoding_ = current_state.previous_encoding_;
+    return *this;
+}
+
+Cdr& Cdr::cdr_deserialize_type(
+        EncodingAlgorithmFlag type_encoding,
+        std::function<bool (Cdr&, const MemberId&)> functor)
+{
+    static_cast<void>(type_encoding);
+    assert(EncodingAlgorithmFlag::PLAIN_CDR == type_encoding);
+    assert(offset_ == m_cdrBuffer.begin() ? current_encoding_ == type_encoding : true);
+
+    Cdr::state current_state(*this);
+    next_member_id_ = MemberId(0);
+
+    while (offset_ != end_ && functor(*this, next_member_id_))     // TODO Tests with appendables with different length
+    {
+        ++next_member_id_.id;
+    }
+
+    next_member_id_ = current_state.next_member_id_;
     return *this;
 }
 

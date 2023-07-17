@@ -4978,6 +4978,26 @@ private:
             EncodingAlgorithmFlag type_encoding,
             std::function<bool (Cdr&, const MemberId&)> functor);
 
+    Cdr& cdr_begin_serialize_member(
+            const MemberId& member_id,
+            bool is_present,
+            Cdr::state& current_state,
+            XCdrHeaderSelection header_selection);
+
+    Cdr& cdr_end_serialize_member(
+            const Cdr::state& current_state);
+
+    Cdr& cdr_begin_serialize_type(
+            Cdr::state& current_state,
+            EncodingAlgorithmFlag type_encoding);
+
+    Cdr& cdr_end_serialize_type(
+            const Cdr::state& current_state);
+
+    Cdr& cdr_deserialize_type(
+            EncodingAlgorithmFlag type_encoding,
+            std::function<bool (Cdr&, const MemberId&)> functor);
+
     /*!
      * @brief Resets the internal callbacks depending on the current selected Cdr version.
      */

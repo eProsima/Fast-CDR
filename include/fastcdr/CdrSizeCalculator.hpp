@@ -24,6 +24,7 @@
 #include "CdrEncoding.hpp"
 #include "fastcdr_dll.h"
 #include "cdr/fixed_size_string.hpp"
+#include "detail/container_recursive_inspector.hpp"
 #include "xcdr/MemberId.hpp"
 #include "xcdr/optional.hpp"
 
@@ -304,32 +305,18 @@ public:
         return current_alignment - initial_alignment;
     }
 
-    template<class _T, size_t _Size, typename std::enable_if<!std::is_enum<_T>::value &&
-            !std::is_arithmetic<_T>::value>::type* = nullptr>
+    template<class _T, size_t _Size>
     inline size_t calculate_serialized_size(
             const std::array<_T, _Size>& data,
             size_t current_alignment = 0)
     {
         size_t initial_alignment = current_alignment;
 
-        if (CdrVersion::XCDRv2 == cdr_version_)
+        if (CdrVersion::XCDRv2 == cdr_version_ && !is_multi_array_primitive(&data))
         {
             // DHEADER
             current_alignment += 4 + alignment(current_alignment, 4);
         }
-
-        current_alignment += calculate_array_serialized_size(data.data(), data.size(), current_alignment);
-
-        return current_alignment - initial_alignment;
-    }
-
-    template<class _T, size_t _Size, typename std::enable_if<std::is_enum<_T>::value ||
-            std::is_arithmetic<_T>::value>::type* = nullptr>
-    inline size_t calculate_serialized_size(
-            const std::array<_T, _Size>& data,
-            size_t current_alignment = 0)
-    {
-        size_t initial_alignment = current_alignment;
 
         current_alignment += calculate_array_serialized_size(data.data(), data.size(), current_alignment);
 
@@ -416,6 +403,23 @@ public:
         for (size_t count = 0; count < num_elements; ++count)
         {
             current_alignment += calculate_serialized_size(data[count], current_alignment);
+        }
+
+        return current_alignment - initial_alignment;
+    }
+
+    template<class _T, size_t _N>
+    inline size_t calculate_array_serialized_size(
+            const std::array<_T, _N>* data,
+            size_t num_elements,
+            size_t current_alignment = 0)
+    {
+        size_t initial_alignment = current_alignment;
+
+        for (size_t count = 0; count < num_elements; ++count)
+        {
+            current_alignment += calculate_array_serialized_size(data[count].data(),
+                            data[count].size(), current_alignment);
         }
 
         return current_alignment - initial_alignment;

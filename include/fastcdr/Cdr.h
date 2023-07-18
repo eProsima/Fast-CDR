@@ -30,6 +30,7 @@
 #include "FastBuffer.h"
 #include "exceptions/NotEnoughMemoryException.h"
 #include "cdr/fixed_size_string.hpp"
+#include "detail/container_recursive_inspector.hpp"
 #include "xcdr/MemberId.hpp"
 #include "xcdr/optional.hpp"
 
@@ -3961,7 +3962,7 @@ public:
     }
 
     /*!
-     * @brief Encodes a non-primitive array member of a type according to the encoding algorithm used.
+     * @brief Encodes an array member of a type according to the encoding algorithm used.
      * @param[in] member_id Member identifier.
      * @param[in] member_value Non-primitive array member value.
      * @param[in] header_selection Selects which member header will be used to allocate space.
@@ -3970,9 +3971,9 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to encode into a buffer
      * position that exceeds the internal memory size.
      */
-    template<class _T, size_t _Size, typename std::enable_if<!std::is_enum<_T>::value &&
-            !std::is_arithmetic<_T>::value>::type* = nullptr>
+    template<class _T, size_t _Size>
     Cdr& serialize_member(
+
             const MemberId& member_id,
             const std::array<_T, _Size>& member_value,
             XCdrHeaderSelection header_selection = XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT)
@@ -3982,7 +3983,7 @@ public:
 
         Cdr::state dheader_state(*this);
 
-        if (CdrVersion::XCDRv2 == cdr_version_)
+        if (CdrVersion::XCDRv2 == cdr_version_ && !is_multi_array_primitive(&member_value))
         {
             // Serialize DHEADER
             uint32_t dheader {0};
@@ -3991,7 +3992,7 @@ public:
 
         serialize(member_value);
 
-        if (CdrVersion::XCDRv2 == cdr_version_)
+        if (CdrVersion::XCDRv2 == cdr_version_ && !is_multi_array_primitive(&member_value))
         {
             auto offset = offset_;
             Cdr::state state_after(*this);
@@ -4002,29 +4003,6 @@ public:
             serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
         }
 
-        return (this->*end_serialize_member_)(current_state);
-    }
-
-    /*!
-     * @brief Encodes a primitive array member of a type according to the encoding algorithm used.
-     * @param[in] member_id Member identifier.
-     * @param[in] member_value Primitive array member value.
-     * @param[in] header_selection Selects which member header will be used to allocate space.
-     * Default: XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to encode into a buffer
-     * position that exceeds the internal memory size.
-     */
-    template<class _T, size_t _Size, typename std::enable_if<std::is_enum<_T>::value ||
-            std::is_arithmetic<_T>::value>::type* = nullptr>
-    Cdr& serialize_member(
-            const MemberId& member_id,
-            const std::array<_T, _Size>& member_value,
-            XCdrHeaderSelection header_selection = XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT)
-    {
-        Cdr::state current_state(*this);
-        (this->*begin_serialize_member_)(member_id, true, current_state, header_selection);
-        serialize(member_value);
         return (this->*end_serialize_member_)(current_state);
     }
 
@@ -4214,7 +4192,7 @@ public:
     }
 
     /*!
-     * @brief Decodes a non-primitive array member of a type according to the encoding algorithm used.
+     * @brief Decodes an array member of a type according to the encoding algorithm used.
      * @param[out] member_value A reference of the variable were the non-primitive array member value will be stored.
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
@@ -4225,7 +4203,7 @@ public:
     Cdr& deserialize_member(
             std::array<_T, _Size>& member_value)
     {
-        if (CdrVersion::XCDRv2 == cdr_version_)
+        if (CdrVersion::XCDRv2 == cdr_version_ && !is_multi_array_primitive(&member_value))
         {
             uint32_t dheader {0};
             deserialize(dheader);
@@ -4246,21 +4224,6 @@ public:
         }
 
         return *this;
-    }
-
-    /*!
-     * @brief Decodes a primitive array member of a type according to the encoding algorithm used.
-     * @param[out] member_value A reference of the variable were the primitive array member value will be stored.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
-     * position that exceeds the internal memory size.
-     */
-    template<class _T, size_t _Size, typename std::enable_if<std::is_enum<_T>::value ||
-            std::is_arithmetic<_T>::value>::type* = nullptr>
-    Cdr& deserialize_member(
-            std::array<_T, _Size>& member_value)
-    {
-        return deserialize(member_value);
     }
 
     /*!

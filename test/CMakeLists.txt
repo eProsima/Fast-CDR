@@ -15,15 +15,7 @@
 find_package(GTest CONFIG REQUIRED)
 include(${PROJECT_SOURCE_DIR}/cmake/testing/GoogleTest.cmake)
 
-###############################################################################
-# Unit tests
-###############################################################################
-set(UNITTESTS_SOURCE SimpleTest.cpp ResizeTest.cpp)
-add_executable(UnitTests ${UNITTESTS_SOURCE})
-set_common_compile_options(UnitTests)
-target_link_libraries(UnitTests fastcdr GTest::gtest_main)
-gtest_discover_tests(UnitTests)
-
+add_subdirectory(cdr)
 add_subdirectory(xcdr)
 
 ###############################################################################

@@ -227,6 +227,7 @@ public:
         size_t initial_alignment = current_alignment;
 
         current_alignment += 4 + alignment(current_alignment, 4) + data.size() + 1;
+        serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
 
         return current_alignment - initial_alignment;
     }
@@ -238,6 +239,7 @@ public:
         size_t initial_alignment = current_alignment;
 
         current_alignment += 4 + alignment(current_alignment, 4) + data.size() * 4;
+        serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
 
         return current_alignment - initial_alignment;
     }
@@ -287,6 +289,12 @@ public:
 
         current_alignment += calculate_array_serialized_size(data.data(), data.size(), current_alignment);
 
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            // Inform DHEADER can be joined with NEXTINT
+            serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
+        }
+
         return current_alignment - initial_alignment;
     }
 
@@ -312,13 +320,21 @@ public:
     {
         size_t initial_alignment = current_alignment;
 
-        if (CdrVersion::XCDRv2 == cdr_version_ && !is_multi_array_primitive(&data))
+        if (CdrVersion::XCDRv2 == cdr_version_ &&
+                !is_multi_array_primitive(&data))
         {
             // DHEADER
             current_alignment += 4 + alignment(current_alignment, 4);
         }
 
         current_alignment += calculate_array_serialized_size(data.data(), data.size(), current_alignment);
+
+        if (CdrVersion::XCDRv2 == cdr_version_ &&
+                !is_multi_array_primitive(&data))
+        {
+            // Inform DHEADER can be joined with NEXTINT
+            serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
+        }
 
         return current_alignment - initial_alignment;
     }
@@ -343,6 +359,12 @@ public:
         {
             current_alignment += calculate_serialized_size(it->first, current_alignment);
             current_alignment += calculate_serialized_size(it->second, current_alignment);
+        }
+
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            // Inform DHEADER can be joined with NEXTINT
+            serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
         }
 
         return current_alignment - initial_alignment;
@@ -403,23 +425,6 @@ public:
         for (size_t count = 0; count < num_elements; ++count)
         {
             current_alignment += calculate_serialized_size(data[count], current_alignment);
-        }
-
-        return current_alignment - initial_alignment;
-    }
-
-    template<class _T, size_t _N>
-    inline size_t calculate_array_serialized_size(
-            const std::array<_T, _N>* data,
-            size_t num_elements,
-            size_t current_alignment = 0)
-    {
-        size_t initial_alignment = current_alignment;
-
-        for (size_t count = 0; count < num_elements; ++count)
-        {
-            current_alignment += calculate_array_serialized_size(data[count].data(),
-                            data[count].size(), current_alignment);
         }
 
         return current_alignment - initial_alignment;
@@ -542,6 +547,20 @@ public:
         return num_elements * 16 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
     }
 
+    template<class _T, size_t _N>
+    inline size_t calculate_array_serialized_size(
+            const std::array<_T, _N>* data,
+            size_t num_elements,
+            size_t current_alignment = 0)
+    {
+        size_t initial_alignment = current_alignment;
+
+        current_alignment += calculate_array_serialized_size(data->data(),
+                        num_elements * data->size(), current_alignment);
+
+        return current_alignment - initial_alignment;
+    }
+
     template<class _T>
     inline size_t calculate_member_serialized_size(
             const MemberId& id,
@@ -569,6 +588,10 @@ public:
             if (8 < calculated_size)
             {
                 calculated_size += 8; // Long EMHEADER.
+                if (NO_SERIALIZED_MEMBER_SIZE != serialized_member_size_)
+                {
+                    calculated_size -= 4; // Join NEXTINT and DHEADER.
+                }
             }
             else
             {
@@ -587,6 +610,7 @@ public:
 
         }
 
+        serialized_member_size_ = NO_SERIALIZED_MEMBER_SIZE;
 
         return (current_alignment  + calculated_size) - initial_alignment;
     }
@@ -619,6 +643,10 @@ public:
             if (8 < calculated_size)
             {
                 calculated_size += 8; // Long EMHEADER.
+                if (NO_SERIALIZED_MEMBER_SIZE != serialized_member_size_)
+                {
+                    calculated_size -= 4; // Join NEXTINT and DHEADER.
+                }
             }
             else
             {
@@ -653,6 +681,8 @@ public:
             current_alignment += 4 + alignment(current_alignment, 4); // DHEADER
         }
 
+        serialized_member_size_ = NO_SERIALIZED_MEMBER_SIZE; // Avoid error when serializen arrays, sequences, etc..
+
         return current_alignment - initial_alignment;
     }
 
@@ -666,6 +696,10 @@ public:
         {
             current_alignment += 4 + alignment(current_alignment, 4); // Sentinel
         }
+        else if (CdrVersion::XCDRv2 == cdr_version_ && EncodingAlgorithmFlag::PLAIN_CDR2 != current_encoding_)
+        {
+            serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
+        }
 
         current_encoding_ = new_encoding;
         return current_alignment - initial_alignment;
@@ -678,6 +712,14 @@ private:
     CdrVersion cdr_version_;
 
     EncodingAlgorithmFlag current_encoding_ {EncodingAlgorithmFlag::PLAIN_CDR2};
+
+    enum
+    {
+        NO_SERIALIZED_MEMBER_SIZE,
+        SERIALIZED_MEMBER_SIZE
+    }
+    //! Specifies if a DHEADER was serialized. Used to calculate XCDRv2 member headers.
+    serialized_member_size_ {NO_SERIALIZED_MEMBER_SIZE};
 
     inline size_t alignment(
             size_t current_alignment,

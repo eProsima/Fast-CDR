@@ -440,27 +440,6 @@ Cdr& Cdr::serialize(
 }
 
 Cdr& Cdr::serialize(
-        const int16_t short_t,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        serialize(short_t);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
-}
-
-Cdr& Cdr::serialize(
         const int32_t long_t)
 {
     size_t align = alignment(sizeof(long_t));
@@ -493,27 +472,6 @@ Cdr& Cdr::serialize(
     }
 
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
-}
-
-Cdr& Cdr::serialize(
-        const int32_t long_t,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        serialize(long_t);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
 }
 
 Cdr& Cdr::serialize(
@@ -556,27 +514,6 @@ Cdr& Cdr::serialize(
 }
 
 Cdr& Cdr::serialize(
-        const int64_t longlong_t,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        serialize(longlong_t);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
-}
-
-Cdr& Cdr::serialize(
         const float float_t)
 {
     size_t align = alignment(sizeof(float_t));
@@ -609,27 +546,6 @@ Cdr& Cdr::serialize(
     }
 
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
-}
-
-Cdr& Cdr::serialize(
-        const float float_t,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        serialize(float_t);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
 }
 
 Cdr& Cdr::serialize(
@@ -669,27 +585,6 @@ Cdr& Cdr::serialize(
     }
 
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
-}
-
-Cdr& Cdr::serialize(
-        const double double_t,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        serialize(double_t);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
 }
 
 Cdr& Cdr::serialize(
@@ -779,27 +674,6 @@ Cdr& Cdr::serialize(
     }
 
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
-}
-
-Cdr& Cdr::serialize(
-        const long double ldouble_t,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        serialize(ldouble_t);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
 }
 
 Cdr& Cdr::serialize(
@@ -925,48 +799,6 @@ Cdr& Cdr::serialize(
     return *this;
 }
 
-Cdr& Cdr::serialize(
-        const char* string_t,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        serialize(string_t);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
-}
-
-Cdr& Cdr::serialize(
-        const wchar_t* string_t,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        serialize(string_t);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
-}
-
 Cdr& Cdr::serializeArray(
         const bool* bool_t,
         size_t numElements)
@@ -1062,28 +894,6 @@ Cdr& Cdr::serializeArray(
 }
 
 Cdr& Cdr::serializeArray(
-        const int16_t* short_t,
-        size_t numElements,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        serializeArray(short_t, numElements);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
-}
-
-Cdr& Cdr::serializeArray(
         const int32_t* long_t,
         size_t numElements)
 {
@@ -1133,28 +943,6 @@ Cdr& Cdr::serializeArray(
 }
 
 Cdr& Cdr::serializeArray(
-        const int32_t* long_t,
-        size_t numElements,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        serializeArray(long_t, numElements);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
-}
-
-Cdr& Cdr::serializeArray(
         const wchar_t* wchar,
         size_t numElements)
 {
@@ -1167,28 +955,6 @@ Cdr& Cdr::serializeArray(
     {
         serialize(wchar[count]);
     }
-    return *this;
-}
-
-Cdr& Cdr::serializeArray(
-        const wchar_t* wchar,
-        size_t numElements,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        serializeArray(wchar, numElements);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
     return *this;
 }
 
@@ -1246,28 +1012,6 @@ Cdr& Cdr::serializeArray(
 }
 
 Cdr& Cdr::serializeArray(
-        const int64_t* longlong_t,
-        size_t numElements,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        serializeArray(longlong_t, numElements);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
-}
-
-Cdr& Cdr::serializeArray(
         const float* float_t,
         size_t numElements)
 {
@@ -1314,28 +1058,6 @@ Cdr& Cdr::serializeArray(
     }
 
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
-}
-
-Cdr& Cdr::serializeArray(
-        const float* float_t,
-        size_t numElements,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        serializeArray(float_t, numElements);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
 }
 
 Cdr& Cdr::serializeArray(
@@ -1389,28 +1111,6 @@ Cdr& Cdr::serializeArray(
     }
 
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
-}
-
-Cdr& Cdr::serializeArray(
-        const double* double_t,
-        size_t numElements,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        serializeArray(double_t, numElements);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
 }
 
 Cdr& Cdr::serializeArray(
@@ -1536,28 +1236,6 @@ Cdr& Cdr::serializeArray(
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
-Cdr& Cdr::serializeArray(
-        const long double* ldouble_t,
-        size_t numElements,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        serializeArray(ldouble_t, numElements);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
-}
-
 Cdr& Cdr::deserialize(
         char& char_t)
 {
@@ -1607,27 +1285,6 @@ Cdr& Cdr::deserialize(
 }
 
 Cdr& Cdr::deserialize(
-        int16_t& short_t,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        deserialize(short_t);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
-}
-
-Cdr& Cdr::deserialize(
         int32_t& long_t)
 {
     size_t align = alignment(sizeof(long_t));
@@ -1660,27 +1317,6 @@ Cdr& Cdr::deserialize(
     }
 
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
-}
-
-Cdr& Cdr::deserialize(
-        int32_t& long_t,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        deserialize(long_t);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
 }
 
 Cdr& Cdr::deserialize(
@@ -1723,27 +1359,6 @@ Cdr& Cdr::deserialize(
 }
 
 Cdr& Cdr::deserialize(
-        int64_t& longlong_t,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        deserialize(longlong_t);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
-}
-
-Cdr& Cdr::deserialize(
         float& float_t)
 {
     size_t align = alignment(sizeof(float_t));
@@ -1776,27 +1391,6 @@ Cdr& Cdr::deserialize(
     }
 
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
-}
-
-Cdr& Cdr::deserialize(
-        float& float_t,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        deserialize(float_t);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
 }
 
 Cdr& Cdr::deserialize(
@@ -1836,27 +1430,6 @@ Cdr& Cdr::deserialize(
     }
 
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
-}
-
-Cdr& Cdr::deserialize(
-        double& double_t,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        deserialize(double_t);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
 }
 
 Cdr& Cdr::deserialize(
@@ -1939,27 +1512,6 @@ Cdr& Cdr::deserialize(
     }
 
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
-}
-
-Cdr& Cdr::deserialize(
-        long double& ldouble_t,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        deserialize(ldouble_t);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
 }
 
 Cdr& Cdr::deserialize(
@@ -2059,48 +1611,6 @@ Cdr& Cdr::deserialize(
 
     set_state(state_before_error);
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
-}
-
-Cdr& Cdr::deserialize(
-        char*& string_t,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        deserialize(string_t);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
-}
-
-Cdr& Cdr::deserialize(
-        wchar_t*& string_t,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        deserialize(string_t);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
 }
 
 const char* Cdr::readString(
@@ -2266,28 +1776,6 @@ Cdr& Cdr::deserializeArray(
 }
 
 Cdr& Cdr::deserializeArray(
-        int16_t* short_t,
-        size_t numElements,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        deserializeArray(short_t, numElements);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
-}
-
-Cdr& Cdr::deserializeArray(
         int32_t* long_t,
         size_t numElements)
 {
@@ -2337,28 +1825,6 @@ Cdr& Cdr::deserializeArray(
 }
 
 Cdr& Cdr::deserializeArray(
-        int32_t* long_t,
-        size_t numElements,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        deserializeArray(long_t, numElements);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
-}
-
-Cdr& Cdr::deserializeArray(
         wchar_t* wchar,
         size_t numElements)
 {
@@ -2373,28 +1839,6 @@ Cdr& Cdr::deserializeArray(
         deserialize(value);
         wchar[count] = static_cast<wchar_t>(value);
     }
-    return *this;
-}
-
-Cdr& Cdr::deserializeArray(
-        wchar_t* wchar,
-        size_t numElements,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        deserializeArray(wchar, numElements);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
     return *this;
 }
 
@@ -2452,28 +1896,6 @@ Cdr& Cdr::deserializeArray(
 }
 
 Cdr& Cdr::deserializeArray(
-        int64_t* longlong_t,
-        size_t numElements,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        deserializeArray(longlong_t, numElements);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
-}
-
-Cdr& Cdr::deserializeArray(
         float* float_t,
         size_t numElements)
 {
@@ -2520,28 +1942,6 @@ Cdr& Cdr::deserializeArray(
     }
 
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
-}
-
-Cdr& Cdr::deserializeArray(
-        float* float_t,
-        size_t numElements,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        deserializeArray(float_t, numElements);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
 }
 
 Cdr& Cdr::deserializeArray(
@@ -2595,28 +1995,6 @@ Cdr& Cdr::deserializeArray(
     }
 
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
-}
-
-Cdr& Cdr::deserializeArray(
-        double* double_t,
-        size_t numElements,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        deserializeArray(double_t, numElements);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
 }
 
 Cdr& Cdr::deserializeArray(
@@ -2732,28 +2110,6 @@ Cdr& Cdr::deserializeArray(
     }
 
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
-}
-
-Cdr& Cdr::deserializeArray(
-        long double* ldouble_t,
-        size_t numElements,
-        Endianness endianness)
-{
-    bool auxSwap = m_swapBytes;
-    m_swapBytes = (m_swapBytes && (m_endianness == endianness)) || (!m_swapBytes && (m_endianness != endianness));
-
-    try
-    {
-        deserializeArray(ldouble_t, numElements);
-        m_swapBytes = auxSwap;
-    }
-    catch (Exception& ex)
-    {
-        m_swapBytes = auxSwap;
-        ex.raise();
-    }
-
-    return *this;
 }
 
 Cdr& Cdr::serializeBoolSequence(

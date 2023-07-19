@@ -1000,7 +1000,7 @@ TEST(CDRResizeTests, ArrayOctet)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(octet_array_2_t, 5);
+        cdr_ser.serialize_array(octet_array_2_t, 5);
     });
 
     // Deserialization.
@@ -1010,7 +1010,7 @@ TEST(CDRResizeTests, ArrayOctet)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(octet_array_2_value, 5);
+        cdr_des.deserialize_array(octet_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(octet_array_2_value, octet_array_2_t, 5);
@@ -1024,7 +1024,7 @@ TEST(CDRResizeTests, ArrayChar)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(char_array_2_t, 5);
+        cdr_ser.serialize_array(char_array_2_t, 5);
     });
 
     // Deserialization.
@@ -1034,7 +1034,7 @@ TEST(CDRResizeTests, ArrayChar)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(char_array_2_value, 5);
+        cdr_des.deserialize_array(char_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(char_array_2_value, char_array_2_t, 5);
@@ -1048,7 +1048,7 @@ TEST(CDRResizeTests, ArrayWChar)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(wchar_array_2_t, 5);
+        cdr_ser.serialize_array(wchar_array_2_t, 5);
     });
 
     // Deserialization.
@@ -1058,7 +1058,7 @@ TEST(CDRResizeTests, ArrayWChar)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(char_array_2_value, 5);
+        cdr_des.deserialize_array(char_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(char_array_2_value, wchar_array_2_t, 5);
@@ -1072,7 +1072,7 @@ TEST(CDRResizeTests, ArrayInt8)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(int8_array_2_t, 5);
+        cdr_ser.serialize_array(int8_array_2_t, 5);
     });
 
     // Deserialization.
@@ -1082,7 +1082,7 @@ TEST(CDRResizeTests, ArrayInt8)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(int8_array_2_value, 5);
+        cdr_des.deserialize_array(int8_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(int8_array_2_value, int8_array_2_t, 5);
@@ -1096,7 +1096,7 @@ TEST(CDRResizeTests, ArrayUnsignedShort)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(ushort_array_2_t, 5);
+        cdr_ser.serialize_array(ushort_array_2_t, 5);
     });
 
     // Deserialization.
@@ -1106,7 +1106,7 @@ TEST(CDRResizeTests, ArrayUnsignedShort)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(ushort_array_2_value, 5);
+        cdr_des.deserialize_array(ushort_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(ushort_array_2_value, ushort_array_2_t, 5);
@@ -1120,7 +1120,7 @@ TEST(CDRResizeTests, ArrayShort)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(short_array_2_t, 5);
+        cdr_ser.serialize_array(short_array_2_t, 5);
     });
 
     // Deserialization.
@@ -1130,7 +1130,7 @@ TEST(CDRResizeTests, ArrayShort)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(short_array_2_value, 5);
+        cdr_des.deserialize_array(short_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(short_array_2_value, short_array_2_t, 5);
@@ -1144,7 +1144,7 @@ TEST(CDRResizeTests, ArrayUnsignedLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(ulong_array_2_t, 5);
+        cdr_ser.serialize_array(ulong_array_2_t, 5);
     });
 
     // Deserialization.
@@ -1154,7 +1154,7 @@ TEST(CDRResizeTests, ArrayUnsignedLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(ulong_array_2_value, 5);
+        cdr_des.deserialize_array(ulong_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(ulong_array_2_value, ulong_array_2_t, 5);
@@ -1168,7 +1168,7 @@ TEST(CDRResizeTests, ArrayLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(long_array_2_t, 5);
+        cdr_ser.serialize_array(long_array_2_t, 5);
     });
 
     // Deserialization.
@@ -1178,7 +1178,7 @@ TEST(CDRResizeTests, ArrayLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(long_array_2_value, 5);
+        cdr_des.deserialize_array(long_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(long_array_2_value, long_array_2_t, 5);
@@ -1192,7 +1192,7 @@ TEST(CDRResizeTests, ArrayUnsignedLongLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(ulonglong_array_2_t, 5);
+        cdr_ser.serialize_array(ulonglong_array_2_t, 5);
     });
 
     // Deserialization.
@@ -1202,7 +1202,7 @@ TEST(CDRResizeTests, ArrayUnsignedLongLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(ulonglong_array_2_value, 5);
+        cdr_des.deserialize_array(ulonglong_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(ulonglong_array_2_value, ulonglong_array_2_t, 5);
@@ -1216,7 +1216,7 @@ TEST(CDRResizeTests, ArrayLongLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(longlong_array_2_t, 5);
+        cdr_ser.serialize_array(longlong_array_2_t, 5);
     });
 
     // Deserialization.
@@ -1226,7 +1226,7 @@ TEST(CDRResizeTests, ArrayLongLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(longlong_array_2_value, 5);
+        cdr_des.deserialize_array(longlong_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(longlong_array_2_value, longlong_array_2_t, 5);
@@ -1240,7 +1240,7 @@ TEST(CDRResizeTests, ArrayFloat)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(float_array_2_t, 5);
+        cdr_ser.serialize_array(float_array_2_t, 5);
     });
 
     // Deserialization.
@@ -1250,7 +1250,7 @@ TEST(CDRResizeTests, ArrayFloat)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(float_array_2_value, 5);
+        cdr_des.deserialize_array(float_array_2_value, 5);
     });
 
     EXPECT_ARRAY_FLOAT_EQ(float_array_2_value, float_array_2_t, 5);
@@ -1264,7 +1264,7 @@ TEST(CDRResizeTests, ArrayDouble)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(double_array_2_t, 5);
+        cdr_ser.serialize_array(double_array_2_t, 5);
     });
 
     // Deserialization.
@@ -1274,7 +1274,7 @@ TEST(CDRResizeTests, ArrayDouble)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(double_array_2_value, 5);
+        cdr_des.deserialize_array(double_array_2_value, 5);
     });
 
     EXPECT_ARRAY_DOUBLE_EQ(double_array_2_value, double_array_2_t, 5);
@@ -1288,7 +1288,7 @@ TEST(CDRResizeTests, ArrayLongDouble)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(ldouble_array_2_t, 5);
+        cdr_ser.serialize_array(ldouble_array_2_t, 5);
     });
 
     // Deserialization.
@@ -1298,7 +1298,7 @@ TEST(CDRResizeTests, ArrayLongDouble)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(ldouble_array_2_value, 5);
+        cdr_des.deserialize_array(ldouble_array_2_value, 5);
     });
 
     EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_array_2_value, ldouble_array_2_t, 5);
@@ -1312,7 +1312,7 @@ TEST(CDRResizeTests, ArrayBoolean)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(bool_array_2_t, 5);
+        cdr_ser.serialize_array(bool_array_2_t, 5);
     });
 
     // Deserialization.
@@ -1322,7 +1322,7 @@ TEST(CDRResizeTests, ArrayBoolean)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(bool_array_2_value, 5);
+        cdr_des.deserialize_array(bool_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(bool_array_2_value, bool_array_2_t, 5);
@@ -1336,7 +1336,7 @@ TEST(CDRResizeTests, ArrayString)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(string_array_2_t, 5);
+        cdr_ser.serialize_array(string_array_2_t, 5);
     });
 
     // Deserialization.
@@ -1346,7 +1346,7 @@ TEST(CDRResizeTests, ArrayString)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(string_array_2_value, 5);
+        cdr_des.deserialize_array(string_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(string_array_2_value, string_array_2_t, 5);
@@ -1360,7 +1360,7 @@ TEST(CDRResizeTests, ArrayWString)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(wstring_array_2_t, 5);
+        cdr_ser.serialize_array(wstring_array_2_t, 5);
     });
 
     // Deserialization.
@@ -1370,7 +1370,7 @@ TEST(CDRResizeTests, ArrayWString)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(string_array_2_value, 5);
+        cdr_des.deserialize_array(string_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(string_array_2_value, wstring_array_2_t, 5);
@@ -1792,7 +1792,7 @@ TEST(CDRResizeTests, SequenceOctet)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(octet_seq_t, 5);
+        cdr_ser.serialize_sequence(octet_seq_t, 5);
     });
 
     // Deserialization.
@@ -1802,7 +1802,7 @@ TEST(CDRResizeTests, SequenceOctet)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(octet_seq_value, octet_seq_len);
+        cdr_des.deserialize_sequence(octet_seq_value, octet_seq_len);
     });
 
     EXPECT_EQ(octet_seq_len, 5u);
@@ -1819,7 +1819,7 @@ TEST(CDRResizeTests, SequenceChar)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(char_seq_t, 5);
+        cdr_ser.serialize_sequence(char_seq_t, 5);
     });
 
     // Deserialization.
@@ -1829,7 +1829,7 @@ TEST(CDRResizeTests, SequenceChar)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(char_seq_value, char_seq_len);
+        cdr_des.deserialize_sequence(char_seq_value, char_seq_len);
     });
 
     EXPECT_EQ(char_seq_len, 5u);
@@ -1846,7 +1846,7 @@ TEST(CDRResizeTests, SequenceWChar)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(wchar_seq_t, 5);
+        cdr_ser.serialize_sequence(wchar_seq_t, 5);
     });
 
     // Deserialization.
@@ -1856,7 +1856,7 @@ TEST(CDRResizeTests, SequenceWChar)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(char_seq_value, char_seq_len);
+        cdr_des.deserialize_sequence(char_seq_value, char_seq_len);
     });
 
     EXPECT_EQ(char_seq_len, 5u);
@@ -1873,7 +1873,7 @@ TEST(CDRResizeTests, SequenceInt8)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(int8_seq_t, 5);
+        cdr_ser.serialize_sequence(int8_seq_t, 5);
     });
 
     // Deserialization.
@@ -1883,7 +1883,7 @@ TEST(CDRResizeTests, SequenceInt8)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(int8_seq_value, int8_seq_len);
+        cdr_des.deserialize_sequence(int8_seq_value, int8_seq_len);
     });
 
     EXPECT_EQ(int8_seq_len, 5u);
@@ -1900,7 +1900,7 @@ TEST(CDRResizeTests, SequenceUnsignedShort)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(ushort_seq_t, 5);
+        cdr_ser.serialize_sequence(ushort_seq_t, 5);
     });
 
     // Deserialization.
@@ -1910,7 +1910,7 @@ TEST(CDRResizeTests, SequenceUnsignedShort)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(ushort_seq_value, ushort_seq_len);
+        cdr_des.deserialize_sequence(ushort_seq_value, ushort_seq_len);
     });
 
     EXPECT_EQ(ushort_seq_len, 5u);
@@ -1927,7 +1927,7 @@ TEST(CDRResizeTests, SequenceShort)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(short_seq_t, 5);
+        cdr_ser.serialize_sequence(short_seq_t, 5);
     });
 
     // Deserialization.
@@ -1937,7 +1937,7 @@ TEST(CDRResizeTests, SequenceShort)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(short_seq_value, short_seq_len);
+        cdr_des.deserialize_sequence(short_seq_value, short_seq_len);
     });
 
     EXPECT_EQ(short_seq_len, 5u);
@@ -1954,7 +1954,7 @@ TEST(CDRResizeTests, SequenceUnsignedLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(ulong_seq_t, 5);
+        cdr_ser.serialize_sequence(ulong_seq_t, 5);
     });
 
     // Deserialization.
@@ -1964,7 +1964,7 @@ TEST(CDRResizeTests, SequenceUnsignedLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(ulong_seq_value, ulong_seq_len);
+        cdr_des.deserialize_sequence(ulong_seq_value, ulong_seq_len);
     });
 
     EXPECT_EQ(ulong_seq_len, 5u);
@@ -1981,7 +1981,7 @@ TEST(CDRResizeTests, SequenceLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(long_seq_t, 5);
+        cdr_ser.serialize_sequence(long_seq_t, 5);
     });
 
     // Deserialization.
@@ -1991,7 +1991,7 @@ TEST(CDRResizeTests, SequenceLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(long_seq_value, long_seq_len);
+        cdr_des.deserialize_sequence(long_seq_value, long_seq_len);
     });
 
     EXPECT_EQ(long_seq_len, 5u);
@@ -2008,7 +2008,7 @@ TEST(CDRResizeTests, SequenceUnsignedLongLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(ulonglong_seq_t, 5);
+        cdr_ser.serialize_sequence(ulonglong_seq_t, 5);
     });
 
     // Deserialization.
@@ -2018,7 +2018,7 @@ TEST(CDRResizeTests, SequenceUnsignedLongLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(ulonglong_seq_value, ulonglong_seq_len);
+        cdr_des.deserialize_sequence(ulonglong_seq_value, ulonglong_seq_len);
     });
 
     EXPECT_EQ(ulonglong_seq_len, 5u);
@@ -2035,7 +2035,7 @@ TEST(CDRResizeTests, SequenceLongLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(longlong_seq_t, 5);
+        cdr_ser.serialize_sequence(longlong_seq_t, 5);
     });
 
     // Deserialization.
@@ -2045,7 +2045,7 @@ TEST(CDRResizeTests, SequenceLongLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(longlong_seq_value, longlong_seq_len);
+        cdr_des.deserialize_sequence(longlong_seq_value, longlong_seq_len);
     });
 
     EXPECT_EQ(longlong_seq_len, 5u);
@@ -2062,7 +2062,7 @@ TEST(CDRResizeTests, SequenceFloat)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(float_seq_t, 5);
+        cdr_ser.serialize_sequence(float_seq_t, 5);
     });
 
     // Deserialization.
@@ -2072,7 +2072,7 @@ TEST(CDRResizeTests, SequenceFloat)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(float_seq_value, float_seq_len);
+        cdr_des.deserialize_sequence(float_seq_value, float_seq_len);
     });
 
     EXPECT_EQ(float_seq_len, 5u);
@@ -2089,7 +2089,7 @@ TEST(CDRResizeTests, SequenceDouble)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(double_seq_t, 5);
+        cdr_ser.serialize_sequence(double_seq_t, 5);
     });
 
     // Deserialization.
@@ -2099,7 +2099,7 @@ TEST(CDRResizeTests, SequenceDouble)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(double_seq_value, double_seq_len);
+        cdr_des.deserialize_sequence(double_seq_value, double_seq_len);
     });
 
     EXPECT_EQ(double_seq_len, 5u);
@@ -2116,7 +2116,7 @@ TEST(CDRResizeTests, SequenceLongDouble)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(ldouble_seq_t, 5);
+        cdr_ser.serialize_sequence(ldouble_seq_t, 5);
     });
 
     // Deserialization.
@@ -2126,7 +2126,7 @@ TEST(CDRResizeTests, SequenceLongDouble)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(ldouble_seq_value, ldouble_seq_len);
+        cdr_des.deserialize_sequence(ldouble_seq_value, ldouble_seq_len);
     });
 
     EXPECT_EQ(ldouble_seq_len, 5u);
@@ -2143,7 +2143,7 @@ TEST(CDRResizeTests, SequenceBoolean)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(bool_seq_t, 5);
+        cdr_ser.serialize_sequence(bool_seq_t, 5);
     });
 
     // Deserialization.
@@ -2153,7 +2153,7 @@ TEST(CDRResizeTests, SequenceBoolean)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(bool_seq_value, bool_seq_len);
+        cdr_des.deserialize_sequence(bool_seq_value, bool_seq_len);
     });
 
     EXPECT_EQ(bool_seq_len, 5u);
@@ -2170,7 +2170,7 @@ TEST(CDRResizeTests, SequenceString)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(string_seq_t, 5);
+        cdr_ser.serialize_sequence(string_seq_t, 5);
     });
 
     // Deserialization.
@@ -2180,7 +2180,7 @@ TEST(CDRResizeTests, SequenceString)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(string_seq_value, string_seq_len);
+        cdr_des.deserialize_sequence(string_seq_value, string_seq_len);
     });
 
     EXPECT_EQ(string_seq_len, 5u);
@@ -2197,7 +2197,7 @@ TEST(CDRResizeTests, SequenceWString)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(wstring_seq_t, 5);
+        cdr_ser.serialize_sequence(wstring_seq_t, 5);
     });
 
     // Deserialization.
@@ -2207,7 +2207,7 @@ TEST(CDRResizeTests, SequenceWString)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(string_seq_value, string_seq_len);
+        cdr_des.deserialize_sequence(string_seq_value, string_seq_len);
     });
 
     EXPECT_EQ(string_seq_len, 5u);
@@ -2280,28 +2280,35 @@ TEST(CDRResizeTests, Complete)
             float_tt << double_tt << ldouble_tt << bool_t << string_t;
         cdr_ser << octet_array_t << char_array_t << int8_array_t << ushort_array_t << short_array_t << ulong_array_t <<
             long_array_t << ulonglong_array_t << longlong_array_t << float_array_t << double_array_t << ldouble_array_t << bool_array_t;
-        cdr_ser.serializeArray(octet_array_2_t,
-        5).serializeArray(char_array_2_t, 5).serializeArray(int8_array_2_t, 5).
-        serializeArray(ushort_array_2_t, 5).serializeArray(short_array_2_t, 5).serializeArray(ulong_array_2_t, 5).
-        serializeArray(long_array_2_t, 5).serializeArray(ulonglong_array_2_t, 5).serializeArray(longlong_array_2_t, 5).
-        serializeArray(float_array_2_t, 5).serializeArray(double_array_2_t, 5).serializeArray(ldouble_array_2_t,
-        5).serializeArray(
+        cdr_ser.serialize_array(octet_array_2_t,
+        5).serialize_array(char_array_2_t, 5).serialize_array(int8_array_2_t, 5).
+                serialize_array(ushort_array_2_t, 5).serialize_array(short_array_2_t,
+        5).serialize_array(ulong_array_2_t, 5).
+                serialize_array(long_array_2_t, 5).serialize_array(ulonglong_array_2_t,
+        5).serialize_array(longlong_array_2_t, 5).
+                serialize_array(float_array_2_t, 5).serialize_array(double_array_2_t,
+        5).serialize_array(ldouble_array_2_t,
+        5).serialize_array(
             bool_array_2_t,
             5);
         cdr_ser << octet_vector_t << char_vector_t << int8_vector_t << ushort_vector_t << short_vector_t << ulong_vector_t <<
             long_vector_t << ulonglong_vector_t << longlong_vector_t << float_vector_t << double_vector_t << ldouble_vector_t << bool_vector_t;
         cdr_ser << triple_ulong_array_t;
-        cdr_ser.serializeSequence(octet_seq_t, 5).serializeSequence(char_seq_t, 5).serializeSequence(int8_seq_t, 5).
-        serializeSequence(ushort_seq_t, 5).serializeSequence(short_seq_t, 5).serializeSequence(ulong_seq_t, 5).
-        serializeSequence(long_seq_t, 5).serializeSequence(ulonglong_seq_t, 5).serializeSequence(longlong_seq_t, 5).
-        serializeSequence(float_seq_t, 5).serializeSequence(double_seq_t, 5).serializeSequence(ldouble_seq_t, 5);
+        cdr_ser.serialize_sequence(octet_seq_t, 5).serialize_sequence(char_seq_t, 5).serialize_sequence(int8_seq_t, 5).
+                serialize_sequence(ushort_seq_t, 5).serialize_sequence(short_seq_t, 5).serialize_sequence(ulong_seq_t,
+        5).
+                serialize_sequence(long_seq_t, 5).serialize_sequence(ulonglong_seq_t,
+        5).serialize_sequence(longlong_seq_t,
+        5).
+                serialize_sequence(float_seq_t, 5).serialize_sequence(double_seq_t, 5).serialize_sequence(ldouble_seq_t,
+        5);
         cdr_ser.serialize(c_string_t);
         // Wstring and wchar
         cdr_ser << wchar << wstring_t;
-        cdr_ser.serializeArray(wchar_array_2_t, 5).serializeArray(wstring_array_2_t, 5);
+        cdr_ser.serialize_array(wchar_array_2_t, 5).serialize_array(wstring_array_2_t, 5);
         cdr_ser << wchar_array_t << wstring_array_t;
         cdr_ser << wchar_vector_t << wstring_vector_t;
-        cdr_ser.serializeSequence(wchar_seq_t, 5).serializeSequence(wstring_seq_t, 5);
+        cdr_ser.serialize_sequence(wchar_seq_t, 5).serialize_sequence(wstring_seq_t, 5);
         cdr_ser.serialize(c_wstring_t);
     });
 
@@ -2394,33 +2401,38 @@ TEST(CDRResizeTests, Complete)
         cdr_des >> octet_array_value >> char_array_value >> int8_array_value >> ushort_array_value >> short_array_value >>
         ulong_array_value >> long_array_value >> ulonglong_array_value >> longlong_array_value >> float_array_value >>
         double_array_value >> ldouble_array_value >> bool_array_value;
-        cdr_des.deserializeArray(octet_array_2_value,
-        5).deserializeArray(char_array_2_value, 5).deserializeArray(int8_array_2_value, 5).
-        deserializeArray(ushort_array_2_value, 5).deserializeArray(short_array_2_value,
-        5).deserializeArray(ulong_array_2_value, 5).
-        deserializeArray(long_array_2_value, 5).deserializeArray(ulonglong_array_2_value,
-        5).deserializeArray(longlong_array_2_value, 5).
-        deserializeArray(float_array_2_value, 5).deserializeArray(double_array_2_value,
-        5).deserializeArray(ldouble_array_2_value, 5).
-        deserializeArray(bool_array_2_value,
+        cdr_des.deserialize_array(octet_array_2_value,
+        5).deserialize_array(char_array_2_value, 5).deserialize_array(int8_array_2_value, 5).
+                deserialize_array(ushort_array_2_value, 5).deserialize_array(short_array_2_value,
+        5).deserialize_array(ulong_array_2_value, 5).
+                deserialize_array(long_array_2_value, 5).deserialize_array(ulonglong_array_2_value,
+        5).deserialize_array(longlong_array_2_value, 5).
+                deserialize_array(float_array_2_value, 5).deserialize_array(double_array_2_value,
+        5).deserialize_array(ldouble_array_2_value, 5).
+                deserialize_array(bool_array_2_value,
         5);
         cdr_des >> octet_vector_value >> char_vector_value >> int8_vector_value >> ushort_vector_value >> short_vector_value >>
         ulong_vector_value >> long_vector_value >> ulonglong_vector_value >> longlong_vector_value >> float_vector_value >>
         double_vector_value >> ldouble_vector_value >> bool_vector_value;
         cdr_des >> triple_ulong_array_value;
-        cdr_des.deserializeSequence(octet_seq_value, octet_seq_len).deserializeSequence(char_seq_value, char_seq_len).
-        deserializeSequence(int8_seq_value, int8_seq_len).deserializeSequence(ushort_seq_value, ushort_seq_len).
-        deserializeSequence(short_seq_value, short_seq_len).deserializeSequence(ulong_seq_value, ulong_seq_len).
-        deserializeSequence(long_seq_value, long_seq_len).deserializeSequence(ulonglong_seq_value, ulonglong_seq_len).
-        deserializeSequence(longlong_seq_value, longlong_seq_len).deserializeSequence(float_seq_value, float_seq_len).
-        deserializeSequence(double_seq_value, double_seq_len).deserializeSequence(ldouble_seq_value, ldouble_seq_len);
+        cdr_des.deserialize_sequence(octet_seq_value, octet_seq_len).deserialize_sequence(char_seq_value, char_seq_len).
+                deserialize_sequence(int8_seq_value, int8_seq_len).deserialize_sequence(ushort_seq_value,
+        ushort_seq_len).
+                deserialize_sequence(short_seq_value, short_seq_len).deserialize_sequence(ulong_seq_value,
+        ulong_seq_len).
+                deserialize_sequence(long_seq_value, long_seq_len).deserialize_sequence(ulonglong_seq_value,
+        ulonglong_seq_len).
+                deserialize_sequence(longlong_seq_value, longlong_seq_len).deserialize_sequence(float_seq_value,
+        float_seq_len).
+                deserialize_sequence(double_seq_value, double_seq_len).deserialize_sequence(ldouble_seq_value,
+        ldouble_seq_len);
         cdr_des.deserialize(c_string_value);
         // WString and wchar_t
         cdr_des >> wchar_value >> wstring_value;
-        cdr_des.deserializeArray(wchar_array_2_value, 5).deserializeArray(wstring_array_2_value, 5);
+        cdr_des.deserialize_array(wchar_array_2_value, 5).deserialize_array(wstring_array_2_value, 5);
         cdr_des >> wchar_array_value >> wstring_array_value;
         cdr_des >> wchar_vector_value >> wstring_vector_value;
-        cdr_des.deserializeSequence(wchar_seq_value, wchar_seq_len).deserializeSequence(wstring_seq_value,
+        cdr_des.deserialize_sequence(wchar_seq_value, wchar_seq_len).deserialize_sequence(wstring_seq_value,
         wstring_seq_len);
         cdr_des.deserialize(c_wstring_value);
     });
@@ -3318,7 +3330,7 @@ TEST(FastCDRResizeTests, ArrayOctet)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(octet_array_2_t, 5);
+        cdr_ser.serialize_array(octet_array_2_t, 5);
     });
 
     // Deserialization.
@@ -3328,7 +3340,7 @@ TEST(FastCDRResizeTests, ArrayOctet)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(octet_array_2_value, 5);
+        cdr_des.deserialize_array(octet_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(octet_array_2_value, octet_array_2_t, 5);
@@ -3342,7 +3354,7 @@ TEST(FastCDRResizeTests, ArrayChar)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(char_array_2_t, 5);
+        cdr_ser.serialize_array(char_array_2_t, 5);
     });
 
     // Deserialization.
@@ -3352,7 +3364,7 @@ TEST(FastCDRResizeTests, ArrayChar)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(char_array_2_value, 5);
+        cdr_des.deserialize_array(char_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(char_array_2_value, char_array_2_t, 5);
@@ -3366,7 +3378,7 @@ TEST(FastCDRResizeTests, ArrayWChar)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(wchar_array_2_t, 5);
+        cdr_ser.serialize_array(wchar_array_2_t, 5);
     });
 
     // Deserialization.
@@ -3376,7 +3388,7 @@ TEST(FastCDRResizeTests, ArrayWChar)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(char_array_2_value, 5);
+        cdr_des.deserialize_array(char_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(char_array_2_value, wchar_array_2_t, 5);
@@ -3390,7 +3402,7 @@ TEST(FastCDRResizeTests, ArrayInt8)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(int8_array_2_t, 5);
+        cdr_ser.serialize_array(int8_array_2_t, 5);
     });
 
     // Deserialization.
@@ -3400,7 +3412,7 @@ TEST(FastCDRResizeTests, ArrayInt8)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(int8_array_2_value, 5);
+        cdr_des.deserialize_array(int8_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(int8_array_2_value, int8_array_2_t, 5);
@@ -3414,7 +3426,7 @@ TEST(FastCDRResizeTests, ArrayUnsignedShort)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(ushort_array_2_t, 5);
+        cdr_ser.serialize_array(ushort_array_2_t, 5);
     });
 
     // Deserialization.
@@ -3424,7 +3436,7 @@ TEST(FastCDRResizeTests, ArrayUnsignedShort)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(ushort_array_2_value, 5);
+        cdr_des.deserialize_array(ushort_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(ushort_array_2_value, ushort_array_2_t, 5);
@@ -3438,7 +3450,7 @@ TEST(FastCDRResizeTests, ArrayShort)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(short_array_2_t, 5);
+        cdr_ser.serialize_array(short_array_2_t, 5);
     });
 
     // Deserialization.
@@ -3448,7 +3460,7 @@ TEST(FastCDRResizeTests, ArrayShort)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(short_array_2_value, 5);
+        cdr_des.deserialize_array(short_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(short_array_2_value, short_array_2_t, 5);
@@ -3462,7 +3474,7 @@ TEST(FastCDRResizeTests, ArrayUnsignedLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(ulong_array_2_t, 5);
+        cdr_ser.serialize_array(ulong_array_2_t, 5);
     });
 
     // Deserialization.
@@ -3472,7 +3484,7 @@ TEST(FastCDRResizeTests, ArrayUnsignedLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(ulong_array_2_value, 5);
+        cdr_des.deserialize_array(ulong_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(ulong_array_2_value, ulong_array_2_t, 5);
@@ -3486,7 +3498,7 @@ TEST(FastCDRResizeTests, ArrayLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(long_array_2_t, 5);
+        cdr_ser.serialize_array(long_array_2_t, 5);
     });
 
     // Deserialization.
@@ -3496,7 +3508,7 @@ TEST(FastCDRResizeTests, ArrayLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(long_array_2_value, 5);
+        cdr_des.deserialize_array(long_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(long_array_2_value, long_array_2_t, 5);
@@ -3510,7 +3522,7 @@ TEST(FastCDRResizeTests, ArrayUnsignedLongLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(ulonglong_array_2_t, 5);
+        cdr_ser.serialize_array(ulonglong_array_2_t, 5);
     });
 
     // Deserialization.
@@ -3520,7 +3532,7 @@ TEST(FastCDRResizeTests, ArrayUnsignedLongLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(ulonglong_array_2_value, 5);
+        cdr_des.deserialize_array(ulonglong_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(ulonglong_array_2_value, ulonglong_array_2_t, 5);
@@ -3534,7 +3546,7 @@ TEST(FastCDRResizeTests, ArrayLongLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(longlong_array_2_t, 5);
+        cdr_ser.serialize_array(longlong_array_2_t, 5);
     });
 
     // Deserialization.
@@ -3544,7 +3556,7 @@ TEST(FastCDRResizeTests, ArrayLongLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(longlong_array_2_value, 5);
+        cdr_des.deserialize_array(longlong_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(longlong_array_2_value, longlong_array_2_t, 5);
@@ -3558,7 +3570,7 @@ TEST(FastCDRResizeTests, ArrayFloat)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(float_array_2_t, 5);
+        cdr_ser.serialize_array(float_array_2_t, 5);
     });
 
     // Deserialization.
@@ -3568,7 +3580,7 @@ TEST(FastCDRResizeTests, ArrayFloat)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(float_array_2_value, 5);
+        cdr_des.deserialize_array(float_array_2_value, 5);
     });
 
     EXPECT_ARRAY_FLOAT_EQ(float_array_2_value, float_array_2_t, 5);
@@ -3582,7 +3594,7 @@ TEST(FastCDRResizeTests, ArrayDouble)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(double_array_2_t, 5);
+        cdr_ser.serialize_array(double_array_2_t, 5);
     });
 
     // Deserialization.
@@ -3592,7 +3604,7 @@ TEST(FastCDRResizeTests, ArrayDouble)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(double_array_2_value, 5);
+        cdr_des.deserialize_array(double_array_2_value, 5);
     });
 
     EXPECT_ARRAY_DOUBLE_EQ(double_array_2_value, double_array_2_t, 5);
@@ -3606,7 +3618,7 @@ TEST(FastCDRResizeTests, ArrayLongDouble)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(ldouble_array_2_t, 5);
+        cdr_ser.serialize_array(ldouble_array_2_t, 5);
     });
 
     // Deserialization.
@@ -3616,7 +3628,7 @@ TEST(FastCDRResizeTests, ArrayLongDouble)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(ldouble_array_2_value, 5);
+        cdr_des.deserialize_array(ldouble_array_2_value, 5);
     });
 
     EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_array_2_value, ldouble_array_2_t, 5);
@@ -3630,7 +3642,7 @@ TEST(FastCDRResizeTests, ArrayBoolean)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(bool_array_2_t, 5);
+        cdr_ser.serialize_array(bool_array_2_t, 5);
     });
 
     // Deserialization.
@@ -3640,7 +3652,7 @@ TEST(FastCDRResizeTests, ArrayBoolean)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(bool_array_2_value, 5);
+        cdr_des.deserialize_array(bool_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(bool_array_2_value, bool_array_2_t, 5);
@@ -3654,7 +3666,7 @@ TEST(FastCDRResizeTests, ArrayString)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(string_array_2_t, 5);
+        cdr_ser.serialize_array(string_array_2_t, 5);
     });
 
     // Deserialization.
@@ -3664,7 +3676,7 @@ TEST(FastCDRResizeTests, ArrayString)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(string_array_2_value, 5);
+        cdr_des.deserialize_array(string_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(string_array_2_value, string_array_2_t, 5);
@@ -3678,7 +3690,7 @@ TEST(FastCDRResizeTests, ArrayWString)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeArray(wstring_array_2_t, 5);
+        cdr_ser.serialize_array(wstring_array_2_t, 5);
     });
 
     // Deserialization.
@@ -3688,7 +3700,7 @@ TEST(FastCDRResizeTests, ArrayWString)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeArray(string_array_2_value, 5);
+        cdr_des.deserialize_array(string_array_2_value, 5);
     });
 
     EXPECT_ARRAY_EQ(string_array_2_value, wstring_array_2_t, 5);
@@ -4110,7 +4122,7 @@ TEST(FastCDRResizeTests, SequenceOctet)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(octet_seq_t, 5);
+        cdr_ser.serialize_sequence(octet_seq_t, 5);
     });
 
     // Deserialization.
@@ -4120,7 +4132,7 @@ TEST(FastCDRResizeTests, SequenceOctet)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(octet_seq_value, octet_seq_len);
+        cdr_des.deserialize_sequence(octet_seq_value, octet_seq_len);
     });
 
     EXPECT_EQ(octet_seq_len, 5u);
@@ -4137,7 +4149,7 @@ TEST(FastCDRResizeTests, SequenceChar)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(char_seq_t, 5);
+        cdr_ser.serialize_sequence(char_seq_t, 5);
     });
 
     // Deserialization.
@@ -4147,7 +4159,7 @@ TEST(FastCDRResizeTests, SequenceChar)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(char_seq_value, char_seq_len);
+        cdr_des.deserialize_sequence(char_seq_value, char_seq_len);
     });
 
     EXPECT_EQ(char_seq_len, 5u);
@@ -4164,7 +4176,7 @@ TEST(FastCDRResizeTests, SequenceWChar)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(wchar_seq_t, 5);
+        cdr_ser.serialize_sequence(wchar_seq_t, 5);
     });
 
     // Deserialization.
@@ -4174,7 +4186,7 @@ TEST(FastCDRResizeTests, SequenceWChar)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(char_seq_value, char_seq_len);
+        cdr_des.deserialize_sequence(char_seq_value, char_seq_len);
     });
 
     EXPECT_EQ(char_seq_len, 5u);
@@ -4191,7 +4203,7 @@ TEST(FastCDRResizeTests, SequenceInt8)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(int8_seq_t, 5);
+        cdr_ser.serialize_sequence(int8_seq_t, 5);
     });
 
     // Deserialization.
@@ -4201,7 +4213,7 @@ TEST(FastCDRResizeTests, SequenceInt8)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(int8_seq_value, int8_seq_len);
+        cdr_des.deserialize_sequence(int8_seq_value, int8_seq_len);
     });
 
     EXPECT_EQ(int8_seq_len, 5u);
@@ -4218,7 +4230,7 @@ TEST(FastCDRResizeTests, SequenceUnsignedShort)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(ushort_seq_t, 5);
+        cdr_ser.serialize_sequence(ushort_seq_t, 5);
     });
 
     // Deserialization.
@@ -4228,7 +4240,7 @@ TEST(FastCDRResizeTests, SequenceUnsignedShort)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(ushort_seq_value, ushort_seq_len);
+        cdr_des.deserialize_sequence(ushort_seq_value, ushort_seq_len);
     });
 
     EXPECT_EQ(ushort_seq_len, 5u);
@@ -4245,7 +4257,7 @@ TEST(FastCDRResizeTests, SequenceShort)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(short_seq_t, 5);
+        cdr_ser.serialize_sequence(short_seq_t, 5);
     });
 
     // Deserialization.
@@ -4255,7 +4267,7 @@ TEST(FastCDRResizeTests, SequenceShort)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(short_seq_value, short_seq_len);
+        cdr_des.deserialize_sequence(short_seq_value, short_seq_len);
     });
 
     EXPECT_EQ(short_seq_len, 5u);
@@ -4272,7 +4284,7 @@ TEST(FastCDRResizeTests, SequenceUnsignedLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(ulong_seq_t, 5);
+        cdr_ser.serialize_sequence(ulong_seq_t, 5);
     });
 
     // Deserialization.
@@ -4282,7 +4294,7 @@ TEST(FastCDRResizeTests, SequenceUnsignedLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(ulong_seq_value, ulong_seq_len);
+        cdr_des.deserialize_sequence(ulong_seq_value, ulong_seq_len);
     });
 
     EXPECT_EQ(ulong_seq_len, 5u);
@@ -4299,7 +4311,7 @@ TEST(FastCDRResizeTests, SequenceLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(long_seq_t, 5);
+        cdr_ser.serialize_sequence(long_seq_t, 5);
     });
 
     // Deserialization.
@@ -4309,7 +4321,7 @@ TEST(FastCDRResizeTests, SequenceLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(long_seq_value, long_seq_len);
+        cdr_des.deserialize_sequence(long_seq_value, long_seq_len);
     });
 
     EXPECT_EQ(long_seq_len, 5u);
@@ -4326,7 +4338,7 @@ TEST(FastCDRResizeTests, SequenceUnsignedLongLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(ulonglong_seq_t, 5);
+        cdr_ser.serialize_sequence(ulonglong_seq_t, 5);
     });
 
     // Deserialization.
@@ -4336,7 +4348,7 @@ TEST(FastCDRResizeTests, SequenceUnsignedLongLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(ulonglong_seq_value, ulonglong_seq_len);
+        cdr_des.deserialize_sequence(ulonglong_seq_value, ulonglong_seq_len);
     });
 
     EXPECT_EQ(ulonglong_seq_len, 5u);
@@ -4353,7 +4365,7 @@ TEST(FastCDRResizeTests, SequenceLongLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(longlong_seq_t, 5);
+        cdr_ser.serialize_sequence(longlong_seq_t, 5);
     });
 
     // Deserialization.
@@ -4363,7 +4375,7 @@ TEST(FastCDRResizeTests, SequenceLongLong)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(longlong_seq_value, longlong_seq_len);
+        cdr_des.deserialize_sequence(longlong_seq_value, longlong_seq_len);
     });
 
     EXPECT_EQ(longlong_seq_len, 5u);
@@ -4380,7 +4392,7 @@ TEST(FastCDRResizeTests, SequenceFloat)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(float_seq_t, 5);
+        cdr_ser.serialize_sequence(float_seq_t, 5);
     });
 
     // Deserialization.
@@ -4390,7 +4402,7 @@ TEST(FastCDRResizeTests, SequenceFloat)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(float_seq_value, float_seq_len);
+        cdr_des.deserialize_sequence(float_seq_value, float_seq_len);
     });
 
     EXPECT_EQ(float_seq_len, 5u);
@@ -4407,7 +4419,7 @@ TEST(FastCDRResizeTests, SequenceDouble)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(double_seq_t, 5);
+        cdr_ser.serialize_sequence(double_seq_t, 5);
     });
 
     // Deserialization.
@@ -4417,7 +4429,7 @@ TEST(FastCDRResizeTests, SequenceDouble)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(double_seq_value, double_seq_len);
+        cdr_des.deserialize_sequence(double_seq_value, double_seq_len);
     });
 
     EXPECT_EQ(double_seq_len, 5u);
@@ -4434,7 +4446,7 @@ TEST(FastCDRResizeTests, SequenceLongDouble)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(ldouble_seq_t, 5);
+        cdr_ser.serialize_sequence(ldouble_seq_t, 5);
     });
 
     // Deserialization.
@@ -4444,7 +4456,7 @@ TEST(FastCDRResizeTests, SequenceLongDouble)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(ldouble_seq_value, ldouble_seq_len);
+        cdr_des.deserialize_sequence(ldouble_seq_value, ldouble_seq_len);
     });
 
     EXPECT_EQ(ldouble_seq_len, 5u);
@@ -4461,7 +4473,7 @@ TEST(FastCDRResizeTests, SequenceBoolean)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(bool_seq_t, 5);
+        cdr_ser.serialize_sequence(bool_seq_t, 5);
     });
 
     // Deserialization.
@@ -4471,7 +4483,7 @@ TEST(FastCDRResizeTests, SequenceBoolean)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(bool_seq_value, bool_seq_len);
+        cdr_des.deserialize_sequence(bool_seq_value, bool_seq_len);
     });
 
     EXPECT_EQ(bool_seq_len, 5u);
@@ -4488,7 +4500,7 @@ TEST(FastCDRResizeTests, SequenceString)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(string_seq_t, 5);
+        cdr_ser.serialize_sequence(string_seq_t, 5);
     });
 
     // Deserialization.
@@ -4498,7 +4510,7 @@ TEST(FastCDRResizeTests, SequenceString)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(string_seq_value, string_seq_len);
+        cdr_des.deserialize_sequence(string_seq_value, string_seq_len);
     });
 
     EXPECT_EQ(string_seq_len, 5u);
@@ -4515,7 +4527,7 @@ TEST(FastCDRResizeTests, SequenceWString)
 
     EXPECT_NO_THROW(
     {
-        cdr_ser.serializeSequence(wstring_seq_t, 5);
+        cdr_ser.serialize_sequence(wstring_seq_t, 5);
     });
 
     // Deserialization.
@@ -4525,7 +4537,7 @@ TEST(FastCDRResizeTests, SequenceWString)
 
     EXPECT_NO_THROW(
     {
-        cdr_des.deserializeSequence(string_seq_value, string_seq_len);
+        cdr_des.deserialize_sequence(string_seq_value, string_seq_len);
     });
 
     EXPECT_EQ(string_seq_len, 5u);
@@ -4599,28 +4611,35 @@ TEST(FastCDRResizeTests, Complete)
             float_tt << double_tt << ldouble_tt << bool_t << string_t;
         cdr_ser << octet_array_t << char_array_t << int8_array_t << ushort_array_t << short_array_t << ulong_array_t <<
             long_array_t << ulonglong_array_t << longlong_array_t << float_array_t << double_array_t << ldouble_array_t << bool_array_t;
-        cdr_ser.serializeArray(octet_array_2_t,
-        5).serializeArray(char_array_2_t, 5).serializeArray(int8_array_2_t, 5).
-        serializeArray(ushort_array_2_t, 5).serializeArray(short_array_2_t, 5).serializeArray(ulong_array_2_t, 5).
-        serializeArray(long_array_2_t, 5).serializeArray(ulonglong_array_2_t, 5).serializeArray(longlong_array_2_t, 5).
-        serializeArray(float_array_2_t, 5).serializeArray(double_array_2_t, 5).serializeArray(ldouble_array_2_t, 5).
-        serializeArray(bool_array_2_t,
+        cdr_ser.serialize_array(octet_array_2_t,
+        5).serialize_array(char_array_2_t, 5).serialize_array(int8_array_2_t, 5).
+                serialize_array(ushort_array_2_t, 5).serialize_array(short_array_2_t,
+        5).serialize_array(ulong_array_2_t, 5).
+                serialize_array(long_array_2_t, 5).serialize_array(ulonglong_array_2_t,
+        5).serialize_array(longlong_array_2_t, 5).
+                serialize_array(float_array_2_t, 5).serialize_array(double_array_2_t,
+        5).serialize_array(ldouble_array_2_t, 5).
+                serialize_array(bool_array_2_t,
         5);
         cdr_ser << octet_vector_t << char_vector_t << int8_vector_t << ushort_vector_t << short_vector_t << ulong_vector_t <<
             long_vector_t << ulonglong_vector_t << longlong_vector_t << float_vector_t << double_vector_t <<
             ldouble_vector_t << bool_vector_t;
         cdr_ser << triple_ulong_array_t;
-        cdr_ser.serializeSequence(octet_seq_t, 5).serializeSequence(char_seq_t, 5).serializeSequence(int8_seq_t, 5).
-        serializeSequence(ushort_seq_t, 5).serializeSequence(short_seq_t, 5).serializeSequence(ulong_seq_t, 5).
-        serializeSequence(long_seq_t, 5).serializeSequence(ulonglong_seq_t, 5).serializeSequence(longlong_seq_t, 5).
-        serializeSequence(float_seq_t, 5).serializeSequence(double_seq_t, 5).serializeSequence(ldouble_seq_t, 5);
+        cdr_ser.serialize_sequence(octet_seq_t, 5).serialize_sequence(char_seq_t, 5).serialize_sequence(int8_seq_t, 5).
+                serialize_sequence(ushort_seq_t, 5).serialize_sequence(short_seq_t, 5).serialize_sequence(ulong_seq_t,
+        5).
+                serialize_sequence(long_seq_t, 5).serialize_sequence(ulonglong_seq_t,
+        5).serialize_sequence(longlong_seq_t,
+        5).
+                serialize_sequence(float_seq_t, 5).serialize_sequence(double_seq_t, 5).serialize_sequence(ldouble_seq_t,
+        5);
         cdr_ser.serialize(c_string_t);
         // Wstring and wchar
         cdr_ser << wchar << wstring_t;
-        cdr_ser.serializeArray(wchar_array_2_t, 5).serializeArray(wstring_array_2_t, 5);
+        cdr_ser.serialize_array(wchar_array_2_t, 5).serialize_array(wstring_array_2_t, 5);
         cdr_ser << wchar_array_t << wstring_array_t;
         cdr_ser << wchar_vector_t << wstring_vector_t;
-        cdr_ser.serializeSequence(wchar_seq_t, 5).serializeSequence(wstring_seq_t, 5);
+        cdr_ser.serialize_sequence(wchar_seq_t, 5).serialize_sequence(wstring_seq_t, 5);
         cdr_ser.serialize(c_wstring_t);
     });
 
@@ -4713,32 +4732,37 @@ TEST(FastCDRResizeTests, Complete)
         cdr_des >> octet_array_value >> char_array_value >> int8_array_value >> ushort_array_value >> short_array_value >>
         ulong_array_value >> long_array_value >> ulonglong_array_value >> longlong_array_value >> float_array_value >>
         double_array_value >> ldouble_array_value >> bool_array_value;
-        cdr_des.deserializeArray(octet_array_2_value,
-        5).deserializeArray(char_array_2_value, 5).deserializeArray(int8_array_2_value, 5).
-        deserializeArray(ushort_array_2_value, 5).deserializeArray(short_array_2_value,
-        5).deserializeArray(ulong_array_2_value, 5).
-        deserializeArray(long_array_2_value, 5).deserializeArray(ulonglong_array_2_value,
-        5).deserializeArray(longlong_array_2_value, 5).
-        deserializeArray(float_array_2_value, 5).deserializeArray(double_array_2_value,
-        5).deserializeArray(ldouble_array_2_value, 5).deserializeArray(bool_array_2_value,
+        cdr_des.deserialize_array(octet_array_2_value,
+        5).deserialize_array(char_array_2_value, 5).deserialize_array(int8_array_2_value, 5).
+                deserialize_array(ushort_array_2_value, 5).deserialize_array(short_array_2_value,
+        5).deserialize_array(ulong_array_2_value, 5).
+                deserialize_array(long_array_2_value, 5).deserialize_array(ulonglong_array_2_value,
+        5).deserialize_array(longlong_array_2_value, 5).
+                deserialize_array(float_array_2_value, 5).deserialize_array(double_array_2_value,
+        5).deserialize_array(ldouble_array_2_value, 5).deserialize_array(bool_array_2_value,
         5);
         cdr_des >> octet_vector_value >> char_vector_value >> int8_vector_value >> ushort_vector_value >> short_vector_value >>
         ulong_vector_value >> long_vector_value >> ulonglong_vector_value >> longlong_vector_value >> float_vector_value >>
         double_vector_value >> ldouble_vector_value >> bool_vector_value;
         cdr_des >> triple_ulong_array_value;
-        cdr_des.deserializeSequence(octet_seq_value, octet_seq_len).deserializeSequence(char_seq_value, char_seq_len).
-        deserializeSequence(int8_seq_value, int8_seq_len).deserializeSequence(ushort_seq_value, ushort_seq_len).
-        deserializeSequence(short_seq_value, short_seq_len).deserializeSequence(ulong_seq_value, ulong_seq_len).
-        deserializeSequence(long_seq_value, long_seq_len).deserializeSequence(ulonglong_seq_value, ulonglong_seq_len).
-        deserializeSequence(longlong_seq_value, longlong_seq_len).deserializeSequence(float_seq_value, float_seq_len).
-        deserializeSequence(double_seq_value, double_seq_len).deserializeSequence(ldouble_seq_value, ldouble_seq_len);
+        cdr_des.deserialize_sequence(octet_seq_value, octet_seq_len).deserialize_sequence(char_seq_value, char_seq_len).
+                deserialize_sequence(int8_seq_value, int8_seq_len).deserialize_sequence(ushort_seq_value,
+        ushort_seq_len).
+                deserialize_sequence(short_seq_value, short_seq_len).deserialize_sequence(ulong_seq_value,
+        ulong_seq_len).
+                deserialize_sequence(long_seq_value, long_seq_len).deserialize_sequence(ulonglong_seq_value,
+        ulonglong_seq_len).
+                deserialize_sequence(longlong_seq_value, longlong_seq_len).deserialize_sequence(float_seq_value,
+        float_seq_len).
+                deserialize_sequence(double_seq_value, double_seq_len).deserialize_sequence(ldouble_seq_value,
+        ldouble_seq_len);
         cdr_des.deserialize(c_string_value);
         // WString and wchar_t
         cdr_des >> wchar_value >> wstring_value;
-        cdr_des.deserializeArray(wchar_array_2_value, 5).deserializeArray(wstring_array_2_value, 5);
+        cdr_des.deserialize_array(wchar_array_2_value, 5).deserialize_array(wstring_array_2_value, 5);
         cdr_des >> wchar_array_value >> wstring_array_value;
         cdr_des >> wchar_vector_value >> wstring_vector_value;
-        cdr_des.deserializeSequence(wchar_seq_value, wchar_seq_len).deserializeSequence(wstring_seq_value,
+        cdr_des.deserialize_sequence(wchar_seq_value, wchar_seq_len).deserialize_sequence(wstring_seq_value,
         wstring_seq_len);
         cdr_des.deserialize(c_wstring_value);
     });

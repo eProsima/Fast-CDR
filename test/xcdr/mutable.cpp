@@ -197,7 +197,7 @@ TEST_P(XCdrMutableTest, unordered_and_more_serialized_elements)
     //}
 
     //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
     ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(),
             expected_streams[tested_stream].size()));
     //}
@@ -375,7 +375,7 @@ TEST_P(XCdrMutableTest, inner_unordered_and_more_serialized_elements)
     //}
 
     //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
     ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(),
             expected_streams[tested_stream].size()));
     //}

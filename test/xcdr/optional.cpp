@@ -140,7 +140,7 @@ void null_align_serialize_the_optional_value(
     //}
 
     //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
     ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
     //}
 
@@ -204,7 +204,7 @@ void serialize_the_optional_value(
     //}
 
     //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
     ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
     //}
 
@@ -264,7 +264,7 @@ void align_serialize_the_optional_value(
     //}
 
     //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
     ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
     //}
 
@@ -334,11 +334,11 @@ void longdouble_align_serialize_the_optional_value(
     //}
 
     //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), total_size);
+    ASSERT_EQ(cdr.get_serialized_data_length(), total_size);
     ASSERT_EQ(0, memcmp(buffer.get(), expected_streams_begin[tested_stream].data(),
             expected_streams_begin[tested_stream].size()));
     ASSERT_EQ(0,
-            memcmp(buffer.get() + cdr.getSerializedDataLength() - expected_streams_end[tested_stream].size(),
+            memcmp(buffer.get() + cdr.get_serialized_data_length() - expected_streams_end[tested_stream].size(),
             expected_streams_end[tested_stream].data(),
             expected_streams_end[tested_stream].size()));
     //}
@@ -404,7 +404,7 @@ void serialize_optional(
     //}
 
     //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
     ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
     //}
 
@@ -462,7 +462,7 @@ void null_align_serialize_optional(
     //}
 
     //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
     ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
     //}
 
@@ -527,7 +527,7 @@ void align_serialize_optional(
     //}
 
     //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
     ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
     //}
 
@@ -597,11 +597,11 @@ void longdouble_align_serialize_optional(
     //}
 
     //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), total_size);
+    ASSERT_EQ(cdr.get_serialized_data_length(), total_size);
     ASSERT_EQ(0, memcmp(buffer.get(), expected_streams_begin[tested_stream].data(),
             expected_streams_begin[tested_stream].size()));
     ASSERT_EQ(0,
-            memcmp(buffer.get() + cdr.getSerializedDataLength() - expected_streams_end[tested_stream].size(),
+            memcmp(buffer.get() + cdr.get_serialized_data_length() - expected_streams_end[tested_stream].size(),
             expected_streams_end[tested_stream].data(),
             expected_streams_end[tested_stream].size()));
     //}
@@ -729,7 +729,7 @@ TEST_P(XCdrOptionalTest, null_optional)
         //}
 
         //{ Test encoded content
-        ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+        ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
         ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(),
                 expected_streams[tested_stream].size()));
         //}
@@ -779,7 +779,7 @@ TEST_P(XCdrOptionalTest, null_optional)
         //}
 
         //{ Test encoded content
-        ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+        ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
         ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(),
                 expected_streams[tested_stream].size()));
         //}
@@ -1666,11 +1666,11 @@ TEST_P(XCdrOptionalTest, longdouble_optional)
         //}
 
         //{ Test encoded content
-        ASSERT_EQ(cdr.getSerializedDataLength(), total_size);
+        ASSERT_EQ(cdr.get_serialized_data_length(), total_size);
         ASSERT_EQ(0, memcmp(buffer.get(), expected_streams_begin[tested_stream].data(),
                 expected_streams_begin[tested_stream].size()));
         ASSERT_EQ(0,
-                memcmp(buffer.get() + cdr.getSerializedDataLength() - expected_streams_end[tested_stream].size(),
+                memcmp(buffer.get() + cdr.get_serialized_data_length() - expected_streams_end[tested_stream].size(),
                 expected_streams_end[tested_stream].data(),
                 expected_streams_end[tested_stream].size()));
         //}
@@ -1725,11 +1725,11 @@ TEST_P(XCdrOptionalTest, longdouble_optional)
         //}
 
         //{ Test encoded content
-        ASSERT_EQ(cdr.getSerializedDataLength(), total_size);
+        ASSERT_EQ(cdr.get_serialized_data_length(), total_size);
         ASSERT_EQ(0, memcmp(buffer.get(), expected_streams_begin[tested_stream].data(),
                 expected_streams_begin[tested_stream].size()));
         ASSERT_EQ(0,
-                memcmp(buffer.get() + cdr.getSerializedDataLength() - expected_streams_end[tested_stream].size(),
+                memcmp(buffer.get() + cdr.get_serialized_data_length() - expected_streams_end[tested_stream].size(),
                 expected_streams_end[tested_stream].data(),
                 expected_streams_end[tested_stream].size()));
         //}
@@ -6819,7 +6819,7 @@ TEST_P(XCdrOptionalTest, two_inner_null_optional)
         //}
 
         //{ Test encoded content
-        ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+        ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
         ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(),
                 expected_streams[tested_stream].size()));
         //}
@@ -6872,7 +6872,7 @@ TEST_P(XCdrOptionalTest, two_inner_null_optional)
         //}
 
         //{ Test encoded content
-        ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+        ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
         ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(),
                 expected_streams[tested_stream].size()));
         //}
@@ -7027,7 +7027,7 @@ TEST_P(XCdrOptionalTest, two_inner_short_optional)
         //}
 
         //{ Test encoded content
-        ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+        ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
         ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(),
                 expected_streams[tested_stream].size()));
         //}
@@ -7080,7 +7080,7 @@ TEST_P(XCdrOptionalTest, two_inner_short_optional)
         //}
 
         //{ Test encoded content
-        ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+        ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
         ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(),
                 expected_streams[tested_stream].size()));
         //}

@@ -139,7 +139,7 @@ TEST_P(XCdrv1PLTest, pl_octet_opt_member)
     //}
 
     //{ Test encoded content
-    ASSERT_EQ(cdr.getSerializedDataLength(), expected_streams[tested_stream].size());
+    ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
     ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
     //}
 

@@ -1,4 +1,4 @@
-// Copyright 2023 Proyectos y Sistemas de Mantenimiento SL (eProsima).
+// Copyright 2016 Proyectos y Sistemas de Mantenimiento SL (eProsima).
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,32 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <fastcdr/exceptions/BadOptionalAccessException.hpp>
+#include <fastcdr/exceptions/BadParamException.h>
 
 using namespace eprosima::fastcdr::exception;
 
-const char* const BadOptionalAccessException::BAD_OPTIONAL_ACCESS_MESSAGE_DEFAULT = "Bad optional access";
+const char* const BadParamException::BAD_PARAM_MESSAGE_DEFAULT = "Bad parameter";
 
-BadOptionalAccessException::BadOptionalAccessException(
+BadParamException::BadParamException(
         const char* const& message) noexcept
     : Exception(message)
 {
 }
 
-BadOptionalAccessException::BadOptionalAccessException(
-        const BadOptionalAccessException& ex) noexcept
+BadParamException::BadParamException(
+        const BadParamException& ex) noexcept
     : Exception(ex)
 {
 }
 
-BadOptionalAccessException::BadOptionalAccessException(
-        BadOptionalAccessException&& ex) noexcept
+BadParamException::BadParamException(
+        BadParamException&& ex) noexcept
     : Exception(std::move(ex))
 {
 }
 
-BadOptionalAccessException& BadOptionalAccessException::operator =(
-        const BadOptionalAccessException& ex) noexcept
+BadParamException& BadParamException::operator =(
+        const BadParamException& ex) noexcept
 {
     if (this != &ex)
     {
@@ -48,8 +48,8 @@ BadOptionalAccessException& BadOptionalAccessException::operator =(
     return *this;
 }
 
-BadOptionalAccessException& BadOptionalAccessException::operator =(
-        BadOptionalAccessException&& ex) noexcept
+BadParamException& BadParamException::operator =(
+        BadParamException&& ex) noexcept
 {
     if (this != &ex)
     {
@@ -60,11 +60,11 @@ BadOptionalAccessException& BadOptionalAccessException::operator =(
     return *this;
 }
 
-BadOptionalAccessException::~BadOptionalAccessException() noexcept
+BadParamException::~BadParamException() noexcept
 {
 }
 
-void BadOptionalAccessException::raise() const
+void BadParamException::raise() const
 {
     throw *this;
 }

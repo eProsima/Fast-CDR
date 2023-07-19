@@ -85,7 +85,7 @@ jobs:
         colcon build \
             --event-handlers=console_direct+ \
             --packages-select fastcdr \
-            --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo -DEPROSIMA_BUILD_TESTS=ON \
+            --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             ${{ inputs.cmake_args }}
 
     - name: Run Tests

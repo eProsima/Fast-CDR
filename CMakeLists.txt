@@ -17,11 +17,6 @@
 ###############################################################################
 cmake_minimum_required(VERSION 3.22)
 
-set(IS_TOP_LEVEL TRUE)
-if(PROJECT_SOURCE_DIR)
-    set(IS_TOP_LEVEL FALSE)
-endif()
-
 # Set CMAKE_BUILD_TYPE to Release by default.
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Setting build type to 'Release' as none was specified.")
@@ -44,11 +39,6 @@ set(${PROJECT_NAME}_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} library provides
 
 message(STATUS "Configuring ${PROJECT_NAME_LARGE}")
 message(STATUS "Version: ${PROJECT_VERSION}")
-
-###############################################################################
-# Generation of windows installers.
-###############################################################################
-option(EPROSIMA_INSTALLER "Activate the creation of a build to create windows installers" OFF)
 
 ###############################################################################
 # CCache on Windows on CI
@@ -85,10 +75,6 @@ option(BUILD_SHARED_LIBS "Create shared libraries by default" ON)
 ###############################################################################
 
 option(EPROSIMA_BUILD "Activate internal building" OFF)
-
-if(EPROSIMA_INSTALLER)
-    set(EPROSIMA_BUILD ON)
-endif()
 
 ###############################################################################
 # Test system configuration
@@ -132,11 +118,7 @@ else()
     set(DOC_DIR "${DATA_INSTALL_DIR}/doc")
 endif()
 set(DOC_INSTALL_DIR ${DOC_DIR} CACHE PATH "Installation directory for documentation")
-if(WIN32 AND EPROSIMA_INSTALLER AND IS_TOP_LEVEL)
-    set(LICENSE_INSTALL_DIR . CACHE PATH "Installation directory for licenses")
-else()
-    set(LICENSE_INSTALL_DIR ${DATA_INSTALL_DIR}/${PROJECT_NAME} CACHE PATH "Installation directory for licenses")
-endif()
+set(LICENSE_INSTALL_DIR ${DATA_INSTALL_DIR}/${PROJECT_NAME} CACHE PATH "Installation directory for licenses")
 
 ###############################################################################
 # Compile library.
@@ -144,23 +126,14 @@ endif()
 add_subdirectory(src/cpp)
 
 ###############################################################################
-# Testing options
-###############################################################################
-option(EPROSIMA_BUILD_TESTS "Activate the building and execution unit tests and integral tests" OFF)
-
-if(EPROSIMA_BUILD AND NOT EPROSIMA_INSTALLER AND NOT EPROSIMA_INSTALLER_MINION)
-    set(EPROSIMA_BUILD_TESTS ON)
-endif()
-
-###############################################################################
 # Testing
 ###############################################################################
-if(EPROSIMA_BUILD_TESTS AND IS_TOP_LEVEL AND NOT EPROSIMA_INSTALLER)
-    enable_testing()
-    include(CTest)
+enable_testing()
+include(CTest)
 
+if (BUILD_TESTING)
     add_subdirectory(test)
-endif()
+endif(BUILD_TESTING)
 
 ###############################################################################
 # Documentation
@@ -168,11 +141,6 @@ endif()
 # Add an option to toggle the generation of the API documentation.
 option(BUILD_DOCUMENTATION "Use doxygen to create product documentation" OFF)
 option(CHECK_DOCUMENTATION "Use doxygen to check code documentation" OFF)
-
-if(EPROSIMA_INSTALLER)
-    set(BUILD_DOCUMENTATION ON)
-    set(DOXYGEN_SHOULD_SKIP_THIS_PUBLIC "DOXYGEN_SHOULD_SKIP_THIS_PUBLIC")
-endif()
 
 if(CHECK_DOCUMENTATION)
     set(BUILD_DOCUMENTATION ON)
@@ -243,26 +211,10 @@ if(BUILD_DOCUMENTATION)
 
     configure_file(doc/README.html.in ${README_LOCATION}/README.html @ONLY IMMEDIATE)
 
-    ### ReadTheDocs ########################
-#    if(NOT CHECK_DOCUMENTATION)
-#        add_custom_target(readthedocs
-#            COMMAND "${WGET_EXE}" "https://media.readthedocs.org/htmlzip/eprosima-fast-cdr/v${PROJECT_VERSION}/eprosima-fast-cdr.zip"
-#            COMMAND "${UNZIP_EXE}" "eprosima-fast-cdr.zip" -d "${PROJECT_BINARY_DIR}/doc/"
-#            COMMAND ${CMAKE_COMMAND} -E remove_directory "${PROJECT_BINARY_DIR}/doc/manual"
-#            COMMAND ${CMAKE_COMMAND} -E rename "${PROJECT_BINARY_DIR}/doc/eprosima-fast-cdr-v${PROJECT_VERSION}" "${PROJECT_BINARY_DIR}/doc/manual"
-#            COMMAND ${CMAKE_COMMAND} -E remove "eprosima-fast-cdr.zip"
-#            )
-#
-#        add_dependencies(readthedocs docdirs)
-#    endif()
-
     add_custom_target(doc ALL
         COMMENT "Generated project documentation" VERBATIM)
 
     add_dependencies(doc doxygen)
-#    if(NOT CHECK_DOCUMENTATION)
-#        add_dependencies(doc readthedocs)
-#    endif()
 endif()
 
 
@@ -274,9 +226,6 @@ install(FILES ${PROJECT_SOURCE_DIR}/LICENSE
     DESTINATION ${LICENSE_INSTALL_DIR}
     COMPONENT licenses
     )
-set(CPACK_COMPONENT_LICENSES_HIDDEN 1)
-
-set(CPACK_COMPONENTS_ALL headers licenses)
 
 if(BUILD_DOCUMENTATION)
 
@@ -290,36 +239,4 @@ if(BUILD_DOCUMENTATION)
         DESTINATION ${README_INSTALL_LOCATION}
         COMPONENT documentation
         )
-
-#    if(NOT CHECK_DOCUMENTATION)
-#        install(DIRECTORY ${PROJECT_BINARY_DIR}/doc/manual
-#            DESTINATION ${DOC_INSTALL_DIR}
-#            COMPONENT documentation
-#            )
-#    endif()
-
-    ### Documentation component
-    set(CPACK_COMPONENT_DOCUMENTATION_DISPLAY_NAME "Documentation")
-    set(CPACK_COMPONENT_DOCUMENTATION_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} documentation")
-
-    set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} documentation)
 endif()
-
-if(MSVC OR MSVC_IDE)
-    if(EPROSIMA_INSTALLER)
-        set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL}
-            libraries_i86Win32VS2010
-            libraries_x64Win64VS2010
-            libraries_i86Win32VS2013
-            libraries_x64Win64VS2013
-            libraries_i86Win32VS2015
-            libraries_x64Win64VS2015
-            )
-    else()
-        set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} libraries_${MSVC_ARCH})
-    endif()
-else()
-    set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} libraries)
-endif()
-
-include(${PROJECT_SOURCE_DIR}/cmake/packaging/eProsimaPackaging.cmake)

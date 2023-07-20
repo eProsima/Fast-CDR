@@ -1518,7 +1518,6 @@ public:
      * This function allocates memory to store the string. The user pointer will be set to point this allocated memory.
      * The user will have to free this allocated memory using free()
      * @param string_t The pointer that will point to the string read from the buffer.
-     * The user will have to free the allocated memory using free()
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
@@ -1526,11 +1525,10 @@ public:
             char*& string_t);
 
     /*!
-     * @brief This function deserializes a wide string.
+     * @brief This function deserializes a wide-string.
      * This function allocates memory to store the wide string. The user pointer will be set to point this allocated memory.
      * The user will have to free this allocated memory using free()
      * @param string_t The pointer that will point to the wide string read from the buffer.
-     * The user will have to free the allocated memory using free()
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
@@ -1554,7 +1552,7 @@ public:
     }
 
     /*!
-     * @brief This function deserializes a std::string.
+     * @brief This function deserializes a std::wstring.
      * @param string_t The variable that will store the string read from the buffer.
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
@@ -1935,7 +1933,7 @@ public:
     /*!
      * @brief Decodes the value of a type with a different endianness.
      * @param[out] value Reference to the variable where the value will be stored after decoding from the buffer.
-     * @param endianness Endianness that will be used in the serialization of this value.
+     * @param endianness Endianness that will be used in the deserialization of this value.
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
      * position that exceeds the internal memory size.
@@ -2284,7 +2282,7 @@ public:
      * @brief This function template deserializes an array of non-basic objects with a different endianness.
      * @param type_t The variable that will store the array of objects read from the buffer.
      * @param num_elements Number of the elements in the array.
-     * @param endianness Endianness that will be used in the serialization of this value.
+     * @param endianness Endianness that will be used in the deserialization of this value.
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
@@ -2708,7 +2706,7 @@ private:
      * @brief This function template detects the content type of STD container array and deserializes the array with a different endianness.
      * @param array_t The variable that will store the array read from the buffer.
      * @param num_elements Number of the elements in the array.
-     * @param endianness Endianness that will be used in the serialization of this value.
+     * @param endianness Endianness that will be used in the deserialization of this value.
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */

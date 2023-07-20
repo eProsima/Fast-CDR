@@ -77,7 +77,7 @@ public:
         LONG_HEADER,
         //! Initially a short member header is allocated but can be changed to the longer version.
         AUTO_WITH_SHORT_HEADER_BY_DEFAULT,
-        //! Initially a long member header is allocated but can be changed to the shorten version.
+        //! Initially a long member header is allocated but can be changed to the shorter version.
         AUTO_WITH_LONG_HEADER_BY_DEFAULT
     } XCdrHeaderSelection;
 
@@ -111,10 +111,10 @@ public:
         //! The position in the buffer when the state was created.
         const FastBuffer::iterator offset_;
 
-        //! The position from the alignment is calculated, when the state was created..
+        //! The position from the alignment is calculated, when the state was created.
         const FastBuffer::iterator origin_;
 
-        //! This attribute specified if it is needed to swap the bytes when the state was created..
+        //! This attribute specifies if it is needed to swap the bytes when the state is created.
         bool swap_bytes_ {false};
 
         //! Stores the last datasize serialized/deserialized when the state was created.
@@ -299,9 +299,9 @@ public:
      * @brief Encodes the value into the buffer.
      *
      * If previously a MemberId was set using operator<<, this operator will encode the value as a member of a type
-     * with that member identifier according to the encoding algorithm used.
+     * consistent with the set member identifier and according to the encoding algorithm used.
      *
-     * In other case, the operator will only encode the value.
+     * In other case, the operator will simply encode the value.
      *
      * @param[in] value A reference to the value which will be encoded in the buffer.
      * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -331,7 +331,7 @@ public:
      * If this operator is called while decoding members of a type, this operator will decode the value as a member
      * according to the encoding algorithm used.
      *
-     * In other case, the operator will only decode the value.
+     * In other case, the operator will simply decode the value.
      *
      * @param[out] value Reference to the variable where the value will be stored after decoding from the buffer.
      * @return Reference to the eprosima::fastcdr::Cdr object.

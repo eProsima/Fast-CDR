@@ -298,6 +298,55 @@ static void check_no_space(
     }
 }
 
+static void check_no_space(
+        const wchar_t& input_value,
+        size_t buf_size = 1)
+{
+    // Check good case.
+    char buffer[BUFFER_LENGTH];
+
+    // Serialization.
+    {
+        FastBuffer cdrbuffer(buffer, buf_size);
+        Cdr cdr_ser(cdrbuffer);
+        EXPECT_THROW(cdr_ser << input_value, NotEnoughMemoryException);
+    }
+
+    // Deserialization.
+    {
+        FastBuffer cdrbuffer(buffer, buf_size);
+        Cdr cdr_des(cdrbuffer);
+        wchar_t output_value;
+
+        EXPECT_THROW(cdr_des >> output_value, NotEnoughMemoryException);
+    }
+}
+
+template<size_t _N>
+static void check_no_space(
+        const std::array<wchar_t, _N>& input_value,
+        size_t buf_size = sizeof(input_value) / 2 - 1)
+{
+    // Check good case.
+    char buffer[BUFFER_LENGTH];
+
+    // Serialization.
+    {
+        FastBuffer cdrbuffer(buffer, buf_size);
+        Cdr cdr_ser(cdrbuffer);
+        EXPECT_THROW(cdr_ser << input_value, NotEnoughMemoryException);
+    }
+
+    // Deserialization.
+    {
+        FastBuffer cdrbuffer(buffer, buf_size);
+        Cdr cdr_des(cdrbuffer);
+        std::array<wchar_t, _N> output_value;
+
+        EXPECT_THROW(cdr_des >> output_value, NotEnoughMemoryException);
+    }
+}
+
 template<typename T, size_t N = N_ARR_ELEMENTS>
 static void check_good_case_array(
         const T* input_value)

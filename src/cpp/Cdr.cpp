@@ -751,7 +751,7 @@ Cdr& Cdr::serialize(
     if (string_t != nullptr)
     {
         wstrlen = wcslen(string_t);
-        bytesLength = size_to_uint32(wstrlen * 4);
+        bytesLength = size_to_uint32(wstrlen * 2);
     }
 
     if (bytesLength > 0)
@@ -761,31 +761,7 @@ Cdr& Cdr::serialize(
 
         if (((end_ - offset_) >= bytesLength) || resize(bytesLength))
         {
-            // Save last datasize.
-            last_data_size_ = sizeof(uint32_t);
-
-#if defined(_WIN32)
             serialize_array(string_t, wstrlen);
-#else
-            if (swap_bytes_)
-            {
-                const char* dst = reinterpret_cast<const char*>(string_t);
-                const char* end = dst + bytesLength;
-
-                for (; dst < end; dst += sizeof(*string_t))
-                {
-                    offset_++ << dst[3];
-                    offset_++ << dst[2];
-                    offset_++ << dst[1];
-                    offset_++ << dst[0];
-                }
-            }
-            else
-            {
-                offset_.memcopy(string_t, bytesLength);
-                offset_ += bytesLength; // size on bytes
-            }
-#endif // if defined(_WIN32)
         }
         else
         {
@@ -797,8 +773,6 @@ Cdr& Cdr::serialize(
     {
         serialize(bytesLength);
     }
-
-    serialized_member_size_ = SERIALIZED_MEMBER_SIZE_4;
 
     return *this;
 }
@@ -1591,25 +1565,20 @@ Cdr& Cdr::deserialize(
         string_t = NULL;
         return *this;
     }
-    else if ((end_ - offset_) >= length)
+    else if ((end_ - offset_) >= (length * 2))
     {
         // Save last datasize.
-        last_data_size_ = 4;
+        last_data_size_ = sizeof(uint16_t);
         // Allocate memory.
         string_t = reinterpret_cast<wchar_t*>(calloc(length + 1, sizeof(wchar_t))); // WStrings never serialize terminating zero
 
-#if defined(_WIN32)
         for (size_t idx = 0; idx < length; ++idx)
         {
-            uint32_t temp;
+            uint16_t temp;
             offset_ >> temp;
             string_t[idx] = static_cast<wchar_t>(temp);
-            offset_ += 4;
+            offset_ += sizeof(uint16_t);
         }
-#else
-        memcpy(string_t, &offset_, length * sizeof(wchar_t));
-        offset_ += length * sizeof(wchar_t);
-#endif // if defined(_WIN32)
         return *this;
     }
 
@@ -1655,7 +1624,7 @@ const std::wstring Cdr::read_wstring(
     state state_(*this);
 
     *this >> length;
-    uint32_t bytesLength = length * 4;
+    uint32_t bytesLength = length * 2;
 
     if (bytesLength == 0)
     {
@@ -1664,7 +1633,7 @@ const std::wstring Cdr::read_wstring(
     else if ((end_ - offset_) >= bytesLength)
     {
         // Save last datasize.
-        last_data_size_ = sizeof(uint32_t);
+        last_data_size_ = sizeof(uint16_t);
 
         returnedValue.resize(length);
         deserialize_array(const_cast<wchar_t*>(returnedValue.c_str()), length);
@@ -1837,7 +1806,7 @@ Cdr& Cdr::deserialize_array(
         return *this;
     }
 
-    uint32_t value;
+    uint16_t value;
     for (size_t count = 0; count < num_elements; ++count)
     {
         deserialize(value);

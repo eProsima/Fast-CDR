@@ -2466,7 +2466,21 @@ void Cdr::xcdr2_change_to_short_member_header(
     assert(0x10000000 > member_id.id);
     assert(8 >= member_serialized_size);
 
-    uint32_t lc = ((member_serialized_size - 1) << 28) & 0x70000000;
+    uint32_t lc = 0;
+    switch (member_serialized_size)
+    {
+        case 2:
+            lc = 0x10000000;
+            break;
+        case 4:
+            lc = 0x20000000;
+            break;
+        case 8:
+            lc = 0x30000000;
+            break;
+        default:
+            break;
+    }
     uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | lc | member_id.id;
     serialize(flags_and_member_id);
     memmove(&offset_, &offset_ + 4, member_serialized_size);

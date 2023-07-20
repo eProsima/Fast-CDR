@@ -651,7 +651,7 @@ public:
         {
             serialize_array(vector_t.data(), vector_t.size());
         }
-        catch (eprosima::fastcdr::exception::Exception& ex)
+        catch (exception::Exception& ex)
         {
             set_state(dheader_state);
             ex.raise();
@@ -690,7 +690,7 @@ public:
         {
             return serialize_array(vector_t.data(), vector_t.size());
         }
-        catch (eprosima::fastcdr::exception::Exception& ex)
+        catch (exception::Exception& ex)
         {
             set_state(state_before_error);
             ex.raise();
@@ -729,7 +729,7 @@ public:
                 serialize(it_pair->second);
             }
         }
-        catch (eprosima::fastcdr::exception::Exception& ex)
+        catch (exception::Exception& ex)
         {
             set_state(dheader_state);
             ex.raise();
@@ -772,7 +772,7 @@ public:
                 serialize(it_pair->second);
             }
         }
-        catch (eprosima::fastcdr::exception::Exception& ex)
+        catch (exception::Exception& ex)
         {
             set_state(state_);
             ex.raise();
@@ -892,7 +892,7 @@ public:
             serialize(value);
             swap_bytes_ = auxSwap;
         }
-        catch (eprosima::fastcdr::exception::Exception& ex)
+        catch (exception::Exception& ex)
         {
             swap_bytes_ = auxSwap;
             ex.raise();
@@ -1288,7 +1288,7 @@ public:
             serialize_array(type_t, num_elements);
             swap_bytes_ = auxSwap;
         }
-        catch (eprosima::fastcdr::exception::Exception& ex)
+        catch (exception::Exception& ex)
         {
             swap_bytes_ = auxSwap;
             ex.raise();
@@ -1317,7 +1317,7 @@ public:
         {
             return serialize_array(sequence_t, num_elements);
         }
-        catch (eprosima::fastcdr::exception::Exception& ex)
+        catch (exception::Exception& ex)
         {
             set_state(state_before_error);
             ex.raise();
@@ -1349,7 +1349,7 @@ public:
             serialize_sequence(sequence_t, num_elements);
             swap_bytes_ = auxSwap;
         }
-        catch (eprosima::fastcdr::exception::Exception& ex)
+        catch (exception::Exception& ex)
         {
             swap_bytes_ = auxSwap;
             ex.raise();
@@ -1684,8 +1684,8 @@ public:
             if ((end_ - offset_) < sequence_length)
             {
                 set_state(state_before_error);
-                throw eprosima::fastcdr::exception::NotEnoughMemoryException(
-                          eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+                throw exception::NotEnoughMemoryException(
+                          exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
             }
 
             try
@@ -1693,7 +1693,7 @@ public:
                 vector_t.resize(sequence_length);
                 return deserialize_array(vector_t.data(), vector_t.size());
             }
-            catch (eprosima::fastcdr::exception::Exception& ex)
+            catch (exception::Exception& ex)
             {
                 set_state(state_before_error);
                 ex.raise();
@@ -1728,8 +1728,8 @@ public:
         if ((end_ - offset_) < sequence_length)
         {
             set_state(state_before_error);
-            throw eprosima::fastcdr::exception::NotEnoughMemoryException(
-                      eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            throw exception::NotEnoughMemoryException(
+                      exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
 
         try
@@ -1737,7 +1737,7 @@ public:
             vector_t.resize(sequence_length);
             return deserialize_array(vector_t.data(), vector_t.size());
         }
-        catch (eprosima::fastcdr::exception::Exception& ex)
+        catch (exception::Exception& ex)
         {
             set_state(state_before_error);
             ex.raise();
@@ -1800,7 +1800,7 @@ public:
                     map_t.emplace(std::pair<_K, _T>(std::move(key), std::move(value)));
                 }
             }
-            catch (eprosima::fastcdr::exception::Exception& ex)
+            catch (exception::Exception& ex)
             {
                 set_state(state_);
                 ex.raise();
@@ -1837,7 +1837,7 @@ public:
                 map_t.emplace(std::pair<_K, _T>(std::move(key), std::move(value)));
             }
         }
-        catch (eprosima::fastcdr::exception::Exception& ex)
+        catch (exception::Exception& ex)
         {
             set_state(state_);
             ex.raise();
@@ -2301,7 +2301,7 @@ public:
             deserialize_array(type_t, num_elements);
             swap_bytes_ = auxSwap;
         }
-        catch (eprosima::fastcdr::exception::Exception& ex)
+        catch (exception::Exception& ex)
         {
             swap_bytes_ = auxSwap;
             ex.raise();
@@ -2366,7 +2366,7 @@ public:
             sequence_t = reinterpret_cast<_T*>(calloc(sequence_length, sizeof(_T)));
             deserialize_array(sequence_t, sequence_length);
         }
-        catch (eprosima::fastcdr::exception::Exception& ex)
+        catch (exception::Exception& ex)
         {
             free(sequence_t);
             sequence_t = NULL;
@@ -2440,7 +2440,7 @@ public:
             deserialize_sequence(sequence_t, num_elements);
             swap_bytes_ = auxSwap;
         }
-        catch (eprosima::fastcdr::exception::Exception& ex)
+        catch (exception::Exception& ex)
         {
             swap_bytes_ = auxSwap;
             ex.raise();
@@ -2472,8 +2472,7 @@ public:
         Cdr::state current_state(*this);
         (this->*begin_serialize_member_)(member_id, true, current_state, header_selection);
         serialize(member_value);
-        (this->*end_serialize_member_)(current_state);
-        return *this;
+        return (this->*end_serialize_member_)(current_state);
     }
 
     /*!
@@ -2509,8 +2508,7 @@ public:
     Cdr& deserialize_member(
             _T& member_value)
     {
-        deserialize(member_value);
-        return *this;
+        return deserialize(member_value);
     }
 
     /*!

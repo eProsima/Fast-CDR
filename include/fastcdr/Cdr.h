@@ -2499,7 +2499,7 @@ public:
 
     /*!
      * @brief Decodes a member of a type according to the encoding algorithm used.
-     * @param[out] member_value A reference of the variable were the member value will be stored.
+     * @param[out] member_value A reference of the variable where the member value will be stored.
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
      * position that exceeds the internal memory size.
@@ -2513,7 +2513,7 @@ public:
 
     /*!
      * @brief Decodes an optional member of a type according to the encoding algorithm used.
-     * @param[out] member_value A reference of the variable were the optional member value will be stored.
+     * @param[out] member_value A reference of the variable where the optional member value will be stored.
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
      * position that exceeds the internal memory size.
@@ -2532,7 +2532,7 @@ public:
                 deserialize(member_value);
             }
             assert(current_state.member_size_ == offset_ - origin_);
-            // Reset state to POP(origin=0) because before serializing member the algorithm did PUSH(origin=0).
+            // Reset state to POP(origin=0) because before deserializing member the algorithm did PUSH(origin=0).
             auto last_offset = offset_;
             set_state(current_state);
             offset_ = last_offset;
@@ -2882,7 +2882,7 @@ private:
             size_t member_serialized_size);
 
     /*!
-     * @brief Changes the previous encoded short header to a long header according to XCDRv2.
+     * @brief Changes the previous encoded long header to a short header according to XCDRv2.
      * @param[in] member_id Member identifier.
      * @pre Member identifier less than 0x10000000.
      * @param[in] member_serialized_size Size of the serialized member.
@@ -3096,8 +3096,8 @@ private:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to encode into a buffer
      * position that exceeds the internal memory size.
-     * @exception exception::BadParamException This exception is thrown when trying to decode a incorrect behaviour
-     * occurs.
+     * @exception exception::BadParamException This exception is thrown when an incorrect behaviour happens when
+     * trying to decode.
      */
     Cdr& xcdr1_deserialize_type(
             EncodingAlgorithmFlag type_encoding,
@@ -3113,8 +3113,8 @@ private:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to encode into a buffer
      * position that exceeds the internal memory size.
-     * @exception exception::BadParamException This exception is thrown when trying to decode a incorrect behaviour
-     * occurs.
+     * @exception exception::BadParamException This exception is thrown when an incorrect behaviour happens when
+     * trying to decode.
      */
     Cdr& xcdr2_deserialize_type(
             EncodingAlgorithmFlag type_encoding,
@@ -3187,10 +3187,10 @@ private:
     //! @brief The type of CDR that will be use in serialization/deserialization.
     CdrVersion cdr_version_ {CdrVersion::XCDRv2};
 
-    //! @brief Using eprosima::fastcdr::DDS_CDR type, this attribute stores the encoding algorithm.
+    //! @brief Stores the main encoding algorithm.
     EncodingAlgorithmFlag encoding_flag_ {EncodingAlgorithmFlag::PLAIN_CDR2};
 
-    //!
+    //! @brief Stores the current encoding algorithm.
     EncodingAlgorithmFlag current_encoding_ {EncodingAlgorithmFlag::PLAIN_CDR2};
 
     //! @brief This attribute stores the option flags when the CDR type is DDS_CDR;

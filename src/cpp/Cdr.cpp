@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <cstring>
+#include <limits>
+
 #include <fastcdr/Cdr.h>
 #include <fastcdr/exceptions/BadParamException.h>
-
-#include <limits>
 
 namespace eprosima {
 namespace fastcdr {
@@ -28,6 +29,8 @@ const Cdr::Endianness Cdr::DEFAULT_ENDIAN = BIG_ENDIANNESS;
 const Cdr::Endianness Cdr::DEFAULT_ENDIAN = LITTLE_ENDIANNESS;
 #endif // if FASTCDR_IS_BIG_ENDIAN_TARGET
 
+constexpr uint16_t PID_EXTENDED = 0x3F01;
+constexpr uint16_t PID_EXTENDED_LENGTH = 0x8;
 constexpr uint16_t PID_SENTINEL = 0x3F02;
 constexpr uint16_t PID_SENTINEL_LENGTH = 0x0;
 
@@ -145,7 +148,8 @@ void Cdr::reset_callbacks()
 
 Cdr& Cdr::read_encapsulation()
 {
-    uint8_t dummy = 0, encapsulation = 0;
+    uint8_t dummy {0};
+    uint8_t encapsulation {0};
     state state_before_error(*this);
 
     try
@@ -173,7 +177,7 @@ Cdr& Cdr::read_encapsulation()
         }
 
         // Check encapsulationKind correctness
-        const uint8_t encoding_flag = encapsulation & static_cast<uint8_t>(~0x1_8u);
+        const uint8_t encoding_flag = encapsulation & static_cast<uint8_t>(~0x1);
         switch (encoding_flag)
         {
             case EncodingAlgorithmFlag::PLAIN_CDR2:
@@ -2278,9 +2282,9 @@ void Cdr::xcdr1_serialize_long_member_header(
 {
     make_alignment(alignment(4));
 
-    uint16_t flags_and_extended_pid = (member_id.must_understand ? 0x4000 : 0x0) | static_cast<uint16_t>(0x3F01);
+    uint16_t flags_and_extended_pid = (member_id.must_understand ? 0x4000 : 0x0) | static_cast<uint16_t>(PID_EXTENDED);
     serialize(flags_and_extended_pid);
-    uint16_t size = 8;
+    uint16_t size = PID_EXTENDED_LENGTH;
     serialize(size);
     uint32_t id = member_id.id;
     serialize(id);
@@ -2330,9 +2334,9 @@ void Cdr::xcdr1_change_to_long_member_header(
         throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
     make_alignment(align);
-    uint16_t flags_and_extended_pid = (member_id.must_understand ? 0x4000 : 0x0) | static_cast<uint16_t>(0x3F01);
+    uint16_t flags_and_extended_pid = (member_id.must_understand ? 0x4000 : 0x0) | static_cast<uint16_t>(PID_EXTENDED);
     serialize(flags_and_extended_pid);
-    uint16_t size = 8;
+    uint16_t size = PID_EXTENDED_LENGTH;
     serialize(size);
     uint32_t id = member_id.id;
     serialize(id);
@@ -2352,7 +2356,7 @@ bool Cdr::xcdr1_deserialize_member_header(
     uint16_t id = (flags_and_member_id & 0x3FFF);
 
 
-    if (0x3F01 > id)
+    if (PID_EXTENDED > id)
     {
         member_id.id = id;
         uint16_t size = 0;
@@ -2361,11 +2365,11 @@ bool Cdr::xcdr1_deserialize_member_header(
         current_state.header_serialized_ = XCdrHeaderSelection::SHORT_HEADER;
         reset_alignment();
     }
-    else if (0x3F01 == id) // PID_EXTENDED
+    else if (PID_EXTENDED == id) // PID_EXTENDED
     {
         uint16_t size = 0;
         deserialize(size);
-        if (8 != size)
+        if (PID_EXTENDED_LENGTH != size)
         {
             throw BadParamException("PID_EXTENDED comes with a size different than 8");
         }
@@ -2376,7 +2380,7 @@ bool Cdr::xcdr1_deserialize_member_header(
         current_state.header_serialized_ = XCdrHeaderSelection::LONG_HEADER;
         reset_alignment();
     }
-    else if (0x3F02 == id) // PID_SENTINEL
+    else if (PID_SENTINEL == id) // PID_SENTINEL
     {
         uint16_t size = 0;
         deserialize(size);

@@ -619,7 +619,6 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    template<class _T = bool>
     Cdr& serialize(
             const std::vector<bool>& vector_t)
     {
@@ -1254,7 +1253,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to encode into a buffer
      * position that exceeds the internal memory size.
      */
-    template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr, typename = void>
+    template<class _T>
     Cdr& serialize_array(
             const _T* value,
             size_t num_elements)
@@ -1262,144 +1261,6 @@ public:
         for (size_t count = 0; count < num_elements; ++count)
         {
             serialize(value[count]);
-        }
-        return *this;
-    }
-
-    /*!
-     * @brief Encodes an array of enumerations into the buffer.
-     * @param[in] value Array which will be encoded in the buffer.
-     * @param[in] num_elements Number of the elements in the array.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to encode into a buffer
-     * position that exceeds the internal memory size.
-     */
-    template<class _T,
-            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
-            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            int32_t>::value>::type* = nullptr>
-    Cdr& serialize_array(
-            const _T* value,
-            size_t num_elements)
-    {
-        for (size_t count = 0; count < num_elements; ++count)
-        {
-            serialize(static_cast<int32_t>(value[count]));
-        }
-        return *this;
-    }
-
-    /*!
-     * @brief Encodes an array of enumerations into the buffer.
-     * @param[in] value Array which will be encoded in the buffer.
-     * @param[in] num_elements Number of the elements in the array.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to encode into a buffer
-     * position that exceeds the internal memory size.
-     */
-    template<class _T,
-            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
-            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            uint32_t>::value>::type* = nullptr>
-    Cdr& serialize_array(
-            const _T* value,
-            size_t num_elements)
-    {
-        for (size_t count = 0; count < num_elements; ++count)
-        {
-            serialize(static_cast<uint32_t>(value[count]));
-        }
-        return *this;
-    }
-
-    /*!
-     * @brief Encodes an array of enumerations into the buffer.
-     * @param[in] value Array which will be encoded in the buffer.
-     * @param[in] num_elements Number of the elements in the array.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to encode into a buffer
-     * position that exceeds the internal memory size.
-     */
-    template<class _T,
-            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
-            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            int16_t>::value>::type* = nullptr>
-    Cdr& serialize_array(
-            const _T* value,
-            size_t num_elements)
-    {
-        for (size_t count = 0; count < num_elements; ++count)
-        {
-            serialize(static_cast<int16_t>(value[count]));
-        }
-        return *this;
-    }
-
-    /*!
-     * @brief Encodes an array of enumerations into the buffer.
-     * @param[in] value Array which will be encoded in the buffer.
-     * @param[in] num_elements Number of the elements in the array.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to encode into a buffer
-     * position that exceeds the internal memory size.
-     */
-    template<class _T,
-            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
-            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            uint16_t>::value>::type* = nullptr>
-    Cdr& serialize_array(
-            const _T* value,
-            size_t num_elements)
-    {
-        for (size_t count = 0; count < num_elements; ++count)
-        {
-            serialize(static_cast<uint16_t>(value[count]));
-        }
-        return *this;
-    }
-
-    /*!
-     * @brief Encodes an array of enumerations into the buffer.
-     * @param[in] value Array which will be encoded in the buffer.
-     * @param[in] num_elements Number of the elements in the array.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to encode into a buffer
-     * position that exceeds the internal memory size.
-     */
-    template<class _T,
-            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
-            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            int8_t>::value>::type* = nullptr>
-    Cdr& serialize_array(
-            const _T* value,
-            size_t num_elements)
-    {
-        for (size_t count = 0; count < num_elements; ++count)
-        {
-            serialize(static_cast<int8_t>(value[count]));
-        }
-        return *this;
-    }
-
-    /*!
-     * @brief Encodes an array of enumerations into the buffer.
-     * @param[in] value Array which will be encoded in the buffer.
-     * @param[in] num_elements Number of the elements in the array.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to encode into a buffer
-     * position that exceeds the internal memory size.
-     */
-    template<class _T,
-            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
-            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            uint8_t>::value>::type* = nullptr>
-    Cdr& serialize_array(
-            const _T* value,
-            size_t num_elements)
-    {
-        for (size_t count = 0; count < num_elements; ++count)
-        {
-            serialize(static_cast<uint8_t>(value[count]));
         }
         return *this;
     }
@@ -1763,7 +1624,6 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    template<class _T = bool>
     Cdr& deserialize(
             std::vector<bool>& vector_t)
     {
@@ -2408,7 +2268,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
      * position that exceeds the internal memory size.
      */
-    template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr, typename = void>
+    template<class _T>
     Cdr& deserialize_array(
             _T* value,
             size_t num_elements)
@@ -2416,156 +2276,6 @@ public:
         for (size_t count = 0; count < num_elements; ++count)
         {
             deserialize(value[count]);
-        }
-        return *this;
-    }
-
-    /*!
-     * @brief Decodes an array of enumerations from the buffer.
-     * @param[out] value Reference to the variable where the array will be stored after decoding from the buffer.
-     * @param[in] num_elements Number of the elements in the array.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
-     * position that exceeds the internal memory size.
-     */
-    template<class _T,
-            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
-            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            int32_t>::value>::type* = nullptr>
-    Cdr& deserialize_array(
-            _T* value,
-            size_t num_elements)
-    {
-        for (size_t count = 0; count < num_elements; ++count)
-        {
-            int32_t decoded_value;
-            deserialize(decoded_value);
-            value[count] = static_cast<_T>(decoded_value);
-        }
-        return *this;
-    }
-
-    /*!
-     * @brief Decodes an array of enumerations from the buffer.
-     * @param[out] value Reference to the variable where the array will be stored after decoding from the buffer.
-     * @param[in] num_elements Number of the elements in the array.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
-     * position that exceeds the internal memory size.
-     */
-    template<class _T,
-            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
-            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            uint32_t>::value>::type* = nullptr>
-    Cdr& deserialize_array(
-            _T* value,
-            size_t num_elements)
-    {
-        for (size_t count = 0; count < num_elements; ++count)
-        {
-            uint32_t decoded_value;
-            deserialize(decoded_value);
-            value[count] = static_cast<_T>(decoded_value);
-        }
-        return *this;
-    }
-
-    /*!
-     * @brief Decodes an array of enumerations from the buffer.
-     * @param[out] value Reference to the variable where the array will be stored after decoding from the buffer.
-     * @param[in] num_elements Number of the elements in the array.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
-     * position that exceeds the internal memory size.
-     */
-    template<class _T,
-            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
-            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            int16_t>::value>::type* = nullptr>
-    Cdr& deserialize_array(
-            _T* value,
-            size_t num_elements)
-    {
-        for (size_t count = 0; count < num_elements; ++count)
-        {
-            int16_t decoded_value;
-            deserialize(decoded_value);
-            value[count] = static_cast<_T>(decoded_value);
-        }
-        return *this;
-    }
-
-    /*!
-     * @brief Decodes an array of enumerations from the buffer.
-     * @param[out] value Reference to the variable where the array will be stored after decoding from the buffer.
-     * @param[in] num_elements Number of the elements in the array.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
-     * position that exceeds the internal memory size.
-     */
-    template<class _T,
-            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
-            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            uint16_t>::value>::type* = nullptr>
-    Cdr& deserialize_array(
-            _T* value,
-            size_t num_elements)
-    {
-        for (size_t count = 0; count < num_elements; ++count)
-        {
-            uint16_t decoded_value;
-            deserialize(decoded_value);
-            value[count] = static_cast<_T>(decoded_value);
-        }
-        return *this;
-    }
-
-    /*!
-     * @brief Decodes an array of enumerations from the buffer.
-     * @param[out] value Reference to the variable where the array will be stored after decoding from the buffer.
-     * @param[in] num_elements Number of the elements in the array.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
-     * position that exceeds the internal memory size.
-     */
-    template<class _T,
-            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
-            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            int8_t>::value>::type* = nullptr>
-    Cdr& deserialize_array(
-            _T* value,
-            size_t num_elements)
-    {
-        for (size_t count = 0; count < num_elements; ++count)
-        {
-            int8_t decoded_value;
-            deserialize(decoded_value);
-            value[count] = static_cast<_T>(decoded_value);
-        }
-        return *this;
-    }
-
-    /*!
-     * @brief Decodes an array of enumerations from the buffer.
-     * @param[out] value Reference to the variable where the array will be stored after decoding from the buffer.
-     * @param[in] num_elements Number of the elements in the array.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
-     * position that exceeds the internal memory size.
-     */
-    template<class _T,
-            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
-            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            uint8_t>::value>::type* = nullptr>
-    Cdr& deserialize_array(
-            _T* value,
-            size_t num_elements)
-    {
-        for (size_t count = 0; count < num_elements; ++count)
-        {
-            uint8_t decoded_value;
-            deserialize(decoded_value);
-            value[count] = static_cast<_T>(decoded_value);
         }
         return *this;
     }
@@ -2611,7 +2321,6 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    template<class _T = std::string>
     Cdr& deserialize_sequence(
             std::string*& sequence_t,
             size_t& num_elements)
@@ -2628,7 +2337,6 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    template<class _T = std::wstring>
     Cdr& deserialize_sequence(
             std::wstring*& sequence_t,
             size_t& num_elements)
@@ -2912,7 +2620,6 @@ public:
      * @param[in] member_id Member identifier.
      * @return Reference to the eprosima::fastcdr::Cdr object.
      */
-    template<class _T = MemberId>
     inline Cdr& operator << (
             const MemberId& member_id) noexcept
     {

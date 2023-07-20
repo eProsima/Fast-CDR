@@ -445,7 +445,7 @@ public:
     Cdr& serialize(
             const wchar_t wchar)
     {
-        return serialize(static_cast<uint32_t>(wchar));
+        return serialize(static_cast<uint16_t>(wchar));
     }
 
     /*!
@@ -1447,7 +1447,7 @@ public:
     Cdr& deserialize(
             wchar_t& wchar)
     {
-        uint32_t ret;
+        uint16_t ret;
         deserialize(ret);
         wchar = static_cast<wchar_t>(ret);
         return *this;

@@ -54,6 +54,9 @@ class Cdr_DllAPI Cdr
 {
 public:
 
+    /*!
+     * @brief This enumeration represents endianness types.
+     */
     typedef enum : uint8_t
     {
         //! @brief Big endianness.
@@ -850,7 +853,7 @@ public:
     /*!
      * @brief Encodes the value of a type into the buffer.
      *
-     * To do that, the encoder expects a function `serialize` is provided by the type.
+     * To do that, the encoder expects a function `serialize` to be provided by the type.
      *
      * @param[in] value A reference to the value which will be encoded in the buffer.
      * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -1243,7 +1246,7 @@ public:
     /*!
      * @brief Encodes an array of a type not managed by this encoder into the buffer.
      *
-     * To do that, the encoder expects a function `serialize` is provided by the type.
+     * To do that, the encoder expects a function `serialize` to be provided by the type.
      *
      * @param[in] value Array which will be encoded in the buffer.
      * @param[in] num_elements Number of the elements in the array.
@@ -1264,7 +1267,7 @@ public:
     }
 
     /*!
-     * @brief Encodes an array of an enumeration into the buffer.
+     * @brief Encodes an array of enumerations into the buffer.
      * @param[in] value Array which will be encoded in the buffer.
      * @param[in] num_elements Number of the elements in the array.
      * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -1287,7 +1290,7 @@ public:
     }
 
     /*!
-     * @brief Encodes an array of an enumeration into the buffer.
+     * @brief Encodes an array of enumerations into the buffer.
      * @param[in] value Array which will be encoded in the buffer.
      * @param[in] num_elements Number of the elements in the array.
      * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -1310,7 +1313,7 @@ public:
     }
 
     /*!
-     * @brief Encodes an array of an enumeration into the buffer.
+     * @brief Encodes an array of enumerations into the buffer.
      * @param[in] value Array which will be encoded in the buffer.
      * @param[in] num_elements Number of the elements in the array.
      * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -1333,7 +1336,7 @@ public:
     }
 
     /*!
-     * @brief Encodes an array of an enumeration into the buffer.
+     * @brief Encodes an array of enumerations into the buffer.
      * @param[in] value Array which will be encoded in the buffer.
      * @param[in] num_elements Number of the elements in the array.
      * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -1356,7 +1359,7 @@ public:
     }
 
     /*!
-     * @brief Encodes an array of an enumeration into the buffer.
+     * @brief Encodes an array of enumerations into the buffer.
      * @param[in] value Array which will be encoded in the buffer.
      * @param[in] num_elements Number of the elements in the array.
      * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -1379,7 +1382,7 @@ public:
     }
 
     /*!
-     * @brief Encodes an array of an enumeration into the buffer.
+     * @brief Encodes an array of enumerations into the buffer.
      * @param[in] value Array which will be encoded in the buffer.
      * @param[in] num_elements Number of the elements in the array.
      * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -2051,7 +2054,7 @@ public:
     /*!
      * @brief Decodes the value of a type from the buffer.
      *
-     * To do that, the encoder expects a function `deserialize` is provided by the type.
+     * To do that, the encoder expects a function `deserialize` to be provided by the type.
      *
      * @param[out] value Reference to the variable where the value will be stored after decoding from the buffer.
      * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -2397,7 +2400,7 @@ public:
     /*!
      * @brief Decodes an array of a type not managed by this encoder from the buffer.
      *
-     * To do that, the encoder expects a function `deserialize` is provided by the type.
+     * To do that, the encoder expects a function `deserialize` to be provided by the type.
      *
      * @param[out] value Reference to the variable where the array will be stored after decoding from the buffer.
      * @param[in] num_elements Number of the elements in the array.
@@ -2418,7 +2421,7 @@ public:
     }
 
     /*!
-     * @brief Decodes an array of an enumeration from the buffer.
+     * @brief Decodes an array of enumerations from the buffer.
      * @param[out] value Reference to the variable where the array will be stored after decoding from the buffer.
      * @param[in] num_elements Number of the elements in the array.
      * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -2443,7 +2446,7 @@ public:
     }
 
     /*!
-     * @brief Decodes an array of an enumeration from the buffer.
+     * @brief Decodes an array of enumerations from the buffer.
      * @param[out] value Reference to the variable where the array will be stored after decoding from the buffer.
      * @param[in] num_elements Number of the elements in the array.
      * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -2468,7 +2471,7 @@ public:
     }
 
     /*!
-     * @brief Decodes an array of an enumeration from the buffer.
+     * @brief Decodes an array of enumerations from the buffer.
      * @param[out] value Reference to the variable where the array will be stored after decoding from the buffer.
      * @param[in] num_elements Number of the elements in the array.
      * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -2493,7 +2496,7 @@ public:
     }
 
     /*!
-     * @brief Decodes an array of an enumeration from the buffer.
+     * @brief Decodes an array of enumerations from the buffer.
      * @param[out] value Reference to the variable where the array will be stored after decoding from the buffer.
      * @param[in] num_elements Number of the elements in the array.
      * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -2518,7 +2521,7 @@ public:
     }
 
     /*!
-     * @brief Decodes an array of an enumeration from the buffer.
+     * @brief Decodes an array of enumerations from the buffer.
      * @param[out] value Reference to the variable where the array will be stored after decoding from the buffer.
      * @param[in] num_elements Number of the elements in the array.
      * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -2543,7 +2546,7 @@ public:
     }
 
     /*!
-     * @brief Decodes an array of an enumeration from the buffer.
+     * @brief Decodes an array of enumerations from the buffer.
      * @param[out] value Reference to the variable where the array will be stored after decoding from the buffer.
      * @param[in] num_elements Number of the elements in the array.
      * @return Reference to the eprosima::fastcdr::Cdr object.

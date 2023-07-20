@@ -123,7 +123,7 @@ public:
         //! Stores the last datasize serialized/deserialized when the state was created.
         size_t last_data_size_ {0};
 
-        //! Next member id which will be encoded.
+        //! Not related with the state. Next member id which will be encoded.
         MemberId next_member_id_;
 
         //! Not related with the state. Used by encoding algorithms to set the encoded member size.

@@ -16,6 +16,7 @@
 #define _FASTCDR_CDRSIZECALCULATOR_HPP_
 
 #include <array>
+#include <bitset>
 #include <cstdint>
 #include <limits>
 #include <map>
@@ -154,7 +155,7 @@ public:
             const wchar_t&,
             size_t current_alignment = 0)
     {
-        return 4 + alignment(current_alignment, 4);
+        return 2 + alignment(current_alignment, 2);
     }
 
     inline size_t calculate_serialized_size(
@@ -238,8 +239,7 @@ public:
     {
         size_t initial_alignment = current_alignment;
 
-        current_alignment += 4 + alignment(current_alignment, 4) + data.size() * 4;
-        serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
+        current_alignment += 4 + alignment(current_alignment, 4) + data.size() * 2;
 
         return current_alignment - initial_alignment;
     }
@@ -389,6 +389,38 @@ public:
         return current_alignment - initial_alignment;
     }
 
+    template<size_t N, typename std::enable_if < (N < 9) > ::type* = nullptr>
+    inline size_t calculate_serialized_size(
+            const std::bitset<N>&,
+            size_t)
+    {
+        return 1;
+    }
+
+    template<size_t N, typename std::enable_if < (8 < N && N < 17) > ::type* = nullptr>
+    inline size_t calculate_serialized_size(
+            const std::bitset<N>&,
+            size_t current_alignment = 0)
+    {
+        return 2 + alignment(current_alignment, 2);
+    }
+
+    template<size_t N, typename std::enable_if < (16 < N && N < 33) > ::type* = nullptr>
+    inline size_t calculate_serialized_size(
+            const std::bitset<N>&,
+            size_t current_alignment = 0)
+    {
+        return 4 + alignment(current_alignment, 4);
+    }
+
+    template<size_t N, typename std::enable_if < (32 < N && N < 65) > ::type* = nullptr>
+    inline size_t calculate_serialized_size(
+            const std::bitset<N>&,
+            size_t current_alignment = 0)
+    {
+        return 8 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
+    }
+
     template<class _T>
     inline size_t calculate_serialized_size(
             const optional<_T>& data,
@@ -463,7 +495,7 @@ public:
             size_t current_alignment = 0)
     {
 
-        return num_elements * 4 + alignment(current_alignment, 4);
+        return num_elements * 2 + alignment(current_alignment, 2);
     }
 
     inline size_t calculate_array_serialized_size(

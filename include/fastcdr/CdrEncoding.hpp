@@ -18,16 +18,16 @@
 namespace eprosima {
 namespace fastcdr {
 
-//! @brief This enumeration represents the two kinds of CDR serialization supported by eprosima::fastcdr::CDR.
+//! @brief This enumeration represents the kinds of CDR serialization supported by eprosima::fastcdr::CDR.
 typedef enum
 {
     //! @brief Common CORBA CDR serialization.
     CORBA_CDR = 0,
     //! @brief DDS CDR serialization.
     DDS_CDR = 1,
-    //!
+    //! @brief XCDRv1 encoding defined by standard DDS X-Types 1.3
     XCDRv1 = 2,
-    //!
+    //! @brief XCDRv2 encoding defined by standard DDS X-Types 1.3
     XCDRv2 = 3
 } CdrVersion;
 

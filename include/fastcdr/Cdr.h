@@ -20,17 +20,20 @@
 #include <cassert>
 #include <cstdint>
 #include <functional>
-#include <iostream>
 #include <map>
 #include <string>
+#include <type_traits>
+#include <utility>
 #include <vector>
 
-#include "CdrEncoding.hpp"
 #include "fastcdr_dll.h"
-#include "FastBuffer.h"
-#include "exceptions/NotEnoughMemoryException.h"
+
+#include "CdrEncoding.hpp"
 #include "cdr/fixed_size_string.hpp"
 #include "detail/container_recursive_inspector.hpp"
+#include "exceptions/Exception.h"
+#include "exceptions/NotEnoughMemoryException.h"
+#include "FastBuffer.h"
 #include "xcdr/MemberId.hpp"
 #include "xcdr/optional.hpp"
 

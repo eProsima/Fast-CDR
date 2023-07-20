@@ -1640,8 +1640,8 @@ const char* Cdr::read_string(
     }
 
     set_state(state_before_error);
-    throw eprosima::fastcdr::exception::NotEnoughMemoryException(
-              eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw exception::NotEnoughMemoryException(
+              exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 const std::wstring Cdr::read_wstring(
@@ -1673,8 +1673,8 @@ const std::wstring Cdr::read_wstring(
     }
 
     set_state(state_);
-    throw eprosima::fastcdr::exception::NotEnoughMemoryException(
-              eprosima::fastcdr::exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    throw exception::NotEnoughMemoryException(
+              exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
 Cdr& Cdr::deserialize_array(
@@ -2205,7 +2205,7 @@ Cdr& Cdr::deserialize_string_sequence(
         sequence_t = new std::string[sequence_length];
         deserialize_array(sequence_t, sequence_length);
     }
-    catch (eprosima::fastcdr::exception::Exception& ex)
+    catch (exception::Exception& ex)
     {
         delete [] sequence_t;
         sequence_t = NULL;
@@ -2231,7 +2231,7 @@ Cdr& Cdr::deserialize_wstring_sequence(
         sequence_t = new std::wstring[sequence_length];
         deserialize_array(sequence_t, sequence_length);
     }
-    catch (eprosima::fastcdr::exception::Exception& ex)
+    catch (exception::Exception& ex)
     {
         delete [] sequence_t;
         sequence_t = NULL;

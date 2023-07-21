@@ -77,12 +77,6 @@ endif()
 option(BUILD_SHARED_LIBS "Create shared libraries by default" ON)
 
 ###############################################################################
-# Load external eProsima projects.
-###############################################################################
-
-option(EPROSIMA_BUILD "Activate internal building" OFF)
-
-###############################################################################
 # Test system configuration
 ###############################################################################
 include(${PROJECT_SOURCE_DIR}/cmake/common/check_configuration.cmake)

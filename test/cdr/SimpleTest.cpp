@@ -325,7 +325,7 @@ static void check_no_space(
 template<size_t _N>
 static void check_no_space(
         const std::array<wchar_t, _N>& input_value,
-        size_t buf_size = sizeof(input_value) / 2 - 1)
+        size_t buf_size = sizeof(std::array<wchar_t, _N>) / 2 - 1)
 {
     // Check good case.
     char buffer[BUFFER_LENGTH];

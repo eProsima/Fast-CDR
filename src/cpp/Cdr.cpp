@@ -280,6 +280,11 @@ Cdr& Cdr::serialize_encapsulation()
     return *this;
 }
 
+CdrVersion Cdr::get_cdr_version() const
+{
+    return cdr_version_;
+}
+
 EncodingAlgorithmFlag Cdr::get_encoding_flag() const
 {
     return encoding_flag_;
@@ -313,6 +318,11 @@ void Cdr::change_endianness(
     }
 }
 
+Cdr::Endianness Cdr::endianness() const
+{
+    return static_cast<Endianness>(endianness_);
+}
+
 bool Cdr::jump(
         size_t num_bytes)
 {
@@ -336,6 +346,11 @@ char* Cdr::get_buffer_pointer()
 char* Cdr::get_current_position()
 {
     return &offset_;
+}
+
+size_t Cdr::get_serialized_data_length() const
+{
+    return offset_ - cdr_buffer_.begin();
 }
 
 Cdr::state Cdr::get_state() const

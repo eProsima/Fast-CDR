@@ -50,7 +50,7 @@ namespace fastcdr {
  * @brief This class offers an interface to serialize/deserialize some basic types using CDR protocol inside an eprosima::fastcdr::FastBuffer.
  * @ingroup FASTCDRAPIREFERENCE
  */
-class Cdr_DllAPI Cdr
+class Cdr
 {
 public:
 
@@ -87,23 +87,23 @@ public:
     /*!
      * @brief This class stores the current state of a CDR serialization.
      */
-    class Cdr_DllAPI state
+    class state
     {
         friend class Cdr;
 
     public:
 
         //! Default constructor.
-        state(
+        Cdr_DllAPI state(
                 const Cdr& cdr);
 
         //! Copy constructor.
-        state(
+        Cdr_DllAPI state(
                 const state& state);
 
 
         //! Compares two states.
-        bool operator ==(
+        Cdr_DllAPI bool operator ==(
                 const state& other_state) const;
 
     private:
@@ -147,7 +147,7 @@ public:
      * @param cdr_version Represents the type of encoding algorithm that will be used in serialization/deserialization.
      * The default value is CdrVersion::XCDRv2.
      */
-    Cdr(
+    Cdr_DllAPI Cdr(
             FastBuffer& cdrBuffer,
             const Endianness endianness = DEFAULT_ENDIAN,
             const CdrVersion cdr_version = XCDRv2);
@@ -159,7 +159,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      * @exception exception::BadParamException This exception is thrown when trying to deserialize an invalid value.
      */
-    Cdr& read_encapsulation();
+    Cdr_DllAPI Cdr& read_encapsulation();
 
     /*!
      * @brief This function writes the encapsulation of the CDR stream.
@@ -167,94 +167,85 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize_encapsulation();
+    Cdr_DllAPI Cdr& serialize_encapsulation();
 
     /*!
      * @brief Retrieves the CdrVersion used by the instance.
      * @return Configured CdrVersion.
      */
-    CdrVersion get_cdr_version() const
-    {
-        return cdr_version_;
-    }
+    Cdr_DllAPI CdrVersion get_cdr_version() const;
 
     /*!
      * @brief Returns the EncodingAlgorithmFlag set in the encapsulation when the CDR type is
      * CdrVersion::DDS_CDR, CdrVersion::XCDRv1 or CdrVersion::XCDRv2.
      * @return The specified flag in the encapsulation.
      */
-    EncodingAlgorithmFlag get_encoding_flag() const;
+    Cdr_DllAPI EncodingAlgorithmFlag get_encoding_flag() const;
 
     /*!
      * @brief Sets the EncodingAlgorithmFlag for the encapsulation when the CDR type is
      * CdrVersion::DDS_CDR, CdrVersion::XCDRv1 or CdrVersion::XCDRv2.
      * @param[in] encoding_flag Value to be used in the encapsulation.
      */
-    void set_encoding_flag(
+    Cdr_DllAPI void set_encoding_flag(
             EncodingAlgorithmFlag encoding_flag);
 
     /*!
      * @brief This function returns the option flags when the CDR type is eprosima::fastcdr::DDS_CDR.
      * @return The option flags.
      */
-    uint16_t get_dds_cdr_options() const;
+    Cdr_DllAPI uint16_t get_dds_cdr_options() const;
 
     /*!
      * @brief This function sets the option flags when the CDR type is eprosima::fastcdr::DDS_CDR.
      * @param options New value for the option flags.
      */
-    void set_dds_cdr_options(
+    Cdr_DllAPI void set_dds_cdr_options(
             uint16_t options);
 
     /*!
      * @brief This function sets the current endianness used by the CDR type.
      * @param endianness The new endianness value.
      */
-    void change_endianness(
+    Cdr_DllAPI void change_endianness(
             Endianness endianness);
 
     /*!
      * @brief This function returns the current endianness used by the CDR type.
      * @return The endianness.
      */
-    Endianness endianness() const
-    {
-        return static_cast<Endianness>(endianness_);
-    }
+    Cdr_DllAPI Endianness endianness() const;
 
     /*!
      * @brief This function skips a number of bytes in the CDR stream buffer.
      * @param num_bytes The number of bytes that will be jumped.
      * @return True is returned when it works successfully. Otherwise, false is returned.
      */
-    bool jump(
+    Cdr_DllAPI bool jump(
             size_t num_bytes);
 
     /*!
      * @brief This function resets the current position in the buffer to the beginning.
      */
-    void reset();
+    Cdr_DllAPI void reset();
 
     /*!
      * @brief This function returns the pointer to the current used buffer.
      * @return Pointer to the starting position of the buffer.
      */
-    char* get_buffer_pointer();
+    Cdr_DllAPI char* get_buffer_pointer();
 
     /*!
      * @brief This function returns the current position in the CDR stream.
      * @return Pointer to the current position in the buffer.
      */
-    char* get_current_position();
+    Cdr_DllAPI char* get_current_position();
 
     /*!
      * @brief This function returns the length of the serialized data inside the stream.
      * @return The length of the serialized data.
      */
-    inline size_t get_serialized_data_length() const
-    {
-        return offset_ - cdr_buffer_.begin();
-    }
+    Cdr_DllAPI size_t get_serialized_data_length() const;
 
     /*!
      * @brief Get the number of bytes needed to align a position to certain data size.
@@ -273,13 +264,13 @@ public:
      * @brief Returns the current state of the CDR serialization process.
      * @return The current state of the CDR serialization process.
      */
-    state get_state() const;
+    Cdr_DllAPI state get_state() const;
 
     /*!
      * @brief Sets a previous state of the CDR serialization process;
      * @param state Previous state that will be set.
      */
-    void set_state(
+    Cdr_DllAPI void set_state(
             const state& state);
 
     /*!
@@ -287,7 +278,7 @@ public:
      * @param num_bytes The number of bytes the alignment should advance.
      * @return True If alignment was moved successfully.
      */
-    bool move_alignment_forward(
+    Cdr_DllAPI bool move_alignment_forward(
             size_t num_bytes);
 
     /*!
@@ -362,7 +353,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& serialize(
             const uint8_t octet_t)
     {
@@ -375,7 +366,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize(
+    Cdr_DllAPI Cdr& serialize(
             const char char_t);
 
     /*!
@@ -384,7 +375,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& serialize(
             const int8_t int8)
     {
@@ -397,7 +388,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& serialize(
             const uint16_t ushort_t)
     {
@@ -410,7 +401,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize(
+    Cdr_DllAPI Cdr& serialize(
             const int16_t short_t);
 
     /*!
@@ -419,7 +410,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& serialize(
             const uint32_t ulong_t)
     {
@@ -432,7 +423,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize(
+    Cdr_DllAPI Cdr& serialize(
             const int32_t long_t);
 
     /*!
@@ -441,7 +432,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& serialize(
             const wchar_t wchar)
     {
@@ -454,7 +445,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& serialize(
             const uint64_t ulonglong_t)
     {
@@ -467,7 +458,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize(
+    Cdr_DllAPI Cdr& serialize(
             const int64_t longlong_t);
 
     /*!
@@ -476,7 +467,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize(
+    Cdr_DllAPI Cdr& serialize(
             const float float_t);
 
     /*!
@@ -485,7 +476,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize(
+    Cdr_DllAPI Cdr& serialize(
             const double double_t);
 
     /*!
@@ -495,7 +486,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      * @note Due to internal representation differences, WIN32 and *NIX like systems are not compatible.
      */
-    Cdr& serialize(
+    Cdr_DllAPI Cdr& serialize(
             const long double ldouble_t);
 
     /*!
@@ -504,7 +495,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize(
+    Cdr_DllAPI Cdr& serialize(
             const bool bool_t);
 
     /*!
@@ -513,7 +504,8 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    inline Cdr& serialize(
+    TEMPLATE_SPEC
+    Cdr& serialize(
             char* string_t)
     {
         return serialize(static_cast<const char*>(string_t));
@@ -525,7 +517,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize(
+    Cdr_DllAPI Cdr& serialize(
             const char* string_t);
 
     /*!
@@ -534,7 +526,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize(
+    Cdr_DllAPI Cdr& serialize(
             const wchar_t* string_t);
 
     /*!
@@ -543,7 +535,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& serialize(
             const std::string& string_t)
     {
@@ -556,7 +548,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& serialize(
             const std::wstring& string_t)
     {
@@ -571,7 +563,6 @@ public:
      * position that exceeds the internal memory size.
      */
     template <size_t MAX_CHARS>
-    inline
     Cdr& serialize(
             const fixed_string<MAX_CHARS>& value)
     {
@@ -585,7 +576,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
     template<class _T, size_t _Size>
-    inline Cdr& serialize(
+    Cdr& serialize(
             const std::array<_T, _Size>& array_t)
     {
         Cdr::state dheader_state(*this);
@@ -619,6 +610,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
+    TEMPLATE_SPEC
     Cdr& serialize(
             const std::vector<bool>& vector_t)
     {
@@ -860,7 +852,7 @@ public:
      * position that exceeds the internal memory size.
      */
     template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr, typename = void>
-    inline Cdr& serialize(
+    Cdr& serialize(
             const _T& value)
     {
         extern void serialize(
@@ -913,7 +905,7 @@ public:
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
             int32_t>::value>::type* = nullptr>
-    inline Cdr& serialize(
+    Cdr& serialize(
             const _T& value)
     {
         return serialize(static_cast<int32_t>(value));
@@ -931,7 +923,7 @@ public:
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
             uint32_t>::value>::type* = nullptr>
-    inline Cdr& serialize(
+    Cdr& serialize(
             const _T& value)
     {
         return serialize(static_cast<uint32_t>(value));
@@ -949,7 +941,7 @@ public:
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
             int16_t>::value>::type* = nullptr>
-    inline Cdr& serialize(
+    Cdr& serialize(
             const _T& value)
     {
         return serialize(static_cast<int16_t>(value));
@@ -967,7 +959,7 @@ public:
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
             uint16_t>::value>::type* = nullptr>
-    inline Cdr& serialize(
+    Cdr& serialize(
             const _T& value)
     {
         return serialize(static_cast<uint16_t>(value));
@@ -985,7 +977,7 @@ public:
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
             int8_t>::value>::type* = nullptr>
-    inline Cdr& serialize(
+    Cdr& serialize(
             const _T& value)
     {
         return serialize(static_cast<int8_t>(value));
@@ -1003,7 +995,7 @@ public:
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
             uint8_t>::value>::type* = nullptr>
-    inline Cdr& serialize(
+    Cdr& serialize(
             const _T& value)
     {
         return serialize(static_cast<uint8_t>(value));
@@ -1016,7 +1008,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& serialize_array(
             const uint8_t* octet_t,
             size_t num_elements)
@@ -1031,7 +1023,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize_array(
+    Cdr_DllAPI Cdr& serialize_array(
             const char* char_t,
             size_t num_elements);
 
@@ -1042,7 +1034,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& serialize_array(
             const int8_t* int8,
             size_t num_elements)
@@ -1057,7 +1049,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& serialize_array(
             const uint16_t* ushort_t,
             size_t num_elements)
@@ -1072,7 +1064,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize_array(
+    Cdr_DllAPI Cdr& serialize_array(
             const int16_t* short_t,
             size_t num_elements);
 
@@ -1083,7 +1075,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& serialize_array(
             const uint32_t* ulong_t,
             size_t num_elements)
@@ -1098,7 +1090,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize_array(
+    Cdr_DllAPI Cdr& serialize_array(
             const int32_t* long_t,
             size_t num_elements);
 
@@ -1109,7 +1101,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize_array(
+    Cdr_DllAPI Cdr& serialize_array(
             const wchar_t* wchar,
             size_t num_elements);
 
@@ -1120,7 +1112,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& serialize_array(
             const uint64_t* ulonglong_t,
             size_t num_elements)
@@ -1135,7 +1127,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize_array(
+    Cdr_DllAPI Cdr& serialize_array(
             const int64_t* longlong_t,
             size_t num_elements);
 
@@ -1146,7 +1138,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize_array(
+    Cdr_DllAPI Cdr& serialize_array(
             const float* float_t,
             size_t num_elements);
 
@@ -1157,7 +1149,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize_array(
+    Cdr_DllAPI Cdr& serialize_array(
             const double* double_t,
             size_t num_elements);
 
@@ -1168,7 +1160,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize_array(
+    Cdr_DllAPI Cdr& serialize_array(
             const long double* ldouble_t,
             size_t num_elements);
 
@@ -1179,7 +1171,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize_array(
+    Cdr_DllAPI Cdr& serialize_array(
             const bool* bool_t,
             size_t num_elements);
 
@@ -1190,7 +1182,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& serialize_array(
             const std::string* string_t,
             size_t num_elements)
@@ -1209,7 +1201,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& serialize_array(
             const std::wstring* string_t,
             size_t num_elements)
@@ -1230,7 +1222,6 @@ public:
      * position that exceeds the internal memory size.
      */
     template<size_t MAX_CHARS>
-    inline
     Cdr& serialize_array(
             const fixed_string<MAX_CHARS>* value,
             size_t num_elements)
@@ -1364,7 +1355,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& deserialize(
             uint8_t& octet_t)
     {
@@ -1377,7 +1368,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    Cdr& deserialize(
+    Cdr_DllAPI Cdr& deserialize(
             char& char_t);
 
     /*!
@@ -1386,7 +1377,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& deserialize(
             int8_t& int8)
     {
@@ -1399,7 +1390,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& deserialize(
             uint16_t& ushort_t)
     {
@@ -1412,7 +1403,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    Cdr& deserialize(
+    Cdr_DllAPI Cdr& deserialize(
             int16_t& short_t);
 
     /*!
@@ -1421,7 +1412,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& deserialize(
             uint32_t& ulong_t)
     {
@@ -1434,7 +1425,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    Cdr& deserialize(
+    Cdr_DllAPI Cdr& deserialize(
             int32_t& long_t);
 
     /*!
@@ -1443,7 +1434,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& deserialize(
             wchar_t& wchar)
     {
@@ -1459,7 +1450,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& deserialize(
             uint64_t& ulonglong_t)
     {
@@ -1472,7 +1463,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    Cdr& deserialize(
+    Cdr_DllAPI Cdr& deserialize(
             int64_t& longlong_t);
 
     /*!
@@ -1481,7 +1472,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    Cdr& deserialize(
+    Cdr_DllAPI Cdr& deserialize(
             float& float_t);
 
     /*!
@@ -1490,7 +1481,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    Cdr& deserialize(
+    Cdr_DllAPI Cdr& deserialize(
             double& double_t);
 
     /*!
@@ -1500,7 +1491,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      * @note Due to internal representation differences, WIN32 and *NIX like systems are not compatible.
      */
-    Cdr& deserialize(
+    Cdr_DllAPI Cdr& deserialize(
             long double& ldouble_t);
 
     /*!
@@ -1510,7 +1501,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      * @exception exception::BadParamException This exception is thrown when trying to deserialize an invalid value.
      */
-    Cdr& deserialize(
+    Cdr_DllAPI Cdr& deserialize(
             bool& bool_t);
 
     /*!
@@ -1521,7 +1512,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    Cdr& deserialize(
+    Cdr_DllAPI Cdr& deserialize(
             char*& string_t);
 
     /*!
@@ -1532,7 +1523,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    Cdr& deserialize(
+    Cdr_DllAPI Cdr& deserialize(
             wchar_t*& string_t);
 
     /*!
@@ -1541,7 +1532,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& deserialize(
             std::string& string_t)
     {
@@ -1557,7 +1548,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& deserialize(
             std::wstring& string_t)
     {
@@ -1574,7 +1565,7 @@ public:
      * position that exceeds the internal memory size.
      */
     template <size_t MAX_CHARS>
-    inline Cdr& deserialize(
+    Cdr& deserialize(
             fixed_string<MAX_CHARS>& value)
     {
         uint32_t length = 0;
@@ -1590,7 +1581,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
     template<class _T, size_t _Size>
-    inline Cdr& deserialize(
+    Cdr& deserialize(
             std::array<_T, _Size>& array_t)
     {
         if (CdrVersion::XCDRv2 == cdr_version_ && !is_multi_array_primitive(&array_t))
@@ -1622,6 +1613,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
+    TEMPLATE_SPEC
     Cdr& deserialize(
             std::vector<bool>& vector_t)
     {
@@ -1870,7 +1862,7 @@ public:
      * position that exceeds the internal memory size.
      */
     template<size_t N, typename std::enable_if < (N < 9) > ::type* = nullptr>
-    inline Cdr& deserialize(
+    Cdr& deserialize(
             std::bitset<N>& value)
     {
         uint8_t decode_value {0};
@@ -1880,7 +1872,7 @@ public:
     }
 
     template<size_t N, typename std::enable_if < (8 < N && N < 17) > ::type* = nullptr>
-    inline Cdr& deserialize(
+    Cdr& deserialize(
             std::bitset<N>& value)
     {
         uint16_t decode_value {0};
@@ -1890,7 +1882,7 @@ public:
     }
 
     template<size_t N, typename std::enable_if < (16 < N && N < 33) > ::type* = nullptr>
-    inline Cdr& deserialize(
+    Cdr& deserialize(
             std::bitset<N>& value)
     {
         uint32_t decode_value {0};
@@ -1900,7 +1892,7 @@ public:
     }
 
     template<size_t N, typename std::enable_if < (32 < N && N < 65) > ::type* = nullptr>
-    inline Cdr& deserialize(
+    Cdr& deserialize(
             std::bitset<N>& value)
     {
         uint64_t decode_value {0};
@@ -1920,7 +1912,7 @@ public:
      * position that exceeds the internal memory size.
      */
     template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr, typename = void>
-    inline Cdr& deserialize(
+    Cdr& deserialize(
             _T& value)
     {
         extern void deserialize(
@@ -1972,7 +1964,7 @@ public:
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
             int32_t>::value>::type* = nullptr>
-    inline Cdr& deserialize(
+    Cdr& deserialize(
             _T& value)
     {
         int32_t decode_value {0};
@@ -1992,7 +1984,7 @@ public:
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
             uint32_t>::value>::type* = nullptr>
-    inline Cdr& deserialize(
+    Cdr& deserialize(
             _T& value)
     {
         uint32_t decode_value {0};
@@ -2012,7 +2004,7 @@ public:
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
             int16_t>::value>::type* = nullptr>
-    inline Cdr& deserialize(
+    Cdr& deserialize(
             _T& value)
     {
         int16_t decode_value {0};
@@ -2032,7 +2024,7 @@ public:
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
             uint16_t>::value>::type* = nullptr>
-    inline Cdr& deserialize(
+    Cdr& deserialize(
             _T& value)
     {
         uint16_t decode_value {0};
@@ -2052,7 +2044,7 @@ public:
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
             int8_t>::value>::type* = nullptr>
-    inline Cdr& deserialize(
+    Cdr& deserialize(
             _T& value)
     {
         int8_t decode_value {0};
@@ -2072,7 +2064,7 @@ public:
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
             uint8_t>::value>::type* = nullptr>
-    inline Cdr& deserialize(
+    Cdr& deserialize(
             _T& value)
     {
         uint8_t decode_value {0};
@@ -2088,7 +2080,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& deserialize_array(
             uint8_t* octet_t,
             size_t num_elements)
@@ -2103,7 +2095,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    Cdr& deserialize_array(
+    Cdr_DllAPI Cdr& deserialize_array(
             char* char_t,
             size_t num_elements);
 
@@ -2114,7 +2106,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& deserialize_array(
             int8_t* int8,
             size_t num_elements)
@@ -2129,7 +2121,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& deserialize_array(
             uint16_t* ushort_t,
             size_t num_elements)
@@ -2144,7 +2136,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    Cdr& deserialize_array(
+    Cdr_DllAPI Cdr& deserialize_array(
             int16_t* short_t,
             size_t num_elements);
 
@@ -2155,7 +2147,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& deserialize_array(
             uint32_t* ulong_t,
             size_t num_elements)
@@ -2170,7 +2162,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    Cdr& deserialize_array(
+    Cdr_DllAPI Cdr& deserialize_array(
             int32_t* long_t,
             size_t num_elements);
 
@@ -2181,7 +2173,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    Cdr& deserialize_array(
+    Cdr_DllAPI Cdr& deserialize_array(
             wchar_t* wchar,
             size_t num_elements);
 
@@ -2192,7 +2184,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    inline
+    TEMPLATE_SPEC
     Cdr& deserialize_array(
             uint64_t* ulonglong_t,
             size_t num_elements)
@@ -2207,7 +2199,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    Cdr& deserialize_array(
+    Cdr_DllAPI Cdr& deserialize_array(
             int64_t* longlong_t,
             size_t num_elements);
 
@@ -2218,7 +2210,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    Cdr& deserialize_array(
+    Cdr_DllAPI Cdr& deserialize_array(
             float* float_t,
             size_t num_elements);
 
@@ -2229,7 +2221,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    Cdr& deserialize_array(
+    Cdr_DllAPI Cdr& deserialize_array(
             double* double_t,
             size_t num_elements);
 
@@ -2240,7 +2232,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    Cdr& deserialize_array(
+    Cdr_DllAPI Cdr& deserialize_array(
             long double* ldouble_t,
             size_t num_elements);
 
@@ -2251,7 +2243,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    Cdr& deserialize_array(
+    Cdr_DllAPI Cdr& deserialize_array(
             bool* bool_t,
             size_t num_elements);
 
@@ -2319,6 +2311,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
+    TEMPLATE_SPEC
     Cdr& deserialize_sequence(
             std::string*& sequence_t,
             size_t& num_elements)
@@ -2335,6 +2328,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
+    TEMPLATE_SPEC
     Cdr& deserialize_sequence(
             std::wstring*& sequence_t,
             size_t& num_elements)
@@ -2616,7 +2610,7 @@ public:
      * @param[in] member_id Member identifier.
      * @return Reference to the eprosima::fastcdr::Cdr object.
      */
-    inline Cdr& operator << (
+    Cdr& operator << (
             const MemberId& member_id) noexcept
     {
         assert(next_member_id_ == MEMBER_ID_INVALID);

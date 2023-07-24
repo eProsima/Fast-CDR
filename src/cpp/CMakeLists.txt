@@ -24,6 +24,7 @@ set(${PROJECT_NAME}_source_files
     ${ALL_HEADERS}
 
     Cdr.cpp
+    CdrSizeCalculator.cpp
     FastCdr.cpp
     FastBuffer.cpp
     exceptions/BadOptionalAccessException.cpp

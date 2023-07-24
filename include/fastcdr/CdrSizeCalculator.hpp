@@ -22,8 +22,9 @@
 #include <map>
 #include <vector>
 
-#include "CdrEncoding.hpp"
 #include "fastcdr_dll.h"
+
+#include "CdrEncoding.hpp"
 #include "cdr/fixed_size_string.hpp"
 #include "detail/container_recursive_inspector.hpp"
 #include "xcdr/MemberId.hpp"
@@ -37,31 +38,14 @@ class CdrSizeCalculator
 public:
 
     Cdr_DllAPI CdrSizeCalculator(
-            CdrVersion cdr_version)
-        : cdr_version_(cdr_version)
-    {
-        switch (cdr_version_)
-        {
-            case CdrVersion::XCDRv2:
-                break;
-            default:
-                current_encoding_ = EncodingAlgorithmFlag::PLAIN_CDR;
-                break;
-        }
-    }
+            CdrVersion cdr_version);
 
-    Cdr_DllAPI CdrVersion get_cdr_version() const
-    {
-        return cdr_version_;
-    }
+    Cdr_DllAPI CdrVersion get_cdr_version() const;
 
-    Cdr_DllAPI EncodingAlgorithmFlag get_encoding() const
-    {
-        return current_encoding_;
-    }
+    Cdr_DllAPI EncodingAlgorithmFlag get_encoding() const;
 
     template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr>
-    inline size_t calculate_serialized_size(
+    size_t calculate_serialized_size(
             const _T& data,
             size_t current_alignment = 0)
     {
@@ -71,7 +55,7 @@ public:
 
     template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
             std::is_same<typename std::underlying_type<_T>::type, int32_t>::value>::type* = nullptr>
-    inline size_t calculate_serialized_size(
+    size_t calculate_serialized_size(
             const _T& data,
             size_t current_alignment = 0)
     {
@@ -80,7 +64,7 @@ public:
 
     template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
             std::is_same<typename std::underlying_type<_T>::type, uint32_t>::value>::type* = nullptr>
-    inline size_t calculate_serialized_size(
+    size_t calculate_serialized_size(
             const _T& data,
             size_t current_alignment = 0)
     {
@@ -89,7 +73,7 @@ public:
 
     template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
             std::is_same<typename std::underlying_type<_T>::type, int16_t>::value>::type* = nullptr>
-    inline size_t calculate_serialized_size(
+    size_t calculate_serialized_size(
             const _T& data,
             size_t current_alignment = 0)
     {
@@ -98,7 +82,7 @@ public:
 
     template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
             std::is_same<typename std::underlying_type<_T>::type, uint16_t>::value>::type* = nullptr>
-    inline size_t calculate_serialized_size(
+    size_t calculate_serialized_size(
             const _T& data,
             size_t current_alignment = 0)
     {
@@ -107,7 +91,7 @@ public:
 
     template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
             std::is_same<typename std::underlying_type<_T>::type, int8_t>::value>::type* = nullptr>
-    inline size_t calculate_serialized_size(
+    size_t calculate_serialized_size(
             const _T& data,
             size_t current_alignment = 0)
     {
@@ -116,127 +100,127 @@ public:
 
     template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
             std::is_same<typename std::underlying_type<_T>::type, uint8_t>::value>::type* = nullptr>
-    inline size_t calculate_serialized_size(
+    size_t calculate_serialized_size(
             const _T& data,
             size_t current_alignment = 0)
     {
         return calculate_serialized_size(static_cast<uint8_t>(data), current_alignment);
     }
 
-    template<>
-    inline size_t calculate_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_serialized_size(
             const int8_t&,
             size_t)
     {
         return 1;
     }
 
-    template<>
-    inline size_t calculate_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_serialized_size(
             const uint8_t&,
             size_t)
     {
         return 1;
     }
 
-    template<>
-    inline size_t calculate_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_serialized_size(
             const char&,
             size_t)
     {
         return 1;
     }
 
-    template<>
-    inline size_t calculate_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_serialized_size(
             const bool&,
             size_t)
     {
         return 1;
     }
 
-    template<>
-    inline size_t calculate_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_serialized_size(
             const wchar_t&,
             size_t current_alignment)
     {
         return 2 + alignment(current_alignment, 2);
     }
 
-    template<>
-    inline size_t calculate_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_serialized_size(
             const int16_t&,
             size_t current_alignment)
     {
         return 2 + alignment(current_alignment, 2);
     }
 
-    template<>
-    inline size_t calculate_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_serialized_size(
             const uint16_t&,
             size_t current_alignment)
     {
         return 2 + alignment(current_alignment, 2);
     }
 
-    template<>
-    inline size_t calculate_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_serialized_size(
             const int32_t&,
             size_t current_alignment)
     {
         return 4 + alignment(current_alignment, 4);
     }
 
-    template<>
-    inline size_t calculate_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_serialized_size(
             const uint32_t&,
             size_t current_alignment)
     {
         return 4 + alignment(current_alignment, 4);
     }
 
-    template<>
-    inline size_t calculate_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_serialized_size(
             const int64_t&,
             size_t current_alignment)
     {
         return 8 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
     }
 
-    template<>
-    inline size_t calculate_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_serialized_size(
             const uint64_t&,
             size_t current_alignment)
     {
         return 8 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
     }
 
-    template<>
-    inline size_t calculate_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_serialized_size(
             const float&,
             size_t current_alignment)
     {
         return 4 + alignment(current_alignment, 4);
     }
 
-    template<>
-    inline size_t calculate_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_serialized_size(
             const double&,
             size_t current_alignment)
     {
         return 8 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
     }
 
-    template<>
-    inline size_t calculate_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_serialized_size(
             const long double&,
             size_t current_alignment)
     {
         return 16 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
     }
 
-    template<>
-    inline size_t calculate_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_serialized_size(
             const std::string& data,
             size_t current_alignment)
     {
@@ -248,8 +232,8 @@ public:
         return current_alignment - initial_alignment;
     }
 
-    template<>
-    inline size_t calculate_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_serialized_size(
             const std::wstring& data,
             size_t current_alignment)
     {
@@ -261,7 +245,7 @@ public:
     }
 
     template <size_t MAX_CHARS>
-    inline size_t calculate_serialized_size(
+    size_t calculate_serialized_size(
             const fixed_string<MAX_CHARS>& data,
             size_t current_alignment = 0)
     {
@@ -274,7 +258,7 @@ public:
 
 #if !defined(_MSC_VER)
     template<class _T = bool>
-    inline size_t calculate_serialized_size(
+    size_t calculate_serialized_size(
             const std::vector<bool>& data,
             size_t current_alignment = 0)
     {
@@ -289,7 +273,7 @@ public:
 
     template<class _T, typename std::enable_if<!std::is_enum<_T>::value &&
             !std::is_arithmetic<_T>::value>::type* = nullptr>
-    inline size_t calculate_serialized_size(
+    size_t calculate_serialized_size(
             const std::vector<_T>& data,
             size_t current_alignment = 0)
     {
@@ -316,7 +300,7 @@ public:
 
     template<class _T, typename std::enable_if<std::is_enum<_T>::value ||
             std::is_arithmetic<_T>::value>::type* = nullptr>
-    inline size_t calculate_serialized_size(
+    size_t calculate_serialized_size(
             const std::vector<_T>& data,
             size_t current_alignment = 0)
     {
@@ -330,7 +314,7 @@ public:
     }
 
     template<class _T, size_t _Size>
-    inline size_t calculate_serialized_size(
+    size_t calculate_serialized_size(
             const std::array<_T, _Size>& data,
             size_t current_alignment = 0)
     {
@@ -357,7 +341,7 @@ public:
 
     template<class _K, class _V, typename std::enable_if<!std::is_enum<_V>::value &&
             !std::is_arithmetic<_V>::value>::type* = nullptr>
-    inline size_t calculate_serialized_size(
+    size_t calculate_serialized_size(
             const std::map<_K, _V>& data,
             size_t current_alignment = 0)
     {
@@ -388,7 +372,7 @@ public:
 
     template<class _K, class _V, typename std::enable_if<std::is_enum<_V>::value ||
             std::is_arithmetic<_V>::value>::type* = nullptr>
-    inline size_t calculate_serialized_size(
+    size_t calculate_serialized_size(
             const std::map<_K, _V>& data,
             size_t current_alignment = 0)
     {
@@ -406,7 +390,7 @@ public:
     }
 
     template<size_t N, typename std::enable_if < (N < 9) > ::type* = nullptr>
-    inline size_t calculate_serialized_size(
+    size_t calculate_serialized_size(
             const std::bitset<N>&,
             size_t)
     {
@@ -414,7 +398,7 @@ public:
     }
 
     template<size_t N, typename std::enable_if < (8 < N && N < 17) > ::type* = nullptr>
-    inline size_t calculate_serialized_size(
+    size_t calculate_serialized_size(
             const std::bitset<N>&,
             size_t current_alignment = 0)
     {
@@ -422,7 +406,7 @@ public:
     }
 
     template<size_t N, typename std::enable_if < (16 < N && N < 33) > ::type* = nullptr>
-    inline size_t calculate_serialized_size(
+    size_t calculate_serialized_size(
             const std::bitset<N>&,
             size_t current_alignment = 0)
     {
@@ -430,7 +414,7 @@ public:
     }
 
     template<size_t N, typename std::enable_if < (32 < N && N < 65) > ::type* = nullptr>
-    inline size_t calculate_serialized_size(
+    size_t calculate_serialized_size(
             const std::bitset<N>&,
             size_t current_alignment = 0)
     {
@@ -438,7 +422,7 @@ public:
     }
 
     template<class _T>
-    inline size_t calculate_serialized_size(
+    size_t calculate_serialized_size(
             const optional<_T>& data,
             size_t current_alignment = 0)
     {
@@ -463,7 +447,7 @@ public:
     }
 
     template<class _T>
-    inline size_t calculate_array_serialized_size(
+    size_t calculate_array_serialized_size(
             const _T* data,
             size_t num_elements,
             size_t current_alignment = 0)
@@ -478,8 +462,8 @@ public:
         return current_alignment - initial_alignment;
     }
 
-    template<>
-    inline size_t calculate_array_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_array_serialized_size(
             const int8_t*,
             size_t num_elements,
             size_t)
@@ -488,8 +472,8 @@ public:
         return num_elements;
     }
 
-    template<>
-    inline size_t calculate_array_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_array_serialized_size(
             const uint8_t*,
             size_t num_elements,
             size_t)
@@ -498,8 +482,8 @@ public:
         return num_elements;
     }
 
-    template<>
-    inline size_t calculate_array_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_array_serialized_size(
             const char*,
             size_t num_elements,
             size_t)
@@ -508,8 +492,8 @@ public:
         return num_elements;
     }
 
-    template<>
-    inline size_t calculate_array_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_array_serialized_size(
             const wchar_t*,
             size_t num_elements,
             size_t current_alignment)
@@ -518,8 +502,8 @@ public:
         return num_elements * 2 + alignment(current_alignment, 2);
     }
 
-    template<>
-    inline size_t calculate_array_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_array_serialized_size(
             const int16_t*,
             size_t num_elements,
             size_t current_alignment)
@@ -528,8 +512,8 @@ public:
         return num_elements * 2 + alignment(current_alignment, 2);
     }
 
-    template<>
-    inline size_t calculate_array_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_array_serialized_size(
             const uint16_t*,
             size_t num_elements,
             size_t current_alignment)
@@ -538,8 +522,8 @@ public:
         return num_elements * 2 + alignment(current_alignment, 2);
     }
 
-    template<>
-    inline size_t calculate_array_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_array_serialized_size(
             const int32_t*,
             size_t num_elements,
             size_t current_alignment)
@@ -548,8 +532,8 @@ public:
         return num_elements * 4 + alignment(current_alignment, 4);
     }
 
-    template<>
-    inline size_t calculate_array_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_array_serialized_size(
             const uint32_t*,
             size_t num_elements,
             size_t current_alignment)
@@ -558,8 +542,8 @@ public:
         return num_elements * 4 + alignment(current_alignment, 4);
     }
 
-    template<>
-    inline size_t calculate_array_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_array_serialized_size(
             const int64_t*,
             size_t num_elements,
             size_t current_alignment)
@@ -568,8 +552,8 @@ public:
         return num_elements * 8 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
     }
 
-    template<>
-    inline size_t calculate_array_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_array_serialized_size(
             const uint64_t*,
             size_t num_elements,
             size_t current_alignment)
@@ -578,8 +562,8 @@ public:
         return num_elements * 8 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
     }
 
-    template<>
-    inline size_t calculate_array_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_array_serialized_size(
             const float*,
             size_t num_elements,
             size_t current_alignment)
@@ -588,8 +572,8 @@ public:
         return num_elements * 4 + alignment(current_alignment, 4);
     }
 
-    template<>
-    inline size_t calculate_array_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_array_serialized_size(
             const double*,
             size_t num_elements,
             size_t current_alignment)
@@ -598,8 +582,8 @@ public:
         return num_elements * 8 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
     }
 
-    template<>
-    inline size_t calculate_array_serialized_size(
+    TEMPLATE_SPEC
+    size_t calculate_array_serialized_size(
             const long double*,
             size_t num_elements,
             size_t current_alignment)
@@ -609,7 +593,7 @@ public:
     }
 
     template<class _T, size_t _N>
-    inline size_t calculate_array_serialized_size(
+    size_t calculate_array_serialized_size(
             const std::array<_T, _N>* data,
             size_t num_elements,
             size_t current_alignment = 0)
@@ -623,7 +607,7 @@ public:
     }
 
     template<class _T>
-    inline size_t calculate_member_serialized_size(
+    size_t calculate_member_serialized_size(
             const MemberId& id,
             const _T& data,
             size_t current_alignment = 0)
@@ -677,7 +661,7 @@ public:
     }
 
     template<class _T>
-    inline size_t calculate_member_serialized_size(
+    size_t calculate_member_serialized_size(
             const MemberId& id,
             const optional<_T>& data,
             size_t current_alignment = 0)
@@ -732,39 +716,11 @@ public:
 
     Cdr_DllAPI size_t begin_calculate_type_serialized_size(
             EncodingAlgorithmFlag new_encoding,
-            size_t current_alignment = 0)
-    {
-        size_t initial_alignment = current_alignment;
-        current_encoding_ = new_encoding;
-
-        if (CdrVersion::XCDRv2 == cdr_version_ && EncodingAlgorithmFlag::PLAIN_CDR2 != current_encoding_)
-        {
-            current_alignment += 4 + alignment(current_alignment, 4); // DHEADER
-        }
-
-        serialized_member_size_ = NO_SERIALIZED_MEMBER_SIZE; // Avoid error when serializen arrays, sequences, etc..
-
-        return current_alignment - initial_alignment;
-    }
+            size_t current_alignment = 0);
 
     Cdr_DllAPI size_t end_calculate_type_serialized_size(
             EncodingAlgorithmFlag new_encoding,
-            size_t current_alignment = 0)
-    {
-        size_t initial_alignment = current_alignment;
-
-        if (CdrVersion::XCDRv1 == cdr_version_ && EncodingAlgorithmFlag::PL_CDR == current_encoding_)
-        {
-            current_alignment += 4 + alignment(current_alignment, 4); // Sentinel
-        }
-        else if (CdrVersion::XCDRv2 == cdr_version_ && EncodingAlgorithmFlag::PLAIN_CDR2 != current_encoding_)
-        {
-            serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
-        }
-
-        current_encoding_ = new_encoding;
-        return current_alignment - initial_alignment;
-    }
+            size_t current_alignment = 0);
 
 private:
 

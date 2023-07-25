@@ -767,19 +767,6 @@ public:
     }
 
     /*!
-     * @brief This function template serializes a sequence of booleans.
-     * @param vector_t The sequence that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    TEMPLATE_SPEC
-    Cdr& serialize(
-            const std::vector<bool>& vector_t)
-    {
-        return serialize_bool_sequence(vector_t);
-    }
-
-    /*!
      * @brief This function template serializes a sequence of non-primitive.
      * @param vector_t The sequence that will be serialized in the buffer.
      * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -851,6 +838,19 @@ public:
         }
 
         return *this;
+    }
+
+    /*!
+     * @brief This function template serializes a sequence of booleans.
+     * @param vector_t The sequence that will be serialized in the buffer.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+     */
+    TEMPLATE_SPEC
+    Cdr& serialize(
+            const std::vector<bool>& vector_t)
+    {
+        return serialize_bool_sequence(vector_t);
     }
 
     /*!
@@ -934,22 +934,6 @@ public:
 
         return *this;
     }
-
-#ifdef _MSC_VER
-    /*!
-     * @brief This function template serializes a sequence of booleans.
-     * @param vector_t The sequence that will be serialized in the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     */
-    template<>
-    Cdr& serialize<bool>(
-            const std::vector<bool>& vector_t)
-    {
-        return serialize_bool_sequence(vector_t);
-    }
-
-#endif // ifdef _MSC_VER
 
     /*!
      * @brief Encodes the value of a bitset into the buffer.
@@ -1779,19 +1763,6 @@ public:
     }
 
     /*!
-     * @brief This function template deserializes a sequence.
-     * @param vector_t The variable that will store the sequence read from the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
-     */
-    TEMPLATE_SPEC
-    Cdr& deserialize(
-            std::vector<bool>& vector_t)
-    {
-        return deserialize_bool_sequence(vector_t);
-    }
-
-    /*!
      * @brief This function template deserializes a sequence of non-primitive.
      * @param vector_t The variable that will store the sequence read from the buffer.
      * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -1910,6 +1881,19 @@ public:
     }
 
     /*!
+     * @brief This function template deserializes a sequence.
+     * @param vector_t The variable that will store the sequence read from the buffer.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+     */
+    TEMPLATE_SPEC
+    Cdr& deserialize(
+            std::vector<bool>& vector_t)
+    {
+        return deserialize_bool_sequence(vector_t);
+    }
+
+    /*!
      * @brief This function template deserializes a map of non-primitive.
      * @param map_t The variable that will store the map read from the buffer.
      * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -2008,22 +1992,6 @@ public:
 
         return *this;
     }
-
-#ifdef _MSC_VER
-    /*!
-     * @brief This function template deserializes a sequence.
-     * @param vector_t The variable that will store the sequence read from the buffer.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
-     */
-    template<>
-    Cdr& deserialize<bool>(
-            std::vector<bool>& vector_t)
-    {
-        return deserialize_bool_sequence(vector_t);
-    }
-
-#endif // ifdef _MSC_VER
 
     /*!
      * @brief Decodes a bitset from the buffer.

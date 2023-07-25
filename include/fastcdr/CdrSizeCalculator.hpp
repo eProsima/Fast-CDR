@@ -33,6 +33,14 @@
 namespace eprosima {
 namespace fastcdr {
 
+class CdrSizeCalculator;
+
+template<class _T>
+extern size_t calculate_serialized_size(
+        CdrSizeCalculator&,
+        const _T&,
+        size_t);
+
 class CdrSizeCalculator
 {
 public:
@@ -49,8 +57,7 @@ public:
             const _T& data,
             size_t current_alignment = 0)
     {
-        extern size_t calculate_serialized_size(CdrSizeCalculator&, const _T&, size_t);
-        return calculate_serialized_size(*this, data, current_alignment);
+        return eprosima::fastcdr::calculate_serialized_size(*this, data, current_alignment);
     }
 
     template<class _T, typename std::enable_if<std::is_enum<_T>::value &&

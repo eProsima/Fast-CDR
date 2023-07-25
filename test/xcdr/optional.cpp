@@ -74,6 +74,7 @@ public:
 namespace eprosima {
 namespace fastcdr {
 
+template<>
 void serialize(
         Cdr& cdr,
         const InnerOptionalShortStruct& data)
@@ -84,6 +85,7 @@ void serialize(
     cdr.end_serialize_type(current_status);
 }
 
+template<>
 void deserialize(
         Cdr& cdr,
         InnerOptionalShortStruct& data)

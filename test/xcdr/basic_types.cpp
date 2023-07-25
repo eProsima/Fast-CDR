@@ -90,6 +90,8 @@ struct InnerBasicTypesShortStruct
 
 namespace eprosima {
 namespace fastcdr {
+
+template<>
 void serialize(
         Cdr& cdr,
         const InnerBasicTypesShortStruct& data)
@@ -102,6 +104,7 @@ void serialize(
     cdr.end_serialize_type(current_status);
 }
 
+template<>
 void deserialize(
         Cdr& cdr,
         InnerBasicTypesShortStruct& data)
@@ -176,6 +179,7 @@ public:
 namespace eprosima {
 namespace fastcdr {
 
+template<>
 void serialize(
         Cdr& cdr,
         const InnerBasicTypesStruct& data)
@@ -187,6 +191,7 @@ void serialize(
     cdr.end_serialize_type(current_status);
 }
 
+template<>
 void deserialize(
         Cdr& cdr,
         InnerBasicTypesStruct& data)

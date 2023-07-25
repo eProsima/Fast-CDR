@@ -263,9 +263,15 @@ public:
         return current_alignment - initial_alignment;
     }
 
-#if !defined(_MSC_VER)
-    template<class _T = bool>
-    size_t calculate_serialized_size(
+#ifdef _MSC_VER
+    /*!
+     * @brief This function template serializes a sequence of booleans.
+     * @param vector_t The sequence that will be serialized in the buffer.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+     */
+    template<>
+    size_t calculate_serialized_size<bool>(
             const std::vector<bool>& data,
             size_t current_alignment = 0)
     {
@@ -276,7 +282,19 @@ public:
         return current_alignment - initial_alignment;
     }
 
-#endif // if !defined(_MSC_VER)
+#endif // ifdef _MSC_VER
+
+    TEMPLATE_SPEC
+    size_t calculate_serialized_size(
+            const std::vector<bool>& data,
+            size_t current_alignment = 0)
+    {
+        size_t initial_alignment = current_alignment;
+
+        current_alignment += data.size() + 4 + alignment(current_alignment, 4);
+
+        return current_alignment - initial_alignment;
+    }
 
     template<class _T, typename std::enable_if<!std::is_enum<_T>::value &&
             !std::is_arithmetic<_T>::value>::type* = nullptr>

@@ -46,6 +46,18 @@
 namespace eprosima {
 namespace fastcdr {
 
+class Cdr;
+
+template<class _T>
+extern void serialize(
+        Cdr&,
+        const _T&);
+
+template<class _T>
+extern void deserialize(
+        Cdr&,
+        _T&);
+
 /*!
  * @brief This class offers an interface to serialize/deserialize some basic types using CDR protocol inside an eprosima::fastcdr::FastBuffer.
  * @ingroup FASTCDRAPIREFERENCE
@@ -361,10 +373,7 @@ public:
     Cdr& serialize(
             const _T& value)
     {
-        extern void serialize(
-            Cdr&,
-            const _T&);
-        serialize(*this, value);
+        eprosima::fastcdr::serialize(*this, value);
         return *this;
     }
 
@@ -1356,10 +1365,7 @@ public:
     Cdr& deserialize(
             _T& value)
     {
-        extern void deserialize(
-            Cdr&,
-            _T&);
-        deserialize(*this, value);
+        eprosima::fastcdr::deserialize(*this, value);
         return *this;
     }
 

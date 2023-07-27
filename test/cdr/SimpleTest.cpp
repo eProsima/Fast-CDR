@@ -472,16 +472,16 @@ TEST(CDRTests, DDSEncapsulation)
     valid_encapsulations.fill({false, eprosima::fastcdr::CdrVersion::DDS_CDR});
 
     // Valid representation identifiers from table 10.3
-    valid_encapsulations[0 + EncodingAlgorithmFlag::PLAIN_CDR] = {true, eprosima::fastcdr::CdrVersion::XCDRv1};  // PLAIN_CDR_BE
-    valid_encapsulations[1 + EncodingAlgorithmFlag::PLAIN_CDR] = {true, eprosima::fastcdr::CdrVersion::XCDRv1};
-    valid_encapsulations[0 + EncodingAlgorithmFlag::PL_CDR] = {true, eprosima::fastcdr::CdrVersion::XCDRv1};
-    valid_encapsulations[1 + EncodingAlgorithmFlag::PL_CDR] = {true, eprosima::fastcdr::CdrVersion::XCDRv1};   // PL_CDR_LE
+    valid_encapsulations[0 + EncodingAlgorithmFlag::PLAIN_CDR] = {true, eprosima::fastcdr::CdrVersion::XCDRv1};   // PLAIN_CDR_BE
+    valid_encapsulations[1 + EncodingAlgorithmFlag::PLAIN_CDR] = {true, eprosima::fastcdr::CdrVersion::XCDRv1};   // PLAIN_CDR_LE
+    valid_encapsulations[0 + EncodingAlgorithmFlag::PL_CDR] = {true, eprosima::fastcdr::CdrVersion::XCDRv1};      // PL_CDR_BE
+    valid_encapsulations[1 + EncodingAlgorithmFlag::PL_CDR] = {true, eprosima::fastcdr::CdrVersion::XCDRv1};      // PL_CDR_LE
     valid_encapsulations[0 + EncodingAlgorithmFlag::PLAIN_CDR2] = {true, eprosima::fastcdr::CdrVersion::XCDRv2};  // PLAIN_CDR2_BE
-    valid_encapsulations[1 + EncodingAlgorithmFlag::PLAIN_CDR2] = {true, eprosima::fastcdr::CdrVersion::XCDRv2};  // PLAIN_CDR2_BE
-    valid_encapsulations[0 + EncodingAlgorithmFlag::DELIMIT_CDR2] = {true, eprosima::fastcdr::CdrVersion::XCDRv2};  // DELIMIT_CDR2_BE
-    valid_encapsulations[1 + EncodingAlgorithmFlag::DELIMIT_CDR2] = {true, eprosima::fastcdr::CdrVersion::XCDRv2};   // DELIMIT_CDR2_LE
-    valid_encapsulations[0 + EncodingAlgorithmFlag::PL_CDR2] = {true, eprosima::fastcdr::CdrVersion::XCDRv2};
-    valid_encapsulations[1 + EncodingAlgorithmFlag::PL_CDR2] = {true, eprosima::fastcdr::CdrVersion::XCDRv2};
+    valid_encapsulations[1 + EncodingAlgorithmFlag::PLAIN_CDR2] = {true, eprosima::fastcdr::CdrVersion::XCDRv2};  // PLAIN_CDR2_LE
+    valid_encapsulations[0 + EncodingAlgorithmFlag::DELIMIT_CDR2] = {true, eprosima::fastcdr::CdrVersion::XCDRv2};// DELIMIT_CDR2_BE
+    valid_encapsulations[1 + EncodingAlgorithmFlag::DELIMIT_CDR2] = {true, eprosima::fastcdr::CdrVersion::XCDRv2};// DELIMIT_CDR2_LE
+    valid_encapsulations[0 + EncodingAlgorithmFlag::PL_CDR2] = {true, eprosima::fastcdr::CdrVersion::XCDRv2};     // PL_CDR2_BE
+    valid_encapsulations[1 + EncodingAlgorithmFlag::PL_CDR2] = {true, eprosima::fastcdr::CdrVersion::XCDRv2};     // PL_CDR2_LE
 
     for (uint16_t i = 0; i < 256; ++i)
     {

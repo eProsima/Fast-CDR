@@ -207,14 +207,14 @@ public:
      * @brief This function returns the option flags when the CDR type is eprosima::fastcdr::DDS_CDR.
      * @return The option flags.
      */
-    Cdr_DllAPI uint16_t get_dds_cdr_options() const;
+    Cdr_DllAPI std::array<uint8_t, 2> get_dds_cdr_options() const;
 
     /*!
      * @brief This function sets the option flags when the CDR type is eprosima::fastcdr::DDS_CDR.
      * @param options New value for the option flags.
      */
     Cdr_DllAPI void set_dds_cdr_options(
-            uint16_t options);
+            const std::array<uint8_t, 2>& options);
 
     /*!
      * @brief This function sets the current endianness used by the CDR type.
@@ -3268,7 +3268,7 @@ private:
     EncodingAlgorithmFlag current_encoding_ {EncodingAlgorithmFlag::PLAIN_CDR2};
 
     //! @brief This attribute stores the option flags when the CDR type is DDS_CDR;
-    uint16_t options_ {0};
+    std::array<uint8_t, 2> options_ {0};
 
     //! @brief The endianness that will be applied over the buffer.
     uint8_t endianness_ {Endianness::LITTLE_ENDIANNESS};

@@ -27,6 +27,7 @@ CdrSizeCalculator::CdrSizeCalculator(
             break;
         default:
             current_encoding_ = EncodingAlgorithmFlag::PLAIN_CDR;
+            align64_ = 8;
             break;
     }
 }

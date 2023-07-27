@@ -48,6 +48,51 @@ inline size_t alignment_on_state(
     return (dataSize - ((offset - origin) % dataSize)) & (dataSize - 1);
 }
 
+inline uint32_t Cdr::get_long_lc(
+        SerializedMemberSizeForNextInt serialized_member_size)
+{
+    uint32_t lc = 0x40000000;
+
+    switch (serialized_member_size)
+    {
+        case SERIALIZED_MEMBER_SIZE_8:
+            lc =  0x70000000;
+            break;
+        case SERIALIZED_MEMBER_SIZE_4:
+            lc =  0x60000000;
+            break;
+        case SERIALIZED_MEMBER_SIZE:
+            lc = 0x50000000;
+            break;
+        default:
+            break;
+    }
+
+    return lc;
+}
+
+inline uint32_t Cdr::get_short_lc(
+        size_t member_serialized_size)
+{
+    uint32_t lc = 0x0;
+    switch (member_serialized_size)
+    {
+        case 2:
+            lc = 0x10000000;
+            break;
+        case 4:
+            lc = 0x20000000;
+            break;
+        case 8:
+            lc = 0x30000000;
+            break;
+        default:
+            break;
+    }
+
+    return lc;
+}
+
 Cdr::state::state(
         const Cdr& cdr)
     : offset_(cdr.offset_)
@@ -98,13 +143,14 @@ Cdr::Cdr(
     switch (cdr_version_)
     {
         case CdrVersion::XCDRv2:
-            align64_ = 4;
             break;
         case CdrVersion::XCDRv1:
+            align64_ = 8;
             encoding_flag_ = EncodingAlgorithmFlag::PLAIN_CDR;
             current_encoding_ = EncodingAlgorithmFlag::PLAIN_CDR;
             break;
         default:
+            align64_ = 8;
             encoding_flag_ = EncodingAlgorithmFlag::PLAIN_CDR;
             current_encoding_ = EncodingAlgorithmFlag::PLAIN_CDR;
             break;
@@ -1546,7 +1592,7 @@ Cdr& Cdr::deserialize(
 
     if (length == 0)
     {
-        string_t = NULL;
+        string_t = nullptr;
         return *this;
     }
     else if ((end_ - offset_) >= length)
@@ -1577,7 +1623,7 @@ Cdr& Cdr::deserialize(
 
     if (length == 0)
     {
-        string_t = NULL;
+        string_t = nullptr;
         return *this;
     }
     else if ((end_ - offset_) >= (length * 2))
@@ -2132,13 +2178,18 @@ Cdr& Cdr::serialize_bool_sequence(
         throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
+    if (CdrVersion::XCDRv2 == cdr_version_)
+    {
+        serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
+    }
+
     return *this;
 }
 
 Cdr& Cdr::deserialize_bool_sequence(
         std::vector<bool>& vector_t)
 {
-    uint32_t sequence_length = 0;
+    uint32_t sequence_length {0};
     state state_before_error(*this);
 
     *this >> sequence_length;
@@ -2183,22 +2234,55 @@ Cdr& Cdr::deserialize_string_sequence(
         std::string*& sequence_t,
         size_t& num_elements)
 {
-    uint32_t sequence_length = 0;
-    state state_before_error(*this);
+    uint32_t sequence_length {0};
 
-    deserialize(sequence_length);
-
-    try
+    if (CdrVersion::XCDRv2 == cdr_version_)
     {
-        sequence_t = new std::string[sequence_length];
-        deserialize_array(sequence_t, sequence_length);
+        uint32_t dheader {0};
+        deserialize(dheader);
+
+        auto offset = offset_;
+
+        deserialize(sequence_length);
+
+        try
+        {
+            sequence_t = new std::string[sequence_length];
+
+            uint32_t count {0};
+            while (offset_ - offset < dheader && count < sequence_length)
+            {
+                deserialize(sequence_t[count]);
+                ++count;
+            }
+
+            assert(offset_ - offset == dheader);
+        }
+        catch (exception::Exception& ex)
+        {
+            delete [] sequence_t;
+            sequence_t = nullptr;
+            ex.raise();
+        }
     }
-    catch (exception::Exception& ex)
+    else
     {
-        delete [] sequence_t;
-        sequence_t = NULL;
-        set_state(state_before_error);
-        ex.raise();
+        state state_before_error(*this);
+
+        deserialize(sequence_length);
+
+        try
+        {
+            sequence_t = new std::string[sequence_length];
+            deserialize_array(sequence_t, sequence_length);
+        }
+        catch (exception::Exception& ex)
+        {
+            delete [] sequence_t;
+            sequence_t = nullptr;
+            set_state(state_before_error);
+            ex.raise();
+        }
     }
 
     num_elements = sequence_length;
@@ -2209,22 +2293,55 @@ Cdr& Cdr::deserialize_wstring_sequence(
         std::wstring*& sequence_t,
         size_t& num_elements)
 {
-    uint32_t sequence_length = 0;
-    state state_before_error(*this);
+    uint32_t sequence_length {0};
 
-    deserialize(sequence_length);
-
-    try
+    if (CdrVersion::XCDRv2 == cdr_version_)
     {
-        sequence_t = new std::wstring[sequence_length];
-        deserialize_array(sequence_t, sequence_length);
+        uint32_t dheader {0};
+        deserialize(dheader);
+
+        auto offset = offset_;
+
+        deserialize(sequence_length);
+
+        try
+        {
+            sequence_t = new std::wstring[sequence_length];
+
+            uint32_t count {0};
+            while (offset_ - offset < dheader && count < sequence_length)
+            {
+                deserialize(sequence_t[count]);
+                ++count;
+            }
+
+            assert(offset_ - offset == dheader);
+        }
+        catch (exception::Exception& ex)
+        {
+            delete [] sequence_t;
+            sequence_t = nullptr;
+            ex.raise();
+        }
     }
-    catch (exception::Exception& ex)
+    else
     {
-        delete [] sequence_t;
-        sequence_t = NULL;
-        set_state(state_before_error);
-        ex.raise();
+        state state_before_error(*this);
+
+        deserialize(sequence_length);
+
+        try
+        {
+            sequence_t = new std::wstring[sequence_length];
+            deserialize_array(sequence_t, sequence_length);
+        }
+        catch (exception::Exception& ex)
+        {
+            delete [] sequence_t;
+            sequence_t = nullptr;
+            set_state(state_before_error);
+            ex.raise();
+        }
     }
 
     num_elements = sequence_length;
@@ -2395,21 +2512,7 @@ void Cdr::xcdr2_end_short_member_header(
     assert(0x10000000 > member_id.id);
     assert(8 >= member_serialized_size);
 
-    uint32_t lc = 0;
-    switch (member_serialized_size)
-    {
-        case 2:
-            lc = 0x10000000;
-            break;
-        case 4:
-            lc = 0x20000000;
-            break;
-        case 8:
-            lc = 0x30000000;
-            break;
-        default:
-            break;
-    }
+    uint32_t lc = get_short_lc(member_serialized_size);
     uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | lc | member_id.id;
     serialize(flags_and_member_id);
 }
@@ -2431,9 +2534,7 @@ void Cdr::xcdr2_end_long_member_header(
 {
     assert(0x10000000 > member_id.id);
 
-    uint32_t lc = 0 == member_serialized_size ?
-            (SERIALIZED_MEMBER_SIZE_4 == serialized_member_size_ ? 0x60000000  : 0x50000000)
-        : 0x40000000;
+    uint32_t lc = 0 == member_serialized_size ? get_long_lc(serialized_member_size_) : 0x40000000;
     uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | lc | member_id.id;
     serialize(flags_and_member_id);
     if (0 < member_serialized_size)
@@ -2450,21 +2551,7 @@ void Cdr::xcdr2_change_to_short_member_header(
     assert(0x10000000 > member_id.id);
     assert(8 >= member_serialized_size);
 
-    uint32_t lc = 0;
-    switch (member_serialized_size)
-    {
-        case 2:
-            lc = 0x10000000;
-            break;
-        case 4:
-            lc = 0x20000000;
-            break;
-        case 8:
-            lc = 0x30000000;
-            break;
-        default:
-            break;
-    }
+    uint32_t lc = get_short_lc(member_serialized_size);
     uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | lc | member_id.id;
     serialize(flags_and_member_id);
     memmove(&offset_, &offset_ + 4, member_serialized_size);
@@ -2484,7 +2571,7 @@ void Cdr::xcdr2_change_to_long_member_header(
     {
         throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
-    uint32_t lc = 0x40000000;
+    uint32_t lc = get_long_lc(serialized_member_size_);
     uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | lc | member_id.id;
     serialize(flags_and_member_id);
     uint32_t size = static_cast<uint32_t>(member_serialized_size);
@@ -2498,7 +2585,7 @@ void Cdr::xcdr2_shrink_to_long_member_header(
     assert(0x10000000 > member_id.id);
 
     memmove(&offset_ + 4, &offset_ + 8, offset - offset_ - 8);
-    uint32_t lc = SERIALIZED_MEMBER_SIZE_4 == serialized_member_size_ ? 0x60000000  : 0x50000000;
+    uint32_t lc = get_long_lc(serialized_member_size_);
     uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | lc | member_id.id;
     serialize(flags_and_member_id);
 }

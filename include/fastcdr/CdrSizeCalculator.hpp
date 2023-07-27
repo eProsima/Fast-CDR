@@ -754,6 +754,9 @@ private:
     //! Specifies if a DHEADER was serialized. Used to calculate XCDRv2 member headers.
     serialized_member_size_ {NO_SERIALIZED_MEMBER_SIZE};
 
+    //! Align for types equal or greater than 64bits.
+    size_t align64_ {4};
+
     inline size_t alignment(
             size_t current_alignment,
             size_t dataSize) const

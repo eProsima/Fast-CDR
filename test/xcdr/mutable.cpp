@@ -12,33 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <gtest/gtest.h>
-
 #include <array>
 #include <memory>
+#include <tuple>
 #include <vector>
 
+#include <gtest/gtest.h>
+
 #include <fastcdr/Cdr.h>
+#include "utility.hpp"
 
 using namespace eprosima::fastcdr;
-
-static CdrVersion get_version_from_algorithm(
-        EncodingAlgorithmFlag ef)
-{
-    CdrVersion cdr_version { CdrVersion::XCDRv2 };
-
-    switch (ef)
-    {
-        case EncodingAlgorithmFlag::PLAIN_CDR:
-        case EncodingAlgorithmFlag::PL_CDR:
-            cdr_version = CdrVersion::XCDRv1;
-            break;
-        default:
-            break;
-    }
-
-    return cdr_version;
-}
 
 using XCdrStreamValues =
         std::array<std::vector<uint8_t>,

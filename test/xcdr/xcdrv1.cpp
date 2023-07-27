@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <array>
 #include <memory>
+#include <tuple>
 #include <vector>
 
 #include <fastcdr/Cdr.h>

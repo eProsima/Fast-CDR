@@ -268,7 +268,7 @@ Cdr& Cdr::read_encapsulation()
 
         if (CdrVersion::CORBA_CDR < cdr_version_)
         {
-            (*this) >> options_;
+            deserialize(options_);
         }
     }
     catch (Exception& ex)
@@ -312,7 +312,7 @@ Cdr& Cdr::serialize_encapsulation()
     {
         if (CdrVersion::CORBA_CDR < cdr_version_)
         {
-            (*this) << options_;
+            serialize(options_);
         }
     }
     catch (Exception& ex)
@@ -342,13 +342,13 @@ void Cdr::set_encoding_flag(
     encoding_flag_ = encoding_flag;
 }
 
-uint16_t Cdr::get_dds_cdr_options() const
+std::array<uint8_t, 2> Cdr::get_dds_cdr_options() const
 {
     return options_;
 }
 
 void Cdr::set_dds_cdr_options(
-        uint16_t options)
+        const std::array<uint8_t, 2>& options)
 {
     options_ = options;
 }
@@ -423,7 +423,7 @@ void Cdr::reset()
             cdr_version_ ? EncodingAlgorithmFlag::PLAIN_CDR2 : EncodingAlgorithmFlag::PLAIN_CDR;
     current_encoding_ = encoding_flag_;
     next_member_id_ = MEMBER_ID_INVALID;
-    options_ = 0;
+    options_ = {0, 0};
 }
 
 bool Cdr::move_alignment_forward(

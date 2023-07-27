@@ -16,7 +16,6 @@
 #include <limits>
 
 #include <fastcdr/Cdr.h>
-#include <fastcdr/exceptions/BadParamException.h>
 
 namespace eprosima {
 namespace fastcdr {
@@ -2256,7 +2255,10 @@ Cdr& Cdr::deserialize_string_sequence(
                 ++count;
             }
 
-            assert(offset_ - offset == dheader);
+            if (offset_ - offset != dheader)
+            {
+                throw BadParamException("Member size greater than size specified by DHEADER");
+            }
         }
         catch (exception::Exception& ex)
         {
@@ -2315,7 +2317,10 @@ Cdr& Cdr::deserialize_wstring_sequence(
                 ++count;
             }
 
-            assert(offset_ - offset == dheader);
+            if (offset_ - offset != dheader)
+            {
+                throw BadParamException("Member size greater than size specified by DHEADER");
+            }
         }
         catch (exception::Exception& ex)
         {
@@ -2596,7 +2601,6 @@ Cdr& Cdr::xcdr1_begin_serialize_member(
         Cdr::state& current_state,
         Cdr::XCdrHeaderSelection header_selection)
 {
-    static_cast<void>(current_state);
     static_cast<void>(is_present);
     assert(is_present);
     assert(MEMBER_ID_INVALID != member_id);
@@ -2715,7 +2719,6 @@ Cdr& Cdr::xcdr1_begin_serialize_opt_member(
         Cdr::state& current_state,
         Cdr::XCdrHeaderSelection header_selection)
 {
-    static_cast<void>(current_state);
     assert(MEMBER_ID_INVALID != member_id);
     assert(MEMBER_ID_INVALID == next_member_id_ || member_id == next_member_id_);
     assert(current_state == Cdr::state(*this));
@@ -2840,7 +2843,6 @@ Cdr& Cdr::xcdr2_begin_serialize_member(
         Cdr::state& current_state,
         XCdrHeaderSelection header_selection)
 {
-    static_cast<void>(current_state);
     assert(MEMBER_ID_INVALID != member_id);
     assert(MEMBER_ID_INVALID == next_member_id_ || member_id == next_member_id_);
     assert(current_state == Cdr::state(*this));
@@ -3020,7 +3022,7 @@ void Cdr::xcdr2_deserialize_member_header(
         uint32_t size = 0;
         deserialize(size);
         current_state.member_size_ = 4 + (size * (5 == lc ? 1 : (6 == lc ? 4 : 8)));
-        current_state.header_serialized_ = XCdrHeaderSelection::SHORT_HEADER;
+        current_state.header_serialized_ = XCdrHeaderSelection::SHORT_HEADER; // Avoid take into account DHEADER after.
         offset_ -= sizeof(uint32_t);
     }
 }
@@ -3029,7 +3031,6 @@ Cdr& Cdr::xcdr1_begin_serialize_type(
         Cdr::state& current_state,
         EncodingAlgorithmFlag type_encoding) noexcept
 {
-    static_cast<void>(current_state);
     assert(current_state == Cdr::state(*this));
     assert(EncodingAlgorithmFlag::PLAIN_CDR == current_encoding_ ||
             EncodingAlgorithmFlag::PL_CDR == current_encoding_);
@@ -3063,7 +3064,6 @@ Cdr& Cdr::xcdr2_begin_serialize_type(
         Cdr::state& current_state,
         EncodingAlgorithmFlag type_encoding)
 {
-    static_cast<void>(current_state);
     assert(current_state == Cdr::state(*this));
     assert(EncodingAlgorithmFlag::PLAIN_CDR2 == current_encoding_ ||
             EncodingAlgorithmFlag::DELIMIT_CDR2 == current_encoding_ ||
@@ -3077,7 +3077,7 @@ Cdr& Cdr::xcdr2_begin_serialize_type(
         uint32_t dheader {0};
         serialize(dheader);
     }
-    serialized_member_size_ = NO_SERIALIZED_MEMBER_SIZE; // Avoid error when serializen arrays, sequences, etc..
+    serialized_member_size_ = NO_SERIALIZED_MEMBER_SIZE; // Avoid error when serializing arrays, sequences, etc..
     current_state.previous_encoding_ = current_encoding_;
     current_encoding_ = type_encoding;
     return *this;
@@ -3131,7 +3131,8 @@ Cdr& Cdr::xcdr1_deserialize_type(
 
             if (current_state.member_size_ != offset_ - origin_)
             {
-                throw BadParamException("Member size provided by member header is not equal at the real decoded member");
+                throw BadParamException(
+                          "Member size provided by member header is not equal to at the real decoded member size");
             }
             // Reset state to POP(origin=0) because before serializing member the algorithm did PUSH(origin=0).
             auto last_offset = offset_;
@@ -3144,7 +3145,7 @@ Cdr& Cdr::xcdr1_deserialize_type(
     {
         next_member_id_ = MemberId(0);
 
-        while (offset_ != end_ && functor(*this, next_member_id_)) // TODO Tests with appendables with different length
+        while (offset_ != end_ && functor(*this, next_member_id_))
         {
             ++next_member_id_.id;
         }
@@ -3176,9 +3177,12 @@ Cdr& Cdr::xcdr2_deserialize_type(
         {
             while (offset_ - current_state.offset_ != dheader)
             {
-                assert(offset_ - current_state.offset_ < dheader); // TODO throw exception
+                if (offset_ - current_state.offset_ > dheader)
+                {
+                    throw BadParamException("Member size greater than size specified by DHEADER");
+                }
+
                 auto offset = offset_;
-                (void)offset;
 
                 xcdr2_deserialize_member_header(next_member_id_, current_state);
                 bool deser_value = functor(*this, next_member_id_);
@@ -3285,7 +3289,7 @@ Cdr& Cdr::cdr_deserialize_type(
     Cdr::state current_state(*this);
     next_member_id_ = MemberId(0);
 
-    while (offset_ != end_ && functor(*this, next_member_id_))     // TODO Tests with appendables with different length
+    while (offset_ != end_ && functor(*this, next_member_id_))
     {
         ++next_member_id_.id;
     }

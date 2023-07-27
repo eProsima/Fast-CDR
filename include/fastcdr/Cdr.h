@@ -837,6 +837,11 @@ public:
             ex.raise();
         }
 
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            serialized_member_size_ = get_serialized_member_size<_T>();
+        }
+
         return *this;
     }
 
@@ -1275,13 +1280,62 @@ public:
     }
 
     /*!
-     * @brief This function template serializes a raw sequence.
+     * @brief This function template serializes a raw sequence of non-primitives
      * @param sequence_t Pointer to the sequence that will be serialized in the buffer.
      * @param num_elements The number of elements contained in the sequence.
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    template<class _T>
+    template<class _T, typename std::enable_if<!std::is_enum<_T>::value &&
+            !std::is_arithmetic<_T>::value>::type* = nullptr>
+    Cdr& serialize_sequence(
+            const _T* sequence_t,
+            size_t num_elements)
+    {
+        Cdr::state dheader_state(*this);
+
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            // Serialize DHEADER
+            uint32_t dheader {0};
+            serialize(dheader);
+        }
+
+        serialize(static_cast<int32_t>(num_elements));
+
+        try
+        {
+            serialize_array(sequence_t, num_elements);
+        }
+        catch (exception::Exception& ex)
+        {
+            set_state(dheader_state);
+            ex.raise();
+        }
+
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            auto offset = offset_;
+            Cdr::state state_after(*this);
+            set_state(dheader_state);
+            size_t dheader = offset - offset_ - (4 + alignment(sizeof(uint32_t)));/* DHEADER */
+            serialize(static_cast<uint32_t>(dheader));
+            set_state(state_after);
+            serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
+        }
+
+        return *this;
+    }
+
+    /*!
+     * @brief This function template serializes a raw sequence of primitives
+     * @param sequence_t Pointer to the sequence that will be serialized in the buffer.
+     * @param num_elements The number of elements contained in the sequence.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+     */
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value ||
+            std::is_arithmetic<_T>::value>::type* = nullptr>
     Cdr& serialize_sequence(
             const _T* sequence_t,
             size_t num_elements)
@@ -1292,12 +1346,17 @@ public:
 
         try
         {
-            return serialize_array(sequence_t, num_elements);
+            serialize_array(sequence_t, num_elements);
         }
         catch (exception::Exception& ex)
         {
             set_state(state_before_error);
             ex.raise();
+        }
+
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            serialized_member_size_ = get_serialized_member_size<_T>();
         }
 
         return *this;
@@ -1773,6 +1832,8 @@ public:
     Cdr& deserialize(
             std::vector<_T>& vector_t)
     {
+        uint32_t sequence_length {0};
+
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
             uint32_t dheader {0};
@@ -1780,7 +1841,6 @@ public:
 
             auto offset = offset_;
 
-            uint32_t sequence_length {0};
             deserialize(sequence_length);
 
             if (0 == sequence_length)
@@ -1804,7 +1864,6 @@ public:
         }
         else
         {
-            uint32_t sequence_length = 0;
             state state_before_error(*this);
 
             deserialize(sequence_length);
@@ -2270,7 +2329,7 @@ public:
             size_t num_elements);
 
     /*!
-     * @brief This function template deserializes a raw sequence.
+     * @brief This function template deserializes a raw sequence of non-primitives.
      * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
      * The user will have to free this allocated memory using free()
      * @param sequence_t The pointer that will store the sequence read from the buffer.
@@ -2278,7 +2337,85 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    template<class _T>
+    template<class _T, typename std::enable_if<!std::is_enum<_T>::value &&
+            !std::is_arithmetic<_T>::value>::type* = nullptr>
+    Cdr& deserialize_sequence(
+            _T*& sequence_t,
+            size_t& num_elements)
+    {
+        uint32_t sequence_length {0};
+
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            uint32_t dheader {0};
+            deserialize(dheader);
+
+            auto offset = offset_;
+
+            deserialize(sequence_length);
+
+            try
+            {
+                sequence_t = reinterpret_cast<_T*>(calloc(sequence_length, sizeof(_T)));
+
+                uint32_t count {0};
+                while (offset_ - offset < dheader && count < sequence_length)
+                {
+                    deserialize(sequence_t[count]);
+                    ++count;
+                }
+
+                assert(offset_ - offset == dheader);
+            }
+            catch (exception::Exception& ex)
+            {
+                free(sequence_t);
+                sequence_t = NULL;
+                ex.raise();
+            }
+        }
+        else
+        {
+            state state_before_error(*this);
+
+            deserialize(sequence_length);
+
+            if ((end_ - offset_) < sequence_length)
+            {
+                set_state(state_before_error);
+                throw exception::NotEnoughMemoryException(
+                          exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            }
+
+            try
+            {
+                sequence_t = reinterpret_cast<_T*>(calloc(sequence_length, sizeof(_T)));
+                deserialize_array(sequence_t, sequence_length);
+            }
+            catch (exception::Exception& ex)
+            {
+                free(sequence_t);
+                sequence_t = NULL;
+                set_state(state_before_error);
+                ex.raise();
+            }
+        }
+
+        num_elements = sequence_length;
+        return *this;
+    }
+
+    /*!
+     * @brief This function template deserializes a raw sequence of primitives.
+     * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
+     * The user will have to free this allocated memory using free()
+     * @param sequence_t The pointer that will store the sequence read from the buffer.
+     * @param num_elements This variable return the number of elements of the sequence.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+     */
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value ||
+            std::is_arithmetic<_T>::value>::type* = nullptr>
     Cdr& deserialize_sequence(
             _T*& sequence_t,
             size_t& num_elements)
@@ -3142,17 +3279,34 @@ private:
     MemberId next_member_id_;
 
     //! Align for types equal or greater than 64bits.
-    size_t align64_ {8};
+    size_t align64_ {4};
 
 
-    enum
+    enum SerializedMemberSizeForNextInt
     {
         NO_SERIALIZED_MEMBER_SIZE,
         SERIALIZED_MEMBER_SIZE,
         SERIALIZED_MEMBER_SIZE_4,
+        SERIALIZED_MEMBER_SIZE_8
     }
     //! Specifies if a DHEADER was serialized. Used to optimize XCDRv2 member headers.
     serialized_member_size_ {NO_SERIALIZED_MEMBER_SIZE};
+
+
+    uint32_t get_long_lc(
+            SerializedMemberSizeForNextInt serialized_member_size);
+
+    uint32_t get_short_lc(
+            size_t member_serialized_size);
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value ||
+            std::is_arithmetic<_T>::value>::type* = nullptr>
+    constexpr SerializedMemberSizeForNextInt get_serialized_member_size() const
+    {
+        return (1 == sizeof(_T) ? SERIALIZED_MEMBER_SIZE :
+               (4 == sizeof(_T) ? SERIALIZED_MEMBER_SIZE_4 :
+               (8 == sizeof(_T) ? SERIALIZED_MEMBER_SIZE_8 :  NO_SERIALIZED_MEMBER_SIZE)));
+    }
 
 };
 

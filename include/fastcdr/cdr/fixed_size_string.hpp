@@ -102,7 +102,8 @@ public:
     fixed_string& operator = (
             const std::string& str) noexcept
     {
-        set(str.c_str()); return *this;
+        set(str.c_str());
+        return *this;
     }
 
     // Assign from fixed_string of any size
@@ -146,19 +147,19 @@ public:
     bool operator != (
             const char* rhs) const noexcept
     {
-        return strncmp(string_data, rhs, MAX_CHARS) != 0;
+        return !(*this == rhs);
     }
 
     bool operator != (
             const std::string& rhs) const noexcept
     {
-        return strncmp(string_data, rhs.c_str(), MAX_CHARS) != 0;
+        return !(*this == rhs);
     }
 
     template<size_t N>  bool operator != (
             const fixed_string<N>& rhs) const noexcept
     {
-        return strncmp(string_data, rhs.c_str(), MAX_CHARS) != 0;
+        return !(*this == rhs);
     }
 
     template<size_t N>  bool operator < (

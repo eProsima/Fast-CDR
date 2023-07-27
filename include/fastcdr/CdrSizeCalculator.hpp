@@ -633,7 +633,7 @@ public:
         if (EncodingAlgorithmFlag::PL_CDR == current_encoding_ ||
                 EncodingAlgorithmFlag::PL_CDR2 == current_encoding_)
         {
-            // Align to 4 because the XCDR header before calculate the data serialized size.
+            // Align to 4 for the XCDR header before calculating the data serialized size.
             current_alignment += alignment(current_alignment, 4);
         }
 
@@ -689,7 +689,7 @@ public:
         {
             if (data.has_value() || EncodingAlgorithmFlag::PLAIN_CDR == current_encoding_)
             {
-                // Align to 4 because the XCDR header before calculate the data serialized size.
+                // Align to 4 for the XCDR header before calculating the data serialized size.
                 current_alignment += alignment(current_alignment, 4);
             }
         }
@@ -742,7 +742,7 @@ private:
 
     CdrSizeCalculator() = delete;
 
-    CdrVersion cdr_version_;
+    CdrVersion cdr_version_ {CdrVersion::XCDRv2};
 
     EncodingAlgorithmFlag current_encoding_ {EncodingAlgorithmFlag::PLAIN_CDR2};
 

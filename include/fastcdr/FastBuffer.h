@@ -222,7 +222,7 @@ public:
     bool operator !=(
             const _FastBuffer_iterator& other_iterator) const
     {
-        return other_iterator.current_position_ != current_position_;
+        return !(other_iterator == *this);
     }
 
 private:

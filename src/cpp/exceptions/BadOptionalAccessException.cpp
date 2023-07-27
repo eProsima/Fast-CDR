@@ -16,7 +16,8 @@
 
 using namespace eprosima::fastcdr::exception;
 
-const char* const BadOptionalAccessException::BAD_OPTIONAL_ACCESS_MESSAGE_DEFAULT = "Bad optional access";
+const char* const BadOptionalAccessException::BAD_OPTIONAL_ACCESS_MESSAGE_DEFAULT =
+        "Bad optional access: value not set";
 
 BadOptionalAccessException::BadOptionalAccessException(
         const char* const& message) noexcept

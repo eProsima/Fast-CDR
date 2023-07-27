@@ -51,7 +51,7 @@ public:
     bool operator !=(
             const MemberId member_id) const
     {
-        return id != member_id.id;
+        return !(member_id == *this);
     }
 
     uint32_t id { member_id_invalid_value_ };

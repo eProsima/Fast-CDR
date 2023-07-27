@@ -17,6 +17,7 @@
 
 #include <new>
 #include <type_traits>
+#include <utility>
 
 #include "../exceptions/BadOptionalAccessException.hpp"
 
@@ -24,12 +25,13 @@ namespace eprosima {
 namespace fastcdr {
 
 namespace detail {
-template<class T, class E = void>
+template<class T, typename = void>
 struct optional_storage
 {
     union
     {
-        char dummy_; T val_;
+        char dummy_;
+        T val_;
     };
 
     bool engaged_ { false };
@@ -175,7 +177,7 @@ public:
         if (!storage_.engaged_)
         {
             throw exception::BadOptionalAccessException(
-                      "Bad optional accesss: value not set");
+                      exception::BadOptionalAccessException::BAD_OPTIONAL_ACCESS_MESSAGE_DEFAULT);
         }
 
         return storage_.val_;
@@ -192,7 +194,7 @@ public:
         if (!storage_.engaged_)
         {
             throw exception::BadOptionalAccessException(
-                      "Bad optional accesss: value not set");
+                      exception::BadOptionalAccessException::BAD_OPTIONAL_ACCESS_MESSAGE_DEFAULT);
         }
 
         return storage_.val_;
@@ -209,7 +211,7 @@ public:
         if (!storage_.engaged_)
         {
             throw exception::BadOptionalAccessException(
-                      "Bad optional accesss: value not set");
+                      exception::BadOptionalAccessException::BAD_OPTIONAL_ACCESS_MESSAGE_DEFAULT);
         }
 
         return std::move(storage_.val_);
@@ -226,7 +228,7 @@ public:
         if (!storage_.engaged_)
         {
             throw exception::BadOptionalAccessException(
-                      "Bad optional accesss: value not set");
+                      exception::BadOptionalAccessException::BAD_OPTIONAL_ACCESS_MESSAGE_DEFAULT);
         }
 
         return std::move(storage_.val_);
@@ -288,7 +290,7 @@ public:
         return *this;
     }
 
-    //! Unintialize the optional.
+    //! Uninitialized the optional.
     optional& operator = (
             nullopt_t) noexcept
     {
@@ -397,4 +399,4 @@ private:
 }        // namespace fastcdr
 }        // namespace eprosima
 
-     #endif //_FASTCDR_XCDR_OPTIONAL_HPP_
+#endif //_FASTCDR_XCDR_OPTIONAL_HPP_

@@ -52,7 +52,7 @@ public:
 
     Cdr_DllAPI EncodingAlgorithmFlag get_encoding() const;
 
-    template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr>
+    template<class _T, typename std::enable_if<!std::is_enum<_T>::value>::type* = nullptr, typename = void>
     size_t calculate_serialized_size(
             const _T& data,
             size_t current_alignment = 0)
@@ -60,8 +60,10 @@ public:
         return eprosima::fastcdr::calculate_serialized_size(*this, data, current_alignment);
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, int32_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            int32_t>::value>::type* = nullptr>
     size_t calculate_serialized_size(
             const _T& data,
             size_t current_alignment = 0)
@@ -69,8 +71,10 @@ public:
         return calculate_serialized_size(static_cast<int32_t>(data), current_alignment);
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, uint32_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            uint32_t>::value>::type* = nullptr>
     size_t calculate_serialized_size(
             const _T& data,
             size_t current_alignment = 0)
@@ -78,8 +82,10 @@ public:
         return calculate_serialized_size(static_cast<uint32_t>(data), current_alignment);
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, int16_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            int16_t>::value>::type* = nullptr>
     size_t calculate_serialized_size(
             const _T& data,
             size_t current_alignment = 0)
@@ -87,8 +93,10 @@ public:
         return calculate_serialized_size(static_cast<int16_t>(data), current_alignment);
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, uint16_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            uint16_t>::value>::type* = nullptr>
     size_t calculate_serialized_size(
             const _T& data,
             size_t current_alignment = 0)
@@ -96,8 +104,10 @@ public:
         return calculate_serialized_size(static_cast<uint16_t>(data), current_alignment);
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, int8_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            int8_t>::value>::type* = nullptr>
     size_t calculate_serialized_size(
             const _T& data,
             size_t current_alignment = 0)
@@ -105,8 +115,10 @@ public:
         return calculate_serialized_size(static_cast<int8_t>(data), current_alignment);
     }
 
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value &&
-            std::is_same<typename std::underlying_type<_T>::type, uint8_t>::value>::type* = nullptr>
+    template<class _T,
+            typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
+            typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
+            uint8_t>::value>::type* = nullptr>
     size_t calculate_serialized_size(
             const _T& data,
             size_t current_alignment = 0)

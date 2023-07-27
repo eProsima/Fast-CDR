@@ -18,8 +18,8 @@
 set(XCDR_TEST_SOURCE
     appendable.cpp
     basic_types.cpp
-    optional.cpp
     mutable.cpp
+    optional.cpp
     xcdrv1.cpp
     xcdrv2.cpp
     )

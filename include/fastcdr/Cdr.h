@@ -31,6 +31,7 @@
 #include "CdrEncoding.hpp"
 #include "cdr/fixed_size_string.hpp"
 #include "detail/container_recursive_inspector.hpp"
+#include "exceptions/BadParamException.h"
 #include "exceptions/Exception.h"
 #include "exceptions/NotEnoughMemoryException.h"
 #include "FastBuffer.h"
@@ -1811,7 +1812,10 @@ public:
                 ++count;
             }
 
-            assert(offset_ - offset == dheader);
+            if (offset_ - offset != dheader)
+            {
+                throw exception::BadParamException("Member size greater than size specified by DHEADER");
+            }
         }
         else
         {
@@ -1860,7 +1864,10 @@ public:
                 ++count;
             }
 
-            assert(offset_ - offset == dheader);
+            if (offset_ - offset != dheader)
+            {
+                throw exception::BadParamException("Member size greater than size specified by DHEADER");
+            }
         }
         else
         {
@@ -1986,7 +1993,10 @@ public:
                 ++count;
             }
 
-            assert(offset_ - offset == dheader);
+            if (offset_ - offset != dheader)
+            {
+                throw exception::BadParamException("Member size greater than size specified by DHEADER");
+            }
         }
         else
         {
@@ -2365,7 +2375,10 @@ public:
                     ++count;
                 }
 
-                assert(offset_ - offset == dheader);
+                if (offset_ - offset != dheader)
+                {
+                    throw exception::BadParamException("Member size greater than size specified by DHEADER");
+                }
             }
             catch (exception::Exception& ex)
             {

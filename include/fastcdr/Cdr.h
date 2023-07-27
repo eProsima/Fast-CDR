@@ -830,7 +830,7 @@ public:
 
         try
         {
-            return serialize_array(vector_t.data(), vector_t.size());
+            serialize_array(vector_t.data(), vector_t.size());
         }
         catch (exception::Exception& ex)
         {

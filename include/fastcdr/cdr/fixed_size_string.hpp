@@ -29,24 +29,26 @@
 #define MEMCCPY memccpy
 #endif // ifdef _WIN32
 
-#ifndef DOXYGEN_SHOULD_SKIP_THIS_PUBLIC
 namespace eprosima {
 namespace fastcdr {
 
 /**
- * Template class for non-alloc strings. Will be truncated when assigned from a longer string.
+ * @brief Template class for non-alloc strings.
+ *
+ * Will be truncated when assigned from a longer string.
+ *
  * @tparam MAX_CHARS Maximum number of characters is specified as the template parameter.
  *                   Space for an additional null terminator will be reserved.
- * @ingroup UTILITIES_MODULE
  */
 template <size_t MAX_CHARS>
 struct fixed_string
 {
 public:
 
+    //! @brief Maximum number of characters.
     static constexpr size_t max_size = MAX_CHARS;
 
-    /// Default constructor.
+    //! @brief Default constructor.
     fixed_string() noexcept
     {
         memset(string_data, 0, sizeof(string_data));
@@ -55,7 +57,11 @@ public:
 
     // We don't need to define copy/move constructors/assignment operators as the default ones would be enough
 
-    // Construct / assign from a char array
+    /*!
+     * @brief Constructs from a char array
+     * @param[in] c_array Char array to be constructed from.
+     * @param[in] n_chars Number of characters of the Char array
+     */
     fixed_string(
             const char* c_array,
             size_t n_chars) noexcept
@@ -63,6 +69,12 @@ public:
         assign(c_array, n_chars);
     }
 
+    /*!
+     * @brief Assigns from a char array
+     * @param[in] c_array Char array to be assigned from.
+     * @param[in] n_chars Number of characters of the Char array.
+     * @return Reference of this instance.
+     */
     fixed_string& assign(
             const char* c_array,
             size_t n_chars) noexcept
@@ -76,7 +88,10 @@ public:
         return *this;
     }
 
-    // Construct / assign from a C string
+    /*!
+     * @brief Constructs from a C string.
+     * @param[in] c_string Pointer to the C string.
+     */
     fixed_string (
             const char* c_string) noexcept
         : fixed_string()
@@ -84,6 +99,11 @@ public:
         set(c_string != nullptr ? c_string : "");
     }
 
+    /*!
+     * @brief Assigns from a C string.
+     * @param[in] c_string Pointer to the C string.
+     * @return Reference of this instance.
+     */
     fixed_string& operator = (
             const char* c_string) noexcept
     {
@@ -91,7 +111,10 @@ public:
         return *this;
     }
 
-    // Construct / assign from a std::string
+    /*!
+     * @brief Constructs from a std::string.
+     * @param[in] str Reference to the std::string.
+     */
     fixed_string (
             const std::string& str) noexcept
         : fixed_string()
@@ -99,6 +122,11 @@ public:
         set(str.c_str());
     }
 
+    /*!
+     * @brief Assigns from a std::string.
+     * @param[in] str Reference to the std::string.
+     * return Reference of this instance.
+     */
     fixed_string& operator = (
             const std::string& str) noexcept
     {
@@ -106,100 +134,164 @@ public:
         return *this;
     }
 
-    // Assign from fixed_string of any size
+    /*!
+     * @brief Assigns from a fixed_string of any size.
+     * @param[in] rhs Reference to the fixed_string.
+     * return Reference of this instance.
+     */
     template<size_t N> fixed_string& operator = (
             const fixed_string<N>& rhs) noexcept
     {
         set(rhs.c_str()); return *this;
     }
 
-    // Converters to standard types
+    /*!
+     * @brief Converts to C string.
+     * @return Pointer to the C string.
+     */
     const char* c_str() const noexcept
     {
         return string_data;
     }
 
+    /*!
+     * @brief Converts to std::string.
+     * @return Reference to the std::string.
+     */
     std::string to_string() const
     {
         return std::string(string_data);
     }
 
-    // Equality comparisons
+    /*!
+     * @brief Compares equality with a C string.
+     * @param[in] rhs C string to be compared with.
+     * @return `true` if strings are equal. `false` otherwise.
+     */
     bool operator == (
             const char* rhs) const noexcept
     {
         return strncmp(string_data, rhs, MAX_CHARS) == 0;
     }
 
+    /*!
+     * @brief Compares equality with a std::string.
+     * @param[in] rhs std::string to be compared with.
+     * @return `true` if strings are equal. `false` otherwise.
+     */
     bool operator == (
             const std::string& rhs) const noexcept
     {
         return strncmp(string_data, rhs.c_str(), MAX_CHARS) == 0;
     }
 
+    /*!
+     * @brief Compares equality with a fixed_string of any size.
+     * @param[in] rhs fixed_string to be compared with.
+     * @return `true` if strings are equal. `false` otherwise.
+     */
     template<size_t N>  bool operator == (
             const fixed_string<N>& rhs) const noexcept
     {
         return strncmp(string_data, rhs.c_str(), MAX_CHARS) == 0;
     }
 
-    // Inequality comparisons
+    /*!
+     * @brief Compares inequality with a C string.
+     * @param[in] rhs C string to be compared with.
+     * @return `true` if strings are not equal. `false` otherwise.
+     */
     bool operator != (
             const char* rhs) const noexcept
     {
         return !(*this == rhs);
     }
 
+    /*!
+     * @brief Compares inequality with a std::string.
+     * @param[in] rhs std::string to be compared with.
+     * @return `true` if strings are not equal. `false` otherwise.
+     */
     bool operator != (
             const std::string& rhs) const noexcept
     {
         return !(*this == rhs);
     }
 
+    /*!
+     * @brief Compares inequality with a fixed_string of any size.
+     * @param[in] rhs fixed_string to be compared with.
+     * @return `true` if strings are not equal. `false` otherwise.
+     */
     template<size_t N>  bool operator != (
             const fixed_string<N>& rhs) const noexcept
     {
         return !(*this == rhs);
     }
 
+    /*!
+     * @brief Compares relational less than with a fixed_string of any size.
+     * @param[in] rhs fixed_string to be compared with.
+     * @return `true` if this string is less than the provided one. `false` otherwise.
+     */
     template<size_t N>  bool operator < (
             const fixed_string<N>& rhs) const noexcept
     {
         return 0 > compare(rhs);
     }
 
+    /*!
+     * @brief Compares relational greater than with a fixed_string of any size.
+     * @param[in] rhs fixed_string to be compared with.
+     * @return `true` if this string is greater than the provided one. `false` otherwise.
+     */
     template<size_t N>  bool operator > (
             const fixed_string<N>& rhs) const noexcept
     {
         return 0 < compare(rhs);
     }
 
+    /*!
+     * @brief Compares relational less than with a std::string of any size.
+     * @param[in] rhs std::string to be compared with.
+     * @return `true` if this string is less than the provided one. `false` otherwise.
+     */
     bool operator < (
             const std::string& rhs) const noexcept
     {
         return 0 > compare(rhs);
     }
 
+    /*!
+     * @brief Compares relational greater than with a std::string of any size.
+     * @param[in] rhs std::string to be compared with.
+     * @return `true` if this string is greater than the provided one. `false` otherwise.
+     */
     bool operator > (
             const std::string& rhs) const noexcept
     {
         return 0 < compare(rhs);
     }
 
+    /*!
+     * @brief Casts to a C string.
+     */
     operator const char* () const noexcept {
         return c_str();
     }
 
+    /*!
+     * @brief Returns the size of the string.
+     * @return Length of the string.
+     */
     size_t size() const noexcept
     {
         return string_len;
     }
 
     /*!
-     * Compare with a C string.
-     *
-     * @param str C string to be compared with.
-     *
+     * @brief Compares with a C string.
+     * @param[in] str C string to be compared with.
      * @return Integer value with the result of the comparison as described in `std::string::compare()`.
      */
     int compare(
@@ -209,10 +301,8 @@ public:
     }
 
     /*!
-     * Compare with a std::string.
-     *
-     * @param str std::string to be compared with.
-     *
+     * @brief Compares with a std::string.
+     * @param[in] str std::string to be compared with.
      * @return Integer value with the result of the comparison as described in `std::string::compare()`.
      */
     int compare(
@@ -222,10 +312,8 @@ public:
     }
 
     /*!
-     * Compare with a fixed_string
-     *
-     * @param str fixed_string to be compared with.
-     *
+     * @brief Compares with a fixed_string
+     * @param[in] str fixed_string to be compared with.
      * @return Integer value with the result of the comparison as described in `std::string::compare()`.
      */
     template<size_t N>  int compare(
@@ -251,7 +339,5 @@ using string_255 = fixed_string<255>;
 
 } /* namespace fastcdr */
 } /* namespace eprosima */
-#endif // ifndef DOXYGEN_SHOULD_SKIP_THIS_PUBLIC
 
 #endif /* FASTCDR_UTILS_FIXED_SIZE_STRING_HPP_ */
-

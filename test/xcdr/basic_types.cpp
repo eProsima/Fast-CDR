@@ -20,6 +20,7 @@
 #include <gtest/gtest.h>
 
 #include <fastcdr/Cdr.h>
+#include <fastcdr/CdrSizeCalculator.hpp>
 #include "utility.hpp"
 
 using namespace eprosima::fastcdr;
@@ -74,6 +75,30 @@ struct InnerBasicTypesShortStruct
 
 namespace eprosima {
 namespace fastcdr {
+
+template<>
+size_t calculate_serialized_size(
+        eprosima::fastcdr::CdrSizeCalculator& calculator,
+        const InnerBasicTypesShortStruct& data,
+        size_t current_alignment)
+{
+    size_t initial_alignment = current_alignment;
+
+    eprosima::fastcdr::EncodingAlgorithmFlag previous_encoding = calculator.get_encoding();
+    current_alignment += calculator.begin_calculate_type_serialized_size(previous_encoding, current_alignment);
+
+
+    current_alignment += calculator.calculate_member_serialized_size(eprosima::fastcdr::MemberId(
+                        3), data.value1, current_alignment);
+
+    current_alignment += calculator.calculate_member_serialized_size(eprosima::fastcdr::MemberId(
+                        0x3FFF), data.value2, current_alignment);
+
+
+    current_alignment += calculator.end_calculate_type_serialized_size(previous_encoding, current_alignment);
+
+    return current_alignment - initial_alignment;
+}
 
 template<>
 void serialize(
@@ -164,6 +189,30 @@ namespace eprosima {
 namespace fastcdr {
 
 template<>
+size_t calculate_serialized_size(
+        eprosima::fastcdr::CdrSizeCalculator& calculator,
+        const InnerBasicTypesStruct& data,
+        size_t current_alignment)
+{
+    size_t initial_alignment = current_alignment;
+
+    eprosima::fastcdr::EncodingAlgorithmFlag previous_encoding = calculator.get_encoding();
+    current_alignment += calculator.begin_calculate_type_serialized_size(previous_encoding, current_alignment);
+
+
+    current_alignment += calculator.calculate_member_serialized_size(eprosima::fastcdr::MemberId(
+                        0), data.value1, current_alignment);
+
+    current_alignment += calculator.calculate_member_serialized_size(eprosima::fastcdr::MemberId(
+                        1), data.value2, current_alignment);
+
+
+    current_alignment += calculator.end_calculate_type_serialized_size(previous_encoding, current_alignment);
+
+    return current_alignment - initial_alignment;
+}
+
+template<>
 void serialize(
         Cdr& cdr,
         const InnerBasicTypesStruct& data)
@@ -210,6 +259,14 @@ void serialize_the_value(
         Cdr::Endianness endianness,
         _T value)
 {
+    //{ Calculate encoded size.
+    CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
+    size_t calculated_size = calculator.begin_calculate_type_serialized_size(encoding, 0);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), value, calculated_size);
+    calculated_size += calculator.end_calculate_type_serialized_size(encoding, calculated_size);
+    calculated_size += 4; // Encapsulation
+    //}
+
     //{ Prepare buffer
     uint8_t tested_stream = 0 + encoding + endianness;
     auto buffer =
@@ -231,6 +288,7 @@ void serialize_the_value(
 
     //{ Test encoded content
     ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
+    ASSERT_EQ(cdr.get_serialized_data_length(), calculated_size);
     ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
     //}
 
@@ -267,6 +325,15 @@ void align_serialize_the_value(
         _Align align_value,
         _T value)
 {
+    //{ Calculate encoded size.
+    CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
+    size_t calculated_size = calculator.begin_calculate_type_serialized_size(encoding, 0);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(0), align_value, calculated_size);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), value, calculated_size);
+    calculated_size += calculator.end_calculate_type_serialized_size(encoding, calculated_size);
+    calculated_size += 4; // Encapsulation
+    //}
+
     //{ Prepare buffer
     uint8_t tested_stream = 0 + encoding + endianness;
     auto buffer =
@@ -333,6 +400,15 @@ void longdouble_align_serialize_the_value(
         _Align align_value,
         long double value)
 {
+    //{ Calculate encoded size.
+    CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
+    size_t calculated_size = calculator.begin_calculate_type_serialized_size(encoding, 0);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(0), align_value, calculated_size);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), value, calculated_size);
+    calculated_size += calculator.end_calculate_type_serialized_size(encoding, calculated_size);
+    calculated_size += 4; // Encapsulation
+    //}
+
     //{ Prepare buffer
     uint8_t tested_stream = 0 + encoding + endianness;
     size_t total_size = expected_streams_begin[tested_stream].size() + 16 +
@@ -357,6 +433,7 @@ void longdouble_align_serialize_the_value(
 
     //{ Test encoded content
     ASSERT_EQ(cdr.get_serialized_data_length(), total_size);
+    ASSERT_EQ(cdr.get_serialized_data_length(), calculated_size);
     ASSERT_EQ(0, memcmp(buffer.get(), expected_streams_begin[tested_stream].data(),
             expected_streams_begin[tested_stream].size()));
     ASSERT_EQ(0,
@@ -404,6 +481,14 @@ void serialize(
         Cdr::Endianness endianness,
         _T value)
 {
+    //{ Calculate encoded size.
+    CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
+    size_t calculated_size = calculator.begin_calculate_type_serialized_size(encoding, 0);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), value, calculated_size);
+    calculated_size += calculator.end_calculate_type_serialized_size(encoding, calculated_size);
+    calculated_size += 4; // Encapsulation
+    //}
+
     //{ Prepare buffer
     uint8_t tested_stream = 0 + encoding + endianness;
     auto buffer =
@@ -425,6 +510,7 @@ void serialize(
 
     //{ Test encoded content
     ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
+    ASSERT_EQ(cdr.get_serialized_data_length(), calculated_size);
     ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
     //}
 
@@ -461,6 +547,15 @@ void align_serialize(
         _Align align_value,
         _T value)
 {
+    //{ Calculate encoded size.
+    CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
+    size_t calculated_size = calculator.begin_calculate_type_serialized_size(encoding, 0);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(0), align_value, calculated_size);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), value, calculated_size);
+    calculated_size += calculator.end_calculate_type_serialized_size(encoding, calculated_size);
+    calculated_size += 4; // Encapsulation
+    //}
+
     //{ Prepare buffer
     uint8_t tested_stream = 0 + encoding + endianness;
     auto buffer =
@@ -482,6 +577,7 @@ void align_serialize(
 
     //{ Test encoded content
     ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
+    ASSERT_EQ(cdr.get_serialized_data_length(), calculated_size);
     ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
     //}
 
@@ -526,6 +622,15 @@ void longdouble_align_serialize(
         _Align align_value,
         long double value)
 {
+    //{ Calculate encoded size.
+    CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
+    size_t calculated_size = calculator.begin_calculate_type_serialized_size(encoding, 0);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(0), align_value, calculated_size);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), value, calculated_size);
+    calculated_size += calculator.end_calculate_type_serialized_size(encoding, calculated_size);
+    calculated_size += 4; // Encapsulation
+    //}
+
     //{ Prepare buffer
     uint8_t tested_stream = 0 + encoding + endianness;
     size_t total_size = expected_streams_begin[tested_stream].size() + 16 +
@@ -550,6 +655,7 @@ void longdouble_align_serialize(
 
     //{ Test encoded content
     ASSERT_EQ(cdr.get_serialized_data_length(), total_size);
+    ASSERT_EQ(cdr.get_serialized_data_length(), calculated_size);
     ASSERT_EQ(0, memcmp(buffer.get(), expected_streams_begin[tested_stream].data(),
             expected_streams_begin[tested_stream].size()));
     ASSERT_EQ(0,
@@ -1422,6 +1528,14 @@ TEST_P(XCdrBasicTypesTest, longdouble)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
+    //{ Calculate encoded size.
+    CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
+    size_t calculated_size = calculator.begin_calculate_type_serialized_size(encoding, 0);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), longdouble_value, calculated_size);
+    calculated_size += calculator.end_calculate_type_serialized_size(encoding, calculated_size);
+    calculated_size += 4; // Encapsulation
+    //}
+
     {
         //{ Prepare buffer
         uint8_t tested_stream = 0 + encoding + endianness;
@@ -1447,6 +1561,7 @@ TEST_P(XCdrBasicTypesTest, longdouble)
 
         //{ Test encoded content
         ASSERT_EQ(cdr.get_serialized_data_length(), total_size);
+        ASSERT_EQ(cdr.get_serialized_data_length(), calculated_size);
         ASSERT_EQ(0, memcmp(buffer.get(), expected_streams_begin[tested_stream].data(),
                 expected_streams_begin[tested_stream].size()));
         ASSERT_EQ(0,
@@ -1505,6 +1620,7 @@ TEST_P(XCdrBasicTypesTest, longdouble)
 
         //{ Test encoded content
         ASSERT_EQ(cdr.get_serialized_data_length(), total_size);
+        ASSERT_EQ(cdr.get_serialized_data_length(), calculated_size);
         ASSERT_EQ(0, memcmp(buffer.get(), expected_streams_begin[tested_stream].data(),
                 expected_streams_begin[tested_stream].size()));
         ASSERT_EQ(0,
@@ -10494,6 +10610,16 @@ TEST_P(XCdrBasicTypesTest, one_inner_struct)
 
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
+    InnerBasicTypesShortStruct value { ushort_value };
+
+    //{ Calculate encoded size.
+    CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
+    size_t calculated_size = calculator.begin_calculate_type_serialized_size(encoding, 0);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), value, calculated_size);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(2), value, calculated_size);
+    calculated_size += calculator.end_calculate_type_serialized_size(encoding, calculated_size);
+    calculated_size += 4; // Encapsulation
+    //}
 
     {
         //{ Prepare buffer
@@ -10506,7 +10632,6 @@ TEST_P(XCdrBasicTypesTest, one_inner_struct)
         //}
 
         //{ Encode
-        InnerBasicTypesShortStruct value { ushort_value };
         cdr.set_encoding_flag(encoding);
         cdr.serialize_encapsulation();
         Cdr::state enc_state(cdr);
@@ -10519,6 +10644,7 @@ TEST_P(XCdrBasicTypesTest, one_inner_struct)
 
         //{ Test encoded content
         ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
+        ASSERT_EQ(cdr.get_serialized_data_length(), calculated_size);
         ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(),
                 expected_streams[tested_stream].size()));
         //}
@@ -10585,7 +10711,6 @@ TEST_P(XCdrBasicTypesTest, one_inner_struct)
         //}
 
         //{ Encode
-        InnerBasicTypesShortStruct value { ushort_value };
         cdr.set_encoding_flag(encoding);
         cdr.serialize_encapsulation();
         Cdr::state enc_state(cdr);
@@ -10598,6 +10723,7 @@ TEST_P(XCdrBasicTypesTest, one_inner_struct)
 
         //{ Test encoded content
         ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
+        ASSERT_EQ(cdr.get_serialized_data_length(), calculated_size);
         ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(),
                 expected_streams[tested_stream].size()));
         //}
@@ -10896,6 +11022,16 @@ TEST_P(XCdrBasicTypesTest, two_inner_struct)
 
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
+    InnerBasicTypesStruct value { ushort_value };
+
+    //{ Calculate encoded size.
+    CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
+    size_t calculated_size = calculator.begin_calculate_type_serialized_size(encoding, 0);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), value, calculated_size);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(2), value, calculated_size);
+    calculated_size += calculator.end_calculate_type_serialized_size(encoding, calculated_size);
+    calculated_size += 4; // Encapsulation
+    //}
 
     {
         //{ Prepare buffer
@@ -10908,7 +11044,6 @@ TEST_P(XCdrBasicTypesTest, two_inner_struct)
         //}
 
         //{ Encode
-        InnerBasicTypesStruct value { ushort_value };
         cdr.set_encoding_flag(encoding);
         cdr.serialize_encapsulation();
         Cdr::state enc_state(cdr);
@@ -10921,6 +11056,7 @@ TEST_P(XCdrBasicTypesTest, two_inner_struct)
 
         //{ Test encoded content
         ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
+        ASSERT_EQ(cdr.get_serialized_data_length(), calculated_size);
         ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(),
                 expected_streams[tested_stream].size()));
         //}
@@ -10987,7 +11123,6 @@ TEST_P(XCdrBasicTypesTest, two_inner_struct)
         //}
 
         //{ Encode
-        InnerBasicTypesStruct value { ushort_value };
         cdr.set_encoding_flag(encoding);
         cdr.serialize_encapsulation();
         Cdr::state enc_state(cdr);
@@ -11000,6 +11135,7 @@ TEST_P(XCdrBasicTypesTest, two_inner_struct)
 
         //{ Test encoded content
         ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
+        ASSERT_EQ(cdr.get_serialized_data_length(), calculated_size);
         ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(),
                 expected_streams[tested_stream].size()));
         //}

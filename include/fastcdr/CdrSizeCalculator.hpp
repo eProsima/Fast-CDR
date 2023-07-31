@@ -314,6 +314,11 @@ public:
 
         current_alignment += calculate_array_serialized_size(data.data(), data.size(), current_alignment);
 
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            serialized_member_size_ = get_serialized_member_size<_T>();
+        }
+
         return current_alignment - initial_alignment;
     }
 
@@ -746,10 +751,12 @@ private:
 
     EncodingAlgorithmFlag current_encoding_ {EncodingAlgorithmFlag::PLAIN_CDR2};
 
-    enum
+    enum SerializedMemberSizeForNextInt
     {
         NO_SERIALIZED_MEMBER_SIZE,
-        SERIALIZED_MEMBER_SIZE
+        SERIALIZED_MEMBER_SIZE,
+        SERIALIZED_MEMBER_SIZE_4,
+        SERIALIZED_MEMBER_SIZE_8
     }
     //! Specifies if a DHEADER was serialized. Used to calculate XCDRv2 member headers.
     serialized_member_size_ {NO_SERIALIZED_MEMBER_SIZE};
@@ -762,6 +769,15 @@ private:
             size_t dataSize) const
     {
         return (dataSize - (current_alignment % dataSize)) & (dataSize - 1);
+    }
+
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value ||
+            std::is_arithmetic<_T>::value>::type* = nullptr>
+    constexpr SerializedMemberSizeForNextInt get_serialized_member_size() const
+    {
+        return (1 == sizeof(_T) ? SERIALIZED_MEMBER_SIZE :
+               (4 == sizeof(_T) ? SERIALIZED_MEMBER_SIZE_4 :
+               (8 == sizeof(_T) ? SERIALIZED_MEMBER_SIZE_8 :  NO_SERIALIZED_MEMBER_SIZE)));
     }
 
 };

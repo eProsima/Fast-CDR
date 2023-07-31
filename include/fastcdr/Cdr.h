@@ -157,7 +157,7 @@ public:
      * the assigned buffer.
      * @param cdrBuffer A reference to the buffer that contains (or will contain) the CDR representation.
      * @param endianness The initial endianness that will be used. The default value is the endianness of the system.
-     * @param cdr_version Represents the type of encoding algorithm that will be used in serialization/deserialization.
+     * @param cdr_version Represents the type of encoding algorithm that will be used for the encoding.
      * The default value is CdrVersion::XCDRv2.
      */
     Cdr_DllAPI Cdr(

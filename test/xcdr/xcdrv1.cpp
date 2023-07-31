@@ -95,6 +95,18 @@ void xcdrv1_serialize_the_value(
     //}
 }
 
+/*!
+ * @test Test the decoder can get the XCDR version from the encapsulation.
+ * @code{.idl}
+ * struct AutoSelectStruct
+ * {
+ *     @id(0)
+ *     unsigned short value1;
+ *     @id(1)
+ *     unsigned long value2;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrv1Test, auto_selection_on_decode)
 {
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
@@ -146,7 +158,17 @@ TEST_P(XCdrv1Test, auto_selection_on_decode)
     ASSERT_EQ(ul, dul);
 }
 
-TEST_P(XCdrv1PLTest, pl_octet_opt_member)
+/*!
+ * @test Test serialization of a octet member changing the XCdrHeaderSelection
+ * @code{.idl}
+ * struct PLOctetStruct
+ * {
+ *     @id(1)
+ *     octet value1;
+ * };
+ * @endcode
+ */
+TEST_P(XCdrv1PLTest, pl_octet_member)
 {
     constexpr unsigned char octet_value = 0xCD;
 
@@ -192,7 +214,17 @@ TEST_P(XCdrv1PLTest, pl_octet_opt_member)
     xcdrv1_serialize_the_value(expected_streams, header_selection, octet_value);
 }
 
-TEST_P(XCdrv1PLTest, pl_long_opt_member)
+/*!
+ * @test Test serialization of a long member changing the XCdrHeaderSelection
+ * @code{.idl}
+ * struct PLLongStruct
+ * {
+ *     @id(1)
+ *     long value1;
+ * };
+ * @endcode
+ */
+TEST_P(XCdrv1PLTest, pl_long_member)
 {
     constexpr int32_t long_value {static_cast<int32_t>(0xDCCDCDCD)};
     constexpr uint8_t ival {0xCD};

@@ -590,6 +590,15 @@ void longdouble_align_serialize(
     //}
 }
 
+/*!
+ * @test Test an structure with a field of short type.
+ * @code{.idl}
+ * struct ShortStruct
+ * {
+ *     short var_short;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, short)
 {
     constexpr int16_t short_value {0x7DDC};
@@ -670,6 +679,15 @@ TEST_P(XCdrBasicTypesTest, short)
     serialize(expected_streams, encoding, endianness, short_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type.
+ * @code{.idl}
+ * struct UShortStruct
+ * {
+ *     unsigned short var_ushort;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, ushort)
 {
     constexpr uint16_t ushort_value {static_cast<uint16_t>(0xCDDC)};
@@ -750,6 +768,15 @@ TEST_P(XCdrBasicTypesTest, ushort)
     serialize(expected_streams, encoding, endianness, ushort_value);
 }
 
+/*!
+ * @test Test an structure with a field of long type.
+ * @code{.idl}
+ * struct LongStruct
+ * {
+ *     long var_long;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, long)
 {
     constexpr int32_t long_value {static_cast<int32_t>(0xCDCDCDDC)};
@@ -828,6 +855,15 @@ TEST_P(XCdrBasicTypesTest, long)
     serialize(expected_streams, encoding, endianness, long_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type.
+ * @code{.idl}
+ * struct ULongStruct
+ * {
+ *     unsigned long var_ulong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, ulong)
 {
     constexpr uint32_t ulong_value {0xCDCDCDDC};
@@ -906,6 +942,15 @@ TEST_P(XCdrBasicTypesTest, ulong)
     serialize(expected_streams, encoding, endianness, ulong_value);
 }
 
+/*!
+ * @test Test an structure with a field of long long type.
+ * @code{.idl}
+ * struct LongLongStruct
+ * {
+ *     long long var_longlong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, longlong)
 {
     constexpr int64_t longlong_value {static_cast<int64_t>(0xCDCDCDCDCDCDCDDCll)};
@@ -994,6 +1039,15 @@ TEST_P(XCdrBasicTypesTest, longlong)
     serialize(expected_streams, encoding, endianness, longlong_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long long type.
+ * @code{.idl}
+ * struct ULongLongStruct
+ * {
+ *     unsigned long long var_ulonglong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, ulonglong)
 {
     constexpr uint64_t ulonglong_value {0xCDCDCDCDCDCDCDDCull};
@@ -1082,6 +1136,15 @@ TEST_P(XCdrBasicTypesTest, ulonglong)
     serialize(expected_streams, encoding, endianness, ulonglong_value);
 }
 
+/*!
+ * @test Test an structure with a field of float type.
+ * @code{.idl}
+ * struct FloatStruct
+ * {
+ *     float var_float;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, float)
 {
     constexpr float float_value {13.0};
@@ -1160,6 +1223,15 @@ TEST_P(XCdrBasicTypesTest, float)
     serialize(expected_streams, encoding, endianness, float_value);
 }
 
+/*!
+ * @test Test an structure with a field of double type.
+ * @code{.idl}
+ * struct DoubleStruct
+ * {
+ *     double var_double;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, double)
 {
     constexpr double double_value {13.0};
@@ -1248,6 +1320,15 @@ TEST_P(XCdrBasicTypesTest, double)
     serialize(expected_streams, encoding, endianness, double_value);
 }
 
+/*!
+ * @test Test an structure with a field of long double type.
+ * @code{.idl}
+ * struct LongDoubleStruct
+ * {
+ *     long double var_longdouble;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, longdouble)
 {
     constexpr long double longdouble_value = std::numeric_limits<long double>::min();
@@ -1459,6 +1540,15 @@ TEST_P(XCdrBasicTypesTest, longdouble)
 
 }
 
+/*!
+ * @test Test an structure with a field of boolean type.
+ * @code{.idl}
+ * struct BooleanStruct
+ * {
+ *     boolean var_boolean;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, boolean)
 {
     constexpr bool boolean_value {true};
@@ -1538,6 +1628,15 @@ TEST_P(XCdrBasicTypesTest, boolean)
     serialize(expected_streams, encoding, endianness, boolean_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type.
+ * @code{.idl}
+ * struct OctetStruct
+ * {
+ *     octet var_octet;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, octet)
 {
     constexpr uint8_t octet_value {0xCD};
@@ -1616,6 +1715,15 @@ TEST_P(XCdrBasicTypesTest, octet)
     serialize(expected_streams, encoding, endianness, octet_value);
 }
 
+/*!
+ * @test Test an structure with a field of char type.
+ * @code{.idl}
+ * struct CharStruct
+ * {
+ *     char var_char;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, char)
 {
     constexpr char char_value {'}'};
@@ -1695,6 +1803,15 @@ TEST_P(XCdrBasicTypesTest, char)
     serialize(expected_streams, encoding, endianness, char_value);
 }
 
+/*!
+ * @test Test an structure with a field of wchar type.
+ * @code{.idl}
+ * struct WCharStruct
+ * {
+ *     wchar var_wchar;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, wchar)
 {
     constexpr wchar_t wchar_value {static_cast<wchar_t>(0x0000CDDC)};
@@ -1775,6 +1892,15 @@ TEST_P(XCdrBasicTypesTest, wchar)
     serialize(expected_streams, encoding, endianness, wchar_value);
 }
 
+/*!
+ * @test Test an structure with a field of string type.
+ * @code{.idl}
+ * struct StringStruct
+ * {
+ *     string var_string;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, string)
 {
     const std::string string_value {"AB"};
@@ -1865,6 +1991,15 @@ TEST_P(XCdrBasicTypesTest, string)
     serialize(expected_streams, encoding, endianness, string_value);
 }
 
+/*!
+ * @test Test an structure with a field of wstring type.
+ * @code{.idl}
+ * struct WStringStruct
+ * {
+ *     wstring var_wstring;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, wstring)
 {
     const std::wstring string_value {L"AB"};
@@ -1963,6 +2098,21 @@ TEST_P(XCdrBasicTypesTest, wstring)
     serialize(expected_streams, encoding, endianness, string_value);
 }
 
+/*!
+ * @test Test an structure with a field of enum 32bits type.
+ * @code{.idl}
+ * enum Enum32
+ * {
+ *     ENUM32_VAL_1 = 0,
+ *     ENUM32_VAL_2 = 1
+ * };
+ *
+ * struct Enum32Struct
+ * {
+ *     Enum32 var_enum32;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, enum32)
 {
     constexpr Enum32 enum_value {ENUM32_VAL_2};
@@ -2039,6 +2189,22 @@ TEST_P(XCdrBasicTypesTest, enum32)
     serialize(expected_streams, encoding, endianness, enum_value);
 }
 
+/*!
+ * @test Test an structure with a field of enum 16bits type.
+ * @code{.idl}
+ * @bit_bound(16)
+ * enum Enum16
+ * {
+ *     ENUM16_VAL_1 = 0,
+ *     ENUM16_VAL_2 = 1
+ * };
+ *
+ * struct Enum16Struct
+ * {
+ *     Enum16 var_enum16;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, enum16)
 {
     constexpr Enum16 enum_value {ENUM16_VAL_2};
@@ -2117,6 +2283,22 @@ TEST_P(XCdrBasicTypesTest, enum16)
     serialize(expected_streams, encoding, endianness, enum_value);
 }
 
+/*!
+ * @test Test an structure with a field of enum 8bits type.
+ * @code{.idl}
+ * @bit_bound(8)
+ * enum Enum8
+ * {
+ *     ENUM8_VAL_1 = 0,
+ *     ENUM8_VAL_2 = 1
+ * };
+ *
+ * struct Enum8Struct
+ * {
+ *     Enum8 var_enum8;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, enum8)
 {
     constexpr Enum8 enum_value {ENUM8_VAL_2};
@@ -2195,6 +2377,16 @@ TEST_P(XCdrBasicTypesTest, enum8)
     serialize(expected_streams, encoding, endianness, enum_value);
 }
 
+/*!
+ * @test Test an structure with a field of array of unsigned long type.
+ * @code{.idl}
+ *
+ * struct ULongArrayStruct
+ * {
+ *     unsigned long var_ulongarray[2];
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, array_ulong)
 {
     const std::array<uint32_t, 2> array_value {0xCDCDCDDC, 0xCDCDCDDC};
@@ -2283,6 +2475,23 @@ TEST_P(XCdrBasicTypesTest, array_ulong)
     serialize(expected_streams, encoding, endianness, array_value);
 }
 
+/*!
+ * @test Test an structure with a field of array of struct type.
+ * @code{.idl}
+ * struct InnerBasicTypesShortStruct
+ * {
+ *     @id(3)
+ *     unsigned short value1;
+ *     @id(16383)
+ *     unsigned short value2;
+ * };
+ *
+ * struct StructArrayStruct
+ * {
+ *     InnerBasicTypesShortStruct var_structarray[2];
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, array_struct)
 {
     const std::array<InnerBasicTypesShortStruct, 2> array_value {{{0xCDDC}, {0xDCCD}}};
@@ -2435,6 +2644,17 @@ TEST_P(XCdrBasicTypesTest, array_struct)
     serialize(expected_streams, encoding, endianness, array_value);
 }
 
+
+/*!
+ * @test Test an structure with a field of multi array of unsigned long type.
+ * @code{.idl}
+ *
+ * struct ULongMultiArrayStruct
+ * {
+ *     unsigned long var_ulongarray[2][2];
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, multi_array_ulong)
 {
     const std::array<std::array<uint32_t, 2>, 2>  array_value {{
@@ -2548,6 +2768,23 @@ TEST_P(XCdrBasicTypesTest, multi_array_ulong)
     serialize(expected_streams, encoding, endianness, array_value);
 }
 
+/*!
+ * @test Test an structure with a field of multi array of struct type.
+ * @code{.idl}
+ * struct InnerBasicTypesShortStruct
+ * {
+ *     @id(3)
+ *     unsigned short value1;
+ *     @id(16383)
+ *     unsigned short value2;
+ * };
+ *
+ * struct StructMultiArrayStruct
+ * {
+ *     InnerBasicTypesShortStruct var_structarray[2][2];
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, multi_array_struct)
 {
     const std::array<std::array<InnerBasicTypesShortStruct, 2>, 2> array_value {{
@@ -2783,6 +3020,16 @@ TEST_P(XCdrBasicTypesTest, multi_array_struct)
     serialize(expected_streams, encoding, endianness, array_value);
 }
 
+/*!
+ * @test Test an structure with a field of sequence of unsigned long type.
+ * @code{.idl}
+ *
+ * struct ULongSequenceStruct
+ * {
+ *     sequence<unsigned long, 2> var_ulongsequence;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, sequence_ulong)
 {
     const std::vector<uint32_t> sequence_value {0xCDCDCDDC, 0xCDCDCDDC};
@@ -2881,6 +3128,23 @@ TEST_P(XCdrBasicTypesTest, sequence_ulong)
     serialize(expected_streams, encoding, endianness, sequence_value);
 }
 
+/*!
+ * @test Test an structure with a field of sequence of struct type.
+ * @code{.idl}
+ * struct InnerBasicTypesShortStruct
+ * {
+ *     @id(3)
+ *     unsigned short value1;
+ *     @id(16383)
+ *     unsigned short value2;
+ * };
+ *
+ * struct StructSequenceStruct
+ * {
+ *     sequence<InnerBasicTypesShortStruct, 2> var_structsequence;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, sequence_struct)
 {
     const std::vector<InnerBasicTypesShortStruct> sequence_value {{{0xCDDC}, {0xDCCD}}};
@@ -3043,6 +3307,16 @@ TEST_P(XCdrBasicTypesTest, sequence_struct)
     serialize(expected_streams, encoding, endianness, sequence_value);
 }
 
+/*!
+ * @test Test an structure with a field of map of unsigned long type.
+ * @code{.idl}
+ *
+ * struct ULongMapStruct
+ * {
+ *     map<unsigned short, unsigned long> var_ulongmap;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, map_ulong)
 {
     const std::map<uint16_t, uint32_t> map_value {{static_cast<uint16_t>(0xCDDC), 0xCDCDCDDCu},
@@ -3184,6 +3458,23 @@ TEST_P(XCdrBasicTypesTest, map_ulong)
     serialize(expected_streams, encoding, endianness, map_value);
 }
 
+/*!
+ * @test Test an structure with a field of map of struct type.
+ * @code{.idl}
+ * struct InnerBasicTypesShortStruct
+ * {
+ *     @id(3)
+ *     unsigned short value1;
+ *     @id(16383)
+ *     unsigned short value2;
+ * };
+ *
+ * struct StructMapStruct
+ * {
+ *     map<unsigned short, InnerBasicTypesShortStruct> var_structmap;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, map_struct)
 {
     const std::map<uint16_t, InnerBasicTypesShortStruct> map_value {
@@ -3376,6 +3667,20 @@ TEST_P(XCdrBasicTypesTest, map_struct)
     serialize(expected_streams, encoding, endianness, map_value);
 }
 
+/*!
+ * @test Test an structure with a field of bitset 7bits type.
+ * @code{.idl}
+ * bitset Bitset7
+ * {
+ *     bitfield<7> field;
+ * };
+ *
+ * struct Bitset7Struct
+ * {
+ *     Bitset7 var_bitset7;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, bitset_8)
 {
     constexpr std::bitset<7> bitset_value {0x08};
@@ -3455,6 +3760,20 @@ TEST_P(XCdrBasicTypesTest, bitset_8)
     serialize(expected_streams, encoding, endianness, bitset_value);
 }
 
+/*!
+ * @test Test an structure with a field of bitset 14bits type.
+ * @code{.idl}
+ * bitset Bitset14
+ * {
+ *     bitfield<14> field;
+ * };
+ *
+ * struct Bitset14Struct
+ * {
+ *     Bitset14 var_bitset14;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, bitset_16)
 {
     constexpr std::bitset<14> bitset_value {0x0088};
@@ -3535,6 +3854,20 @@ TEST_P(XCdrBasicTypesTest, bitset_16)
     serialize(expected_streams, encoding, endianness, bitset_value);
 }
 
+/*!
+ * @test Test an structure with a field of bitset 30bits type.
+ * @code{.idl}
+ * bitset Bitset30
+ * {
+ *     bitfield<30> field;
+ * };
+ *
+ * struct Bitset30Struct
+ * {
+ *     Bitset30 var_bitset30;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, bitset_32)
 {
     constexpr std::bitset<30> bitset_value {0x0DDCDCDC};
@@ -3613,6 +3946,20 @@ TEST_P(XCdrBasicTypesTest, bitset_32)
     serialize(expected_streams, encoding, endianness, bitset_value);
 }
 
+/*!
+ * @test Test an structure with a field of bitset 45bits type.
+ * @code{.idl}
+ * bitset Bitset45
+ * {
+ *     bitfield<45> field;
+ * };
+ *
+ * struct Bitset45Struct
+ * {
+ *     Bitset45 var_bitset45;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, bitset_64)
 {
     constexpr std::bitset<45> bitset_value {0x000000DCDCDCDCDCull};
@@ -3701,6 +4048,16 @@ TEST_P(XCdrBasicTypesTest, bitset_64)
     serialize(expected_streams, encoding, endianness, bitset_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and another of short type.
+ * @code{.idl}
+ * struct ShortAlign1Struct
+ * {
+ *     octet var_align;
+ *     short var_short;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, short_align_1)
 {
     const uint8_t align_value {0xAB};
@@ -3806,6 +4163,16 @@ TEST_P(XCdrBasicTypesTest, short_align_1)
     align_serialize(expected_streams, encoding, endianness, align_value, short_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and another of short type.
+ * @code{.idl}
+ * struct ShortAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     short var_short;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, short_align_2)
 {
     const uint16_t align_value {0xABBA};
@@ -3907,6 +4274,16 @@ TEST_P(XCdrBasicTypesTest, short_align_2)
     align_serialize(expected_streams, encoding, endianness, align_value, short_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and another of short type.
+ * @code{.idl}
+ * struct ShortAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     short var_short;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, short_align_4)
 {
     const uint32_t align_value {0xABABABBA};
@@ -4004,6 +4381,16 @@ TEST_P(XCdrBasicTypesTest, short_align_4)
     align_serialize(expected_streams, encoding, endianness, align_value, short_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and another of unsigned short type.
+ * @code{.idl}
+ * struct UShortAlign1Struct
+ * {
+ *     octet var_align;
+ *     unsigned short var_ushort;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, ushort_align_1)
 {
     const uint8_t align_value {0xAB};
@@ -4109,6 +4496,16 @@ TEST_P(XCdrBasicTypesTest, ushort_align_1)
     align_serialize(expected_streams, encoding, endianness, align_value, ushort_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and another of unsigned short type.
+ * @code{.idl}
+ * struct UShortAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     unsigned short var_ushort;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, ushort_align_2)
 {
     const uint16_t align_value {0xABBA};
@@ -4210,6 +4607,16 @@ TEST_P(XCdrBasicTypesTest, ushort_align_2)
     align_serialize(expected_streams, encoding, endianness, align_value, ushort_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and another of unsigned short type.
+ * @code{.idl}
+ * struct UShortAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     unsigned short var_ushort;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, ushort_align_4)
 {
     const uint32_t align_value {0xABABABBA};
@@ -4307,6 +4714,16 @@ TEST_P(XCdrBasicTypesTest, ushort_align_4)
     align_serialize(expected_streams, encoding, endianness, align_value, ushort_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and another of long type.
+ * @code{.idl}
+ * struct LongAlign1Struct
+ * {
+ *     octet var_align;
+ *     long var_long;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, long_align_1)
 {
     const uint8_t align_value {0xAB};
@@ -4410,6 +4827,16 @@ TEST_P(XCdrBasicTypesTest, long_align_1)
     align_serialize(expected_streams, encoding, endianness, align_value, long_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and another of long type.
+ * @code{.idl}
+ * struct LongAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     long var_long;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, long_align_2)
 {
     const uint16_t align_value {0xABBA};
@@ -4515,6 +4942,16 @@ TEST_P(XCdrBasicTypesTest, long_align_2)
     align_serialize(expected_streams, encoding, endianness, align_value, long_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and another of long type.
+ * @code{.idl}
+ * struct LongAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     long var_long;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, long_align_4)
 {
     const uint32_t align_value {0xABABABBA};
@@ -4610,6 +5047,16 @@ TEST_P(XCdrBasicTypesTest, long_align_4)
     align_serialize(expected_streams, encoding, endianness, align_value, long_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and another of unsigned long type.
+ * @code{.idl}
+ * struct ULongAlign1Struct
+ * {
+ *     octet var_align;
+ *     unsigned long var_ulong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, ulong_align_1)
 {
     const uint8_t align_value {0xAB};
@@ -4713,6 +5160,16 @@ TEST_P(XCdrBasicTypesTest, ulong_align_1)
     align_serialize(expected_streams, encoding, endianness, align_value, ulong_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and another of unsigned long type.
+ * @code{.idl}
+ * struct ULongAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     unsigned long var_ulong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, ulong_align_2)
 {
     const uint16_t align_value {0xABBA};
@@ -4818,6 +5275,16 @@ TEST_P(XCdrBasicTypesTest, ulong_align_2)
     align_serialize(expected_streams, encoding, endianness, align_value, ulong_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and another of unsigned long type.
+ * @code{.idl}
+ * struct ULongAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     unsigned long var_ulong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, ulong_align_4)
 {
     const uint32_t align_value {0xABABABBA};
@@ -4913,6 +5380,16 @@ TEST_P(XCdrBasicTypesTest, ulong_align_4)
     align_serialize(expected_streams, encoding, endianness, align_value, ulong_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and another of long long type.
+ * @code{.idl}
+ * struct LongLongAlign1Struct
+ * {
+ *     octet var_align;
+ *     long long var_longlong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, longlong_align_1)
 {
     const uint8_t align_value {0xAB};
@@ -5028,6 +5505,16 @@ TEST_P(XCdrBasicTypesTest, longlong_align_1)
     align_serialize(expected_streams, encoding, endianness, align_value, longlong_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and another of long long type.
+ * @code{.idl}
+ * struct LongLongAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     long long var_longlong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, longlong_align_2)
 {
     const uint16_t align_value {0xABBA};
@@ -5145,6 +5632,16 @@ TEST_P(XCdrBasicTypesTest, longlong_align_2)
     align_serialize(expected_streams, encoding, endianness, align_value, longlong_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and another of long long type.
+ * @code{.idl}
+ * struct LongLongAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     long long var_longlong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, longlong_align_4)
 {
     const uint32_t align_value {0xABABABBA};
@@ -5252,6 +5749,16 @@ TEST_P(XCdrBasicTypesTest, longlong_align_4)
     align_serialize(expected_streams, encoding, endianness, align_value, longlong_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and another of unsigned long long type.
+ * @code{.idl}
+ * struct ULongLongAlign1Struct
+ * {
+ *     octet var_align;
+ *     unsigned long long var_ulonglong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, ulonglong_align_1)
 {
     const uint8_t align_value {0xAB};
@@ -5367,6 +5874,16 @@ TEST_P(XCdrBasicTypesTest, ulonglong_align_1)
     align_serialize(expected_streams, encoding, endianness, align_value, ulonglong_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and another of unsigned long long type.
+ * @code{.idl}
+ * struct ULongLongAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     unsigned long long var_ulonglong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, ulonglong_align_2)
 {
     const uint16_t align_value {0xABBA};
@@ -5484,6 +6001,16 @@ TEST_P(XCdrBasicTypesTest, ulonglong_align_2)
     align_serialize(expected_streams, encoding, endianness, align_value, ulonglong_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and another of unsigned long long type.
+ * @code{.idl}
+ * struct ULongLongAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     unsigned long long var_ulonglong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, ulonglong_align_4)
 {
     const uint32_t align_value {0xABABABBA};
@@ -5591,6 +6118,16 @@ TEST_P(XCdrBasicTypesTest, ulonglong_align_4)
     align_serialize(expected_streams, encoding, endianness, align_value, ulonglong_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and another of float type.
+ * @code{.idl}
+ * struct FloatAlign1Struct
+ * {
+ *     octet var_align;
+ *     float var_float;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, float_align_1)
 {
     const uint8_t align_value {0xAB};
@@ -5694,6 +6231,16 @@ TEST_P(XCdrBasicTypesTest, float_align_1)
     align_serialize(expected_streams, encoding, endianness, align_value, float_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and another of float type.
+ * @code{.idl}
+ * struct FloatAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     float var_float;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, float_align_2)
 {
     const uint16_t align_value {0xABBA};
@@ -5799,6 +6346,16 @@ TEST_P(XCdrBasicTypesTest, float_align_2)
     align_serialize(expected_streams, encoding, endianness, align_value, float_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and another of float type.
+ * @code{.idl}
+ * struct FloatAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     float var_float;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, float_align_4)
 {
     const uint32_t align_value {0xABABABBA};
@@ -5894,6 +6451,16 @@ TEST_P(XCdrBasicTypesTest, float_align_4)
     align_serialize(expected_streams, encoding, endianness, align_value, float_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and another of double type.
+ * @code{.idl}
+ * struct DoubleAlign1Struct
+ * {
+ *     octet var_align;
+ *     double var_double;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, double_align_1)
 {
     const uint8_t align_value {0xAB};
@@ -6009,6 +6576,16 @@ TEST_P(XCdrBasicTypesTest, double_align_1)
     align_serialize(expected_streams, encoding, endianness, align_value, double_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and another of double type.
+ * @code{.idl}
+ * struct DoubleAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     double var_double;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, double_align_2)
 {
     const uint16_t align_value {0xABBA};
@@ -6126,6 +6703,16 @@ TEST_P(XCdrBasicTypesTest, double_align_2)
     align_serialize(expected_streams, encoding, endianness, align_value, double_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and another of double type.
+ * @code{.idl}
+ * struct DoubleAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     double var_double;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, double_align_4)
 {
     const uint32_t align_value {0xABABABBA};
@@ -6233,6 +6820,16 @@ TEST_P(XCdrBasicTypesTest, double_align_4)
     align_serialize(expected_streams, encoding, endianness, align_value, double_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and another of long double type.
+ * @code{.idl}
+ * struct LongDoubleAlign1Struct
+ * {
+ *     octet var_align;
+ *     long double var_longdouble;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, longdouble_align_1)
 {
     const uint8_t align_value {0xAB};
@@ -6360,6 +6957,16 @@ TEST_P(XCdrBasicTypesTest, longdouble_align_1)
             align_value, longdouble_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and another of long double type.
+ * @code{.idl}
+ * struct LongDoubleAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     long double var_longdouble;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, longdouble_align_2)
 {
     const uint16_t align_value {0xABBA};
@@ -6489,6 +7096,16 @@ TEST_P(XCdrBasicTypesTest, longdouble_align_2)
             align_value, longdouble_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and another of long double type.
+ * @code{.idl}
+ * struct LongDoubleAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     long double var_longdouble;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, longdouble_align_4)
 {
     const uint32_t align_value {0xABABABBA};
@@ -6608,6 +7225,16 @@ TEST_P(XCdrBasicTypesTest, longdouble_align_4)
             align_value, longdouble_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and another of boolean type.
+ * @code{.idl}
+ * struct BooleanAlign1Struct
+ * {
+ *     octet var_align;
+ *     boolean var_boolean;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, boolean_align_1)
 {
     const uint8_t align_value {0xAB};
@@ -6706,6 +7333,16 @@ TEST_P(XCdrBasicTypesTest, boolean_align_1)
     align_serialize(expected_streams, encoding, endianness, align_value, boolean_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and another of boolean type.
+ * @code{.idl}
+ * struct BooleanAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     boolean var_boolean;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, boolean_align_2)
 {
     const uint16_t align_value {0xABBA};
@@ -6806,6 +7443,16 @@ TEST_P(XCdrBasicTypesTest, boolean_align_2)
     align_serialize(expected_streams, encoding, endianness, align_value, boolean_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and another of boolean type.
+ * @code{.idl}
+ * struct BooleanAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     boolean var_boolean;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, boolean_align_4)
 {
     const uint32_t align_value {0xABABABBA};
@@ -6902,6 +7549,16 @@ TEST_P(XCdrBasicTypesTest, boolean_align_4)
     align_serialize(expected_streams, encoding, endianness, align_value, boolean_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and another of octet type.
+ * @code{.idl}
+ * struct OctetAlign1Struct
+ * {
+ *     octet var_align;
+ *     octet var_octet;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, octet_align_1)
 {
     const uint8_t align_value {0xAB};
@@ -6999,6 +7656,16 @@ TEST_P(XCdrBasicTypesTest, octet_align_1)
     align_serialize(expected_streams, encoding, endianness, align_value, octet_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and another of octet type.
+ * @code{.idl}
+ * struct OctetAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     octet var_octet;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, octet_align_2)
 {
     const uint16_t align_value {0xABBA};
@@ -7098,6 +7765,16 @@ TEST_P(XCdrBasicTypesTest, octet_align_2)
     align_serialize(expected_streams, encoding, endianness, align_value, octet_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and another of octet type.
+ * @code{.idl}
+ * struct OctetAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     octet var_octet;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, octet_align_4)
 {
     const uint32_t align_value {0xABABABBA};
@@ -7193,6 +7870,16 @@ TEST_P(XCdrBasicTypesTest, octet_align_4)
     align_serialize(expected_streams, encoding, endianness, align_value, octet_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and another of char type.
+ * @code{.idl}
+ * struct CharAlign1Struct
+ * {
+ *     octet var_align;
+ *     char var_char;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, char_align_1)
 {
     const uint8_t align_value {0xAB};
@@ -7291,6 +7978,16 @@ TEST_P(XCdrBasicTypesTest, char_align_1)
     align_serialize(expected_streams, encoding, endianness, align_value, char_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and another of char type.
+ * @code{.idl}
+ * struct CharAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     char var_char;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, char_align_2)
 {
     const uint16_t align_value {0xABBA};
@@ -7391,6 +8088,16 @@ TEST_P(XCdrBasicTypesTest, char_align_2)
     align_serialize(expected_streams, encoding, endianness, align_value, char_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and another of char type.
+ * @code{.idl}
+ * struct CharAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     char var_char;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, char_align_4)
 {
     const uint32_t align_value {0xABABABBA};
@@ -7487,6 +8194,16 @@ TEST_P(XCdrBasicTypesTest, char_align_4)
     align_serialize(expected_streams, encoding, endianness, align_value, char_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and another of wchar type.
+ * @code{.idl}
+ * struct WCharAlign1Struct
+ * {
+ *     octet var_align;
+ *     wchar var_wchar;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, wchar_align_1)
 {
     const uint8_t align_value {0xAB};
@@ -7592,6 +8309,16 @@ TEST_P(XCdrBasicTypesTest, wchar_align_1)
     align_serialize(expected_streams, encoding, endianness, align_value, wchar_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and another of wchar type.
+ * @code{.idl}
+ * struct WCharAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     wchar var_wchar;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, wchar_align_2)
 {
     const uint16_t align_value {0xABBA};
@@ -7693,6 +8420,16 @@ TEST_P(XCdrBasicTypesTest, wchar_align_2)
     align_serialize(expected_streams, encoding, endianness, align_value, wchar_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and another of wchar type.
+ * @code{.idl}
+ * struct WCharAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     wchar var_wchar;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, wchar_align_4)
 {
     const uint32_t align_value {0xABABABBA};
@@ -7790,6 +8527,16 @@ TEST_P(XCdrBasicTypesTest, wchar_align_4)
     align_serialize(expected_streams, encoding, endianness, align_value, wchar_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and another of string type.
+ * @code{.idl}
+ * struct StringAlign1Struct
+ * {
+ *     octet var_align;
+ *     string var_string;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, string_align_1)
 {
     const uint8_t align_value {0xAB};
@@ -7905,6 +8652,16 @@ TEST_P(XCdrBasicTypesTest, string_align_1)
     align_serialize(expected_streams, encoding, endianness, align_value, string_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and another of string type.
+ * @code{.idl}
+ * struct StringAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     string var_string;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, string_align_2)
 {
     const uint16_t align_value {0xABBA};
@@ -8022,6 +8779,16 @@ TEST_P(XCdrBasicTypesTest, string_align_2)
     align_serialize(expected_streams, encoding, endianness, align_value, string_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and another of string type.
+ * @code{.idl}
+ * struct StringAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     string var_string;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, string_align_4)
 {
     const uint32_t align_value {0xABABABBA};
@@ -8129,6 +8896,16 @@ TEST_P(XCdrBasicTypesTest, string_align_4)
     align_serialize(expected_streams, encoding, endianness, align_value, string_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and another of wstring type.
+ * @code{.idl}
+ * struct WStringAlign1Struct
+ * {
+ *     octet var_align;
+ *     wstring var_wstring;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, wstring_align_1)
 {
     const uint8_t align_value {0xAB};
@@ -8252,6 +9029,16 @@ TEST_P(XCdrBasicTypesTest, wstring_align_1)
     align_serialize(expected_streams, encoding, endianness, align_value, wstring_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and another of wstring type.
+ * @code{.idl}
+ * struct WStringAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     wstring var_wstring;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, wstring_align_2)
 {
     const uint16_t align_value {0xABBA};
@@ -8377,6 +9164,16 @@ TEST_P(XCdrBasicTypesTest, wstring_align_2)
     align_serialize(expected_streams, encoding, endianness, align_value, wstring_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and another of wstring type.
+ * @code{.idl}
+ * struct WStringAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     wstring var_wstring;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, wstring_align_4)
 {
     const uint32_t align_value {0xABABABBA};
@@ -8492,6 +9289,22 @@ TEST_P(XCdrBasicTypesTest, wstring_align_4)
     align_serialize(expected_streams, encoding, endianness, align_value, wstring_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and another of enum 32bits type.
+ * @code{.idl}
+ * enum Enum32
+ * {
+ *     ENUM32_VAL_1 = 0,
+ *     ENUM32_VAL_2 = 1
+ * };
+ *
+ * struct Enum32Align1Struct
+ * {
+ *     octet var_align;
+ *     Enum32 var_enum32;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, enum32_align_1)
 {
     const uint8_t align_value {0xAB};
@@ -8593,6 +9406,22 @@ TEST_P(XCdrBasicTypesTest, enum32_align_1)
     align_serialize(expected_streams, encoding, endianness, align_value, enum_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and another of enum 32bits type.
+ * @code{.idl}
+ * enum Enum32
+ * {
+ *     ENUM32_VAL_1 = 0,
+ *     ENUM32_VAL_2 = 1
+ * };
+ *
+ * struct Enum32Align2Struct
+ * {
+ *     unsigned short var_align;
+ *     Enum32 var_enum32;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, enum32_align_2)
 {
     const uint16_t align_value {0xABBA};
@@ -8696,6 +9525,22 @@ TEST_P(XCdrBasicTypesTest, enum32_align_2)
     align_serialize(expected_streams, encoding, endianness, align_value, enum_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and another of enum 32bits type.
+ * @code{.idl}
+ * enum Enum32
+ * {
+ *     ENUM32_VAL_1 = 0,
+ *     ENUM32_VAL_2 = 1
+ * };
+ *
+ * struct Enum32Align4Struct
+ * {
+ *     unsigned long var_align;
+ *     Enum32 var_enum32;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, enum32_align_4)
 {
     const uint32_t align_value {0xABABABBA};
@@ -8789,6 +9634,22 @@ TEST_P(XCdrBasicTypesTest, enum32_align_4)
     align_serialize(expected_streams, encoding, endianness, align_value, enum_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and another of enum 16bits type.
+ * @code{.idl}
+ * enum Enum16
+ * {
+ *     ENUM16_VAL_1 = 0,
+ *     ENUM16_VAL_2 = 1
+ * };
+ *
+ * struct Enum16Align1Struct
+ * {
+ *     octet var_align;
+ *     Enum16 var_enum16;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, enum16_align_1)
 {
     const uint8_t align_value {0xAB};
@@ -8892,6 +9753,22 @@ TEST_P(XCdrBasicTypesTest, enum16_align_1)
     align_serialize(expected_streams, encoding, endianness, align_value, enum_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and another of enum 16bits type.
+ * @code{.idl}
+ * enum Enum16
+ * {
+ *     ENUM16_VAL_1 = 0,
+ *     ENUM16_VAL_2 = 1
+ * };
+ *
+ * struct Enum16Align2Struct
+ * {
+ *     unsigned short var_align;
+ *     Enum16 var_enum16;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, enum16_align_2)
 {
     const uint16_t align_value {0xABBA};
@@ -8991,6 +9868,22 @@ TEST_P(XCdrBasicTypesTest, enum16_align_2)
     align_serialize(expected_streams, encoding, endianness, align_value, enum_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and another of enum 16bits type.
+ * @code{.idl}
+ * enum Enum16
+ * {
+ *     ENUM16_VAL_1 = 0,
+ *     ENUM16_VAL_2 = 1
+ * };
+ *
+ * struct Enum16Align4Struct
+ * {
+ *     unsigned long var_align;
+ *     Enum16 var_enum16;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, enum16_align_4)
 {
     const uint32_t align_value {0xABABABBA};
@@ -9086,6 +9979,22 @@ TEST_P(XCdrBasicTypesTest, enum16_align_4)
     align_serialize(expected_streams, encoding, endianness, align_value, enum_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and another of enum 8bits type.
+ * @code{.idl}
+ * enum Enum8
+ * {
+ *     ENUM8_VAL_1 = 0,
+ *     ENUM8_VAL_2 = 1
+ * };
+ *
+ * struct Enum8Align1Struct
+ * {
+ *     octet var_align;
+ *     Enum8 var_enum8;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, enum8_align_1)
 {
     const uint8_t align_value {0xAB};
@@ -9183,6 +10092,22 @@ TEST_P(XCdrBasicTypesTest, enum8_align_1)
     align_serialize(expected_streams, encoding, endianness, align_value, enum_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and another of enum 8bits type.
+ * @code{.idl}
+ * enum Enum8
+ * {
+ *     ENUM8_VAL_1 = 0,
+ *     ENUM8_VAL_2 = 1
+ * };
+ *
+ * struct Enum8Align2Struct
+ * {
+ *     unsigned short var_align;
+ *     Enum8 var_enum8;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, enum8_align_2)
 {
     const uint16_t align_value {0xABBA};
@@ -9282,6 +10207,22 @@ TEST_P(XCdrBasicTypesTest, enum8_align_2)
     align_serialize(expected_streams, encoding, endianness, align_value, enum_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and another of enum 8bits type.
+ * @code{.idl}
+ * enum Enum8
+ * {
+ *     ENUM8_VAL_1 = 0,
+ *     ENUM8_VAL_2 = 1
+ * };
+ *
+ * struct Enum8Align4Struct
+ * {
+ *     unsigned long var_align;
+ *     Enum8 var_enum8;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, enum8_align_4)
 {
     const uint32_t align_value {0xABABABBA};
@@ -9377,6 +10318,26 @@ TEST_P(XCdrBasicTypesTest, enum8_align_4)
     align_serialize(expected_streams, encoding, endianness, align_value, enum_value);
 }
 
+/*!
+ * @test Test an structure with two fields of struct type.
+ * @code{.idl}
+ * struct InnerBasicTypesShortStruct
+ * {
+ *     @id(3)
+ *     unsigned short value1;
+ *     @id(16383)
+ *     unsigned short value2;
+ * };
+ *
+ * struct InnerStructStruct
+ * {
+ *     @id(1)
+ *     InnerBasicTypesShortStruct var_field1;
+ *     @id(2)
+ *     InnerBasicTypesShortStruct var_field2;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, one_inner_struct)
 {
     const uint16_t ushort_value {0xCDDC};
@@ -9693,6 +10654,34 @@ TEST_P(XCdrBasicTypesTest, one_inner_struct)
     }
 }
 
+/*!
+ * @test Test an structure with two fields of struct type.
+ * @code{.idl}
+ * struct InnerBasicTypesShortStruct
+ * {
+ *     @id(3)
+ *     unsigned short value1;
+ *     @id(16383)
+ *     unsigned short value2;
+ * };
+ *
+ * struct InnerBasicTypesStruct
+ * {
+ *     @id(0)
+ *     InnerBasicTypesShortStruct value1;
+ *     @id(1)
+ *     unsigned short value2;
+ * };
+ *
+ * struct InnerStructStruct
+ * {
+ *     @id(1)
+ *     InnerBasicTypesStruct var_field1;
+ *     @id(2)
+ *     InnerBasicTypesStruct var_field2;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrBasicTypesTest, two_inner_struct)
 {
     const uint16_t ushort_value {0xCDDC};

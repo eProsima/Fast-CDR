@@ -639,6 +639,16 @@ void longdouble_align_serialize_optional(
     //}
 }
 
+/*!
+ * @test Test a exception is launch when accessing an empty optional field of long type.
+ * @code{.idl}
+ * struct AccessNullOptional
+ * {
+ *     @optional
+ *     long var_long;
+ * };
+ * @endcode
+ */
 TEST(XCdrOptionalTest, bad_optional_access)
 {
     optional<int32_t> opt;
@@ -646,6 +656,16 @@ TEST(XCdrOptionalTest, bad_optional_access)
     ASSERT_THROW(opt.value(), exception::BadOptionalAccessException);
 }
 
+/*!
+ * @test Test encoding of an empty optional field of octet type
+ * @code{.idl}
+ * struct NullOptional
+ * {
+ *     @optional
+ *     octet var_octet;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, null_optional)
 {
     //{ Defining expected XCDR streams
@@ -809,6 +829,16 @@ TEST_P(XCdrOptionalTest, null_optional)
 
 }
 
+/*!
+ * @test Test an structure with an optional field of short type.
+ * @code{.idl}
+ * struct OptionalShortStruct
+ * {
+ *     @optional
+ *     short var_short;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, short_optional)
 {
     constexpr int16_t short_value {0x7DDC};
@@ -895,6 +925,16 @@ TEST_P(XCdrOptionalTest, short_optional)
     serialize_optional(expected_streams, encoding, endianness, short_value);
 }
 
+/*!
+ * @test Test an structure with an optional field of unsigned short type.
+ * @code{.idl}
+ * struct OptionalUShortStruct
+ * {
+ *     @optional
+ *     unsigned short var_ushort;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, ushort_optional)
 {
     constexpr uint16_t ushort_value {static_cast<uint16_t>(0xCDDC)};
@@ -981,6 +1021,16 @@ TEST_P(XCdrOptionalTest, ushort_optional)
     serialize_optional(expected_streams, encoding, endianness, ushort_value);
 }
 
+/*!
+ * @test Test an structure with an optional field of long type.
+ * @code{.idl}
+ * struct OptionalLongStruct
+ * {
+ *     @optional
+ *     long var_long;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, long_optional)
 {
     constexpr int32_t long_value {static_cast<int32_t>(0xCDCDCDDC)};
@@ -1069,6 +1119,16 @@ TEST_P(XCdrOptionalTest, long_optional)
     serialize_optional(expected_streams, encoding, endianness, long_value);
 }
 
+/*!
+ * @test Test an structure with an optional field of unsigned long type.
+ * @code{.idl}
+ * struct OptionalULongStruct
+ * {
+ *     @optional
+ *     unsigned long var_ulong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, ulong_optional)
 {
     constexpr uint32_t ulong_value {0xCDCDCDDC};
@@ -1157,6 +1217,16 @@ TEST_P(XCdrOptionalTest, ulong_optional)
     serialize_optional(expected_streams, encoding, endianness, ulong_value);
 }
 
+/*!
+ * @test Test an structure with an optional field of long long type.
+ * @code{.idl}
+ * struct OptionalLongLongStruct
+ * {
+ *     @optional
+ *     long long var_longlong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, longlong_optional)
 {
     constexpr int64_t longlong_value {static_cast<int64_t>(0xCDCDCDCDCDCDCDDCll)};
@@ -1255,6 +1325,16 @@ TEST_P(XCdrOptionalTest, longlong_optional)
     serialize_optional(expected_streams, encoding, endianness, longlong_value);
 }
 
+/*!
+ * @test Test an structure with an optional field of unsigned long long type.
+ * @code{.idl}
+ * struct OptionalULongLongStruct
+ * {
+ *     @optional
+ *     unsigned long long var_ulonglong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, ulonglong_optional)
 {
     constexpr uint64_t ulonglong_value {0xCDCDCDCDCDCDCDDCull};
@@ -1353,6 +1433,16 @@ TEST_P(XCdrOptionalTest, ulonglong_optional)
     serialize_optional(expected_streams, encoding, endianness, ulonglong_value);
 }
 
+/*!
+ * @test Test an structure with an optional field of float type.
+ * @code{.idl}
+ * struct OptionalFloatStruct
+ * {
+ *     @optional
+ *     float var_float;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, float_optional)
 {
     constexpr float float_value {13.0};
@@ -1441,6 +1531,16 @@ TEST_P(XCdrOptionalTest, float_optional)
     serialize_optional(expected_streams, encoding, endianness, float_value);
 }
 
+/*!
+ * @test Test an structure with an optional field of double type.
+ * @code{.idl}
+ * struct OptionalDoubleStruct
+ * {
+ *     @optional
+ *     double var_double;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, double_optional)
 {
     constexpr double double_value {13.0};
@@ -1539,6 +1639,16 @@ TEST_P(XCdrOptionalTest, double_optional)
     serialize_optional(expected_streams, encoding, endianness, double_value);
 }
 
+/*!
+ * @test Test an structure with an optional field of long double type.
+ * @code{.idl}
+ * struct OptionalLongDoubleStruct
+ * {
+ *     @optional
+ *     long double var_longdouble;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, longdouble_optional)
 {
     constexpr long double longdouble_value = std::numeric_limits<long double>::min();
@@ -1762,6 +1872,16 @@ TEST_P(XCdrOptionalTest, longdouble_optional)
 
 }
 
+/*!
+ * @test Test an structure with an optional field of boolean type.
+ * @code{.idl}
+ * struct OptionalBooleanStruct
+ * {
+ *     @optional
+ *     boolean var_boolean;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, boolean_optional)
 {
     constexpr bool boolean_value {true};
@@ -1847,6 +1967,16 @@ TEST_P(XCdrOptionalTest, boolean_optional)
     serialize_optional(expected_streams, encoding, endianness, boolean_value);
 }
 
+/*!
+ * @test Test an structure with an optional field of octet type.
+ * @code{.idl}
+ * struct OptionalOctetStruct
+ * {
+ *     @optional
+ *     octet var_octet;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, octet_optional)
 {
     constexpr uint8_t octet_value {0xCD};
@@ -1931,6 +2061,16 @@ TEST_P(XCdrOptionalTest, octet_optional)
     serialize_optional(expected_streams, encoding, endianness, octet_value);
 }
 
+/*!
+ * @test Test an structure with an optional field of char type.
+ * @code{.idl}
+ * struct OptionalCharStruct
+ * {
+ *     @optional
+ *     char var_char;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, char_optional)
 {
     constexpr char char_value {'}'};
@@ -2016,6 +2156,16 @@ TEST_P(XCdrOptionalTest, char_optional)
     serialize_optional(expected_streams, encoding, endianness, char_value);
 }
 
+/*!
+ * @test Test an structure with an optional field of wchar type.
+ * @code{.idl}
+ * struct OptionalWCharStruct
+ * {
+ *     @optional
+ *     wchar var_wchar;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, wchar_optional)
 {
     constexpr wchar_t wchar_value {static_cast<wchar_t>(0x0000CDDC)};
@@ -2106,6 +2256,17 @@ TEST_P(XCdrOptionalTest, wchar_optional)
     serialize_optional(expected_streams, encoding, endianness, wchar_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and an empty optional field of octet type.
+ * @code{.idl}
+ * struct NullAlign1Optional
+ * {
+ *     octet var_align;
+ *     @optional
+ *     octet var_octet;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, null_align_1_optional)
 {
     const uint8_t align_value {0xAB};
@@ -2193,6 +2354,17 @@ TEST_P(XCdrOptionalTest, null_align_1_optional)
 
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and an empty optional field of octet type.
+ * @code{.idl}
+ * struct NullAlign2Optional
+ * {
+ *     unsigned short var_align;
+ *     @optional
+ *     octet var_octet;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, null_align_2_optional)
 {
     const uint16_t align_value {0xABBA};
@@ -2281,6 +2453,17 @@ TEST_P(XCdrOptionalTest, null_align_2_optional)
     null_align_serialize_optional(expected_streams, encoding, endianness, align_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and an empty optional field of octet type.
+ * @code{.idl}
+ * struct NullAlign4Optional
+ * {
+ *     unsigned long var_align;
+ *     @optional
+ *     octet var_octet;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, null_align_4_optional)
 {
     const uint32_t align_value {0xABABABBA};
@@ -2365,6 +2548,17 @@ TEST_P(XCdrOptionalTest, null_align_4_optional)
     null_align_serialize_optional(expected_streams, encoding, endianness, align_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and an optional of short type.
+ * @code{.idl}
+ * struct OptionalShortAlign1Struct
+ * {
+ *     octet var_align;
+ *     @optional
+ *     short var_short;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, short_align_1_optional)
 {
     const uint8_t align_value {0xAB};
@@ -2472,6 +2666,16 @@ TEST_P(XCdrOptionalTest, short_align_1_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, short_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and another of short type.
+ * @code{.idl}
+ * struct ShortAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     short var_short;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, short_align_2_optional)
 {
     const uint16_t align_value {0xABBA};
@@ -2585,6 +2789,17 @@ TEST_P(XCdrOptionalTest, short_align_2_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, short_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and an optional of short type.
+ * @code{.idl}
+ * struct OptionalShortAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     @optional
+ *     short var_short;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, short_align_4_optional)
 {
     const uint32_t align_value {0xABABABBA};
@@ -2692,6 +2907,17 @@ TEST_P(XCdrOptionalTest, short_align_4_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, short_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and an optional of unsigned short type.
+ * @code{.idl}
+ * struct OptionalUShortAlign1Struct
+ * {
+ *     octet var_align;
+ *     @optional
+ *     unsigned short var_ushort;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, ushort_align_1_optional)
 {
     const uint8_t align_value {0xAB};
@@ -2799,6 +3025,17 @@ TEST_P(XCdrOptionalTest, ushort_align_1_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, ushort_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and an optional of unsigned short type.
+ * @code{.idl}
+ * struct OptionalUShortAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     @optional
+ *     unsigned short var_ushort;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, ushort_align_2_optional)
 {
     const uint16_t align_value {0xABBA};
@@ -2912,6 +3149,17 @@ TEST_P(XCdrOptionalTest, ushort_align_2_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, ushort_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and an optional of unsigned short type.
+ * @code{.idl}
+ * struct OptionalUShortAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     @optional
+ *     unsigned short var_ushort;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, ushort_align_4_optional)
 {
     const uint32_t align_value {0xABABABBA};
@@ -3019,6 +3267,17 @@ TEST_P(XCdrOptionalTest, ushort_align_4_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, ushort_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and an optional of long type.
+ * @code{.idl}
+ * struct OptionalLongAlign1Struct
+ * {
+ *     octet var_align;
+ *     @optional
+ *     long var_long;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, long_align_1_optional)
 {
     const uint8_t align_value {0xAB};
@@ -3128,6 +3387,17 @@ TEST_P(XCdrOptionalTest, long_align_1_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, long_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and an optional of long type.
+ * @code{.idl}
+ * struct OptionalLongAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     @optional
+ *     long var_long;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, long_align_2_optional)
 {
     const uint16_t align_value {0xABBA};
@@ -3239,6 +3509,17 @@ TEST_P(XCdrOptionalTest, long_align_2_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, long_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and an optional of long type.
+ * @code{.idl}
+ * struct OptionalLongAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     @optional
+ *     long var_long;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, long_align_4_optional)
 {
     const uint32_t align_value {0xABABABBA};
@@ -3344,6 +3625,17 @@ TEST_P(XCdrOptionalTest, long_align_4_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, long_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and an optional of unsigned long type.
+ * @code{.idl}
+ * struct OptionalULongAlign1Struct
+ * {
+ *     octet var_align;
+ *     @optional
+ *     unsigned long var_ulong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, ulong_align_1_optional)
 {
     const uint8_t align_value {0xAB};
@@ -3453,6 +3745,17 @@ TEST_P(XCdrOptionalTest, ulong_align_1_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, ulong_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and an optional of unsigned long type.
+ * @code{.idl}
+ * struct OptionalULongAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     @optional
+ *     unsigned long var_ulong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, ulong_align_2_optional)
 {
     const uint16_t align_value {0xABBA};
@@ -3564,6 +3867,17 @@ TEST_P(XCdrOptionalTest, ulong_align_2_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, ulong_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and an optional of unsigned long type.
+ * @code{.idl}
+ * struct OptionalULongAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     @optional
+ *     unsigned long var_ulong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, ulong_align_4_optional)
 {
     const uint32_t align_value {0xABABABBA};
@@ -3669,6 +3983,17 @@ TEST_P(XCdrOptionalTest, ulong_align_4_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, ulong_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and an optional of long long type.
+ * @code{.idl}
+ * struct OptionalLongLongAlign1Struct
+ * {
+ *     octet var_align;
+ *     @optional
+ *     long long var_longlong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, longlong_align_1_optional)
 {
     const uint8_t align_value {0xAB};
@@ -3788,6 +4113,17 @@ TEST_P(XCdrOptionalTest, longlong_align_1_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, longlong_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and an optional of long long type.
+ * @code{.idl}
+ * struct OptionalLongLongAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     @optional
+ *     long long var_longlong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, longlong_align_2_optional)
 {
     const uint16_t align_value {0xABBA};
@@ -3908,6 +4244,17 @@ TEST_P(XCdrOptionalTest, longlong_align_2_optional)
 
     align_serialize_optional(expected_streams, encoding, endianness, align_value, longlong_value);
 }
+/*!
+ * @test Test an structure with a field of unsigned long type and an optional of long long type.
+ * @code{.idl}
+ * struct OptionalLongLongAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     @optional
+ *     long long var_longlong;
+ * };
+ * @endcode
+ */
 
 TEST_P(XCdrOptionalTest, longlong_align_4_optional)
 {
@@ -4024,6 +4371,17 @@ TEST_P(XCdrOptionalTest, longlong_align_4_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, longlong_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and an optional of unsigned long long type.
+ * @code{.idl}
+ * struct OptionalULongLongAlign1Struct
+ * {
+ *     octet var_align;
+ *     @optional
+ *     unsigned long long var_ulonglong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, ulonglong_align_1_optional)
 {
     const uint8_t align_value {0xAB};
@@ -4143,6 +4501,17 @@ TEST_P(XCdrOptionalTest, ulonglong_align_1_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, ulonglong_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and an optional of unsigned long long type.
+ * @code{.idl}
+ * struct OptionalULongLongAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     @optional
+ *     unsigned long long var_ulonglong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, ulonglong_align_2_optional)
 {
     const uint16_t align_value {0xABBA};
@@ -4264,6 +4633,17 @@ TEST_P(XCdrOptionalTest, ulonglong_align_2_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, ulonglong_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and an optional of unsigned long long type.
+ * @code{.idl}
+ * struct OptionalULongLongAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     @optional
+ *     unsigned long long var_ulonglong;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, ulonglong_align_4_optional)
 {
     const uint32_t align_value {0xABABABBA};
@@ -4379,6 +4759,17 @@ TEST_P(XCdrOptionalTest, ulonglong_align_4_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, ulonglong_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and an optional of float type.
+ * @code{.idl}
+ * struct OptionalFloatAlign1Struct
+ * {
+ *     octet var_align;
+ *     @optional
+ *     float var_float;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, float_align_1_optional)
 {
     const uint8_t align_value {0xAB};
@@ -4488,6 +4879,17 @@ TEST_P(XCdrOptionalTest, float_align_1_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, float_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and an optional of float type.
+ * @code{.idl}
+ * struct OptionalFloatAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     @optional
+ *     float var_float;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, float_align_2_optional)
 {
     const uint16_t align_value {0xABBA};
@@ -4599,6 +5001,17 @@ TEST_P(XCdrOptionalTest, float_align_2_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, float_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and an optional of float type.
+ * @code{.idl}
+ * struct OptionalFloatAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     @optional
+ *     float var_float;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, float_align_4_optional)
 {
     const uint32_t align_value {0xABABABBA};
@@ -4704,6 +5117,17 @@ TEST_P(XCdrOptionalTest, float_align_4_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, float_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and an optional of double type.
+ * @code{.idl}
+ * struct OptionalDoubleAlign1Struct
+ * {
+ *     octet var_align;
+ *     @optional
+ *     double var_double;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, double_align_1_optional)
 {
     const uint8_t align_value {0xAB};
@@ -4823,6 +5247,17 @@ TEST_P(XCdrOptionalTest, double_align_1_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, double_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and an optional of double type.
+ * @code{.idl}
+ * struct OptionalDoubleAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     @optional
+ *     double var_double;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, double_align_2_optional)
 {
     const uint16_t align_value {0xABBA};
@@ -4944,6 +5379,17 @@ TEST_P(XCdrOptionalTest, double_align_2_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, double_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and an optional of double type.
+ * @code{.idl}
+ * struct OptionalDoubleAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     @optional
+ *     double var_double;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, double_align_4_optional)
 {
     const uint32_t align_value {0xABABABBA};
@@ -5059,6 +5505,17 @@ TEST_P(XCdrOptionalTest, double_align_4_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, double_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and an optional of long double type.
+ * @code{.idl}
+ * struct OptionalLongDoubleAlign1Struct
+ * {
+ *     octet var_align;
+ *     @optional
+ *     long double var_longdouble;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, longdouble_align_1_optional)
 {
     const uint8_t align_value {0xAB};
@@ -5190,6 +5647,17 @@ TEST_P(XCdrOptionalTest, longdouble_align_1_optional)
             align_value, longdouble_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and an optional of long double type.
+ * @code{.idl}
+ * struct OptionalLongDoubleAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     @optional
+ *     long double var_longdouble;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, longdouble_align_2_optional)
 {
     const uint16_t align_value {0xABBA};
@@ -5323,6 +5791,17 @@ TEST_P(XCdrOptionalTest, longdouble_align_2_optional)
             align_value, longdouble_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and an optional of long double type.
+ * @code{.idl}
+ * struct OptionalLongDoubleAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     @optional
+ *     long double var_longdouble;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, longdouble_align_4_optional)
 {
     const uint32_t align_value {0xABABABBA};
@@ -5450,6 +5929,17 @@ TEST_P(XCdrOptionalTest, longdouble_align_4_optional)
             align_value, longdouble_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and an optional of boolean type.
+ * @code{.idl}
+ * struct OptionalBooleanAlign1Struct
+ * {
+ *     octet var_align;
+ *     @optional
+ *     boolean var_boolean;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, boolean_align_1_optional)
 {
     const uint8_t align_value {0xAB};
@@ -5556,6 +6046,17 @@ TEST_P(XCdrOptionalTest, boolean_align_1_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, boolean_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and an optional of boolean type.
+ * @code{.idl}
+ * struct OptionalBooleanAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     @optional
+ *     boolean var_boolean;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, boolean_align_2_optional)
 {
     const uint16_t align_value {0xABBA};
@@ -5664,6 +6165,17 @@ TEST_P(XCdrOptionalTest, boolean_align_2_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, boolean_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and an optional of boolean type.
+ * @code{.idl}
+ * struct OptionalBooleanAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     @optional
+ *     boolean var_boolean;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, boolean_align_4_optional)
 {
     const uint32_t align_value {0xABABABBA};
@@ -5766,6 +6278,17 @@ TEST_P(XCdrOptionalTest, boolean_align_4_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, boolean_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and an optional of octet type.
+ * @code{.idl}
+ * struct OptionalOctetAlign1Struct
+ * {
+ *     octet var_align;
+ *     @optional
+ *     octet var_octet;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, octet_align_1_optional)
 {
     const uint8_t align_value {0xAB};
@@ -5871,6 +6394,17 @@ TEST_P(XCdrOptionalTest, octet_align_1_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, octet_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and an optional of octet type.
+ * @code{.idl}
+ * struct OptionalOctetAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     @optional
+ *     octet var_octet;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, octet_align_2_optional)
 {
     const uint16_t align_value {0xABBA};
@@ -5978,6 +6512,17 @@ TEST_P(XCdrOptionalTest, octet_align_2_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, octet_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and an optional of octet type.
+ * @code{.idl}
+ * struct OptionalOctetAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     @optional
+ *     octet var_octet;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, octet_align_4_optional)
 {
     const uint32_t align_value {0xABABABBA};
@@ -6079,6 +6624,17 @@ TEST_P(XCdrOptionalTest, octet_align_4_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, octet_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and an optional of char type.
+ * @code{.idl}
+ * struct OptionalCharAlign1Struct
+ * {
+ *     octet var_align;
+ *     @optional
+ *     char var_char;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, char_align_1_optional)
 {
     const uint8_t align_value {0xAB};
@@ -6185,6 +6741,17 @@ TEST_P(XCdrOptionalTest, char_align_1_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, char_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and an optional of char type.
+ * @code{.idl}
+ * struct OptionalCharAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     @optional
+ *     char var_char;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, char_align_2_optional)
 {
     const uint16_t align_value {0xABBA};
@@ -6293,6 +6860,17 @@ TEST_P(XCdrOptionalTest, char_align_2_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, char_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and an optional of char type.
+ * @code{.idl}
+ * struct OptionalCharAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     @optional
+ *     char var_char;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, char_align_4_optional)
 {
     const uint32_t align_value {0xABABABBA};
@@ -6395,6 +6973,17 @@ TEST_P(XCdrOptionalTest, char_align_4_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, char_value);
 }
 
+/*!
+ * @test Test an structure with a field of octet type and an optional of wchar type.
+ * @code{.idl}
+ * struct OptionalWCharAlign1Struct
+ * {
+ *     octet var_align;
+ *     @optional
+ *     wchar var_wchar;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, wchar_align_1_optional)
 {
     const uint8_t align_value {0xAB};
@@ -6502,6 +7091,17 @@ TEST_P(XCdrOptionalTest, wchar_align_1_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, wchar_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned short type and an optional of wchar type.
+ * @code{.idl}
+ * struct OptionalWCharAlign2Struct
+ * {
+ *     unsigned short var_align;
+ *     @optional
+ *     wchar var_wchar;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, wchar_align_2_optional)
 {
     const uint16_t align_value {0xABBA};
@@ -6615,6 +7215,17 @@ TEST_P(XCdrOptionalTest, wchar_align_2_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, wchar_value);
 }
 
+/*!
+ * @test Test an structure with a field of unsigned long type and an optional of wchar type.
+ * @code{.idl}
+ * struct OptionalWCharAlign4Struct
+ * {
+ *     unsigned long var_align;
+ *     @optional
+ *     wchar var_wchar;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, wchar_align_4_optional)
 {
     const uint32_t align_value {0xABABABBA};
@@ -6722,79 +7333,121 @@ TEST_P(XCdrOptionalTest, wchar_align_4_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, wchar_value);
 }
 
+/*!
+ * @test Test an structure with two fields of optional struct type where inner optionals are null.
+ * @code{.idl}
+ * struct InnerOptionalShortStruct
+ * {
+ *     @id(3) @optional
+ *     short value1;
+ * };
+ *
+ * struct TwoNullInnerStructStruct
+ * {
+ *     @id(1) @optional
+ *     InnerOptionalShortStruct var_field1;
+ *     @id(3) @optional
+ *     InnerOptionalShortStruct var_field2;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, two_inner_null_optional)
 {
     //{ Defining expected XCDR streams
     XCdrStreamValues expected_streams;
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x00, 0x00, 0x00,     // Encapsulation
-        0x00, 0x01, 0x00, 0x04,     // ShortMemberHeader
-        0x00, 0x03, 0x00, 0x00     // ShortMemberHeader
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        0x00, 0x01, 0x00, 0x04, // ShortMemberHeader
+        0x00, 0x03, 0x00, 0x00, // ShortMemberHeader
+        0x00, 0x03, 0x00, 0x04, // ShortMemberHeader
+        0x00, 0x03, 0x00, 0x00  // ShortMemberHeader
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x01, 0x00, 0x00,     // Encapsulation
-        0x01, 0x00, 0x04, 0x00,     // ShortMemberHeader
-        0x03, 0x00, 0x00, 0x00     // ShortMemberHeader
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        0x01, 0x00, 0x04, 0x00, // ShortMemberHeader
+        0x03, 0x00, 0x00, 0x00, // ShortMemberHeader
+        0x03, 0x00, 0x04, 0x00, // ShortMemberHeader
+        0x03, 0x00, 0x00, 0x00  // ShortMemberHeader
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x02, 0x00, 0x00,     // Encapsulation
-        0x00, 0x01, 0x00, 0x04,     // ShortMemberHeader
-        0x3F, 0x02, 0x00, 0x00,     // Sentinel
-        0x3F, 0x02, 0x00, 0x00,     // Sentinel
+        0x00, 0x02, 0x00, 0x00, // Encapsulation
+        0x00, 0x01, 0x00, 0x04, // ShortMemberHeader
+        0x3F, 0x02, 0x00, 0x00, // Sentinel
+        0x00, 0x03, 0x00, 0x04, // ShortMemberHeader
+        0x3F, 0x02, 0x00, 0x00, // Sentinel
+        0x3F, 0x02, 0x00, 0x00, // Sentinel
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x03, 0x00, 0x00,     // Encapsulation
-        0x01, 0x00, 0x04, 0x00,     // ShortMemberHeader
-        0x02, 0x3F, 0x00, 0x00,     // Sentinel
-        0x02, 0x3F, 0x00, 0x00,     // Sentinel
+        0x00, 0x03, 0x00, 0x00, // Encapsulation
+        0x01, 0x00, 0x04, 0x00, // ShortMemberHeader
+        0x02, 0x3F, 0x00, 0x00, // Sentinel
+        0x03, 0x00, 0x04, 0x00, // ShortMemberHeader
+        0x02, 0x3F, 0x00, 0x00, // Sentinel
+        0x02, 0x3F, 0x00, 0x00, // Sentinel
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x06, 0x00, 0x00,     // Encapsulation
+        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        0x01,                   // Present
+        0x00,                   // Not present
         0x01,                   // Present
         0x00                    // Not present
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x07, 0x00, 0x00,     // Encapsulation
+        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        0x01,                   // Present
+        0x00,                   // Not present
         0x01,                   // Present
         0x00                    // Not present
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x08, 0x00, 0x00,     // Encapsulation
-        0x00, 0x00, 0x00, 0x09,     // DHEADER
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x11, // DHEADER
         0x01,                   // Present
         0x00, 0x00, 0x00,       // Alignment
-        0x00, 0x00, 0x00, 0x01,     // DHEADER
+        0x00, 0x00, 0x00, 0x01, // DHEADER
+        0x00,                   // Not present
+        0x01,                   // Present
+        0x00, 0x00,             // Alignment
+        0x00, 0x00, 0x00, 0x01, // DHEADER
         0x00                    // Not present
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x09, 0x00, 0x00,     // Encapsulation
-        0x09, 0x00, 0x00, 0x00,     // DHEADER
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        0x11, 0x00, 0x00, 0x00, // DHEADER
         0x01,                   // Present
         0x00, 0x00, 0x00,       // Alignment
-        0x01, 0x00, 0x00, 0x00,     // DHEADER
+        0x01, 0x00, 0x00, 0x00, // DHEADER
+        0x00,                   // Not present
+        0x01,                   // Present
+        0x00, 0x00,             // Alignment
+        0x01, 0x00, 0x00, 0x00, // DHEADER
         0x00                    // Not present
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x0A, 0x00, 0x00,     // Encapsulation
-        0x00, 0x00, 0x00, 0x08,     // DHEADER
-        0x50, 0x00, 0x00, 0x01,     // EMHEADER1(M) with NEXTINT
-        0x00, 0x00, 0x00, 0x00,     // NEXTINT + DHEADER
+        0x00, 0x0A, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x10, // DHEADER
+        0x50, 0x00, 0x00, 0x01, // EMHEADER1(M) with NEXTINT
+        0x00, 0x00, 0x00, 0x00, // NEXTINT + DHEADER
+        0x50, 0x00, 0x00, 0x03, // EMHEADER1(M) with NEXTINT
+        0x00, 0x00, 0x00, 0x00  // NEXTINT + DHEADER
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x0B, 0x00, 0x00,     // Encapsulation
-        0x08, 0x00, 0x00, 0x00,     // DHEADER
-        0x01, 0x00, 0x00, 0x50,     // EMHEADER1(M) with NEXTINT
-        0x00, 0x00, 0x00, 0x00,     // NEXTINT + DHEADER
+        0x00, 0x0B, 0x00, 0x00, // Encapsulation
+        0x10, 0x00, 0x00, 0x00, // DHEADER
+        0x01, 0x00, 0x00, 0x50, // EMHEADER1(M) with NEXTINT
+        0x00, 0x00, 0x00, 0x00, // NEXTINT + DHEADER
+        0x03, 0x00, 0x00, 0x50, // EMHEADER1(M) with NEXTINT
+        0x00, 0x00, 0x00, 0x00  // NEXTINT + DHEADER
     };
     //}
 
@@ -6818,6 +7471,7 @@ TEST_P(XCdrOptionalTest, two_inner_null_optional)
         Cdr::state enc_state(cdr);
         cdr.begin_serialize_type(enc_state, encoding);
         cdr.serialize_member(MemberId(1), opt_value);
+        cdr.serialize_member(MemberId(3), opt_value);
         cdr.end_serialize_type(enc_state);
         Cdr::state enc_state_end(cdr);
         //}
@@ -6829,26 +7483,54 @@ TEST_P(XCdrOptionalTest, two_inner_null_optional)
         //}
 
         //{ Decoding optional not present
-        optional<InnerOptionalShortStruct> dopt_value;
+        optional<InnerOptionalShortStruct> dopt_value1;
+        optional<InnerOptionalShortStruct> dopt_value2;
         cdr.reset();
         cdr.read_encapsulation();
         ASSERT_EQ(cdr.get_encoding_flag(), encoding);
         ASSERT_EQ(cdr.endianness(), endianness);
-        cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId&)->bool
+        cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId& mid)->bool
                 {
                     bool ret_value = true;
 
-                    cdr_inner.deserialize_member(dopt_value);
-
-                    if (EncodingAlgorithmFlag::PL_CDR != encoding && EncodingAlgorithmFlag::PL_CDR2 != encoding)
+                    if (EncodingAlgorithmFlag::PL_CDR == cdr_inner.get_encoding_flag() ||
+                    EncodingAlgorithmFlag::PL_CDR2 == cdr_inner.get_encoding_flag())
                     {
-                        ret_value = false;
+                        switch (mid.id)
+                        {
+                            case 1:
+                                cdr_inner.deserialize_member(dopt_value1);
+                                break;
+                            case 3:
+                                cdr_inner.deserialize_member(dopt_value2);
+                                break;
+                            default:
+                                ret_value = false;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (mid.id)
+                        {
+                            case 0:
+                                cdr_inner.deserialize_member(dopt_value1);
+                                break;
+                            case 1:
+                                cdr_inner.deserialize_member(dopt_value2);
+                                break;
+                            default:
+                                ret_value = false;
+                                break;
+                        }
                     }
 
                     return ret_value;
                 });
-        ASSERT_EQ(opt_value.has_value(), dopt_value.has_value());
-        ASSERT_EQ(*opt_value, *dopt_value);
+        ASSERT_EQ(opt_value.has_value(), dopt_value1.has_value());
+        ASSERT_EQ(*opt_value, *dopt_value1);
+        ASSERT_EQ(opt_value.has_value(), dopt_value2.has_value());
+        ASSERT_EQ(*opt_value, *dopt_value2);
         Cdr::state dec_state_end(cdr);
         ASSERT_EQ(enc_state_end, dec_state_end);
         //}
@@ -6871,6 +7553,7 @@ TEST_P(XCdrOptionalTest, two_inner_null_optional)
         Cdr::state enc_state(cdr);
         cdr.begin_serialize_type(enc_state, encoding);
         cdr << MemberId(1) << opt_value;
+        cdr << MemberId(3) << opt_value;
         cdr.end_serialize_type(enc_state);
         Cdr::state enc_state_end(cdr);
         //}
@@ -6882,32 +7565,78 @@ TEST_P(XCdrOptionalTest, two_inner_null_optional)
         //}
 
         //{ Decoding optional not present
-        optional<InnerOptionalShortStruct> dopt_value;
+        optional<InnerOptionalShortStruct> dopt_value1;
+        optional<InnerOptionalShortStruct> dopt_value2;
         cdr.reset();
         cdr.read_encapsulation();
         ASSERT_EQ(cdr.get_encoding_flag(), encoding);
         ASSERT_EQ(cdr.endianness(), endianness);
-        cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId&)->bool
+        cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId& mid)->bool
                 {
                     bool ret_value = true;
 
-                    cdr_inner >> dopt_value;
-
-                    if (EncodingAlgorithmFlag::PL_CDR != encoding && EncodingAlgorithmFlag::PL_CDR2 != encoding)
+                    if (EncodingAlgorithmFlag::PL_CDR == cdr_inner.get_encoding_flag() ||
+                    EncodingAlgorithmFlag::PL_CDR2 == cdr_inner.get_encoding_flag())
                     {
-                        ret_value = false;
+                        switch (mid.id)
+                        {
+                            case 1:
+                                cdr_inner >> dopt_value1;
+                                break;
+                            case 3:
+                                cdr_inner >> dopt_value2;
+                                break;
+                            default:
+                                ret_value = false;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (mid.id)
+                        {
+                            case 0:
+                                cdr_inner >> dopt_value1;
+                                break;
+                            case 1:
+                                cdr_inner >> dopt_value2;
+                                break;
+                            default:
+                                ret_value = false;
+                                break;
+                        }
                     }
 
                     return ret_value;
                 });
-        ASSERT_EQ(opt_value.has_value(), dopt_value.has_value());
-        ASSERT_EQ(*opt_value, *dopt_value);
+        ASSERT_EQ(opt_value.has_value(), dopt_value1.has_value());
+        ASSERT_EQ(*opt_value, *dopt_value1);
+        ASSERT_EQ(opt_value.has_value(), dopt_value2.has_value());
+        ASSERT_EQ(*opt_value, *dopt_value2);
         Cdr::state dec_state_end(cdr);
         ASSERT_EQ(enc_state_end, dec_state_end);
         //}
     }
 }
 
+/*!
+ * @test Test an structure with two fields of optional struct type where inner optionals have value.
+ * @code{.idl}
+ * struct InnerOptionalShortStruct
+ * {
+ *     @id(3) @optional
+ *     short value1;
+ * };
+ *
+ * struct TwoNullInnerStructStruct
+ * {
+ *     @id(1) @optional
+ *     InnerOptionalShortStruct var_field1;
+ *     @id(3) @optional
+ *     InnerOptionalShortStruct var_field2;
+ * };
+ * @endcode
+ */
 TEST_P(XCdrOptionalTest, two_inner_short_optional)
 {
     const int16_t short_value {0x7DDC};
@@ -6918,90 +7647,136 @@ TEST_P(XCdrOptionalTest, two_inner_short_optional)
     XCdrStreamValues expected_streams;
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x00, 0x00, 0x00,     // Encapsulation
-        0x00, 0x01, 0x00, 0x06,     // ShortMemberHeader
-        0x00, 0x03, 0x00, 0x02,     // ShortMemberHeader
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        0x00, 0x01, 0x00, 0x06, // ShortMemberHeader
+        0x00, 0x03, 0x00, 0x02, // ShortMemberHeader
+        ival, fval,             // Short
+        0x00, 0x00,             // Alignment
+        0x00, 0x03, 0x00, 0x06, // ShortMemberHeader
+        0x00, 0x03, 0x00, 0x02, // ShortMemberHeader
         ival, fval              // Short
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x01, 0x00, 0x00,     // Encapsulation
-        0x01, 0x00, 0x06, 0x00,     // ShortMemberHeader
-        0x03, 0x00, 0x02, 0x00,     // ShortMemberHeader
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        0x01, 0x00, 0x06, 0x00, // ShortMemberHeader
+        0x03, 0x00, 0x02, 0x00, // ShortMemberHeader
+        fval, ival,             // Short
+        0x00, 0x00,             // Alignment
+        0x03, 0x00, 0x06, 0x00, // ShortMemberHeader
+        0x03, 0x00, 0x02, 0x00, // ShortMemberHeader
         fval, ival              // Short
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x02, 0x00, 0x00,     // Encapsulation
-        0x00, 0x01, 0x00, 0x0C,     // ShortMemberHeader
-        0x00, 0x03, 0x00, 0x02,     // ShortMemberHeader
+        0x00, 0x02, 0x00, 0x00, // Encapsulation
+        0x00, 0x01, 0x00, 0x0C, // ShortMemberHeader
+        0x00, 0x03, 0x00, 0x02, // ShortMemberHeader
         ival, fval,             // Short
         0x00, 0x00,             // Alignment
-        0x3F, 0x02, 0x00, 0x00,     // Sentinel
-        0x3F, 0x02, 0x00, 0x00,     // Sentinel
+        0x3F, 0x02, 0x00, 0x00, // Sentinel
+        0x00, 0x03, 0x00, 0x0C, // ShortMemberHeader
+        0x00, 0x03, 0x00, 0x02, // ShortMemberHeader
+        ival, fval,             // Short
+        0x00, 0x00,             // Alignment
+        0x3F, 0x02, 0x00, 0x00, // Sentinel
+        0x3F, 0x02, 0x00, 0x00, // Sentinel
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x03, 0x00, 0x00,     // Encapsulation
-        0x01, 0x00, 0x0C, 0x00,     // ShortMemberHeader
-        0x03, 0x00, 0x02, 0x00,     // ShortMemberHeader
+        0x00, 0x03, 0x00, 0x00, // Encapsulation
+        0x01, 0x00, 0x0C, 0x00, // ShortMemberHeader
+        0x03, 0x00, 0x02, 0x00, // ShortMemberHeader
         fval, ival,             // Short
         0x00, 0x00,             // Alignment
-        0x02, 0x3F, 0x00, 0x00,     // Sentinel
-        0x02, 0x3F, 0x00, 0x00,     // Sentinel
+        0x02, 0x3F, 0x00, 0x00, // Sentinel
+        0x03, 0x00, 0x0C, 0x00, // ShortMemberHeader
+        0x03, 0x00, 0x02, 0x00, // ShortMemberHeader
+        fval, ival,             // Short
+        0x00, 0x00,             // Alignment
+        0x02, 0x3F, 0x00, 0x00, // Sentinel
+        0x02, 0x3F, 0x00, 0x00, // Sentinel
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x06, 0x00, 0x00,     // Encapsulation
+        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        0x01,                   // Present
+        0x01,                   // Present
+        ival, fval,             // Short
         0x01,                   // Present
         0x01,                   // Present
         ival, fval              // Short
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x07, 0x00, 0x00,     // Encapsulation
+        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        0x01,                   // Present
+        0x01,                   // Present
+        fval, ival,             // Short
         0x01,                   // Present
         0x01,                   // Present
         fval, ival              // Short
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x08, 0x00, 0x00,     // Encapsulation
-        0x00, 0x00, 0x00, 0x0C,     // DHEADER
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x18, // DHEADER
         0x01,                   // Present
         0x00, 0x00, 0x00,       // Alignment
-        0x00, 0x00, 0x00, 0x04,     // DHEADER
+        0x00, 0x00, 0x00, 0x04, // DHEADER
+        0x01,                   // Present
+        0x00,                   // Alignment
+        ival, fval,             // Short
+        0x01,                   // Present
+        0x00, 0x00, 0x00,       // Alignment
+        0x00, 0x00, 0x00, 0x04, // DHEADER
         0x01,                   // Present
         0x00,                   // Alignment
         ival, fval              // Short
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x09, 0x00, 0x00,     // Encapsulation
-        0x0C, 0x00, 0x00, 0x00,     // DHEADER
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        0x18, 0x00, 0x00, 0x00, // DHEADER
         0x01,                   // Present
         0x00, 0x00, 0x00,       // Alignment
-        0x04, 0x00, 0x00, 0x00,     // DHEADER
+        0x04, 0x00, 0x00, 0x00, // DHEADER
+        0x01,                   // Present
+        0x00,                   // Alignment
+        fval, ival,             // Short
+        0x01,                   // Present
+        0x00, 0x00, 0x00,       // Alignment
+        0x04, 0x00, 0x00, 0x00, // DHEADER
         0x01,                   // Present
         0x00,                   // Alignment
         fval, ival              // Short
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x0A, 0x00, 0x00,     // Encapsulation
-        0x00, 0x00, 0x00, 0x0E,     // DHEADER
-        0x50, 0x00, 0x00, 0x01,     // EMHEADER1(M) with NEXTINT
-        0x00, 0x00, 0x00, 0x06,     // NEXTINT + DHEADER
-        0x10, 0x00, 0x00, 0x03,     // EMHEADER1(M) without NEXTINT
+        0x00, 0x0A, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x1E, // DHEADER
+        0x50, 0x00, 0x00, 0x01, // EMHEADER1(M) with NEXTINT
+        0x00, 0x00, 0x00, 0x06, // NEXTINT + DHEADER
+        0x10, 0x00, 0x00, 0x03, // EMHEADER1(M) without NEXTINT
+        ival, fval,             // Short
+        0x00, 0x00,             // Alignment
+        0x50, 0x00, 0x00, 0x03, // EMHEADER1(M) with NEXTINT
+        0x00, 0x00, 0x00, 0x06, // NEXTINT + DHEADER
+        0x10, 0x00, 0x00, 0x03, // EMHEADER1(M) without NEXTINT
         ival, fval              // Short
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x0B, 0x00, 0x00,     // Encapsulation
-        0x0E, 0x00, 0x00, 0x00,     // DHEADER
-        0x01, 0x00, 0x00, 0x50,     // EMHEADER1(M) with NEXTINT
-        0x06, 0x00, 0x00, 0x00,     // NEXTINT + DHEADER
-        0x03, 0x00, 0x00, 0x10,     // EMHEADER1(M) without NEXTINT
+        0x00, 0x0B, 0x00, 0x00, // Encapsulation
+        0x1E, 0x00, 0x00, 0x00, // DHEADER
+        0x01, 0x00, 0x00, 0x50, // EMHEADER1(M) with NEXTINT
+        0x06, 0x00, 0x00, 0x00, // NEXTINT + DHEADER
+        0x03, 0x00, 0x00, 0x10, // EMHEADER1(M) without NEXTINT
+        fval, ival,             // Short
+        0x00, 0x00,             // Alignment
+        0x03, 0x00, 0x00, 0x50, // EMHEADER1(M) with NEXTINT
+        0x06, 0x00, 0x00, 0x00, // NEXTINT + DHEADER
+        0x03, 0x00, 0x00, 0x10, // EMHEADER1(M) without NEXTINT
         fval, ival              // Short
     };
     //}
@@ -7026,6 +7801,7 @@ TEST_P(XCdrOptionalTest, two_inner_short_optional)
         Cdr::state enc_state(cdr);
         cdr.begin_serialize_type(enc_state, encoding);
         cdr.serialize_member(MemberId(1), opt_value);
+        cdr.serialize_member(MemberId(3), opt_value);
         cdr.end_serialize_type(enc_state);
         Cdr::state enc_state_end(cdr);
         //}
@@ -7037,26 +7813,54 @@ TEST_P(XCdrOptionalTest, two_inner_short_optional)
         //}
 
         //{ Decoding optional not present
-        optional<InnerOptionalShortStruct> dopt_value;
+        optional<InnerOptionalShortStruct> dopt_value1;
+        optional<InnerOptionalShortStruct> dopt_value2;
         cdr.reset();
         cdr.read_encapsulation();
         ASSERT_EQ(cdr.get_encoding_flag(), encoding);
         ASSERT_EQ(cdr.endianness(), endianness);
-        cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId&)->bool
+        cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId& mid)->bool
                 {
                     bool ret_value = true;
 
-                    cdr_inner.deserialize_member(dopt_value);
-
-                    if (EncodingAlgorithmFlag::PL_CDR != encoding && EncodingAlgorithmFlag::PL_CDR2 != encoding)
+                    if (EncodingAlgorithmFlag::PL_CDR == cdr_inner.get_encoding_flag() ||
+                    EncodingAlgorithmFlag::PL_CDR2 == cdr_inner.get_encoding_flag())
                     {
-                        ret_value = false;
+                        switch (mid.id)
+                        {
+                            case 1:
+                                cdr_inner.deserialize_member(dopt_value1);
+                                break;
+                            case 3:
+                                cdr_inner.deserialize_member(dopt_value2);
+                                break;
+                            default:
+                                ret_value = false;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (mid.id)
+                        {
+                            case 0:
+                                cdr_inner.deserialize_member(dopt_value1);
+                                break;
+                            case 1:
+                                cdr_inner.deserialize_member(dopt_value2);
+                                break;
+                            default:
+                                ret_value = false;
+                                break;
+                        }
                     }
 
                     return ret_value;
                 });
-        ASSERT_EQ(opt_value.has_value(), dopt_value.has_value());
-        ASSERT_EQ(*opt_value, *dopt_value);
+        ASSERT_EQ(opt_value.has_value(), dopt_value1.has_value());
+        ASSERT_EQ(*opt_value, *dopt_value1);
+        ASSERT_EQ(opt_value.has_value(), dopt_value2.has_value());
+        ASSERT_EQ(*opt_value, *dopt_value2);
         Cdr::state dec_state_end(cdr);
         ASSERT_EQ(enc_state_end, dec_state_end);
         //}
@@ -7079,6 +7883,7 @@ TEST_P(XCdrOptionalTest, two_inner_short_optional)
         Cdr::state enc_state(cdr);
         cdr.begin_serialize_type(enc_state, encoding);
         cdr << MemberId(1) << opt_value;
+        cdr << MemberId(3) << opt_value;
         cdr.end_serialize_type(enc_state);
         Cdr::state enc_state_end(cdr);
         //}
@@ -7090,26 +7895,54 @@ TEST_P(XCdrOptionalTest, two_inner_short_optional)
         //}
 
         //{ Decoding optional not present
-        optional<InnerOptionalShortStruct> dopt_value;
+        optional<InnerOptionalShortStruct> dopt_value1;
+        optional<InnerOptionalShortStruct> dopt_value2;
         cdr.reset();
         cdr.read_encapsulation();
         ASSERT_EQ(cdr.get_encoding_flag(), encoding);
         ASSERT_EQ(cdr.endianness(), endianness);
-        cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId&)->bool
+        cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId& mid)->bool
                 {
                     bool ret_value = true;
 
-                    cdr_inner >> dopt_value;
-
-                    if (EncodingAlgorithmFlag::PL_CDR != encoding && EncodingAlgorithmFlag::PL_CDR2 != encoding)
+                    if (EncodingAlgorithmFlag::PL_CDR == cdr_inner.get_encoding_flag() ||
+                    EncodingAlgorithmFlag::PL_CDR2 == cdr_inner.get_encoding_flag())
                     {
-                        ret_value = false;
+                        switch (mid.id)
+                        {
+                            case 1:
+                                cdr_inner >> dopt_value1;
+                                break;
+                            case 3:
+                                cdr_inner >> dopt_value2;
+                                break;
+                            default:
+                                ret_value = false;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (mid.id)
+                        {
+                            case 0:
+                                cdr_inner >> dopt_value1;
+                                break;
+                            case 1:
+                                cdr_inner >> dopt_value2;
+                                break;
+                            default:
+                                ret_value = false;
+                                break;
+                        }
                     }
 
                     return ret_value;
                 });
-        ASSERT_EQ(opt_value.has_value(), dopt_value.has_value());
-        ASSERT_EQ(*opt_value, *dopt_value);
+        ASSERT_EQ(opt_value.has_value(), dopt_value1.has_value());
+        ASSERT_EQ(*opt_value, *dopt_value1);
+        ASSERT_EQ(opt_value.has_value(), dopt_value2.has_value());
+        ASSERT_EQ(*opt_value, *dopt_value2);
         Cdr::state dec_state_end(cdr);
         ASSERT_EQ(enc_state_end, dec_state_end);
         //}

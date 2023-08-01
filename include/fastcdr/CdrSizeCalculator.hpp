@@ -201,9 +201,11 @@ public:
      */
     TEMPLATE_SPEC
     size_t calculate_serialized_size(
-            const int8_t&,
-            size_t)
+            const int8_t& data,
+            size_t current_alignment)
     {
+        static_cast<void>(data);
+        static_cast<void>(current_alignment);
         return 1;
     }
 
@@ -215,9 +217,11 @@ public:
      */
     TEMPLATE_SPEC
     size_t calculate_serialized_size(
-            const uint8_t&,
-            size_t)
+            const uint8_t& data,
+            size_t current_alignment)
     {
+        static_cast<void>(data);
+        static_cast<void>(current_alignment);
         return 1;
     }
 
@@ -229,37 +233,42 @@ public:
      */
     TEMPLATE_SPEC
     size_t calculate_serialized_size(
-            const char&,
-            size_t)
-    {
-        return 1;
-    }
-
-    /*!
-     * @brief Specific template which calculates the encoded size of an instance of a bool.
-     * @param[in] data Reference to the instance.
-     * @param[in] current_alignment Current alignment in the encoding.
-     * @return Encoded size of the instance.
-     */
-    TEMPLATE_SPEC
-    size_t calculate_serialized_size(
-            const bool&,
-            size_t)
-    {
-        return 1;
-    }
-
-    /*!
-     * @brief Specific template which calculates the encoded size of an instance of a bool.
-     * @param[in] data Reference to the instance.
-     * @param[in] current_alignment Current alignment in the encoding.
-     * @return Encoded size of the instance.
-     */
-    TEMPLATE_SPEC
-    size_t calculate_serialized_size(
-            const wchar_t&,
+            const char& data,
             size_t current_alignment)
     {
+        static_cast<void>(data);
+        static_cast<void>(current_alignment);
+        return 1;
+    }
+
+    /*!
+     * @brief Specific template which calculates the encoded size of an instance of a bool.
+     * @param[in] data Reference to the instance.
+     * @param[in] current_alignment Current alignment in the encoding.
+     * @return Encoded size of the instance.
+     */
+    TEMPLATE_SPEC
+    size_t calculate_serialized_size(
+            const bool& data,
+            size_t current_alignment)
+    {
+        static_cast<void>(data);
+        static_cast<void>(current_alignment);
+        return 1;
+    }
+
+    /*!
+     * @brief Specific template which calculates the encoded size of an instance of a bool.
+     * @param[in] data Reference to the instance.
+     * @param[in] current_alignment Current alignment in the encoding.
+     * @return Encoded size of the instance.
+     */
+    TEMPLATE_SPEC
+    size_t calculate_serialized_size(
+            const wchar_t& data,
+            size_t current_alignment)
+    {
+        static_cast<void>(data);
         return 2 + alignment(current_alignment, 2);
     }
 
@@ -271,9 +280,10 @@ public:
      */
     TEMPLATE_SPEC
     size_t calculate_serialized_size(
-            const int16_t&,
+            const int16_t& data,
             size_t current_alignment)
     {
+        static_cast<void>(data);
         return 2 + alignment(current_alignment, 2);
     }
 
@@ -285,9 +295,10 @@ public:
      */
     TEMPLATE_SPEC
     size_t calculate_serialized_size(
-            const uint16_t&,
+            const uint16_t& data,
             size_t current_alignment)
     {
+        static_cast<void>(data);
         return 2 + alignment(current_alignment, 2);
     }
 
@@ -299,9 +310,10 @@ public:
      */
     TEMPLATE_SPEC
     size_t calculate_serialized_size(
-            const int32_t&,
+            const int32_t& data,
             size_t current_alignment)
     {
+        static_cast<void>(data);
         return 4 + alignment(current_alignment, 4);
     }
 
@@ -313,9 +325,10 @@ public:
      */
     TEMPLATE_SPEC
     size_t calculate_serialized_size(
-            const uint32_t&,
+            const uint32_t& data,
             size_t current_alignment)
     {
+        static_cast<void>(data);
         return 4 + alignment(current_alignment, 4);
     }
 
@@ -327,10 +340,11 @@ public:
      */
     TEMPLATE_SPEC
     size_t calculate_serialized_size(
-            const int64_t&,
+            const int64_t& data,
             size_t current_alignment)
     {
-        return 8 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
+        static_cast<void>(data);
+        return 8 + alignment(current_alignment, align64_);
     }
 
     /*!
@@ -341,10 +355,11 @@ public:
      */
     TEMPLATE_SPEC
     size_t calculate_serialized_size(
-            const uint64_t&,
+            const uint64_t& data,
             size_t current_alignment)
     {
-        return 8 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
+        static_cast<void>(data);
+        return 8 + alignment(current_alignment, align64_);
     }
 
     /*!
@@ -355,9 +370,10 @@ public:
      */
     TEMPLATE_SPEC
     size_t calculate_serialized_size(
-            const float&,
+            const float& data,
             size_t current_alignment)
     {
+        static_cast<void>(data);
         return 4 + alignment(current_alignment, 4);
     }
 
@@ -369,10 +385,11 @@ public:
      */
     TEMPLATE_SPEC
     size_t calculate_serialized_size(
-            const double&,
+            const double& data,
             size_t current_alignment)
     {
-        return 8 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
+        static_cast<void>(data);
+        return 8 + alignment(current_alignment, align64_);
     }
 
     /*!
@@ -383,10 +400,11 @@ public:
      */
     TEMPLATE_SPEC
     size_t calculate_serialized_size(
-            const long double&,
+            const long double& data,
             size_t current_alignment)
     {
-        return 16 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
+        static_cast<void>(data);
+        return 16 + alignment(current_alignment, align64_);
     }
 
     /*!
@@ -623,9 +641,11 @@ public:
      */
     template<size_t N, typename std::enable_if < (N < 9) > ::type* = nullptr>
     size_t calculate_serialized_size(
-            const std::bitset<N>&,
-            size_t)
+            const std::bitset<N>& data,
+            size_t current_alignment)
     {
+        static_cast<void>(data);
+        static_cast<void>(current_alignment);
         return 1;
     }
 
@@ -637,9 +657,10 @@ public:
      */
     template<size_t N, typename std::enable_if < (8 < N && N < 17) > ::type* = nullptr>
     size_t calculate_serialized_size(
-            const std::bitset<N>&,
+            const std::bitset<N>& data,
             size_t current_alignment = 0)
     {
+        static_cast<void>(data);
         return 2 + alignment(current_alignment, 2);
     }
 
@@ -651,9 +672,10 @@ public:
      */
     template<size_t N, typename std::enable_if < (16 < N && N < 33) > ::type* = nullptr>
     size_t calculate_serialized_size(
-            const std::bitset<N>&,
+            const std::bitset<N>& data,
             size_t current_alignment = 0)
     {
+        static_cast<void>(data);
         return 4 + alignment(current_alignment, 4);
     }
 
@@ -665,10 +687,11 @@ public:
      */
     template<size_t N, typename std::enable_if < (32 < N && N < 65) > ::type* = nullptr>
     size_t calculate_serialized_size(
-            const std::bitset<N>&,
+            const std::bitset<N>& data,
             size_t current_alignment = 0)
     {
-        return 8 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
+        static_cast<void>(data);
+        return 8 + alignment(current_alignment, align64_);
     }
 
     /*!
@@ -706,6 +729,7 @@ public:
      * @brief Specific template which calculates the encoded size of an instance of an array of unknown type.
      * @tparam _T Array's type.
      * @param[in] data Reference to the array's instance.
+     * @param[in] num_elements Number of elements in the array.
      * @param[in] current_alignment Current alignment in the encoding.
      * @return Encoded size of the instance.
      */
@@ -728,214 +752,231 @@ public:
     /*!
      * @brief Specific template which calculates the encoded size of an instance of an array of int8_t.
      * @param[in] data Reference to the array's instance.
+     * @param[in] num_elements Number of elements in the array.
      * @param[in] current_alignment Current alignment in the encoding.
      * @return Encoded size of the instance.
      */
     TEMPLATE_SPEC
     size_t calculate_array_serialized_size(
-            const int8_t*,
+            const int8_t* data,
             size_t num_elements,
-            size_t)
+            size_t current_alignment)
     {
-
+        static_cast<void>(data);
+        static_cast<void>(current_alignment);
         return num_elements;
     }
 
     /*!
      * @brief Specific template which calculates the encoded size of an instance of an array of uint8_t.
      * @param[in] data Reference to the array's instance.
+     * @param[in] num_elements Number of elements in the array.
      * @param[in] current_alignment Current alignment in the encoding.
      * @return Encoded size of the instance.
      */
     TEMPLATE_SPEC
     size_t calculate_array_serialized_size(
-            const uint8_t*,
+            const uint8_t* data,
             size_t num_elements,
-            size_t)
+            size_t current_alignment)
     {
-
+        static_cast<void>(data);
+        static_cast<void>(current_alignment);
         return num_elements;
     }
 
     /*!
      * @brief Specific template which calculates the encoded size of an instance of an array of char.
      * @param[in] data Reference to the array's instance.
+     * @param[in] num_elements Number of elements in the array.
      * @param[in] current_alignment Current alignment in the encoding.
      * @return Encoded size of the instance.
      */
     TEMPLATE_SPEC
     size_t calculate_array_serialized_size(
-            const char*,
+            const char* data,
             size_t num_elements,
-            size_t)
+            size_t current_alignment)
     {
-
+        static_cast<void>(data);
+        static_cast<void>(current_alignment);
         return num_elements;
     }
 
     /*!
      * @brief Specific template which calculates the encoded size of an instance of an array of wchar.
      * @param[in] data Reference to the array's instance.
+     * @param[in] num_elements Number of elements in the array.
      * @param[in] current_alignment Current alignment in the encoding.
      * @return Encoded size of the instance.
      */
     TEMPLATE_SPEC
     size_t calculate_array_serialized_size(
-            const wchar_t*,
+            const wchar_t* data,
             size_t num_elements,
             size_t current_alignment)
     {
-
+        static_cast<void>(data);
         return num_elements * 2 + alignment(current_alignment, 2);
     }
 
     /*!
      * @brief Specific template which calculates the encoded size of an instance of an array of int16_t.
      * @param[in] data Reference to the array's instance.
+     * @param[in] num_elements Number of elements in the array.
      * @param[in] current_alignment Current alignment in the encoding.
      * @return Encoded size of the instance.
      */
     TEMPLATE_SPEC
     size_t calculate_array_serialized_size(
-            const int16_t*,
+            const int16_t* data,
             size_t num_elements,
             size_t current_alignment)
     {
-
+        static_cast<void>(data);
         return num_elements * 2 + alignment(current_alignment, 2);
     }
 
     /*!
      * @brief Specific template which calculates the encoded size of an instance of an array of uint16_t.
      * @param[in] data Reference to the array's instance.
+     * @param[in] num_elements Number of elements in the array.
      * @param[in] current_alignment Current alignment in the encoding.
      * @return Encoded size of the instance.
      */
     TEMPLATE_SPEC
     size_t calculate_array_serialized_size(
-            const uint16_t*,
+            const uint16_t* data,
             size_t num_elements,
             size_t current_alignment)
     {
-
+        static_cast<void>(data);
         return num_elements * 2 + alignment(current_alignment, 2);
     }
 
     /*!
      * @brief Specific template which calculates the encoded size of an instance of an array of int32_t.
      * @param[in] data Reference to the array's instance.
+     * @param[in] num_elements Number of elements in the array.
      * @param[in] current_alignment Current alignment in the encoding.
      * @return Encoded size of the instance.
      */
     TEMPLATE_SPEC
     size_t calculate_array_serialized_size(
-            const int32_t*,
+            const int32_t* data,
             size_t num_elements,
             size_t current_alignment)
     {
-
+        static_cast<void>(data);
         return num_elements * 4 + alignment(current_alignment, 4);
     }
 
     /*!
      * @brief Specific template which calculates the encoded size of an instance of an array of uint32_t.
      * @param[in] data Reference to the array's instance.
+     * @param[in] num_elements Number of elements in the array.
      * @param[in] current_alignment Current alignment in the encoding.
      * @return Encoded size of the instance.
      */
     TEMPLATE_SPEC
     size_t calculate_array_serialized_size(
-            const uint32_t*,
+            const uint32_t* data,
             size_t num_elements,
             size_t current_alignment)
     {
-
+        static_cast<void>(data);
         return num_elements * 4 + alignment(current_alignment, 4);
     }
 
     /*!
      * @brief Specific template which calculates the encoded size of an instance of an array of int64_t.
      * @param[in] data Reference to the array's instance.
+     * @param[in] num_elements Number of elements in the array.
      * @param[in] current_alignment Current alignment in the encoding.
      * @return Encoded size of the instance.
      */
     TEMPLATE_SPEC
     size_t calculate_array_serialized_size(
-            const int64_t*,
+            const int64_t* data,
             size_t num_elements,
             size_t current_alignment)
     {
-
-        return num_elements * 8 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
+        static_cast<void>(data);
+        return num_elements * 8 + alignment(current_alignment, align64_);
     }
 
     /*!
      * @brief Specific template which calculates the encoded size of an instance of an array of uint64_t.
      * @param[in] data Reference to the array's instance.
+     * @param[in] num_elements Number of elements in the array.
      * @param[in] current_alignment Current alignment in the encoding.
      * @return Encoded size of the instance.
      */
     TEMPLATE_SPEC
     size_t calculate_array_serialized_size(
-            const uint64_t*,
+            const uint64_t* data,
             size_t num_elements,
             size_t current_alignment)
     {
-
-        return num_elements * 8 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
+        static_cast<void>(data);
+        return num_elements * 8 + alignment(current_alignment, align64_);
     }
 
     /*!
      * @brief Specific template which calculates the encoded size of an instance of an array of float.
      * @param[in] data Reference to the array's instance.
+     * @param[in] num_elements Number of elements in the array.
      * @param[in] current_alignment Current alignment in the encoding.
      * @return Encoded size of the instance.
      */
     TEMPLATE_SPEC
     size_t calculate_array_serialized_size(
-            const float*,
+            const float* data,
             size_t num_elements,
             size_t current_alignment)
     {
-
+        static_cast<void>(data);
         return num_elements * 4 + alignment(current_alignment, 4);
     }
 
     /*!
      * @brief Specific template which calculates the encoded size of an instance of an array of double.
      * @param[in] data Reference to the array's instance.
+     * @param[in] num_elements Number of elements in the array.
      * @param[in] current_alignment Current alignment in the encoding.
      * @return Encoded size of the instance.
      */
     TEMPLATE_SPEC
     size_t calculate_array_serialized_size(
-            const double*,
+            const double* data,
             size_t num_elements,
             size_t current_alignment)
     {
-
-        return num_elements * 8 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
+        static_cast<void>(data);
+        return num_elements * 8 + alignment(current_alignment, align64_);
     }
 
     /*!
      * @brief Specific template which calculates the encoded size of an instance of an array of long double.
      * @param[in] data Reference to the array's instance.
+     * @param[in] num_elements Number of elements in the array.
      * @param[in] current_alignment Current alignment in the encoding.
      * @return Encoded size of the instance.
      */
     TEMPLATE_SPEC
     size_t calculate_array_serialized_size(
-            const long double*,
+            const long double* data,
             size_t num_elements,
             size_t current_alignment)
     {
-
-        return num_elements * 16 + alignment(current_alignment, CdrVersion::XCDRv2 == cdr_version_ ? 4 : 8);
+        static_cast<void>(data);
+        return num_elements * 16 + alignment(current_alignment, align64_);
     }
 
     /*!
      * @brief Specific template which calculates the encoded size of an instance of an array of fixed_string.
      * @param[in] data Reference to the array's instance.
+     * @param[in] num_elements Number of elements in the array.
      * @param[in] current_alignment Current alignment in the encoding.
      * @return Encoded size of the instance.
      */
@@ -956,6 +997,7 @@ public:
     /*!
      * @brief Generic template which calculates the encoded size of the constructed type's member of a unknown type.
      * @tparam _T Member's type.
+     * @param[in] id Member's identifier.
      * @param[in] data Reference to the member's instance.
      * @param[in] current_alignment Current alignment in the encoding.
      * @return Encoded size of the member's instance.
@@ -1017,6 +1059,7 @@ public:
     /*!
      * @brief Generic template which calculates the encoded size of the constructed type's member of type optional.
      * @tparam _T Member's optional type.
+     * @param[in] id Member's identifier.
      * @param[in] data Reference to the member's instance.
      * @param[in] current_alignment Current alignment in the encoding.
      * @return Encoded size of the member's instance.

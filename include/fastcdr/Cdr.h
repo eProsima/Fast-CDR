@@ -2689,11 +2689,17 @@ public:
      * @brief Tells the encoder the member identifier for the next member to be encoded.
      * @param[in] member_id Member identifier.
      * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::BadParamException This exception is thrown when a member id is already set without being
+     * encoded.
      */
-    Cdr& operator << (
-            const MemberId& member_id) noexcept
+    Cdr& operator <<(
+            const MemberId& member_id)
     {
-        assert(next_member_id_ == MEMBER_ID_INVALID);
+        if (next_member_id_ != MEMBER_ID_INVALID)
+        {
+            throw exception::BadParamException("Member id already set and not encoded");
+        }
+
         next_member_id_ = member_id;
         return *this;
     }

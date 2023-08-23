@@ -335,11 +335,21 @@ EncodingAlgorithmFlag Cdr::get_encoding_flag() const
     return encoding_flag_;
 }
 
-void Cdr::set_encoding_flag(
+bool Cdr::set_encoding_flag(
         EncodingAlgorithmFlag encoding_flag)
 {
-    assert(offset_ == cdr_buffer_.begin());
-    encoding_flag_ = encoding_flag;
+    bool ret_value = false;
+
+    if (CdrVersion::CORBA_CDR != cdr_version_)
+    {
+        if (offset_ == cdr_buffer_.begin())
+        {
+            encoding_flag_ = encoding_flag;
+            ret_value = true;
+        }
+    }
+
+    return ret_value;
 }
 
 std::array<uint8_t, 2> Cdr::get_dds_cdr_options() const

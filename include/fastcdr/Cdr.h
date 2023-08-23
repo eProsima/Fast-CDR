@@ -198,9 +198,11 @@ public:
     /*!
      * @brief Sets the EncodingAlgorithmFlag for the encapsulation when the CDR type is
      * CdrVersion::DDS_CDR, CdrVersion::XCDRv1 or CdrVersion::XCDRv2.
+     * This function only works when is called before starting the encoding/decoding.
      * @param[in] encoding_flag Value to be used in the encapsulation.
+     * @return Indicates whether the setting was successful.
      */
-    Cdr_DllAPI void set_encoding_flag(
+    Cdr_DllAPI bool set_encoding_flag(
             EncodingAlgorithmFlag encoding_flag);
 
     /*!

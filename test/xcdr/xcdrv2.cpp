@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <array>
+#include <iterator>
 #include <memory>
 #include <tuple>
 #include <vector>
@@ -55,7 +56,7 @@ void xcdrv2_serialize_the_value(
     Cdr cdr(fast_buffer, endianness, CdrVersion::XCDRv2);
     //}
 
-    //{ Encode optional not present.
+    //{
     cdr.set_encoding_flag(encoding);
     cdr.serialize_encapsulation();
     Cdr::state enc_state(cdr);
@@ -133,7 +134,7 @@ TEST_P(XCdrv2Test, auto_selection_on_decode)
     cdr.end_serialize_type(enc_state);
     //}
 
-    //{ Decode a ushort and a ulong.
+    //{ Decode an ushort and an ulong.
     Cdr dcdr(fast_buffer, endianness, std::get<1>(GetParam()));
     uint16_t dus{0};
     uint32_t dul{0};
@@ -163,7 +164,7 @@ TEST_P(XCdrv2Test, auto_selection_on_decode)
 }
 
 /*!
- * @test Test serialization of a octet member changing the XCdrHeaderSelection
+ * @test Test serialization of an octet member changing the XCdrHeaderSelection
  * @code{.idl}
  * struct PLOctetStruct
  * {

@@ -1,4 +1,4 @@
-// Copyright 2018 Proyectos y Sistemas de Mantenimiento SL (eProsima).
+// Copyright 2023 Proyectos y Sistemas de Mantenimiento SL (eProsima).
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -142,7 +142,8 @@ public:
     template<size_t N> fixed_string& operator = (
             const fixed_string<N>& rhs) noexcept
     {
-        set(rhs.c_str()); return *this;
+        set(rhs.c_str());
+        return *this;
     }
 
     /*!

@@ -21,7 +21,7 @@ namespace eprosima {
 namespace fastcdr {
 namespace exception {
 /*!
- * @brief This class is thrown as an exception when an invalid parameter is being serialized.
+ * @brief This class is thrown as an exception when accessing to the value of a null optional.
  * @ingroup EXCEPTIONMODULE
  */
 class BadOptionalAccessException : public Exception
@@ -72,7 +72,7 @@ public:
     virtual Cdr_DllAPI ~BadOptionalAccessException() noexcept;
 
     //! @brief This function throws the object as exception.
-    virtual Cdr_DllAPI void raise() const override;
+    Cdr_DllAPI void raise() const override;
 
     //! @brief Default message used in the library.
     static Cdr_DllAPI const char* const BAD_OPTIONAL_ACCESS_MESSAGE_DEFAULT;

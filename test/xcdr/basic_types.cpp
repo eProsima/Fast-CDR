@@ -699,7 +699,7 @@ void longdouble_align_serialize(
 }
 
 /*!
- * @test Test an structure with a field of short type.
+ * @test Test a structure with a field of short type.
  * @code{.idl}
  * struct ShortStruct
  * {
@@ -788,7 +788,7 @@ TEST_P(XCdrBasicTypesTest, short)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type.
+ * @test Test a structure with a field of unsigned short type.
  * @code{.idl}
  * struct UShortStruct
  * {
@@ -877,7 +877,7 @@ TEST_P(XCdrBasicTypesTest, ushort)
 }
 
 /*!
- * @test Test an structure with a field of long type.
+ * @test Test a structure with a field of long type.
  * @code{.idl}
  * struct LongStruct
  * {
@@ -964,7 +964,7 @@ TEST_P(XCdrBasicTypesTest, long)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type.
+ * @test Test a structure with a field of unsigned long type.
  * @code{.idl}
  * struct ULongStruct
  * {
@@ -1051,7 +1051,7 @@ TEST_P(XCdrBasicTypesTest, ulong)
 }
 
 /*!
- * @test Test an structure with a field of long long type.
+ * @test Test a structure with a field of long long type.
  * @code{.idl}
  * struct LongLongStruct
  * {
@@ -1148,7 +1148,7 @@ TEST_P(XCdrBasicTypesTest, longlong)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long long type.
+ * @test Test a structure with a field of unsigned long long type.
  * @code{.idl}
  * struct ULongLongStruct
  * {
@@ -1245,7 +1245,7 @@ TEST_P(XCdrBasicTypesTest, ulonglong)
 }
 
 /*!
- * @test Test an structure with a field of float type.
+ * @test Test a structure with a field of float type.
  * @code{.idl}
  * struct FloatStruct
  * {
@@ -1332,7 +1332,7 @@ TEST_P(XCdrBasicTypesTest, float)
 }
 
 /*!
- * @test Test an structure with a field of double type.
+ * @test Test a structure with a field of double type.
  * @code{.idl}
  * struct DoubleStruct
  * {
@@ -1429,7 +1429,7 @@ TEST_P(XCdrBasicTypesTest, double)
 }
 
 /*!
- * @test Test an structure with a field of long double type.
+ * @test Test a structure with a field of long double type.
  * @code{.idl}
  * struct LongDoubleStruct
  * {
@@ -1660,7 +1660,7 @@ TEST_P(XCdrBasicTypesTest, longdouble)
 }
 
 /*!
- * @test Test an structure with a field of boolean type.
+ * @test Test a structure with a field of boolean type.
  * @code{.idl}
  * struct BooleanStruct
  * {
@@ -1748,7 +1748,7 @@ TEST_P(XCdrBasicTypesTest, boolean)
 }
 
 /*!
- * @test Test an structure with a field of octet type.
+ * @test Test a structure with a field of octet type.
  * @code{.idl}
  * struct OctetStruct
  * {
@@ -1835,7 +1835,7 @@ TEST_P(XCdrBasicTypesTest, octet)
 }
 
 /*!
- * @test Test an structure with a field of char type.
+ * @test Test a structure with a field of char type.
  * @code{.idl}
  * struct CharStruct
  * {
@@ -1923,7 +1923,7 @@ TEST_P(XCdrBasicTypesTest, char)
 }
 
 /*!
- * @test Test an structure with a field of wchar type.
+ * @test Test a structure with a field of wchar type.
  * @code{.idl}
  * struct WCharStruct
  * {
@@ -2012,7 +2012,7 @@ TEST_P(XCdrBasicTypesTest, wchar)
 }
 
 /*!
- * @test Test an structure with a field of string type.
+ * @test Test a structure with a field of string type.
  * @code{.idl}
  * struct StringStruct
  * {
@@ -2111,7 +2111,7 @@ TEST_P(XCdrBasicTypesTest, string)
 }
 
 /*!
- * @test Test an structure with a field of wstring type.
+ * @test Test a structure with a field of wstring type.
  * @code{.idl}
  * struct WStringStruct
  * {
@@ -2193,7 +2193,7 @@ TEST_P(XCdrBasicTypesTest, wstring)
     {
         0x00, 0x0A, 0x00, 0x00, // Encapsulation
         0x00, 0x00, 0x00, 0x0C, // DHEADER
-        0x30, 0x00, 0x00, 0x01, // EMHEADER1(M) with NEXTINT
+        0x30, 0x00, 0x00, 0x01, // EMHEADER1(M) without NEXTINT
         0x00, 0x00, 0x00, 0x02, // WString length
         0x00, valA,             // WString
         0x00, valB,             // WString
@@ -2202,7 +2202,7 @@ TEST_P(XCdrBasicTypesTest, wstring)
     {
         0x00, 0x0B, 0x00, 0x00, // Encapsulation
         0x0C, 0x00, 0x00, 0x00, // DHEADER
-        0x01, 0x00, 0x00, 0x30, // EMHEADER1(M) with NEXTINT
+        0x01, 0x00, 0x00, 0x30, // EMHEADER1(M) without NEXTINT
         0x02, 0x00, 0x00, 0x00, // WString length
         valA, 0x00,             // WString
         valB, 0x00              // WString
@@ -2218,7 +2218,7 @@ TEST_P(XCdrBasicTypesTest, wstring)
 }
 
 /*!
- * @test Test an structure with a field of enum 32bits type.
+ * @test Test a structure with a field of enum 32bits type.
  * @code{.idl}
  * enum Enum32
  * {
@@ -2309,7 +2309,7 @@ TEST_P(XCdrBasicTypesTest, enum32)
 }
 
 /*!
- * @test Test an structure with a field of enum 16bits type.
+ * @test Test a structure with a field of enum 16bits type.
  * @code{.idl}
  * @bit_bound(16)
  * enum Enum16
@@ -2403,7 +2403,7 @@ TEST_P(XCdrBasicTypesTest, enum16)
 }
 
 /*!
- * @test Test an structure with a field of enum 8bits type.
+ * @test Test a structure with a field of enum 8bits type.
  * @code{.idl}
  * @bit_bound(8)
  * enum Enum8
@@ -2497,7 +2497,7 @@ TEST_P(XCdrBasicTypesTest, enum8)
 }
 
 /*!
- * @test Test an structure with a field of array of unsigned long type.
+ * @test Test a structure with a field of array of unsigned long type.
  * @code{.idl}
  *
  * struct ULongArrayStruct
@@ -2595,7 +2595,7 @@ TEST_P(XCdrBasicTypesTest, array_ulong)
 }
 
 /*!
- * @test Test an structure with a field of array of struct type.
+ * @test Test a structure with a field of array of struct type.
  * @code{.idl}
  * struct InnerBasicTypesShortStruct
  * {
@@ -2765,7 +2765,7 @@ TEST_P(XCdrBasicTypesTest, array_struct)
 
 
 /*!
- * @test Test an structure with a field of multi array of unsigned long type.
+ * @test Test a structure with a field of multi array of unsigned long type.
  * @code{.idl}
  *
  * struct ULongMultiArrayStruct
@@ -2888,7 +2888,7 @@ TEST_P(XCdrBasicTypesTest, multi_array_ulong)
 }
 
 /*!
- * @test Test an structure with a field of multi array of struct type.
+ * @test Test a structure with a field of multi array of struct type.
  * @code{.idl}
  * struct InnerBasicTypesShortStruct
  * {
@@ -3140,7 +3140,7 @@ TEST_P(XCdrBasicTypesTest, multi_array_struct)
 }
 
 /*!
- * @test Test an structure with a field of sequence of unsigned long type.
+ * @test Test a structure with a field of sequence of unsigned long type.
  * @code{.idl}
  *
  * struct ULongSequenceStruct
@@ -3248,7 +3248,7 @@ TEST_P(XCdrBasicTypesTest, sequence_ulong)
 }
 
 /*!
- * @test Test an structure with a field of sequence of struct type.
+ * @test Test a structure with a field of sequence of struct type.
  * @code{.idl}
  * struct InnerBasicTypesShortStruct
  * {
@@ -3427,7 +3427,7 @@ TEST_P(XCdrBasicTypesTest, sequence_struct)
 }
 
 /*!
- * @test Test an structure with a field of map of unsigned long type.
+ * @test Test a structure with a field of map of unsigned long type.
  * @code{.idl}
  *
  * struct ULongMapStruct
@@ -3578,7 +3578,7 @@ TEST_P(XCdrBasicTypesTest, map_ulong)
 }
 
 /*!
- * @test Test an structure with a field of map of struct type.
+ * @test Test a structure with a field of map of struct type.
  * @code{.idl}
  * struct InnerBasicTypesShortStruct
  * {
@@ -3787,7 +3787,7 @@ TEST_P(XCdrBasicTypesTest, map_struct)
 }
 
 /*!
- * @test Test an structure with a field of bitset 7bits type.
+ * @test Test a structure with a field of bitset 7bits type.
  * @code{.idl}
  * bitset Bitset7
  * {
@@ -3880,7 +3880,7 @@ TEST_P(XCdrBasicTypesTest, bitset_8)
 }
 
 /*!
- * @test Test an structure with a field of bitset 14bits type.
+ * @test Test a structure with a field of bitset 14bits type.
  * @code{.idl}
  * bitset Bitset14
  * {
@@ -3974,7 +3974,7 @@ TEST_P(XCdrBasicTypesTest, bitset_16)
 }
 
 /*!
- * @test Test an structure with a field of bitset 30bits type.
+ * @test Test a structure with a field of bitset 30bits type.
  * @code{.idl}
  * bitset Bitset30
  * {
@@ -4066,7 +4066,7 @@ TEST_P(XCdrBasicTypesTest, bitset_32)
 }
 
 /*!
- * @test Test an structure with a field of bitset 45bits type.
+ * @test Test a structure with a field of bitset 45bits type.
  * @code{.idl}
  * bitset Bitset45
  * {
@@ -4168,7 +4168,7 @@ TEST_P(XCdrBasicTypesTest, bitset_64)
 }
 
 /*!
- * @test Test an structure with a field of octet type and another of short type.
+ * @test Test a structure with a field of octet type and another of short type.
  * @code{.idl}
  * struct ShortAlign1Struct
  * {
@@ -4283,7 +4283,7 @@ TEST_P(XCdrBasicTypesTest, short_align_1)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and another of short type.
+ * @test Test a structure with a field of unsigned short type and another of short type.
  * @code{.idl}
  * struct ShortAlign2Struct
  * {
@@ -4394,7 +4394,7 @@ TEST_P(XCdrBasicTypesTest, short_align_2)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and another of short type.
+ * @test Test a structure with a field of unsigned long type and another of short type.
  * @code{.idl}
  * struct ShortAlign4Struct
  * {
@@ -4501,7 +4501,7 @@ TEST_P(XCdrBasicTypesTest, short_align_4)
 }
 
 /*!
- * @test Test an structure with a field of octet type and another of unsigned short type.
+ * @test Test a structure with a field of octet type and another of unsigned short type.
  * @code{.idl}
  * struct UShortAlign1Struct
  * {
@@ -4616,7 +4616,7 @@ TEST_P(XCdrBasicTypesTest, ushort_align_1)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and another of unsigned short type.
+ * @test Test a structure with a field of unsigned short type and another of unsigned short type.
  * @code{.idl}
  * struct UShortAlign2Struct
  * {
@@ -4727,7 +4727,7 @@ TEST_P(XCdrBasicTypesTest, ushort_align_2)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and another of unsigned short type.
+ * @test Test a structure with a field of unsigned long type and another of unsigned short type.
  * @code{.idl}
  * struct UShortAlign4Struct
  * {
@@ -4834,7 +4834,7 @@ TEST_P(XCdrBasicTypesTest, ushort_align_4)
 }
 
 /*!
- * @test Test an structure with a field of octet type and another of long type.
+ * @test Test a structure with a field of octet type and another of long type.
  * @code{.idl}
  * struct LongAlign1Struct
  * {
@@ -4947,7 +4947,7 @@ TEST_P(XCdrBasicTypesTest, long_align_1)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and another of long type.
+ * @test Test a structure with a field of unsigned short type and another of long type.
  * @code{.idl}
  * struct LongAlign2Struct
  * {
@@ -5062,7 +5062,7 @@ TEST_P(XCdrBasicTypesTest, long_align_2)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and another of long type.
+ * @test Test a structure with a field of unsigned long type and another of long type.
  * @code{.idl}
  * struct LongAlign4Struct
  * {
@@ -5167,7 +5167,7 @@ TEST_P(XCdrBasicTypesTest, long_align_4)
 }
 
 /*!
- * @test Test an structure with a field of octet type and another of unsigned long type.
+ * @test Test a structure with a field of octet type and another of unsigned long type.
  * @code{.idl}
  * struct ULongAlign1Struct
  * {
@@ -5280,7 +5280,7 @@ TEST_P(XCdrBasicTypesTest, ulong_align_1)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and another of unsigned long type.
+ * @test Test a structure with a field of unsigned short type and another of unsigned long type.
  * @code{.idl}
  * struct ULongAlign2Struct
  * {
@@ -5395,7 +5395,7 @@ TEST_P(XCdrBasicTypesTest, ulong_align_2)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and another of unsigned long type.
+ * @test Test a structure with a field of unsigned long type and another of unsigned long type.
  * @code{.idl}
  * struct ULongAlign4Struct
  * {
@@ -5500,7 +5500,7 @@ TEST_P(XCdrBasicTypesTest, ulong_align_4)
 }
 
 /*!
- * @test Test an structure with a field of octet type and another of long long type.
+ * @test Test a structure with a field of octet type and another of long long type.
  * @code{.idl}
  * struct LongLongAlign1Struct
  * {
@@ -5625,7 +5625,7 @@ TEST_P(XCdrBasicTypesTest, longlong_align_1)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and another of long long type.
+ * @test Test a structure with a field of unsigned short type and another of long long type.
  * @code{.idl}
  * struct LongLongAlign2Struct
  * {
@@ -5752,7 +5752,7 @@ TEST_P(XCdrBasicTypesTest, longlong_align_2)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and another of long long type.
+ * @test Test a structure with a field of unsigned long type and another of long long type.
  * @code{.idl}
  * struct LongLongAlign4Struct
  * {
@@ -5869,7 +5869,7 @@ TEST_P(XCdrBasicTypesTest, longlong_align_4)
 }
 
 /*!
- * @test Test an structure with a field of octet type and another of unsigned long long type.
+ * @test Test a structure with a field of octet type and another of unsigned long long type.
  * @code{.idl}
  * struct ULongLongAlign1Struct
  * {
@@ -5994,7 +5994,7 @@ TEST_P(XCdrBasicTypesTest, ulonglong_align_1)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and another of unsigned long long type.
+ * @test Test a structure with a field of unsigned short type and another of unsigned long long type.
  * @code{.idl}
  * struct ULongLongAlign2Struct
  * {
@@ -6121,7 +6121,7 @@ TEST_P(XCdrBasicTypesTest, ulonglong_align_2)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and another of unsigned long long type.
+ * @test Test a structure with a field of unsigned long type and another of unsigned long long type.
  * @code{.idl}
  * struct ULongLongAlign4Struct
  * {
@@ -6238,7 +6238,7 @@ TEST_P(XCdrBasicTypesTest, ulonglong_align_4)
 }
 
 /*!
- * @test Test an structure with a field of octet type and another of float type.
+ * @test Test a structure with a field of octet type and another of float type.
  * @code{.idl}
  * struct FloatAlign1Struct
  * {
@@ -6351,7 +6351,7 @@ TEST_P(XCdrBasicTypesTest, float_align_1)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and another of float type.
+ * @test Test a structure with a field of unsigned short type and another of float type.
  * @code{.idl}
  * struct FloatAlign2Struct
  * {
@@ -6466,7 +6466,7 @@ TEST_P(XCdrBasicTypesTest, float_align_2)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and another of float type.
+ * @test Test a structure with a field of unsigned long type and another of float type.
  * @code{.idl}
  * struct FloatAlign4Struct
  * {
@@ -6571,7 +6571,7 @@ TEST_P(XCdrBasicTypesTest, float_align_4)
 }
 
 /*!
- * @test Test an structure with a field of octet type and another of double type.
+ * @test Test a structure with a field of octet type and another of double type.
  * @code{.idl}
  * struct DoubleAlign1Struct
  * {
@@ -6696,7 +6696,7 @@ TEST_P(XCdrBasicTypesTest, double_align_1)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and another of double type.
+ * @test Test a structure with a field of unsigned short type and another of double type.
  * @code{.idl}
  * struct DoubleAlign2Struct
  * {
@@ -6823,7 +6823,7 @@ TEST_P(XCdrBasicTypesTest, double_align_2)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and another of double type.
+ * @test Test a structure with a field of unsigned long type and another of double type.
  * @code{.idl}
  * struct DoubleAlign4Struct
  * {
@@ -6940,7 +6940,7 @@ TEST_P(XCdrBasicTypesTest, double_align_4)
 }
 
 /*!
- * @test Test an structure with a field of octet type and another of long double type.
+ * @test Test a structure with a field of octet type and another of long double type.
  * @code{.idl}
  * struct LongDoubleAlign1Struct
  * {
@@ -7077,7 +7077,7 @@ TEST_P(XCdrBasicTypesTest, longdouble_align_1)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and another of long double type.
+ * @test Test a structure with a field of unsigned short type and another of long double type.
  * @code{.idl}
  * struct LongDoubleAlign2Struct
  * {
@@ -7216,7 +7216,7 @@ TEST_P(XCdrBasicTypesTest, longdouble_align_2)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and another of long double type.
+ * @test Test a structure with a field of unsigned long type and another of long double type.
  * @code{.idl}
  * struct LongDoubleAlign4Struct
  * {
@@ -7345,7 +7345,7 @@ TEST_P(XCdrBasicTypesTest, longdouble_align_4)
 }
 
 /*!
- * @test Test an structure with a field of octet type and another of boolean type.
+ * @test Test a structure with a field of octet type and another of boolean type.
  * @code{.idl}
  * struct BooleanAlign1Struct
  * {
@@ -7453,7 +7453,7 @@ TEST_P(XCdrBasicTypesTest, boolean_align_1)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and another of boolean type.
+ * @test Test a structure with a field of unsigned short type and another of boolean type.
  * @code{.idl}
  * struct BooleanAlign2Struct
  * {
@@ -7563,7 +7563,7 @@ TEST_P(XCdrBasicTypesTest, boolean_align_2)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and another of boolean type.
+ * @test Test a structure with a field of unsigned long type and another of boolean type.
  * @code{.idl}
  * struct BooleanAlign4Struct
  * {
@@ -7669,7 +7669,7 @@ TEST_P(XCdrBasicTypesTest, boolean_align_4)
 }
 
 /*!
- * @test Test an structure with a field of octet type and another of octet type.
+ * @test Test a structure with a field of octet type and another of octet type.
  * @code{.idl}
  * struct OctetAlign1Struct
  * {
@@ -7776,7 +7776,7 @@ TEST_P(XCdrBasicTypesTest, octet_align_1)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and another of octet type.
+ * @test Test a structure with a field of unsigned short type and another of octet type.
  * @code{.idl}
  * struct OctetAlign2Struct
  * {
@@ -7885,7 +7885,7 @@ TEST_P(XCdrBasicTypesTest, octet_align_2)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and another of octet type.
+ * @test Test a structure with a field of unsigned long type and another of octet type.
  * @code{.idl}
  * struct OctetAlign4Struct
  * {
@@ -7990,7 +7990,7 @@ TEST_P(XCdrBasicTypesTest, octet_align_4)
 }
 
 /*!
- * @test Test an structure with a field of octet type and another of char type.
+ * @test Test a structure with a field of octet type and another of char type.
  * @code{.idl}
  * struct CharAlign1Struct
  * {
@@ -8098,7 +8098,7 @@ TEST_P(XCdrBasicTypesTest, char_align_1)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and another of char type.
+ * @test Test a structure with a field of unsigned short type and another of char type.
  * @code{.idl}
  * struct CharAlign2Struct
  * {
@@ -8208,7 +8208,7 @@ TEST_P(XCdrBasicTypesTest, char_align_2)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and another of char type.
+ * @test Test a structure with a field of unsigned long type and another of char type.
  * @code{.idl}
  * struct CharAlign4Struct
  * {
@@ -8314,7 +8314,7 @@ TEST_P(XCdrBasicTypesTest, char_align_4)
 }
 
 /*!
- * @test Test an structure with a field of octet type and another of wchar type.
+ * @test Test a structure with a field of octet type and another of wchar type.
  * @code{.idl}
  * struct WCharAlign1Struct
  * {
@@ -8429,7 +8429,7 @@ TEST_P(XCdrBasicTypesTest, wchar_align_1)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and another of wchar type.
+ * @test Test a structure with a field of unsigned short type and another of wchar type.
  * @code{.idl}
  * struct WCharAlign2Struct
  * {
@@ -8540,7 +8540,7 @@ TEST_P(XCdrBasicTypesTest, wchar_align_2)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and another of wchar type.
+ * @test Test a structure with a field of unsigned long type and another of wchar type.
  * @code{.idl}
  * struct WCharAlign4Struct
  * {
@@ -8647,7 +8647,7 @@ TEST_P(XCdrBasicTypesTest, wchar_align_4)
 }
 
 /*!
- * @test Test an structure with a field of octet type and another of string type.
+ * @test Test a structure with a field of octet type and another of string type.
  * @code{.idl}
  * struct StringAlign1Struct
  * {
@@ -8772,7 +8772,7 @@ TEST_P(XCdrBasicTypesTest, string_align_1)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and another of string type.
+ * @test Test a structure with a field of unsigned short type and another of string type.
  * @code{.idl}
  * struct StringAlign2Struct
  * {
@@ -8899,7 +8899,7 @@ TEST_P(XCdrBasicTypesTest, string_align_2)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and another of string type.
+ * @test Test a structure with a field of unsigned long type and another of string type.
  * @code{.idl}
  * struct StringAlign4Struct
  * {
@@ -9016,7 +9016,7 @@ TEST_P(XCdrBasicTypesTest, string_align_4)
 }
 
 /*!
- * @test Test an structure with a field of octet type and another of wstring type.
+ * @test Test a structure with a field of octet type and another of wstring type.
  * @code{.idl}
  * struct WStringAlign1Struct
  * {
@@ -9121,7 +9121,7 @@ TEST_P(XCdrBasicTypesTest, wstring_align_1)
         0x00, 0x00, 0x00, 0x00, // EMHEADER1(M) without NEXTINT
         align_value,
         0x00, 0x00, 0x00,       // Alignment
-        0x30, 0x00, 0x00, 0x01, // EMHEADER1(M) with NEXTINT
+        0x30, 0x00, 0x00, 0x01, // EMHEADER1(M) without NEXTINT
         0x00, 0x00, 0x00, 0x02, // WString length
         0x00, valA,             // WString
         0x00, valB              // WString
@@ -9133,7 +9133,7 @@ TEST_P(XCdrBasicTypesTest, wstring_align_1)
         0x00, 0x00, 0x00, 0x00, // EMHEADER1(M) without NEXTINT
         align_value,
         0x00, 0x00, 0x00,       // Alignment
-        0x01, 0x00, 0x00, 0x30, // EMHEADER1(M) with NEXTINT
+        0x01, 0x00, 0x00, 0x30, // EMHEADER1(M) without NEXTINT
         0x02, 0x00, 0x00, 0x00, // WString length
         valA, 0x00,             // WString
         valB, 0x00              // WString
@@ -9149,7 +9149,7 @@ TEST_P(XCdrBasicTypesTest, wstring_align_1)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and another of wstring type.
+ * @test Test a structure with a field of unsigned short type and another of wstring type.
  * @code{.idl}
  * struct WStringAlign2Struct
  * {
@@ -9256,7 +9256,7 @@ TEST_P(XCdrBasicTypesTest, wstring_align_2)
         0x10, 0x00, 0x00, 0x00, // EMHEADER1(M) without NEXTINT
         iava, fava,
         0x00, 0x00,             // Alignment
-        0x30, 0x00, 0x00, 0x01, // EMHEADER1(M) with NEXTINT
+        0x30, 0x00, 0x00, 0x01, // EMHEADER1(M) without NEXTINT
         0x00, 0x00, 0x00, 0x02, // WString length
         0x00, valA,             // WString
         0x00, valB              // WString
@@ -9268,7 +9268,7 @@ TEST_P(XCdrBasicTypesTest, wstring_align_2)
         0x00, 0x00, 0x00, 0x10, // EMHEADER1(M) without NEXTINT
         fava, iava,
         0x00, 0x00,             // Alignment
-        0x01, 0x00, 0x00, 0x30, // EMHEADER1(M) with NEXTINT
+        0x01, 0x00, 0x00, 0x30, // EMHEADER1(M) without NEXTINT
         0x02, 0x00, 0x00, 0x00, // WString length
         valA, 0x00,             // WString
         valB, 0x00              // WString
@@ -9284,7 +9284,7 @@ TEST_P(XCdrBasicTypesTest, wstring_align_2)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and another of wstring type.
+ * @test Test a structure with a field of unsigned long type and another of wstring type.
  * @code{.idl}
  * struct WStringAlign4Struct
  * {
@@ -9382,7 +9382,7 @@ TEST_P(XCdrBasicTypesTest, wstring_align_4)
         0x00, 0x00, 0x00, 0x14, // DHEADER
         0x20, 0x00, 0x00, 0x00, // EMHEADER1(M) without NEXTINT
         iava, iava, iava, fava,
-        0x30, 0x00, 0x00, 0x01, // EMHEADER1(M) with NEXTINT
+        0x30, 0x00, 0x00, 0x01, // EMHEADER1(M) without NEXTINT
         0x00, 0x00, 0x00, 0x02, // WString length
         0x00, valA,             // WString
         0x00, valB              // WString
@@ -9393,7 +9393,7 @@ TEST_P(XCdrBasicTypesTest, wstring_align_4)
         0x14, 0x00, 0x00, 0x00, // DHEADER
         0x00, 0x00, 0x00, 0x20, // EMHEADER1(M) without NEXTINT
         fava, iava, iava, iava,
-        0x01, 0x00, 0x00, 0x30, // EMHEADER1(M) with NEXTINT
+        0x01, 0x00, 0x00, 0x30, // EMHEADER1(M) without NEXTINT
         0x02, 0x00, 0x00, 0x00, // WString length
         valA, 0x00,             // WString
         valB, 0x00              // WString
@@ -9409,7 +9409,7 @@ TEST_P(XCdrBasicTypesTest, wstring_align_4)
 }
 
 /*!
- * @test Test an structure with a field of octet type and another of enum 32bits type.
+ * @test Test a structure with a field of octet type and another of enum 32bits type.
  * @code{.idl}
  * enum Enum32
  * {
@@ -9526,7 +9526,7 @@ TEST_P(XCdrBasicTypesTest, enum32_align_1)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and another of enum 32bits type.
+ * @test Test a structure with a field of unsigned short type and another of enum 32bits type.
  * @code{.idl}
  * enum Enum32
  * {
@@ -9645,7 +9645,7 @@ TEST_P(XCdrBasicTypesTest, enum32_align_2)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and another of enum 32bits type.
+ * @test Test a structure with a field of unsigned long type and another of enum 32bits type.
  * @code{.idl}
  * enum Enum32
  * {
@@ -9754,7 +9754,7 @@ TEST_P(XCdrBasicTypesTest, enum32_align_4)
 }
 
 /*!
- * @test Test an structure with a field of octet type and another of enum 16bits type.
+ * @test Test a structure with a field of octet type and another of enum 16bits type.
  * @code{.idl}
  * enum Enum16
  * {
@@ -9873,7 +9873,7 @@ TEST_P(XCdrBasicTypesTest, enum16_align_1)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and another of enum 16bits type.
+ * @test Test a structure with a field of unsigned short type and another of enum 16bits type.
  * @code{.idl}
  * enum Enum16
  * {
@@ -9988,7 +9988,7 @@ TEST_P(XCdrBasicTypesTest, enum16_align_2)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and another of enum 16bits type.
+ * @test Test a structure with a field of unsigned long type and another of enum 16bits type.
  * @code{.idl}
  * enum Enum16
  * {
@@ -10099,7 +10099,7 @@ TEST_P(XCdrBasicTypesTest, enum16_align_4)
 }
 
 /*!
- * @test Test an structure with a field of octet type and another of enum 8bits type.
+ * @test Test a structure with a field of octet type and another of enum 8bits type.
  * @code{.idl}
  * enum Enum8
  * {
@@ -10212,7 +10212,7 @@ TEST_P(XCdrBasicTypesTest, enum8_align_1)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and another of enum 8bits type.
+ * @test Test a structure with a field of unsigned short type and another of enum 8bits type.
  * @code{.idl}
  * enum Enum8
  * {
@@ -10327,7 +10327,7 @@ TEST_P(XCdrBasicTypesTest, enum8_align_2)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and another of enum 8bits type.
+ * @test Test a structure with a field of unsigned long type and another of enum 8bits type.
  * @code{.idl}
  * enum Enum8
  * {
@@ -10438,7 +10438,7 @@ TEST_P(XCdrBasicTypesTest, enum8_align_4)
 }
 
 /*!
- * @test Test an structure with two fields of struct type.
+ * @test Test a structure with two fields of struct type.
  * @code{.idl}
  * struct InnerBasicTypesShortStruct
  * {
@@ -10785,7 +10785,7 @@ TEST_P(XCdrBasicTypesTest, one_inner_struct)
 }
 
 /*!
- * @test Test an structure with two fields of struct type.
+ * @test Test a structure with two fields of struct type.
  * @code{.idl}
  * struct InnerBasicTypesShortStruct
  * {

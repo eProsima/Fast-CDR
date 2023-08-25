@@ -56,7 +56,7 @@ size_t CdrSizeCalculator::begin_calculate_type_serialized_size(
 
     current_alignment += calculated_size;
 
-    serialized_member_size_ = NO_SERIALIZED_MEMBER_SIZE;     // Avoid error when serializen arrays, sequences, etc..
+    serialized_member_size_ = NO_SERIALIZED_MEMBER_SIZE;     // Avoid error when serializing arrays, sequences, etc..
 
     return calculated_size;
 }

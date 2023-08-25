@@ -128,16 +128,16 @@ bool Cdr::state::operator ==(
 }
 
 Cdr::Cdr(
-        FastBuffer& cdrBuffer,
+        FastBuffer& cdr_buffer,
         const Endianness endianness,
         const CdrVersion cdr_version)
-    : cdr_buffer_(cdrBuffer)
+    : cdr_buffer_(cdr_buffer)
     , cdr_version_(cdr_version)
     , endianness_(endianness)
     , swap_bytes_(endianness == DEFAULT_ENDIAN ? false : true)
-    , offset_(cdrBuffer.begin())
-    , origin_(cdrBuffer.begin())
-    , end_(cdrBuffer.end())
+    , offset_(cdr_buffer.begin())
+    , origin_(cdr_buffer.begin())
+    , end_(cdr_buffer.end())
 {
     switch (cdr_version_)
     {
@@ -283,7 +283,8 @@ Cdr& Cdr::read_encapsulation()
 
 Cdr& Cdr::serialize_encapsulation()
 {
-    uint8_t dummy = 0, encapsulation = 0;
+    uint8_t dummy = 0;
+    uint8_t encapsulation = 0;
     state state_before_error(*this);
 
     try
@@ -381,16 +382,16 @@ Cdr::Endianness Cdr::endianness() const
 bool Cdr::jump(
         size_t num_bytes)
 {
-    bool returnedValue = false;
+    bool ret_value = false;
 
     if (((end_ - offset_) >= num_bytes) || resize(num_bytes))
     {
         offset_ += num_bytes;
         last_data_size_ = 0;
-        returnedValue = true;
+        ret_value = true;
     }
 
-    return returnedValue;
+    return ret_value;
 }
 
 char* Cdr::get_buffer_pointer()
@@ -439,16 +440,16 @@ void Cdr::reset()
 bool Cdr::move_alignment_forward(
         size_t num_bytes)
 {
-    bool returnedValue = false;
+    bool ret_value = false;
 
     if (((end_ - origin_) >= num_bytes) || resize(num_bytes))
     {
         origin_ += num_bytes;
         last_data_size_ = 0;
-        returnedValue = true;
+        ret_value = true;
     }
 
-    return returnedValue;
+    return ret_value;
 }
 
 bool Cdr::resize(
@@ -484,9 +485,9 @@ Cdr& Cdr::serialize(
         const int16_t short_t)
 {
     size_t align = alignment(sizeof(short_t));
-    size_t sizeAligned = sizeof(short_t) + align;
+    size_t size_aligned = sizeof(short_t) + align;
 
-    if (((end_ - offset_) >= sizeAligned) || resize(sizeAligned))
+    if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
         // Save last datasize.
         last_data_size_ = sizeof(short_t);
@@ -517,9 +518,9 @@ Cdr& Cdr::serialize(
         const int32_t long_t)
 {
     size_t align = alignment(sizeof(long_t));
-    size_t sizeAligned = sizeof(long_t) + align;
+    size_t size_aligned = sizeof(long_t) + align;
 
-    if (((end_ - offset_) >= sizeAligned) || resize(sizeAligned))
+    if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
         // Save last datasize.
         last_data_size_ = sizeof(long_t);
@@ -552,9 +553,9 @@ Cdr& Cdr::serialize(
         const int64_t longlong_t)
 {
     size_t align = alignment(align64_);
-    size_t sizeAligned = sizeof(longlong_t) + align;
+    size_t size_aligned = sizeof(longlong_t) + align;
 
-    if (((end_ - offset_) >= sizeAligned) || resize(sizeAligned))
+    if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
         // Save last datasize.
         last_data_size_ = align64_;
@@ -591,9 +592,9 @@ Cdr& Cdr::serialize(
         const float float_t)
 {
     size_t align = alignment(sizeof(float_t));
-    size_t sizeAligned = sizeof(float_t) + align;
+    size_t size_aligned = sizeof(float_t) + align;
 
-    if (((end_ - offset_) >= sizeAligned) || resize(sizeAligned))
+    if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
         // Save last datasize.
         last_data_size_ = sizeof(float_t);
@@ -626,9 +627,9 @@ Cdr& Cdr::serialize(
         const double double_t)
 {
     size_t align = alignment(align64_);
-    size_t sizeAligned = sizeof(double_t) + align;
+    size_t size_aligned = sizeof(double_t) + align;
 
-    if (((end_ - offset_) >= sizeAligned) || resize(sizeAligned))
+    if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
         // Save last datasize.
         last_data_size_ = align64_;
@@ -665,9 +666,9 @@ Cdr& Cdr::serialize(
         const long double ldouble_t)
 {
     size_t align = alignment(align64_);
-    size_t sizeAligned = sizeof(ldouble_t) + align;
+    size_t size_aligned = sizeof(ldouble_t) + align;
 
-    if (((end_ - offset_) >= sizeAligned) || resize(sizeAligned))
+    if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
         // Save last datasize.
         last_data_size_ = align64_;
@@ -815,21 +816,21 @@ Cdr& Cdr::serialize(
 Cdr& Cdr::serialize(
         const wchar_t* string_t)
 {
-    uint32_t bytesLength = 0;
+    uint32_t bytes_length = 0;
     size_t wstrlen = 0;
 
     if (string_t != nullptr)
     {
         wstrlen = wcslen(string_t);
-        bytesLength = size_to_uint32(wstrlen * 2);
+        bytes_length = size_to_uint32(wstrlen * 2);
     }
 
-    if (bytesLength > 0)
+    if (bytes_length > 0)
     {
         Cdr::state state_(*this);
         serialize(size_to_uint32(wstrlen));
 
-        if (((end_ - offset_) >= bytesLength) || resize(bytesLength))
+        if (((end_ - offset_) >= bytes_length) || resize(bytes_length))
         {
             serialize_array(string_t, wstrlen);
         }
@@ -841,7 +842,7 @@ Cdr& Cdr::serialize(
     }
     else
     {
-        serialize(bytesLength);
+        serialize(bytes_length);
     }
 
     return *this;
@@ -851,9 +852,9 @@ Cdr& Cdr::serialize_array(
         const bool* bool_t,
         size_t num_elements)
 {
-    size_t totalSize = sizeof(*bool_t) * num_elements;
+    size_t total_size = sizeof(*bool_t) * num_elements;
 
-    if (((end_ - offset_) >= totalSize) || resize(totalSize))
+    if (((end_ - offset_) >= total_size) || resize(total_size))
     {
         // Save last datasize.
         last_data_size_ = sizeof(*bool_t);
@@ -879,15 +880,15 @@ Cdr& Cdr::serialize_array(
         const char* char_t,
         size_t num_elements)
 {
-    size_t totalSize = sizeof(*char_t) * num_elements;
+    size_t total_size = sizeof(*char_t) * num_elements;
 
-    if (((end_ - offset_) >= totalSize) || resize(totalSize))
+    if (((end_ - offset_) >= total_size) || resize(total_size))
     {
         // Save last datasize.
         last_data_size_ = sizeof(*char_t);
 
-        offset_.memcopy(char_t, totalSize);
-        offset_ += totalSize;
+        offset_.memcopy(char_t, total_size);
+        offset_ += total_size;
         return *this;
     }
 
@@ -904,10 +905,10 @@ Cdr& Cdr::serialize_array(
     }
 
     size_t align = alignment(sizeof(*short_t));
-    size_t totalSize = sizeof(*short_t) * num_elements;
-    size_t sizeAligned = totalSize + align;
+    size_t total_size = sizeof(*short_t) * num_elements;
+    size_t size_aligned = total_size + align;
 
-    if (((end_ - offset_) >= sizeAligned) || resize(sizeAligned))
+    if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
         // Save last datasize.
         last_data_size_ = sizeof(*short_t);
@@ -921,7 +922,7 @@ Cdr& Cdr::serialize_array(
         if (swap_bytes_)
         {
             const char* dst = reinterpret_cast<const char*>(short_t);
-            const char* end = dst + totalSize;
+            const char* end = dst + total_size;
 
             for (; dst < end; dst += sizeof(*short_t))
             {
@@ -931,8 +932,8 @@ Cdr& Cdr::serialize_array(
         }
         else
         {
-            offset_.memcopy(short_t, totalSize);
-            offset_ += totalSize;
+            offset_.memcopy(short_t, total_size);
+            offset_ += total_size;
         }
 
         return *this;
@@ -951,10 +952,10 @@ Cdr& Cdr::serialize_array(
     }
 
     size_t align = alignment(sizeof(*long_t));
-    size_t totalSize = sizeof(*long_t) * num_elements;
-    size_t sizeAligned = totalSize + align;
+    size_t total_size = sizeof(*long_t) * num_elements;
+    size_t size_aligned = total_size + align;
 
-    if (((end_ - offset_) >= sizeAligned) || resize(sizeAligned))
+    if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
         // Save last datasize.
         last_data_size_ = sizeof(*long_t);
@@ -968,7 +969,7 @@ Cdr& Cdr::serialize_array(
         if (swap_bytes_)
         {
             const char* dst = reinterpret_cast<const char*>(long_t);
-            const char* end = dst + totalSize;
+            const char* end = dst + total_size;
 
             for (; dst < end; dst += sizeof(*long_t))
             {
@@ -980,8 +981,8 @@ Cdr& Cdr::serialize_array(
         }
         else
         {
-            offset_.memcopy(long_t, totalSize);
-            offset_ += totalSize;
+            offset_.memcopy(long_t, total_size);
+            offset_ += total_size;
         }
 
         return *this;
@@ -1016,10 +1017,10 @@ Cdr& Cdr::serialize_array(
     }
 
     size_t align = alignment(align64_);
-    size_t totalSize = sizeof(*longlong_t) * num_elements;
-    size_t sizeAligned = totalSize + align;
+    size_t total_size = sizeof(*longlong_t) * num_elements;
+    size_t size_aligned = total_size + align;
 
-    if (((end_ - offset_) >= sizeAligned) || resize(sizeAligned))
+    if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
         // Save last datasize.
         last_data_size_ = align64_;
@@ -1033,7 +1034,7 @@ Cdr& Cdr::serialize_array(
         if (swap_bytes_)
         {
             const char* dst = reinterpret_cast<const char*>(longlong_t);
-            const char* end = dst + totalSize;
+            const char* end = dst + total_size;
 
             for (; dst < end; dst += sizeof(*longlong_t))
             {
@@ -1049,8 +1050,8 @@ Cdr& Cdr::serialize_array(
         }
         else
         {
-            offset_.memcopy(longlong_t, totalSize);
-            offset_ += totalSize;
+            offset_.memcopy(longlong_t, total_size);
+            offset_ += total_size;
         }
 
         return *this;
@@ -1069,10 +1070,10 @@ Cdr& Cdr::serialize_array(
     }
 
     size_t align = alignment(sizeof(*float_t));
-    size_t totalSize = sizeof(*float_t) * num_elements;
-    size_t sizeAligned = totalSize + align;
+    size_t total_size = sizeof(*float_t) * num_elements;
+    size_t size_aligned = total_size + align;
 
-    if (((end_ - offset_) >= sizeAligned) || resize(sizeAligned))
+    if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
         // Save last datasize.
         last_data_size_ = sizeof(*float_t);
@@ -1086,7 +1087,7 @@ Cdr& Cdr::serialize_array(
         if (swap_bytes_)
         {
             const char* dst = reinterpret_cast<const char*>(float_t);
-            const char* end = dst + totalSize;
+            const char* end = dst + total_size;
 
             for (; dst < end; dst += sizeof(*float_t))
             {
@@ -1098,8 +1099,8 @@ Cdr& Cdr::serialize_array(
         }
         else
         {
-            offset_.memcopy(float_t, totalSize);
-            offset_ += totalSize;
+            offset_.memcopy(float_t, total_size);
+            offset_ += total_size;
         }
 
         return *this;
@@ -1118,10 +1119,10 @@ Cdr& Cdr::serialize_array(
     }
 
     size_t align = alignment(align64_);
-    size_t totalSize = sizeof(*double_t) * num_elements;
-    size_t sizeAligned = totalSize + align;
+    size_t total_size = sizeof(*double_t) * num_elements;
+    size_t size_aligned = total_size + align;
 
-    if (((end_ - offset_) >= sizeAligned) || resize(sizeAligned))
+    if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
         // Save last datasize.
         last_data_size_ = align64_;
@@ -1135,7 +1136,7 @@ Cdr& Cdr::serialize_array(
         if (swap_bytes_)
         {
             const char* dst = reinterpret_cast<const char*>(double_t);
-            const char* end = dst + totalSize;
+            const char* end = dst + total_size;
 
             for (; dst < end; dst += sizeof(*double_t))
             {
@@ -1151,8 +1152,8 @@ Cdr& Cdr::serialize_array(
         }
         else
         {
-            offset_.memcopy(double_t, totalSize);
-            offset_ += totalSize;
+            offset_.memcopy(double_t, total_size);
+            offset_ += total_size;
         }
 
         return *this;
@@ -1172,10 +1173,10 @@ Cdr& Cdr::serialize_array(
 
     size_t align = alignment(align64_);
     // Fix for Windows ( long doubles only store 8 bytes )
-    size_t totalSize = 16 * num_elements; // sizeof(*ldouble_t)
-    size_t sizeAligned = totalSize + align;
+    size_t total_size = 16 * num_elements; // sizeof(*ldouble_t)
+    size_t size_aligned = total_size + align;
 
-    if (((end_ - offset_) >= sizeAligned) || resize(sizeAligned))
+    if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
         // Save last datasize.
         last_data_size_ = align64_;
@@ -1225,7 +1226,7 @@ Cdr& Cdr::serialize_array(
         if (swap_bytes_)
         {
             const char* dst = reinterpret_cast<const char*>(ldouble_t);
-            const char* end = dst + totalSize;
+            const char* end = dst + total_size;
 
             for (; dst < end; dst += sizeof(*ldouble_t))
             {
@@ -1261,8 +1262,8 @@ Cdr& Cdr::serialize_array(
         else
         {
 #if FASTCDR_SIZEOF_LONG_DOUBLE == 16
-            offset_.memcopy(ldouble_t, totalSize);
-            offset_ += totalSize;
+            offset_.memcopy(ldouble_t, total_size);
+            offset_ += total_size;
 #else
             for (size_t i = 0; i < num_elements; ++i)
             {
@@ -1303,9 +1304,9 @@ Cdr& Cdr::deserialize(
         int16_t& short_t)
 {
     size_t align = alignment(sizeof(short_t));
-    size_t sizeAligned = sizeof(short_t) + align;
+    size_t size_aligned = sizeof(short_t) + align;
 
-    if ((end_ - offset_) >= sizeAligned)
+    if ((end_ - offset_) >= size_aligned)
     {
         // Save last datasize.
         last_data_size_ = sizeof(short_t);
@@ -1336,9 +1337,9 @@ Cdr& Cdr::deserialize(
         int32_t& long_t)
 {
     size_t align = alignment(sizeof(long_t));
-    size_t sizeAligned = sizeof(long_t) + align;
+    size_t size_aligned = sizeof(long_t) + align;
 
-    if ((end_ - offset_) >= sizeAligned)
+    if ((end_ - offset_) >= size_aligned)
     {
         // Save last datasize.
         last_data_size_ = sizeof(long_t);
@@ -1371,9 +1372,9 @@ Cdr& Cdr::deserialize(
         int64_t& longlong_t)
 {
     size_t align = alignment(align64_);
-    size_t sizeAligned = sizeof(longlong_t) + align;
+    size_t size_aligned = sizeof(longlong_t) + align;
 
-    if ((end_ - offset_) >= sizeAligned)
+    if ((end_ - offset_) >= size_aligned)
     {
         // Save last datasize.
         last_data_size_ = align64_;
@@ -1410,9 +1411,9 @@ Cdr& Cdr::deserialize(
         float& float_t)
 {
     size_t align = alignment(sizeof(float_t));
-    size_t sizeAligned = sizeof(float_t) + align;
+    size_t size_aligned = sizeof(float_t) + align;
 
-    if ((end_ - offset_) >= sizeAligned)
+    if ((end_ - offset_) >= size_aligned)
     {
         // Save last datasize.
         last_data_size_ = sizeof(float_t);
@@ -1445,9 +1446,9 @@ Cdr& Cdr::deserialize(
         double& double_t)
 {
     size_t align = alignment(align64_);
-    size_t sizeAligned = sizeof(double_t) + align;
+    size_t size_aligned = sizeof(double_t) + align;
 
-    if ((end_ - offset_) >= sizeAligned)
+    if ((end_ - offset_) >= size_aligned)
     {
         // Save last datasize.
         last_data_size_ = align64_;
@@ -1484,9 +1485,9 @@ Cdr& Cdr::deserialize(
         long double& ldouble_t)
 {
     size_t align = alignment(align64_);
-    size_t sizeAligned = sizeof(ldouble_t) + align;
+    size_t size_aligned = sizeof(ldouble_t) + align;
 
-    if ((end_ - offset_) >= sizeAligned)
+    if ((end_ - offset_) >= size_aligned)
     {
         // Save last datasize.
         last_data_size_ = align64_;
@@ -1659,27 +1660,27 @@ Cdr& Cdr::deserialize(
 const char* Cdr::read_string(
         uint32_t& length)
 {
-    const char* returnedValue = "";
+    const char* ret_value = "";
     state state_before_error(*this);
 
     *this >> length;
 
     if (length == 0)
     {
-        return returnedValue;
+        return ret_value;
     }
     else if ((end_ - offset_) >= length)
     {
         // Save last datasize.
         last_data_size_ = sizeof(uint8_t);
 
-        returnedValue = &offset_;
+        ret_value = &offset_;
         offset_ += length;
-        if (returnedValue[length - 1] == '\0')
+        if (ret_value[length - 1] == '\0')
         {
             --length;
         }
-        return returnedValue;
+        return ret_value;
     }
 
     set_state(state_before_error);
@@ -1690,29 +1691,29 @@ const char* Cdr::read_string(
 const std::wstring Cdr::read_wstring(
         uint32_t& length)
 {
-    std::wstring returnedValue = L"";
+    std::wstring ret_value = L"";
     state state_(*this);
 
     *this >> length;
-    uint32_t bytesLength = length * 2;
+    uint32_t bytes_length = length * 2;
 
-    if (bytesLength == 0)
+    if (bytes_length == 0)
     {
-        return returnedValue;
+        return ret_value;
     }
-    else if ((end_ - offset_) >= bytesLength)
+    else if ((end_ - offset_) >= bytes_length)
     {
         // Save last datasize.
         last_data_size_ = sizeof(uint16_t);
 
-        returnedValue.resize(length);
-        deserialize_array(const_cast<wchar_t*>(returnedValue.c_str()), length);
-        if (returnedValue[length - 1] == L'\0')
+        ret_value.resize(length);
+        deserialize_array(const_cast<wchar_t*>(ret_value.c_str()), length);
+        if (ret_value[length - 1] == L'\0')
         {
             --length;
-            returnedValue.erase(length);
+            ret_value.erase(length);
         }
-        return returnedValue;
+        return ret_value;
     }
 
     set_state(state_);
@@ -1724,9 +1725,9 @@ Cdr& Cdr::deserialize_array(
         bool* bool_t,
         size_t num_elements)
 {
-    size_t totalSize = sizeof(*bool_t) * num_elements;
+    size_t total_size = sizeof(*bool_t) * num_elements;
 
-    if ((end_ - offset_) >= totalSize)
+    if ((end_ - offset_) >= total_size)
     {
         // Save last datasize.
         last_data_size_ = sizeof(*bool_t);
@@ -1756,15 +1757,15 @@ Cdr& Cdr::deserialize_array(
         char* char_t,
         size_t num_elements)
 {
-    size_t totalSize = sizeof(*char_t) * num_elements;
+    size_t total_size = sizeof(*char_t) * num_elements;
 
-    if ((end_ - offset_) >= totalSize)
+    if ((end_ - offset_) >= total_size)
     {
         // Save last datasize.
         last_data_size_ = sizeof(*char_t);
 
-        offset_.rmemcopy(char_t, totalSize);
-        offset_ += totalSize;
+        offset_.rmemcopy(char_t, total_size);
+        offset_ += total_size;
         return *this;
     }
 
@@ -1781,10 +1782,10 @@ Cdr& Cdr::deserialize_array(
     }
 
     size_t align = alignment(sizeof(*short_t));
-    size_t totalSize = sizeof(*short_t) * num_elements;
-    size_t sizeAligned = totalSize + align;
+    size_t total_size = sizeof(*short_t) * num_elements;
+    size_t size_aligned = total_size + align;
 
-    if ((end_ - offset_) >= sizeAligned)
+    if ((end_ - offset_) >= size_aligned)
     {
         // Save last datasize.
         last_data_size_ = sizeof(*short_t);
@@ -1798,7 +1799,7 @@ Cdr& Cdr::deserialize_array(
         if (swap_bytes_)
         {
             char* dst = reinterpret_cast<char*>(short_t);
-            char* end = dst + totalSize;
+            char* end = dst + total_size;
 
             for (; dst < end; dst += sizeof(*short_t))
             {
@@ -1808,8 +1809,8 @@ Cdr& Cdr::deserialize_array(
         }
         else
         {
-            offset_.rmemcopy(short_t, totalSize);
-            offset_ += totalSize;
+            offset_.rmemcopy(short_t, total_size);
+            offset_ += total_size;
         }
 
         return *this;
@@ -1828,10 +1829,10 @@ Cdr& Cdr::deserialize_array(
     }
 
     size_t align = alignment(sizeof(*long_t));
-    size_t totalSize = sizeof(*long_t) * num_elements;
-    size_t sizeAligned = totalSize + align;
+    size_t total_size = sizeof(*long_t) * num_elements;
+    size_t size_aligned = total_size + align;
 
-    if ((end_ - offset_) >= sizeAligned)
+    if ((end_ - offset_) >= size_aligned)
     {
         // Save last datasize.
         last_data_size_ = sizeof(*long_t);
@@ -1845,7 +1846,7 @@ Cdr& Cdr::deserialize_array(
         if (swap_bytes_)
         {
             char* dst = reinterpret_cast<char*>(long_t);
-            char* end = dst + totalSize;
+            char* end = dst + total_size;
 
             for (; dst < end; dst += sizeof(*long_t))
             {
@@ -1857,8 +1858,8 @@ Cdr& Cdr::deserialize_array(
         }
         else
         {
-            offset_.rmemcopy(long_t, totalSize);
-            offset_ += totalSize;
+            offset_.rmemcopy(long_t, total_size);
+            offset_ += total_size;
         }
 
         return *this;
@@ -1895,10 +1896,10 @@ Cdr& Cdr::deserialize_array(
     }
 
     size_t align = alignment(align64_);
-    size_t totalSize = sizeof(*longlong_t) * num_elements;
-    size_t sizeAligned = totalSize + align;
+    size_t total_size = sizeof(*longlong_t) * num_elements;
+    size_t size_aligned = total_size + align;
 
-    if ((end_ - offset_) >= sizeAligned)
+    if ((end_ - offset_) >= size_aligned)
     {
         // Save last datasize.
         last_data_size_ = align64_;
@@ -1912,7 +1913,7 @@ Cdr& Cdr::deserialize_array(
         if (swap_bytes_)
         {
             char* dst = reinterpret_cast<char*>(longlong_t);
-            char* end = dst + totalSize;
+            char* end = dst + total_size;
 
             for (; dst < end; dst += sizeof(*longlong_t))
             {
@@ -1928,8 +1929,8 @@ Cdr& Cdr::deserialize_array(
         }
         else
         {
-            offset_.rmemcopy(longlong_t, totalSize);
-            offset_ += totalSize;
+            offset_.rmemcopy(longlong_t, total_size);
+            offset_ += total_size;
         }
 
         return *this;
@@ -1948,10 +1949,10 @@ Cdr& Cdr::deserialize_array(
     }
 
     size_t align = alignment(sizeof(*float_t));
-    size_t totalSize = sizeof(*float_t) * num_elements;
-    size_t sizeAligned = totalSize + align;
+    size_t total_size = sizeof(*float_t) * num_elements;
+    size_t size_aligned = total_size + align;
 
-    if ((end_ - offset_) >= sizeAligned)
+    if ((end_ - offset_) >= size_aligned)
     {
         // Save last datasize.
         last_data_size_ = sizeof(*float_t);
@@ -1965,7 +1966,7 @@ Cdr& Cdr::deserialize_array(
         if (swap_bytes_)
         {
             char* dst = reinterpret_cast<char*>(float_t);
-            char* end = dst + totalSize;
+            char* end = dst + total_size;
 
             for (; dst < end; dst += sizeof(*float_t))
             {
@@ -1977,8 +1978,8 @@ Cdr& Cdr::deserialize_array(
         }
         else
         {
-            offset_.rmemcopy(float_t, totalSize);
-            offset_ += totalSize;
+            offset_.rmemcopy(float_t, total_size);
+            offset_ += total_size;
         }
 
         return *this;
@@ -1997,10 +1998,10 @@ Cdr& Cdr::deserialize_array(
     }
 
     size_t align = alignment(align64_);
-    size_t totalSize = sizeof(*double_t) * num_elements;
-    size_t sizeAligned = totalSize + align;
+    size_t total_size = sizeof(*double_t) * num_elements;
+    size_t size_aligned = total_size + align;
 
-    if ((end_ - offset_) >= sizeAligned)
+    if ((end_ - offset_) >= size_aligned)
     {
         // Save last datasize.
         last_data_size_ = align64_;
@@ -2014,7 +2015,7 @@ Cdr& Cdr::deserialize_array(
         if (swap_bytes_)
         {
             char* dst = reinterpret_cast<char*>(double_t);
-            char* end = dst + totalSize;
+            char* end = dst + total_size;
 
             for (; dst < end; dst += sizeof(*double_t))
             {
@@ -2030,8 +2031,8 @@ Cdr& Cdr::deserialize_array(
         }
         else
         {
-            offset_.rmemcopy(double_t, totalSize);
-            offset_ += totalSize;
+            offset_.rmemcopy(double_t, total_size);
+            offset_ += total_size;
         }
 
         return *this;
@@ -2051,10 +2052,10 @@ Cdr& Cdr::deserialize_array(
 
     size_t align = alignment(align64_);
     // Fix for Windows ( long doubles only store 8 bytes )
-    size_t totalSize = 16 * num_elements;
-    size_t sizeAligned = totalSize + align;
+    size_t total_size = 16 * num_elements;
+    size_t size_aligned = total_size + align;
 
-    if ((end_ - offset_) >= sizeAligned)
+    if ((end_ - offset_) >= size_aligned)
     {
         // Save last datasize.
         last_data_size_ = align64_;
@@ -2135,8 +2136,8 @@ Cdr& Cdr::deserialize_array(
         else
         {
 #if FASTCDR_SIZEOF_LONG_DOUBLE == 16
-            offset_.rmemcopy(ldouble_t, totalSize);
-            offset_ += totalSize;
+            offset_.rmemcopy(ldouble_t, total_size);
+            offset_ += total_size;
 #else
             for (size_t i = 0; i < num_elements; ++i)
             {
@@ -2162,9 +2163,9 @@ Cdr& Cdr::serialize_bool_sequence(
 
     *this << static_cast<int32_t>(vector_t.size());
 
-    size_t totalSize = vector_t.size() * sizeof(bool);
+    size_t total_size = vector_t.size() * sizeof(bool);
 
-    if (((end_ - offset_) >= totalSize) || resize(totalSize))
+    if (((end_ - offset_) >= total_size) || resize(total_size))
     {
         // Save last datasize.
         last_data_size_ = sizeof(bool);
@@ -2203,9 +2204,9 @@ Cdr& Cdr::deserialize_bool_sequence(
 
     *this >> sequence_length;
 
-    size_t totalSize = sequence_length * sizeof(bool);
+    size_t total_size = sequence_length * sizeof(bool);
 
-    if ((end_ - offset_) >= totalSize)
+    if ((end_ - offset_) >= total_size)
     {
         vector_t.resize(sequence_length);
         // Save last datasize.
@@ -3145,7 +3146,7 @@ Cdr& Cdr::xcdr1_deserialize_type(
             if (current_state.member_size_ != offset_ - prev_offset)
             {
                 throw BadParamException(
-                          "Member size provided by member header is not equal to at the real decoded member size");
+                          "Member size provided by member header is not equal to the real decoded member size");
             }
         }
     }
@@ -3214,7 +3215,7 @@ Cdr& Cdr::xcdr2_deserialize_type(
                         (XCdrHeaderSelection::SHORT_HEADER == current_state.header_serialized_ ? 4 : 8)))
                 {
                     throw BadParamException(
-                              "Member size provided by member header is not equal at the real decoded member");
+                              "Member size provided by member header is not equal to the real decoded member");
                 }
             }
 

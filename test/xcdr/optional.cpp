@@ -953,7 +953,7 @@ TEST_P(XCdrOptionalTest, null_optional)
 }
 
 /*!
- * @test Test an structure with an optional field of short type.
+ * @test Test a structure with an optional field of short type.
  * @code{.idl}
  * struct OptionalShortStruct
  * {
@@ -1049,7 +1049,7 @@ TEST_P(XCdrOptionalTest, short_optional)
 }
 
 /*!
- * @test Test an structure with an optional field of unsigned short type.
+ * @test Test a structure with an optional field of unsigned short type.
  * @code{.idl}
  * struct OptionalUShortStruct
  * {
@@ -1145,7 +1145,7 @@ TEST_P(XCdrOptionalTest, ushort_optional)
 }
 
 /*!
- * @test Test an structure with an optional field of long type.
+ * @test Test a structure with an optional field of long type.
  * @code{.idl}
  * struct OptionalLongStruct
  * {
@@ -1243,7 +1243,7 @@ TEST_P(XCdrOptionalTest, long_optional)
 }
 
 /*!
- * @test Test an structure with an optional field of unsigned long type.
+ * @test Test a structure with an optional field of unsigned long type.
  * @code{.idl}
  * struct OptionalULongStruct
  * {
@@ -1341,7 +1341,7 @@ TEST_P(XCdrOptionalTest, ulong_optional)
 }
 
 /*!
- * @test Test an structure with an optional field of long long type.
+ * @test Test a structure with an optional field of long long type.
  * @code{.idl}
  * struct OptionalLongLongStruct
  * {
@@ -1449,7 +1449,7 @@ TEST_P(XCdrOptionalTest, longlong_optional)
 }
 
 /*!
- * @test Test an structure with an optional field of unsigned long long type.
+ * @test Test a structure with an optional field of unsigned long long type.
  * @code{.idl}
  * struct OptionalULongLongStruct
  * {
@@ -1557,7 +1557,7 @@ TEST_P(XCdrOptionalTest, ulonglong_optional)
 }
 
 /*!
- * @test Test an structure with an optional field of float type.
+ * @test Test a structure with an optional field of float type.
  * @code{.idl}
  * struct OptionalFloatStruct
  * {
@@ -1655,7 +1655,7 @@ TEST_P(XCdrOptionalTest, float_optional)
 }
 
 /*!
- * @test Test an structure with an optional field of double type.
+ * @test Test a structure with an optional field of double type.
  * @code{.idl}
  * struct OptionalDoubleStruct
  * {
@@ -1763,7 +1763,7 @@ TEST_P(XCdrOptionalTest, double_optional)
 }
 
 /*!
- * @test Test an structure with an optional field of long double type.
+ * @test Test a structure with an optional field of long double type.
  * @code{.idl}
  * struct OptionalLongDoubleStruct
  * {
@@ -2006,7 +2006,7 @@ TEST_P(XCdrOptionalTest, longdouble_optional)
 }
 
 /*!
- * @test Test an structure with an optional field of boolean type.
+ * @test Test a structure with an optional field of boolean type.
  * @code{.idl}
  * struct OptionalBooleanStruct
  * {
@@ -2101,7 +2101,7 @@ TEST_P(XCdrOptionalTest, boolean_optional)
 }
 
 /*!
- * @test Test an structure with an optional field of octet type.
+ * @test Test a structure with an optional field of octet type.
  * @code{.idl}
  * struct OptionalOctetStruct
  * {
@@ -2195,7 +2195,7 @@ TEST_P(XCdrOptionalTest, octet_optional)
 }
 
 /*!
- * @test Test an structure with an optional field of char type.
+ * @test Test a structure with an optional field of char type.
  * @code{.idl}
  * struct OptionalCharStruct
  * {
@@ -2290,7 +2290,7 @@ TEST_P(XCdrOptionalTest, char_optional)
 }
 
 /*!
- * @test Test an structure with an optional field of wchar type.
+ * @test Test a structure with an optional field of wchar type.
  * @code{.idl}
  * struct OptionalWCharStruct
  * {
@@ -2390,7 +2390,7 @@ TEST_P(XCdrOptionalTest, wchar_optional)
 }
 
 /*!
- * @test Test an structure with a field of octet type and an empty optional field of octet type.
+ * @test Test a structure with a field of octet type and an empty optional field of octet type.
  * @code{.idl}
  * struct NullAlign1Optional
  * {
@@ -2488,7 +2488,7 @@ TEST_P(XCdrOptionalTest, null_align_1_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and an empty optional field of octet type.
+ * @test Test a structure with a field of unsigned short type and an empty optional field of octet type.
  * @code{.idl}
  * struct NullAlign2Optional
  * {
@@ -2587,7 +2587,7 @@ TEST_P(XCdrOptionalTest, null_align_2_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and an empty optional field of octet type.
+ * @test Test a structure with a field of unsigned long type and an empty optional field of octet type.
  * @code{.idl}
  * struct NullAlign4Optional
  * {
@@ -2682,7 +2682,7 @@ TEST_P(XCdrOptionalTest, null_align_4_optional)
 }
 
 /*!
- * @test Test an structure with a field of octet type and an optional of short type.
+ * @test Test a structure with a field of octet type and an optional of short type.
  * @code{.idl}
  * struct OptionalShortAlign1Struct
  * {
@@ -2800,7 +2800,7 @@ TEST_P(XCdrOptionalTest, short_align_1_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and another of short type.
+ * @test Test a structure with a field of unsigned short type and another of short type.
  * @code{.idl}
  * struct ShortAlign2Struct
  * {
@@ -2923,7 +2923,7 @@ TEST_P(XCdrOptionalTest, short_align_2_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and an optional of short type.
+ * @test Test a structure with a field of unsigned long type and an optional of short type.
  * @code{.idl}
  * struct OptionalShortAlign4Struct
  * {
@@ -3041,7 +3041,7 @@ TEST_P(XCdrOptionalTest, short_align_4_optional)
 }
 
 /*!
- * @test Test an structure with a field of octet type and an optional of unsigned short type.
+ * @test Test a structure with a field of octet type and an optional of unsigned short type.
  * @code{.idl}
  * struct OptionalUShortAlign1Struct
  * {
@@ -3159,7 +3159,7 @@ TEST_P(XCdrOptionalTest, ushort_align_1_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and an optional of unsigned short type.
+ * @test Test a structure with a field of unsigned short type and an optional of unsigned short type.
  * @code{.idl}
  * struct OptionalUShortAlign2Struct
  * {
@@ -3283,7 +3283,7 @@ TEST_P(XCdrOptionalTest, ushort_align_2_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and an optional of unsigned short type.
+ * @test Test a structure with a field of unsigned long type and an optional of unsigned short type.
  * @code{.idl}
  * struct OptionalUShortAlign4Struct
  * {
@@ -3401,7 +3401,7 @@ TEST_P(XCdrOptionalTest, ushort_align_4_optional)
 }
 
 /*!
- * @test Test an structure with a field of octet type and an optional of long type.
+ * @test Test a structure with a field of octet type and an optional of long type.
  * @code{.idl}
  * struct OptionalLongAlign1Struct
  * {
@@ -3521,7 +3521,7 @@ TEST_P(XCdrOptionalTest, long_align_1_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and an optional of long type.
+ * @test Test a structure with a field of unsigned short type and an optional of long type.
  * @code{.idl}
  * struct OptionalLongAlign2Struct
  * {
@@ -3643,7 +3643,7 @@ TEST_P(XCdrOptionalTest, long_align_2_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and an optional of long type.
+ * @test Test a structure with a field of unsigned long type and an optional of long type.
  * @code{.idl}
  * struct OptionalLongAlign4Struct
  * {
@@ -3759,7 +3759,7 @@ TEST_P(XCdrOptionalTest, long_align_4_optional)
 }
 
 /*!
- * @test Test an structure with a field of octet type and an optional of unsigned long type.
+ * @test Test a structure with a field of octet type and an optional of unsigned long type.
  * @code{.idl}
  * struct OptionalULongAlign1Struct
  * {
@@ -3879,7 +3879,7 @@ TEST_P(XCdrOptionalTest, ulong_align_1_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and an optional of unsigned long type.
+ * @test Test a structure with a field of unsigned short type and an optional of unsigned long type.
  * @code{.idl}
  * struct OptionalULongAlign2Struct
  * {
@@ -4001,7 +4001,7 @@ TEST_P(XCdrOptionalTest, ulong_align_2_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and an optional of unsigned long type.
+ * @test Test a structure with a field of unsigned long type and an optional of unsigned long type.
  * @code{.idl}
  * struct OptionalULongAlign4Struct
  * {
@@ -4117,7 +4117,7 @@ TEST_P(XCdrOptionalTest, ulong_align_4_optional)
 }
 
 /*!
- * @test Test an structure with a field of octet type and an optional of long long type.
+ * @test Test a structure with a field of octet type and an optional of long long type.
  * @code{.idl}
  * struct OptionalLongLongAlign1Struct
  * {
@@ -4247,7 +4247,7 @@ TEST_P(XCdrOptionalTest, longlong_align_1_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and an optional of long long type.
+ * @test Test a structure with a field of unsigned short type and an optional of long long type.
  * @code{.idl}
  * struct OptionalLongLongAlign2Struct
  * {
@@ -4378,7 +4378,7 @@ TEST_P(XCdrOptionalTest, longlong_align_2_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, longlong_value);
 }
 /*!
- * @test Test an structure with a field of unsigned long type and an optional of long long type.
+ * @test Test a structure with a field of unsigned long type and an optional of long long type.
  * @code{.idl}
  * struct OptionalLongLongAlign4Struct
  * {
@@ -4505,7 +4505,7 @@ TEST_P(XCdrOptionalTest, longlong_align_4_optional)
 }
 
 /*!
- * @test Test an structure with a field of octet type and an optional of unsigned long long type.
+ * @test Test a structure with a field of octet type and an optional of unsigned long long type.
  * @code{.idl}
  * struct OptionalULongLongAlign1Struct
  * {
@@ -4635,7 +4635,7 @@ TEST_P(XCdrOptionalTest, ulonglong_align_1_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and an optional of unsigned long long type.
+ * @test Test a structure with a field of unsigned short type and an optional of unsigned long long type.
  * @code{.idl}
  * struct OptionalULongLongAlign2Struct
  * {
@@ -4767,7 +4767,7 @@ TEST_P(XCdrOptionalTest, ulonglong_align_2_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and an optional of unsigned long long type.
+ * @test Test a structure with a field of unsigned long type and an optional of unsigned long long type.
  * @code{.idl}
  * struct OptionalULongLongAlign4Struct
  * {
@@ -4893,7 +4893,7 @@ TEST_P(XCdrOptionalTest, ulonglong_align_4_optional)
 }
 
 /*!
- * @test Test an structure with a field of octet type and an optional of float type.
+ * @test Test a structure with a field of octet type and an optional of float type.
  * @code{.idl}
  * struct OptionalFloatAlign1Struct
  * {
@@ -5013,7 +5013,7 @@ TEST_P(XCdrOptionalTest, float_align_1_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and an optional of float type.
+ * @test Test a structure with a field of unsigned short type and an optional of float type.
  * @code{.idl}
  * struct OptionalFloatAlign2Struct
  * {
@@ -5135,7 +5135,7 @@ TEST_P(XCdrOptionalTest, float_align_2_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and an optional of float type.
+ * @test Test a structure with a field of unsigned long type and an optional of float type.
  * @code{.idl}
  * struct OptionalFloatAlign4Struct
  * {
@@ -5251,7 +5251,7 @@ TEST_P(XCdrOptionalTest, float_align_4_optional)
 }
 
 /*!
- * @test Test an structure with a field of octet type and an optional of double type.
+ * @test Test a structure with a field of octet type and an optional of double type.
  * @code{.idl}
  * struct OptionalDoubleAlign1Struct
  * {
@@ -5381,7 +5381,7 @@ TEST_P(XCdrOptionalTest, double_align_1_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and an optional of double type.
+ * @test Test a structure with a field of unsigned short type and an optional of double type.
  * @code{.idl}
  * struct OptionalDoubleAlign2Struct
  * {
@@ -5513,7 +5513,7 @@ TEST_P(XCdrOptionalTest, double_align_2_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and an optional of double type.
+ * @test Test a structure with a field of unsigned long type and an optional of double type.
  * @code{.idl}
  * struct OptionalDoubleAlign4Struct
  * {
@@ -5639,7 +5639,7 @@ TEST_P(XCdrOptionalTest, double_align_4_optional)
 }
 
 /*!
- * @test Test an structure with a field of octet type and an optional of long double type.
+ * @test Test a structure with a field of octet type and an optional of long double type.
  * @code{.idl}
  * struct OptionalLongDoubleAlign1Struct
  * {
@@ -5781,7 +5781,7 @@ TEST_P(XCdrOptionalTest, longdouble_align_1_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and an optional of long double type.
+ * @test Test a structure with a field of unsigned short type and an optional of long double type.
  * @code{.idl}
  * struct OptionalLongDoubleAlign2Struct
  * {
@@ -5925,7 +5925,7 @@ TEST_P(XCdrOptionalTest, longdouble_align_2_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and an optional of long double type.
+ * @test Test a structure with a field of unsigned long type and an optional of long double type.
  * @code{.idl}
  * struct OptionalLongDoubleAlign4Struct
  * {
@@ -6063,7 +6063,7 @@ TEST_P(XCdrOptionalTest, longdouble_align_4_optional)
 }
 
 /*!
- * @test Test an structure with a field of octet type and an optional of boolean type.
+ * @test Test a structure with a field of octet type and an optional of boolean type.
  * @code{.idl}
  * struct OptionalBooleanAlign1Struct
  * {
@@ -6180,7 +6180,7 @@ TEST_P(XCdrOptionalTest, boolean_align_1_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and an optional of boolean type.
+ * @test Test a structure with a field of unsigned short type and an optional of boolean type.
  * @code{.idl}
  * struct OptionalBooleanAlign2Struct
  * {
@@ -6299,7 +6299,7 @@ TEST_P(XCdrOptionalTest, boolean_align_2_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and an optional of boolean type.
+ * @test Test a structure with a field of unsigned long type and an optional of boolean type.
  * @code{.idl}
  * struct OptionalBooleanAlign4Struct
  * {
@@ -6412,7 +6412,7 @@ TEST_P(XCdrOptionalTest, boolean_align_4_optional)
 }
 
 /*!
- * @test Test an structure with a field of octet type and an optional of octet type.
+ * @test Test a structure with a field of octet type and an optional of octet type.
  * @code{.idl}
  * struct OptionalOctetAlign1Struct
  * {
@@ -6528,7 +6528,7 @@ TEST_P(XCdrOptionalTest, octet_align_1_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and an optional of octet type.
+ * @test Test a structure with a field of unsigned short type and an optional of octet type.
  * @code{.idl}
  * struct OptionalOctetAlign2Struct
  * {
@@ -6646,7 +6646,7 @@ TEST_P(XCdrOptionalTest, octet_align_2_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and an optional of octet type.
+ * @test Test a structure with a field of unsigned long type and an optional of octet type.
  * @code{.idl}
  * struct OptionalOctetAlign4Struct
  * {
@@ -6758,7 +6758,7 @@ TEST_P(XCdrOptionalTest, octet_align_4_optional)
 }
 
 /*!
- * @test Test an structure with a field of octet type and an optional of char type.
+ * @test Test a structure with a field of octet type and an optional of char type.
  * @code{.idl}
  * struct OptionalCharAlign1Struct
  * {
@@ -6875,7 +6875,7 @@ TEST_P(XCdrOptionalTest, char_align_1_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and an optional of char type.
+ * @test Test a structure with a field of unsigned short type and an optional of char type.
  * @code{.idl}
  * struct OptionalCharAlign2Struct
  * {
@@ -6994,7 +6994,7 @@ TEST_P(XCdrOptionalTest, char_align_2_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and an optional of char type.
+ * @test Test a structure with a field of unsigned long type and an optional of char type.
  * @code{.idl}
  * struct OptionalCharAlign4Struct
  * {
@@ -7107,7 +7107,7 @@ TEST_P(XCdrOptionalTest, char_align_4_optional)
 }
 
 /*!
- * @test Test an structure with a field of octet type and an optional of wchar type.
+ * @test Test a structure with a field of octet type and an optional of wchar type.
  * @code{.idl}
  * struct OptionalWCharAlign1Struct
  * {
@@ -7225,7 +7225,7 @@ TEST_P(XCdrOptionalTest, wchar_align_1_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned short type and an optional of wchar type.
+ * @test Test a structure with a field of unsigned short type and an optional of wchar type.
  * @code{.idl}
  * struct OptionalWCharAlign2Struct
  * {
@@ -7349,7 +7349,7 @@ TEST_P(XCdrOptionalTest, wchar_align_2_optional)
 }
 
 /*!
- * @test Test an structure with a field of unsigned long type and an optional of wchar type.
+ * @test Test a structure with a field of unsigned long type and an optional of wchar type.
  * @code{.idl}
  * struct OptionalWCharAlign4Struct
  * {
@@ -7467,7 +7467,7 @@ TEST_P(XCdrOptionalTest, wchar_align_4_optional)
 }
 
 /*!
- * @test Test an structure with two fields of optional struct type where inner optionals are null.
+ * @test Test a structure with two fields of optional struct type where inner optionals are null.
  * @code{.idl}
  * struct InnerOptionalShortStruct
  * {
@@ -7764,7 +7764,7 @@ TEST_P(XCdrOptionalTest, two_inner_null_optional)
 }
 
 /*!
- * @test Test an structure with two fields of optional struct type where inner optionals have value.
+ * @test Test a structure with two fields of optional struct type where inner optionals have value.
  * @code{.idl}
  * struct InnerOptionalShortStruct
  * {

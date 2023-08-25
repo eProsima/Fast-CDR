@@ -32,25 +32,25 @@ FastCdr::state::state(
 }
 
 FastCdr::FastCdr(
-        FastBuffer& cdrBuffer)
-    : cdr_buffer_(cdrBuffer)
-    , current_position_(cdrBuffer.begin())
-    , last_position_(cdrBuffer.end())
+        FastBuffer& cdr_buffer)
+    : cdr_buffer_(cdr_buffer)
+    , current_position_(cdr_buffer.begin())
+    , last_position_(cdr_buffer.end())
 {
 }
 
 bool FastCdr::jump(
-        size_t numBytes)
+        size_t num_bytes)
 {
-    bool returnedValue = false;
+    bool ret_value = false;
 
-    if (((last_position_ - current_position_) >= numBytes) || resize(numBytes))
+    if (((last_position_ - current_position_) >= num_bytes) || resize(num_bytes))
     {
-        current_position_ += numBytes;
-        returnedValue = true;
+        current_position_ += num_bytes;
+        ret_value = true;
     }
 
-    return returnedValue;
+    return ret_value;
 }
 
 char* FastCdr::get_current_position()
@@ -75,9 +75,9 @@ void FastCdr::reset()
 }
 
 bool FastCdr::resize(
-        size_t minSizeInc)
+        size_t min_size_inc)
 {
-    if (cdr_buffer_.resize(minSizeInc))
+    if (cdr_buffer_.resize(min_size_inc))
     {
         current_position_ << cdr_buffer_.begin();
         last_position_ = cdr_buffer_.end();
@@ -143,27 +143,27 @@ FastCdr& FastCdr::serialize(
 FastCdr& FastCdr::serialize(
         const wchar_t* string_t)
 {
-    uint32_t bytesLength = 0;
+    uint32_t bytes_length = 0;
     size_t wstrlen = 0;
 
     if (string_t != nullptr)
     {
         wstrlen = wcslen(string_t);
-        bytesLength = size_to_uint32(wstrlen * 4);
+        bytes_length = size_to_uint32(wstrlen * 4);
     }
 
-    if (bytesLength > 0)
+    if (bytes_length > 0)
     {
         FastCdr::state state_(*this);
         serialize(size_to_uint32(wstrlen));
 
-        if (((last_position_ - current_position_) >= bytesLength) || resize(bytesLength))
+        if (((last_position_ - current_position_) >= bytes_length) || resize(bytes_length))
         {
 #if defined(_WIN32)
             serialize_array(string_t, wstrlen);
 #else
-            current_position_.memcopy(string_t, bytesLength);
-            current_position_ += bytesLength; // size on bytes
+            current_position_.memcopy(string_t, bytes_length);
+            current_position_ += bytes_length; // size on bytes
 #endif // if defined(_WIN32)
         }
         else
@@ -174,7 +174,7 @@ FastCdr& FastCdr::serialize(
     }
     else
     {
-        serialize(bytesLength);
+        serialize(bytes_length);
     }
 
     return *this;
@@ -184,9 +184,9 @@ FastCdr& FastCdr::serialize_array(
         const bool* bool_t,
         size_t num_elements)
 {
-    size_t totalSize = sizeof(*bool_t) * num_elements;
+    size_t total_size = sizeof(*bool_t) * num_elements;
 
-    if (((last_position_ - current_position_) >= totalSize) || resize(totalSize))
+    if (((last_position_ - current_position_) >= total_size) || resize(total_size))
     {
         for (size_t count = 0; count < num_elements; ++count)
         {
@@ -209,12 +209,12 @@ FastCdr& FastCdr::serialize_array(
         const char* char_t,
         size_t num_elements)
 {
-    size_t totalSize = sizeof(*char_t) * num_elements;
+    size_t total_size = sizeof(*char_t) * num_elements;
 
-    if (((last_position_ - current_position_) >= totalSize) || resize(totalSize))
+    if (((last_position_ - current_position_) >= total_size) || resize(total_size))
     {
-        current_position_.memcopy(char_t, totalSize);
-        current_position_ += totalSize;
+        current_position_.memcopy(char_t, total_size);
+        current_position_ += total_size;
         return *this;
     }
 
@@ -225,12 +225,12 @@ FastCdr& FastCdr::serialize_array(
         const int16_t* short_t,
         size_t num_elements)
 {
-    size_t totalSize = sizeof(*short_t) * num_elements;
+    size_t total_size = sizeof(*short_t) * num_elements;
 
-    if (((last_position_ - current_position_) >= totalSize) || resize(totalSize))
+    if (((last_position_ - current_position_) >= total_size) || resize(total_size))
     {
-        current_position_.memcopy(short_t, totalSize);
-        current_position_ += totalSize;
+        current_position_.memcopy(short_t, total_size);
+        current_position_ += total_size;
 
         return *this;
     }
@@ -242,12 +242,12 @@ FastCdr& FastCdr::serialize_array(
         const int32_t* long_t,
         size_t num_elements)
 {
-    size_t totalSize = sizeof(*long_t) * num_elements;
+    size_t total_size = sizeof(*long_t) * num_elements;
 
-    if (((last_position_ - current_position_) >= totalSize) || resize(totalSize))
+    if (((last_position_ - current_position_) >= total_size) || resize(total_size))
     {
-        current_position_.memcopy(long_t, totalSize);
-        current_position_ += totalSize;
+        current_position_.memcopy(long_t, total_size);
+        current_position_ += total_size;
 
         return *this;
     }
@@ -270,12 +270,12 @@ FastCdr& FastCdr::serialize_array(
         const int64_t* longlong_t,
         size_t num_elements)
 {
-    size_t totalSize = sizeof(*longlong_t) * num_elements;
+    size_t total_size = sizeof(*longlong_t) * num_elements;
 
-    if (((last_position_ - current_position_) >= totalSize) || resize(totalSize))
+    if (((last_position_ - current_position_) >= total_size) || resize(total_size))
     {
-        current_position_.memcopy(longlong_t, totalSize);
-        current_position_ += totalSize;
+        current_position_.memcopy(longlong_t, total_size);
+        current_position_ += total_size;
 
         return *this;
     }
@@ -287,12 +287,12 @@ FastCdr& FastCdr::serialize_array(
         const float* float_t,
         size_t num_elements)
 {
-    size_t totalSize = sizeof(*float_t) * num_elements;
+    size_t total_size = sizeof(*float_t) * num_elements;
 
-    if (((last_position_ - current_position_) >= totalSize) || resize(totalSize))
+    if (((last_position_ - current_position_) >= total_size) || resize(total_size))
     {
-        current_position_.memcopy(float_t, totalSize);
-        current_position_ += totalSize;
+        current_position_.memcopy(float_t, total_size);
+        current_position_ += total_size;
 
         return *this;
     }
@@ -304,12 +304,12 @@ FastCdr& FastCdr::serialize_array(
         const double* double_t,
         size_t num_elements)
 {
-    size_t totalSize = sizeof(*double_t) * num_elements;
+    size_t total_size = sizeof(*double_t) * num_elements;
 
-    if (((last_position_ - current_position_) >= totalSize) || resize(totalSize))
+    if (((last_position_ - current_position_) >= total_size) || resize(total_size))
     {
-        current_position_.memcopy(double_t, totalSize);
-        current_position_ += totalSize;
+        current_position_.memcopy(double_t, total_size);
+        current_position_ += total_size;
 
         return *this;
     }
@@ -321,9 +321,9 @@ FastCdr& FastCdr::serialize_array(
         const long double* ldouble_t,
         size_t num_elements)
 {
-    size_t totalSize = 16 * num_elements;
+    size_t total_size = 16 * num_elements;
 
-    if (((last_position_ - current_position_) >= totalSize) || resize(totalSize))
+    if (((last_position_ - current_position_) >= total_size) || resize(total_size))
     {
 #if FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
         for (size_t idx = 0; idx < num_elements; ++idx)
@@ -334,8 +334,8 @@ FastCdr& FastCdr::serialize_array(
         }
 #else
 #if FASTCDR_SIZEOF_LONG_DOUBLE == 16
-        current_position_.memcopy(ldouble_t, totalSize);
-        current_position_ += totalSize;
+        current_position_.memcopy(ldouble_t, total_size);
+        current_position_ += total_size;
 #else
 #if FASTCDR_SIZEOF_LONG_DOUBLE == 8
         for (size_t idx = 0; idx < num_elements; ++idx)
@@ -452,24 +452,24 @@ FastCdr& FastCdr::deserialize(
 const char* FastCdr::read_string(
         uint32_t& length)
 {
-    const char* returnedValue = "";
+    const char* ret_value = "";
     state state_before_error(*this);
 
     *this >> length;
 
     if (length == 0)
     {
-        return returnedValue;
+        return ret_value;
     }
     else if ((last_position_ - current_position_) >= length)
     {
-        returnedValue = &current_position_;
+        ret_value = &current_position_;
         current_position_ += length;
-        if (returnedValue[length - 1] == '\0')
+        if (ret_value[length - 1] == '\0')
         {
             --length;
         }
-        return returnedValue;
+        return ret_value;
     }
 
     set_state(state_before_error);
@@ -480,27 +480,27 @@ const char* FastCdr::read_string(
 std::wstring FastCdr::read_wstring(
         uint32_t& length)
 {
-    std::wstring returnedValue = L"";
+    std::wstring ret_value = L"";
     state state_(*this);
 
     *this >> length;
-    uint32_t bytesLength = length * 4;
+    uint32_t bytes_length = length * 4;
 
-    if (bytesLength == 0)
+    if (bytes_length == 0)
     {
-        return returnedValue;
+        return ret_value;
     }
-    else if ((last_position_ - current_position_) >= bytesLength)
+    else if ((last_position_ - current_position_) >= bytes_length)
     {
 
-        returnedValue.resize(length);
-        deserialize_array(const_cast<wchar_t*>(returnedValue.c_str()), length);
-        if (returnedValue[length - 1] == L'\0')
+        ret_value.resize(length);
+        deserialize_array(const_cast<wchar_t*>(ret_value.c_str()), length);
+        if (ret_value[length - 1] == L'\0')
         {
             --length;
-            returnedValue.erase(length);
+            ret_value.erase(length);
         }
-        return returnedValue;
+        return ret_value;
     }
 
     set_state(state_);
@@ -512,9 +512,9 @@ FastCdr& FastCdr::deserialize_array(
         bool* bool_t,
         size_t num_elements)
 {
-    size_t totalSize = sizeof(*bool_t) * num_elements;
+    size_t total_size = sizeof(*bool_t) * num_elements;
 
-    if ((last_position_ - current_position_) >= totalSize)
+    if ((last_position_ - current_position_) >= total_size)
     {
         for (size_t count = 0; count < num_elements; ++count)
         {
@@ -541,12 +541,12 @@ FastCdr& FastCdr::deserialize_array(
         char* char_t,
         size_t num_elements)
 {
-    size_t totalSize = sizeof(*char_t) * num_elements;
+    size_t total_size = sizeof(*char_t) * num_elements;
 
-    if ((last_position_ - current_position_) >= totalSize)
+    if ((last_position_ - current_position_) >= total_size)
     {
-        current_position_.rmemcopy(char_t, totalSize);
-        current_position_ += totalSize;
+        current_position_.rmemcopy(char_t, total_size);
+        current_position_ += total_size;
         return *this;
     }
 
@@ -557,12 +557,12 @@ FastCdr& FastCdr::deserialize_array(
         int16_t* short_t,
         size_t num_elements)
 {
-    size_t totalSize = sizeof(*short_t) * num_elements;
+    size_t total_size = sizeof(*short_t) * num_elements;
 
-    if ((last_position_ - current_position_) >= totalSize)
+    if ((last_position_ - current_position_) >= total_size)
     {
-        current_position_.rmemcopy(short_t, totalSize);
-        current_position_ += totalSize;
+        current_position_.rmemcopy(short_t, total_size);
+        current_position_ += total_size;
 
         return *this;
     }
@@ -574,12 +574,12 @@ FastCdr& FastCdr::deserialize_array(
         int32_t* long_t,
         size_t num_elements)
 {
-    size_t totalSize = sizeof(*long_t) * num_elements;
+    size_t total_size = sizeof(*long_t) * num_elements;
 
-    if ((last_position_ - current_position_) >= totalSize)
+    if ((last_position_ - current_position_) >= total_size)
     {
-        current_position_.rmemcopy(long_t, totalSize);
-        current_position_ += totalSize;
+        current_position_.rmemcopy(long_t, total_size);
+        current_position_ += total_size;
 
         return *this;
     }
@@ -604,12 +604,12 @@ FastCdr& FastCdr::deserialize_array(
         int64_t* longlong_t,
         size_t num_elements)
 {
-    size_t totalSize = sizeof(*longlong_t) * num_elements;
+    size_t total_size = sizeof(*longlong_t) * num_elements;
 
-    if ((last_position_ - current_position_) >= totalSize)
+    if ((last_position_ - current_position_) >= total_size)
     {
-        current_position_.rmemcopy(longlong_t, totalSize);
-        current_position_ += totalSize;
+        current_position_.rmemcopy(longlong_t, total_size);
+        current_position_ += total_size;
 
         return *this;
     }
@@ -621,12 +621,12 @@ FastCdr& FastCdr::deserialize_array(
         float* float_t,
         size_t num_elements)
 {
-    size_t totalSize = sizeof(*float_t) * num_elements;
+    size_t total_size = sizeof(*float_t) * num_elements;
 
-    if ((last_position_ - current_position_) >= totalSize)
+    if ((last_position_ - current_position_) >= total_size)
     {
-        current_position_.rmemcopy(float_t, totalSize);
-        current_position_ += totalSize;
+        current_position_.rmemcopy(float_t, total_size);
+        current_position_ += total_size;
 
         return *this;
     }
@@ -638,12 +638,12 @@ FastCdr& FastCdr::deserialize_array(
         double* double_t,
         size_t num_elements)
 {
-    size_t totalSize = sizeof(*double_t) * num_elements;
+    size_t total_size = sizeof(*double_t) * num_elements;
 
-    if ((last_position_ - current_position_) >= totalSize)
+    if ((last_position_ - current_position_) >= total_size)
     {
-        current_position_.rmemcopy(double_t, totalSize);
-        current_position_ += totalSize;
+        current_position_.rmemcopy(double_t, total_size);
+        current_position_ += total_size;
 
         return *this;
     }
@@ -655,9 +655,9 @@ FastCdr& FastCdr::deserialize_array(
         long double* ldouble_t,
         size_t num_elements)
 {
-    size_t totalSize = 16 * num_elements;
+    size_t total_size = 16 * num_elements;
 
-    if ((last_position_ - current_position_) >= totalSize)
+    if ((last_position_ - current_position_) >= total_size)
     {
 #if FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
         for (size_t idx = 0; idx < num_elements; ++idx)
@@ -669,8 +669,8 @@ FastCdr& FastCdr::deserialize_array(
         }
 #else
 #if FASTCDR_SIZEOF_LONG_DOUBLE == 16
-        current_position_.rmemcopy(ldouble_t, totalSize);
-        current_position_ += totalSize;
+        current_position_.rmemcopy(ldouble_t, total_size);
+        current_position_ += total_size;
 #else
 #if FASTCDR_SIZEOF_LONG_DOUBLE == 8
         for (size_t idx = 0; idx < num_elements; ++idx)
@@ -698,9 +698,9 @@ FastCdr& FastCdr::serialize_bool_sequence(
 
     *this << static_cast<int32_t>(vector_t.size());
 
-    size_t totalSize = vector_t.size() * sizeof(bool);
+    size_t total_size = vector_t.size() * sizeof(bool);
 
-    if (((last_position_ - current_position_) >= totalSize) || resize(totalSize))
+    if (((last_position_ - current_position_) >= total_size) || resize(total_size))
     {
         for (size_t count = 0; count < vector_t.size(); ++count)
         {
@@ -731,9 +731,9 @@ FastCdr& FastCdr::deserialize_bool_sequence(
 
     *this >> sequence_length;
 
-    size_t totalSize = sequence_length * sizeof(bool);
+    size_t total_size = sequence_length * sizeof(bool);
 
-    if ((last_position_ - current_position_) >= totalSize)
+    if ((last_position_ - current_position_) >= total_size)
     {
         vector_t.resize(sequence_length);
         for (uint32_t count = 0; count < sequence_length; ++count)

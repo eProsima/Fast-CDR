@@ -197,7 +197,7 @@ void deserialize(
  *     unsigned short value2;
  * };
  *
- * @appendable
+ * @mutable
  * struct MutableStruct // Decoded version
  * {
  *     @id(16)
@@ -347,7 +347,7 @@ TEST_P(XCdrMutableTest, unordered_and_more_serialized_elements)
  *     unsigned short value2;
  * };
  *
- * @appendable
+ * @mutable
  * struct MutableStruct // Decoded version
  * {
  *     @id(16)

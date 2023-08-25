@@ -394,18 +394,18 @@ public:
             const _T& value,
             Endianness endianness)
     {
-        bool auxSwap = swap_bytes_;
+        bool aux_swap = swap_bytes_;
         swap_bytes_ = (swap_bytes_ && (static_cast<Endianness>(endianness_) == endianness)) ||
                 (!swap_bytes_ && (static_cast<Endianness>(endianness_) != endianness));
 
         try
         {
             serialize(value);
-            swap_bytes_ = auxSwap;
+            swap_bytes_ = aux_swap;
         }
         catch (exception::Exception& ex)
         {
-            swap_bytes_ = auxSwap;
+            swap_bytes_ = aux_swap;
             ex.raise();
         }
 
@@ -956,44 +956,28 @@ public:
     Cdr& serialize(
             const std::bitset<N>& value)
     {
-        state state_before_error(*this);
-
-        serialize(static_cast<uint8_t>(value.to_ulong()));
-
-        return *this;
+        return serialize(static_cast<uint8_t>(value.to_ulong()));
     }
 
     template<size_t N, typename std::enable_if < (8 < N && N < 17) > ::type* = nullptr>
     Cdr& serialize(
             const std::bitset<N>& value)
     {
-        state state_before_error(*this);
-
-        serialize(static_cast<uint16_t>(value.to_ulong()));
-
-        return *this;
+        return serialize(static_cast<uint16_t>(value.to_ulong()));
     }
 
     template<size_t N, typename std::enable_if < (16 < N && N < 33) > ::type* = nullptr>
     Cdr& serialize(
             const std::bitset<N>& value)
     {
-        state state_before_error(*this);
-
-        serialize(static_cast<uint32_t>(value.to_ulong()));
-
-        return *this;
+        return serialize(static_cast<uint32_t>(value.to_ulong()));
     }
 
     template<size_t N, typename std::enable_if < (32 < N && N < 65) > ::type* = nullptr>
     Cdr& serialize(
             const std::bitset<N>& value)
     {
-        state state_before_error(*this);
-
-        serialize(static_cast<uint64_t>(value.to_ullong()));
-
-        return *this;
+        return serialize(static_cast<uint64_t>(value.to_ullong()));
     }
 
     /*!
@@ -1033,18 +1017,18 @@ public:
             size_t num_elements,
             Endianness endianness)
     {
-        bool auxSwap = swap_bytes_;
+        bool aux_swap = swap_bytes_;
         swap_bytes_ = (swap_bytes_ && (static_cast<Endianness>(endianness_) == endianness)) ||
                 (!swap_bytes_ && (static_cast<Endianness>(endianness_) != endianness));
 
         try
         {
             serialize_array(type_t, num_elements);
-            swap_bytes_ = auxSwap;
+            swap_bytes_ = aux_swap;
         }
         catch (exception::Exception& ex)
         {
-            swap_bytes_ = auxSwap;
+            swap_bytes_ = aux_swap;
             ex.raise();
         }
 
@@ -1380,18 +1364,18 @@ public:
             size_t num_elements,
             Endianness endianness)
     {
-        bool auxSwap = swap_bytes_;
+        bool aux_swap = swap_bytes_;
         swap_bytes_ = (swap_bytes_ && (static_cast<Endianness>(endianness_) == endianness)) ||
                 (!swap_bytes_ && (static_cast<Endianness>(endianness_) != endianness));
 
         try
         {
             serialize_sequence(sequence_t, num_elements);
-            swap_bytes_ = auxSwap;
+            swap_bytes_ = aux_swap;
         }
         catch (exception::Exception& ex)
         {
-            swap_bytes_ = auxSwap;
+            swap_bytes_ = aux_swap;
             ex.raise();
         }
 
@@ -1429,18 +1413,18 @@ public:
             _T& value,
             Endianness endianness)
     {
-        bool auxSwap = swap_bytes_;
+        bool aux_swap = swap_bytes_;
         swap_bytes_ = (swap_bytes_ && (static_cast<Endianness>(endianness_) == endianness)) ||
                 (!swap_bytes_ && (static_cast<Endianness>(endianness_) != endianness));
 
         try
         {
             deserialize(value);
-            swap_bytes_ = auxSwap;
+            swap_bytes_ = aux_swap;
         }
         catch (exception::Exception& ex)
         {
-            swap_bytes_ = auxSwap;
+            swap_bytes_ = aux_swap;
             ex.raise();
         }
 
@@ -1869,7 +1853,7 @@ public:
 
             if (offset_ - offset != dheader)
             {
-                throw exception::BadParamException("Member size greater than size specified by DHEADER");
+                throw exception::BadParamException("Member size differs from the size specified by DHEADER");
             }
         }
         else
@@ -2149,18 +2133,18 @@ public:
             size_t num_elements,
             Endianness endianness)
     {
-        bool auxSwap = swap_bytes_;
+        bool aux_swap = swap_bytes_;
         swap_bytes_ = (swap_bytes_ && (static_cast<Endianness>(endianness_) == endianness)) ||
                 (!swap_bytes_ && (static_cast<Endianness>(endianness_) != endianness));
 
         try
         {
             deserialize_array(type_t, num_elements);
-            swap_bytes_ = auxSwap;
+            swap_bytes_ = aux_swap;
         }
         catch (exception::Exception& ex)
         {
-            swap_bytes_ = auxSwap;
+            swap_bytes_ = aux_swap;
             ex.raise();
         }
 
@@ -2474,18 +2458,18 @@ public:
             size_t& num_elements,
             Endianness endianness)
     {
-        bool auxSwap = swap_bytes_;
+        bool aux_swap = swap_bytes_;
         swap_bytes_ = (swap_bytes_ && (static_cast<Endianness>(endianness_) == endianness)) ||
                 (!swap_bytes_ && (static_cast<Endianness>(endianness_) != endianness));
 
         try
         {
             deserialize_sequence(sequence_t, num_elements);
-            swap_bytes_ = auxSwap;
+            swap_bytes_ = aux_swap;
         }
         catch (exception::Exception& ex)
         {
-            swap_bytes_ = auxSwap;
+            swap_bytes_ = aux_swap;
             ex.raise();
         }
 
@@ -2802,15 +2786,13 @@ private:
 
     /*!
      * @brief This function returns the extra bytes regarding the allignment.
-     * @param dataSize The size of the data that will be serialized.
+     * @param data_size The size of the data that will be serialized.
      * @return The size needed for the alignment.
      */
     inline size_t alignment(
-            size_t dataSize) const
+            size_t data_size) const
     {
-        return dataSize >
-               last_data_size_ ? (dataSize - ((offset_ - origin_) % dataSize)) &
-               (dataSize - 1) : 0;
+        return data_size > last_data_size_ ? (data_size - ((offset_ - origin_) % data_size)) & (data_size - 1) : 0;
     }
 
     /*!

@@ -50,7 +50,7 @@ public:
     bool operator ==(
             const AppendableExtraElement& other) const
     {
-        // Expects 'value3' was not deserialized.
+        // 'value3' is not deserialized.
         return value1 == other.value1 && value2 == other.value2 && value3 != other.value3;
     }
 
@@ -125,7 +125,7 @@ public:
     bool operator ==(
             const AppendableLessElement& other) const
     {
-        // Expects 'value3' was not deserialized.
+        // 'value3' is not deserialized.
         return value1 == other.value1 && value2 == other.value2 && value3 != other.value3;
     }
 

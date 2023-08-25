@@ -72,7 +72,7 @@ public:
     virtual Cdr_DllAPI ~BadParamException() noexcept;
 
     //! @brief This function throws the object as exception.
-    virtual Cdr_DllAPI void raise() const override;
+    Cdr_DllAPI void raise() const override;
 
     //! @brief Default message used in the library.
     static Cdr_DllAPI const char* const BAD_PARAM_MESSAGE_DEFAULT;

@@ -258,7 +258,7 @@ public:
     }
 
     /*!
-     * @brief Specific template which calculates the encoded size of an instance of a bool.
+     * @brief Specific template which calculates the encoded size of an instance of a wchar.
      * @param[in] data Reference to the instance.
      * @param[inout] current_alignment Current alignment in the encoding.
      * @return Encoded size of the instance.
@@ -1020,7 +1020,7 @@ public:
     }
 
     /*!
-     * @brief Specific template which calculates the encoded size of an instance of an array of fixed_string.
+     * @brief Specific template which calculates the encoded size of an instance of a multi-dimensional array.
      * @param[in] data Reference to the array's instance.
      * @param[in] num_elements Number of elements in the array.
      * @param[inout] current_alignment Current alignment in the encoding.

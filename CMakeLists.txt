@@ -28,7 +28,7 @@ endif()
 
 # Set BUILD_TESTING to OFF by default.
 if(NOT BUILD_TESTING)
-    message(STATUS "Tests no compiled by default")
+    message(STATUS "Tests not compiled by default")
     set(BUILD_TESTING OFF CACHE BOOL "Enable testing" FORCE)
 endif()
 
@@ -133,7 +133,7 @@ include(CTest)
 
 if (BUILD_TESTING)
     add_subdirectory(test)
-endif(BUILD_TESTING)
+endif()
 
 ###############################################################################
 # Documentation

@@ -72,7 +72,7 @@ public:
     virtual Cdr_DllAPI ~NotEnoughMemoryException() noexcept;
 
     //! @brief This function throws the object as exception.
-    virtual Cdr_DllAPI void raise() const override;
+    Cdr_DllAPI void raise() const override;
 
     //! @brief Default message used in the library.
     static Cdr_DllAPI const char* const NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT;

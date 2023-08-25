@@ -58,7 +58,7 @@ void xcdrv1_serialize_the_value(
     Cdr cdr(fast_buffer, endianness, CdrVersion::XCDRv1);
     //}
 
-    //{ Encode optional not present.
+    //{
     cdr.set_encoding_flag(encoding);
     cdr.serialize_encapsulation();
     Cdr::state enc_state(cdr);
@@ -134,7 +134,7 @@ TEST_P(XCdrv1Test, auto_selection_on_decode)
     cdr.end_serialize_type(enc_state);
     //}
 
-    //{ Decode a ushort and a ulong.
+    //{ Decode an ushort and an ulong.
     Cdr dcdr(fast_buffer, endianness, std::get<1>(GetParam()));
     uint16_t dus{0};
     uint32_t dul{0};
@@ -266,7 +266,7 @@ TEST_P(XCdrv1Test, push_origin_zero)
     ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
     //}
 
-    //{ Decode a ushort and a ulong.
+    //{ Decode an optional octet and a long long.
     optional<uint8_t> duc{0};
     int64_t dlonglong_value{0};
     cdr.reset();
@@ -296,7 +296,7 @@ TEST_P(XCdrv1Test, push_origin_zero)
 }
 
 /*!
- * @test Test serialization of a octet member changing the XCdrHeaderSelection
+ * @test Test serialization of an octet member changing the XCdrHeaderSelection
  * @code{.idl}
  * struct PLOctetStruct
  * {

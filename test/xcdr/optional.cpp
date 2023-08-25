@@ -63,20 +63,18 @@ template<>
 size_t calculate_serialized_size(
         eprosima::fastcdr::CdrSizeCalculator& calculator,
         const InnerOptionalShortStruct& data,
-        size_t current_alignment)
+        size_t& current_alignment)
 {
-    size_t initial_alignment = current_alignment;
-
     eprosima::fastcdr::EncodingAlgorithmFlag previous_encoding = calculator.get_encoding();
-    current_alignment += calculator.begin_calculate_type_serialized_size(previous_encoding, current_alignment);
+    size_t calculated_size {calculator.begin_calculate_type_serialized_size(previous_encoding, current_alignment)};
 
 
-    current_alignment += calculator.calculate_member_serialized_size(eprosima::fastcdr::MemberId(
+    calculated_size += calculator.calculate_member_serialized_size(eprosima::fastcdr::MemberId(
                         3), data.value, current_alignment);
 
-    current_alignment += calculator.end_calculate_type_serialized_size(previous_encoding, current_alignment);
+    calculated_size += calculator.end_calculate_type_serialized_size(previous_encoding, current_alignment);
 
-    return current_alignment - initial_alignment;
+    return calculated_size;
 }
 
 template<>
@@ -143,10 +141,11 @@ void null_align_serialize_the_optional_value(
 
     //{ Calculate encoded size.
     CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
-    size_t calculated_size = calculator.begin_calculate_type_serialized_size(encoding, 0);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(0), align_value, calculated_size);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, calculated_size);
-    calculated_size += calculator.end_calculate_type_serialized_size(encoding, calculated_size);
+    size_t current_alignment {0};
+    size_t calculated_size {calculator.begin_calculate_type_serialized_size(encoding, current_alignment)};
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(0), align_value, current_alignment);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, current_alignment);
+    calculated_size += calculator.end_calculate_type_serialized_size(encoding, current_alignment);
     calculated_size += 4; // Encapsulation
     //}
 
@@ -219,9 +218,10 @@ void serialize_the_optional_value(
 
     //{ Calculate encoded size.
     CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
-    size_t calculated_size = calculator.begin_calculate_type_serialized_size(encoding, 0);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, calculated_size);
-    calculated_size += calculator.end_calculate_type_serialized_size(encoding, calculated_size);
+    size_t current_alignment {0};
+    size_t calculated_size {calculator.begin_calculate_type_serialized_size(encoding, current_alignment)};
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, current_alignment);
+    calculated_size += calculator.end_calculate_type_serialized_size(encoding, current_alignment);
     calculated_size += 4; // Encapsulation
     //}
     //{ Prepare buffer
@@ -287,10 +287,11 @@ void align_serialize_the_optional_value(
 
     //{ Calculate encoded size.
     CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
-    size_t calculated_size = calculator.begin_calculate_type_serialized_size(encoding, 0);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(0), align_value, calculated_size);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, calculated_size);
-    calculated_size += calculator.end_calculate_type_serialized_size(encoding, calculated_size);
+    size_t current_alignment {0};
+    size_t calculated_size {calculator.begin_calculate_type_serialized_size(encoding, current_alignment)};
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(0), align_value, current_alignment);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, current_alignment);
+    calculated_size += calculator.end_calculate_type_serialized_size(encoding, current_alignment);
     calculated_size += 4; // Encapsulation
     //}
 
@@ -366,10 +367,11 @@ void longdouble_align_serialize_the_optional_value(
 
     //{ Calculate encoded size.
     CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
-    size_t calculated_size = calculator.begin_calculate_type_serialized_size(encoding, 0);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(0), align_value, calculated_size);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, calculated_size);
-    calculated_size += calculator.end_calculate_type_serialized_size(encoding, calculated_size);
+    size_t current_alignment {0};
+    size_t calculated_size {calculator.begin_calculate_type_serialized_size(encoding, current_alignment)};
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(0), align_value, current_alignment);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, current_alignment);
+    calculated_size += calculator.end_calculate_type_serialized_size(encoding, current_alignment);
     calculated_size += 4; // Encapsulation
     //}
 
@@ -450,9 +452,10 @@ void serialize_optional(
 
     //{ Calculate encoded size.
     CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
-    size_t calculated_size = calculator.begin_calculate_type_serialized_size(encoding, 0);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, calculated_size);
-    calculated_size += calculator.end_calculate_type_serialized_size(encoding, calculated_size);
+    size_t current_alignment {0};
+    size_t calculated_size {calculator.begin_calculate_type_serialized_size(encoding, current_alignment)};
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, current_alignment);
+    calculated_size += calculator.end_calculate_type_serialized_size(encoding, current_alignment);
     calculated_size += 4; // Encapsulation
     //}
 
@@ -518,10 +521,11 @@ void null_align_serialize_optional(
 
     //{ Calculate encoded size.
     CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
-    size_t calculated_size = calculator.begin_calculate_type_serialized_size(encoding, 0);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(0), align_value, calculated_size);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, calculated_size);
-    calculated_size += calculator.end_calculate_type_serialized_size(encoding, calculated_size);
+    size_t current_alignment {0};
+    size_t calculated_size {calculator.begin_calculate_type_serialized_size(encoding, current_alignment)};
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(0), align_value, current_alignment);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, current_alignment);
+    calculated_size += calculator.end_calculate_type_serialized_size(encoding, current_alignment);
     calculated_size += 4; // Encapsulation
     //}
 
@@ -594,10 +598,11 @@ void align_serialize_optional(
 
     //{ Calculate encoded size.
     CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
-    size_t calculated_size = calculator.begin_calculate_type_serialized_size(encoding, 0);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(0), align_value, calculated_size);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, calculated_size);
-    calculated_size += calculator.end_calculate_type_serialized_size(encoding, calculated_size);
+    size_t current_alignment {0};
+    size_t calculated_size {calculator.begin_calculate_type_serialized_size(encoding, current_alignment)};
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(0), align_value, current_alignment);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, current_alignment);
+    calculated_size += calculator.end_calculate_type_serialized_size(encoding, current_alignment);
     calculated_size += 4; // Encapsulation
     //}
 
@@ -672,10 +677,11 @@ void longdouble_align_serialize_optional(
 
     //{ Calculate encoded size.
     CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
-    size_t calculated_size = calculator.begin_calculate_type_serialized_size(encoding, 0);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(0), align_value, calculated_size);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, calculated_size);
-    calculated_size += calculator.end_calculate_type_serialized_size(encoding, calculated_size);
+    size_t current_alignment {0};
+    size_t calculated_size {calculator.begin_calculate_type_serialized_size(encoding, current_alignment)};
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(0), align_value, current_alignment);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, current_alignment);
+    calculated_size += calculator.end_calculate_type_serialized_size(encoding, current_alignment);
     calculated_size += 4; // Encapsulation
     //}
 
@@ -836,9 +842,10 @@ TEST_P(XCdrOptionalTest, null_optional)
 
     //{ Calculate encoded size.
     CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
-    size_t calculated_size = calculator.begin_calculate_type_serialized_size(encoding, 0);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, calculated_size);
-    calculated_size += calculator.end_calculate_type_serialized_size(encoding, calculated_size);
+    size_t current_alignment {0};
+    size_t calculated_size {calculator.begin_calculate_type_serialized_size(encoding, current_alignment)};
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, current_alignment);
+    calculated_size += calculator.end_calculate_type_serialized_size(encoding, current_alignment);
     calculated_size += 4;     // Encapsulation
     //}
 
@@ -1871,9 +1878,10 @@ TEST_P(XCdrOptionalTest, longdouble_optional)
 
     //{ Calculate encoded size.
     CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
-    size_t calculated_size = calculator.begin_calculate_type_serialized_size(encoding, 0);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, calculated_size);
-    calculated_size += calculator.end_calculate_type_serialized_size(encoding, calculated_size);
+    size_t current_alignment {0};
+    size_t calculated_size {calculator.begin_calculate_type_serialized_size(encoding, current_alignment)};
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, current_alignment);
+    calculated_size += calculator.end_calculate_type_serialized_size(encoding, current_alignment);
     calculated_size += 4; // Encapsulation
     //}
 
@@ -7582,10 +7590,11 @@ TEST_P(XCdrOptionalTest, two_inner_null_optional)
 
     //{ Calculate encoded size.
     CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
-    size_t calculated_size = calculator.begin_calculate_type_serialized_size(encoding, 0);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, calculated_size);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(3), opt_value, calculated_size);
-    calculated_size += calculator.end_calculate_type_serialized_size(encoding, calculated_size);
+    size_t current_alignment {0};
+    size_t calculated_size {calculator.begin_calculate_type_serialized_size(encoding, current_alignment)};
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, current_alignment);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(3), opt_value, current_alignment);
+    calculated_size += calculator.end_calculate_type_serialized_size(encoding, current_alignment);
     calculated_size += 4; // Encapsulation
     //}
 
@@ -7922,10 +7931,11 @@ TEST_P(XCdrOptionalTest, two_inner_short_optional)
 
     //{ Calculate encoded size.
     CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
-    size_t calculated_size = calculator.begin_calculate_type_serialized_size(encoding, 0);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, calculated_size);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(3), opt_value, calculated_size);
-    calculated_size += calculator.end_calculate_type_serialized_size(encoding, calculated_size);
+    size_t current_alignment {0};
+    size_t calculated_size {calculator.begin_calculate_type_serialized_size(encoding, current_alignment)};
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, current_alignment);
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(3), opt_value, current_alignment);
+    calculated_size += calculator.end_calculate_type_serialized_size(encoding, current_alignment);
     calculated_size += 4; // Encapsulation
     //}
 

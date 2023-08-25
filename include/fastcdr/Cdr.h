@@ -302,6 +302,7 @@ public:
     inline void reset_alignment()
     {
         origin_ = offset_;
+        last_data_size_ = 0;
     }
 
     /*!
@@ -2603,16 +2604,16 @@ public:
             Cdr::state current_state(*this);
             MemberId member_id;
             xcdr1_deserialize_member_header(member_id, current_state);
+            auto prev_offset = offset_;
             if (0 < current_state.member_size_)
             {
                 deserialize(member_value);
             }
-            assert(current_state.member_size_ == offset_ - origin_);
-            // Reset state to POP(origin=0) because before deserializing member the algorithm did PUSH(origin=0).
-            auto last_offset = offset_;
-            set_state(current_state);
-            offset_ = last_offset;
-            last_data_size_ = 0;
+            if (current_state.member_size_ != offset_ - prev_offset)
+            {
+                throw exception::BadParamException(
+                          "Member size provided by member header is not equal to at the real decoded member size");
+            }
         }
         else
         {

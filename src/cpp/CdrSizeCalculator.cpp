@@ -44,38 +44,43 @@ EncodingAlgorithmFlag CdrSizeCalculator::get_encoding() const
 
 size_t CdrSizeCalculator::begin_calculate_type_serialized_size(
         EncodingAlgorithmFlag new_encoding,
-        size_t current_alignment)
+        size_t& current_alignment)
 {
-    size_t initial_alignment = current_alignment;
+    size_t calculated_size {0};
     current_encoding_ = new_encoding;
 
     if (CdrVersion::XCDRv2 == cdr_version_ && EncodingAlgorithmFlag::PLAIN_CDR2 != current_encoding_)
     {
-        current_alignment += 4 + alignment(current_alignment, 4);     // DHEADER
+        calculated_size = 4 + alignment(current_alignment, 4);     // DHEADER
     }
+
+    current_alignment += calculated_size;
 
     serialized_member_size_ = NO_SERIALIZED_MEMBER_SIZE;     // Avoid error when serializen arrays, sequences, etc..
 
-    return current_alignment - initial_alignment;
+    return calculated_size;
 }
 
 size_t CdrSizeCalculator::end_calculate_type_serialized_size(
         EncodingAlgorithmFlag new_encoding,
-        size_t current_alignment)
+        size_t& current_alignment)
 {
-    size_t initial_alignment = current_alignment;
+    size_t calculated_size {0};
 
     if (CdrVersion::XCDRv1 == cdr_version_ && EncodingAlgorithmFlag::PL_CDR == current_encoding_)
     {
-        current_alignment += 4 + alignment(current_alignment, 4);     // Sentinel
+        calculated_size = 4 + alignment(current_alignment, 4);     // Sentinel
     }
     else if (CdrVersion::XCDRv2 == cdr_version_ && EncodingAlgorithmFlag::PLAIN_CDR2 != current_encoding_)
     {
         serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
     }
 
+    current_alignment += calculated_size;
+
     current_encoding_ = new_encoding;
-    return current_alignment - initial_alignment;
+
+    return calculated_size;
 }
 
 } // namespace fastcdr

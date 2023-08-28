@@ -267,6 +267,39 @@ TEST_P(XCdrv2PLTest, pl_long_member)
     xcdrv2_serialize_the_value(expected_streams, header_selection, long_value, fval);
 }
 
+/*!
+ * @test Test an exception is thrown when the user sets XCdrHeaderSelection::SHORT_HEADER but a long header is needed.
+ * @code{.idl}
+ * struct PLExceptionStruct
+ * {
+ *     @id(1)
+ *     long double value;
+ * };
+ * @endcode
+ */
+TEST(XCdrv2PLTest, exception_long_header)
+{
+    //{ Prepare buffer
+    EncodingAlgorithmFlag encoding = EncodingAlgorithmFlag::PL_CDR2;
+    Cdr::Endianness endianness = Cdr::Endianness::LITTLE_ENDIANNESS;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(40, sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), 40);
+    Cdr cdr(fast_buffer, endianness, CdrVersion::XCDRv2);
+    //}
+
+    //{
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    Cdr::state enc_state(cdr);
+    cdr.begin_serialize_type(enc_state, encoding);
+    long double value {1};
+    EXPECT_THROW(cdr.serialize_member(MemberId(1), value, Cdr::XCdrHeaderSelection::SHORT_HEADER),
+            exception::BadParamException);
+    //}
+}
+
 INSTANTIATE_TEST_SUITE_P(
     XCdrTest,
     XCdrv2Test,

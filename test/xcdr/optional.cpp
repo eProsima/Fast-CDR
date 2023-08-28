@@ -130,323 +130,13 @@ void deserialize(
 } // namespace fastcdr
 } // namespace eprosima
 
-template<class _Align>
-void null_align_serialize_the_optional_value(
-        const XCdrStreamValues& expected_streams,
-        EncodingAlgorithmFlag encoding,
-        Cdr::Endianness endianness,
-        _Align align_value)
-{
-    optional<uint8_t> opt_value;
-
-    //{ Calculate encoded size.
-    CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
-    size_t current_alignment {0};
-    size_t calculated_size {calculator.begin_calculate_type_serialized_size(encoding, current_alignment)};
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(0), align_value, current_alignment);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, current_alignment);
-    calculated_size += calculator.end_calculate_type_serialized_size(encoding, current_alignment);
-    calculated_size += 4; // Encapsulation
-    //}
-
-    //{ Prepare buffer
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
-
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_type(enc_state, encoding);
-    cdr.serialize_member(MemberId(0), align_value);
-    cdr.serialize_member(MemberId(1), opt_value);
-    cdr.end_serialize_type(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
-    ASSERT_EQ(cdr.get_serialized_data_length(), calculated_size);
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    _Align dalign_value {0};
-    optional<uint8_t> dopt_value;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId& mid)->bool
-            {
-                bool ret_value = true;
-                switch (mid.id)
-                {
-                    case 0:
-                        cdr_inner.deserialize_member(dalign_value);
-                        break;
-                    case 1:
-                        cdr_inner.deserialize_member(dopt_value);
-                        break;
-                    default:
-                        ret_value = false;
-                        break;
-                }
-
-                return ret_value;
-            });
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_FALSE(dopt_value.has_value());
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
-}
-
-template<class _T>
-void serialize_the_optional_value(
-        const XCdrStreamValues& expected_streams,
-        EncodingAlgorithmFlag encoding,
-        Cdr::Endianness endianness,
-        _T value)
-{
-    optional<_T> opt_value {value};
-
-    //{ Calculate encoded size.
-    CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
-    size_t current_alignment {0};
-    size_t calculated_size {calculator.begin_calculate_type_serialized_size(encoding, current_alignment)};
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, current_alignment);
-    calculated_size += calculator.end_calculate_type_serialized_size(encoding, current_alignment);
-    calculated_size += 4; // Encapsulation
-    //}
-    //{ Prepare buffer
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
-
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_type(enc_state, encoding);
-    cdr.serialize_member(MemberId(1), opt_value);
-    cdr.end_serialize_type(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
-    ASSERT_EQ(cdr.get_serialized_data_length(), calculated_size);
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    optional<_T> dopt_value;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId&)->bool
-            {
-                bool ret_value = true;
-
-                cdr_inner.deserialize_member(dopt_value);
-
-                if (EncodingAlgorithmFlag::PL_CDR != encoding && EncodingAlgorithmFlag::PL_CDR2 != encoding)
-                {
-                    ret_value = false;
-                }
-
-                return ret_value;
-            });
-    ASSERT_EQ(opt_value.has_value(), dopt_value.has_value());
-    ASSERT_EQ(*opt_value, *dopt_value);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
-}
-
-template<class _Align, class _T>
-void align_serialize_the_optional_value(
-        const XCdrStreamValues& expected_streams,
-        EncodingAlgorithmFlag encoding,
-        Cdr::Endianness endianness,
-        _Align align_value,
-        _T value)
-{
-    optional<_T> opt_value {value};
-
-    //{ Calculate encoded size.
-    CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
-    size_t current_alignment {0};
-    size_t calculated_size {calculator.begin_calculate_type_serialized_size(encoding, current_alignment)};
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(0), align_value, current_alignment);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, current_alignment);
-    calculated_size += calculator.end_calculate_type_serialized_size(encoding, current_alignment);
-    calculated_size += 4; // Encapsulation
-    //}
-
-    //{ Prepare buffer
-    uint8_t tested_stream = 0 + encoding + endianness;
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
-
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_type(enc_state, encoding);
-    cdr.serialize_member(MemberId(0), align_value);
-    cdr.serialize_member(MemberId(1), opt_value);
-    cdr.end_serialize_type(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
-    ASSERT_EQ(cdr.get_serialized_data_length(), calculated_size);
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(), expected_streams[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    _Align dalign_value {0};
-    optional<_T> dopt_value;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId& mid)->bool
-            {
-                bool ret_value = true;
-                switch (mid.id)
-                {
-                    case 0:
-                        cdr_inner.deserialize_member(dalign_value);
-                        break;
-                    case 1:
-                        cdr_inner.deserialize_member(dopt_value);
-                        break;
-                    default:
-                        ret_value = false;
-                        break;
-                }
-
-                return ret_value;
-            });
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_EQ(opt_value.has_value(), dopt_value.has_value());
-    ASSERT_EQ(*opt_value, *dopt_value);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
-}
-
-template<class _Align>
-void longdouble_align_serialize_the_optional_value(
-        const XCdrStreamValues& expected_streams_begin,
-        const XCdrStreamValues& expected_streams_end,
-        EncodingAlgorithmFlag encoding,
-        Cdr::Endianness endianness,
-        _Align align_value,
-        long double value)
-{
-    optional<long double> opt_value {value};
-
-    //{ Calculate encoded size.
-    CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
-    size_t current_alignment {0};
-    size_t calculated_size {calculator.begin_calculate_type_serialized_size(encoding, current_alignment)};
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(0), align_value, current_alignment);
-    calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, current_alignment);
-    calculated_size += calculator.end_calculate_type_serialized_size(encoding, current_alignment);
-    calculated_size += 4; // Encapsulation
-    //}
-
-    //{ Prepare buffer
-    uint8_t tested_stream = 0 + encoding + endianness;
-    size_t total_size = expected_streams_begin[tested_stream].size() + 16 +
-            expected_streams_end[tested_stream].size();
-    auto buffer =
-            std::unique_ptr<char, void (*)(
-        void*)>{reinterpret_cast<char*>(calloc(total_size, sizeof(char))), free};
-    FastBuffer fast_buffer(buffer.get(), total_size);
-    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
-    //}
-
-    //{ Encode optional not present.
-    cdr.set_encoding_flag(encoding);
-    cdr.serialize_encapsulation();
-    Cdr::state enc_state(cdr);
-    cdr.begin_serialize_type(enc_state, encoding);
-    cdr.serialize_member(MemberId(0), align_value);
-    cdr.serialize_member(MemberId(1), opt_value);
-    cdr.end_serialize_type(enc_state);
-    Cdr::state enc_state_end(cdr);
-    //}
-
-    //{ Test encoded content
-    ASSERT_EQ(cdr.get_serialized_data_length(), total_size);
-    ASSERT_EQ(cdr.get_serialized_data_length(), calculated_size);
-    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams_begin[tested_stream].data(),
-            expected_streams_begin[tested_stream].size()));
-    ASSERT_EQ(0,
-            memcmp(buffer.get() + cdr.get_serialized_data_length() - expected_streams_end[tested_stream].size(),
-            expected_streams_end[tested_stream].data(),
-            expected_streams_end[tested_stream].size()));
-    //}
-
-    //{ Decoding optional not present
-    _Align dalign_value {0};
-    optional<long double> dopt_value;
-    cdr.reset();
-    cdr.read_encapsulation();
-    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
-    ASSERT_EQ(cdr.endianness(), endianness);
-    cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId& mid)->bool
-            {
-                bool ret_value = true;
-                switch (mid.id)
-                {
-                    case 0:
-                        cdr_inner.deserialize_member(dalign_value);
-                        break;
-                    case 1:
-                        cdr_inner.deserialize_member(dopt_value);
-                        break;
-                    default:
-                        ret_value = false;
-                        break;
-                }
-
-                return ret_value;
-            });
-    ASSERT_EQ(align_value, dalign_value);
-    ASSERT_EQ(opt_value.has_value(), dopt_value.has_value());
-    ASSERT_EQ(*opt_value, *dopt_value);
-    Cdr::state dec_state_end(cdr);
-    ASSERT_EQ(enc_state_end, dec_state_end);
-    //}
-}
-
 template<class _T>
 void serialize_optional(
         const XCdrStreamValues& expected_streams,
         EncodingAlgorithmFlag encoding,
         Cdr::Endianness endianness,
-        _T value)
+        _T value,
+        bool low_api)
 {
     optional<_T> opt_value {value};
 
@@ -473,7 +163,14 @@ void serialize_optional(
     cdr.serialize_encapsulation();
     Cdr::state enc_state(cdr);
     cdr.begin_serialize_type(enc_state, encoding);
-    cdr << MemberId(1) << opt_value;
+    if (low_api)
+    {
+        cdr.serialize_member(MemberId(1), opt_value);
+    }
+    else
+    {
+        cdr << MemberId(1) << opt_value;
+    }
     cdr.end_serialize_type(enc_state);
     Cdr::state enc_state_end(cdr);
     //}
@@ -494,7 +191,14 @@ void serialize_optional(
             {
                 bool ret_value = true;
 
-                cdr_inner >> dopt_value;
+                if (low_api)
+                {
+                    cdr_inner.deserialize_member(dopt_value);
+                }
+                else
+                {
+                    cdr_inner >> dopt_value;
+                }
 
                 if (EncodingAlgorithmFlag::PL_CDR != encoding && EncodingAlgorithmFlag::PL_CDR2 != encoding)
                 {
@@ -515,7 +219,8 @@ void null_align_serialize_optional(
         const XCdrStreamValues& expected_streams,
         EncodingAlgorithmFlag encoding,
         Cdr::Endianness endianness,
-        _Align align_value)
+        _Align align_value,
+        bool low_api)
 {
     optional<uint8_t> opt_value;
 
@@ -543,7 +248,15 @@ void null_align_serialize_optional(
     cdr.serialize_encapsulation();
     Cdr::state enc_state(cdr);
     cdr.begin_serialize_type(enc_state, encoding);
-    cdr << MemberId(0) << align_value << MemberId(1) << opt_value;
+    if (low_api)
+    {
+        cdr.serialize_member(MemberId(0), align_value);
+        cdr.serialize_member(MemberId(1), opt_value);
+    }
+    else
+    {
+        cdr << MemberId(0) << align_value << MemberId(1) << opt_value;
+    }
     cdr.end_serialize_type(enc_state);
     Cdr::state enc_state_end(cdr);
     //}
@@ -564,17 +277,35 @@ void null_align_serialize_optional(
     cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId& mid)->bool
             {
                 bool ret_value = true;
-                switch (mid.id)
+                if (low_api)
                 {
-                    case 0:
-                        cdr_inner >> dalign_value;
-                        break;
-                    case 1:
-                        cdr_inner >> dopt_value;
-                        break;
-                    default:
-                        ret_value = false;
-                        break;
+                    switch (mid.id)
+                    {
+                        case 0:
+                            cdr_inner.deserialize_member(dalign_value);
+                            break;
+                        case 1:
+                            cdr_inner.deserialize_member(dopt_value);
+                            break;
+                        default:
+                            ret_value = false;
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (mid.id)
+                    {
+                        case 0:
+                            cdr_inner >> dalign_value;
+                            break;
+                        case 1:
+                            cdr_inner >> dopt_value;
+                            break;
+                        default:
+                            ret_value = false;
+                            break;
+                    }
                 }
 
                 return ret_value;
@@ -592,7 +323,8 @@ void align_serialize_optional(
         EncodingAlgorithmFlag encoding,
         Cdr::Endianness endianness,
         _Align align_value,
-        _T value)
+        _T value,
+        bool low_api)
 {
     optional<_T> opt_value {value};
 
@@ -620,7 +352,15 @@ void align_serialize_optional(
     cdr.serialize_encapsulation();
     Cdr::state enc_state(cdr);
     cdr.begin_serialize_type(enc_state, encoding);
-    cdr << MemberId(0) << align_value << MemberId(1) << opt_value;
+    if (low_api)
+    {
+        cdr.serialize_member(MemberId(0), align_value);
+        cdr.serialize_member(MemberId(1), opt_value);
+    }
+    else
+    {
+        cdr << MemberId(0) << align_value << MemberId(1) << opt_value;
+    }
     cdr.end_serialize_type(enc_state);
     Cdr::state enc_state_end(cdr);
     //}
@@ -641,17 +381,35 @@ void align_serialize_optional(
     cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId& mid)->bool
             {
                 bool ret_value = true;
-                switch (mid.id)
+                if (low_api)
                 {
-                    case 0:
-                        cdr_inner >> dalign_value;
-                        break;
-                    case 1:
-                        cdr_inner >> dopt_value;
-                        break;
-                    default:
-                        ret_value = false;
-                        break;
+                    switch (mid.id)
+                    {
+                        case 0:
+                            cdr_inner.deserialize_member(dalign_value);
+                            break;
+                        case 1:
+                            cdr_inner.deserialize_member(dopt_value);
+                            break;
+                        default:
+                            ret_value = false;
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (mid.id)
+                    {
+                        case 0:
+                            cdr_inner >> dalign_value;
+                            break;
+                        case 1:
+                            cdr_inner >> dopt_value;
+                            break;
+                        default:
+                            ret_value = false;
+                            break;
+                    }
                 }
 
                 return ret_value;
@@ -671,7 +429,8 @@ void longdouble_align_serialize_optional(
         EncodingAlgorithmFlag encoding,
         Cdr::Endianness endianness,
         _Align align_value,
-        long double value)
+        long double value,
+        bool low_api)
 {
     optional<long double> opt_value {value};
 
@@ -701,8 +460,15 @@ void longdouble_align_serialize_optional(
     cdr.serialize_encapsulation();
     Cdr::state enc_state(cdr);
     cdr.begin_serialize_type(enc_state, encoding);
-    cdr << MemberId(0) << align_value;
-    cdr << MemberId(1) << opt_value;
+    if (low_api)
+    {
+        cdr.serialize_member(MemberId(0), align_value);
+        cdr.serialize_member(MemberId(1), opt_value);
+    }
+    else
+    {
+        cdr << MemberId(0) << align_value << MemberId(1) << opt_value;
+    }
     cdr.end_serialize_type(enc_state);
     Cdr::state enc_state_end(cdr);
     //}
@@ -728,17 +494,35 @@ void longdouble_align_serialize_optional(
     cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId& mid)->bool
             {
                 bool ret_value = true;
-                switch (mid.id)
+                if (low_api)
                 {
-                    case 0:
-                        cdr_inner >> dalign_value;
-                        break;
-                    case 1:
-                        cdr_inner >> dopt_value;
-                        break;
-                    default:
-                        ret_value = false;
-                        break;
+                    switch (mid.id)
+                    {
+                        case 0:
+                            cdr_inner.deserialize_member(dalign_value);
+                            break;
+                        case 1:
+                            cdr_inner.deserialize_member(dopt_value);
+                            break;
+                        default:
+                            ret_value = false;
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (mid.id)
+                    {
+                        case 0:
+                            cdr_inner >> dalign_value;
+                            break;
+                        case 1:
+                            cdr_inner >> dopt_value;
+                            break;
+                        default:
+                            ret_value = false;
+                            break;
+                    }
                 }
 
                 return ret_value;
@@ -1043,9 +827,9 @@ TEST_P(XCdrOptionalTest, short_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    serialize_the_optional_value(expected_streams, encoding, endianness, short_value);
+    serialize_optional(expected_streams, encoding, endianness, short_value, true);
 
-    serialize_optional(expected_streams, encoding, endianness, short_value);
+    serialize_optional(expected_streams, encoding, endianness, short_value, false);
 }
 
 /*!
@@ -1139,9 +923,9 @@ TEST_P(XCdrOptionalTest, ushort_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    serialize_the_optional_value(expected_streams, encoding, endianness, ushort_value);
+    serialize_optional(expected_streams, encoding, endianness, ushort_value, true);
 
-    serialize_optional(expected_streams, encoding, endianness, ushort_value);
+    serialize_optional(expected_streams, encoding, endianness, ushort_value, false);
 }
 
 /*!
@@ -1237,9 +1021,9 @@ TEST_P(XCdrOptionalTest, long_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    serialize_the_optional_value(expected_streams, encoding, endianness, long_value);
+    serialize_optional(expected_streams, encoding, endianness, long_value, true);
 
-    serialize_optional(expected_streams, encoding, endianness, long_value);
+    serialize_optional(expected_streams, encoding, endianness, long_value, false);
 }
 
 /*!
@@ -1335,9 +1119,9 @@ TEST_P(XCdrOptionalTest, ulong_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    serialize_the_optional_value(expected_streams, encoding, endianness, ulong_value);
+    serialize_optional(expected_streams, encoding, endianness, ulong_value, true);
 
-    serialize_optional(expected_streams, encoding, endianness, ulong_value);
+    serialize_optional(expected_streams, encoding, endianness, ulong_value, false);
 }
 
 /*!
@@ -1443,9 +1227,9 @@ TEST_P(XCdrOptionalTest, longlong_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    serialize_the_optional_value(expected_streams, encoding, endianness, longlong_value);
+    serialize_optional(expected_streams, encoding, endianness, longlong_value, true);
 
-    serialize_optional(expected_streams, encoding, endianness, longlong_value);
+    serialize_optional(expected_streams, encoding, endianness, longlong_value, false);
 }
 
 /*!
@@ -1551,9 +1335,9 @@ TEST_P(XCdrOptionalTest, ulonglong_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    serialize_the_optional_value(expected_streams, encoding, endianness, ulonglong_value);
+    serialize_optional(expected_streams, encoding, endianness, ulonglong_value, true);
 
-    serialize_optional(expected_streams, encoding, endianness, ulonglong_value);
+    serialize_optional(expected_streams, encoding, endianness, ulonglong_value, false);
 }
 
 /*!
@@ -1649,9 +1433,9 @@ TEST_P(XCdrOptionalTest, float_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    serialize_the_optional_value(expected_streams, encoding, endianness, float_value);
+    serialize_optional(expected_streams, encoding, endianness, float_value, true);
 
-    serialize_optional(expected_streams, encoding, endianness, float_value);
+    serialize_optional(expected_streams, encoding, endianness, float_value, false);
 }
 
 /*!
@@ -1757,9 +1541,9 @@ TEST_P(XCdrOptionalTest, double_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    serialize_the_optional_value(expected_streams, encoding, endianness, double_value);
+    serialize_optional(expected_streams, encoding, endianness, double_value, true);
 
-    serialize_optional(expected_streams, encoding, endianness, double_value);
+    serialize_optional(expected_streams, encoding, endianness, double_value, false);
 }
 
 /*!
@@ -2095,9 +1879,9 @@ TEST_P(XCdrOptionalTest, boolean_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    serialize_the_optional_value(expected_streams, encoding, endianness, boolean_value);
+    serialize_optional(expected_streams, encoding, endianness, boolean_value, true);
 
-    serialize_optional(expected_streams, encoding, endianness, boolean_value);
+    serialize_optional(expected_streams, encoding, endianness, boolean_value, false);
 }
 
 /*!
@@ -2189,9 +1973,9 @@ TEST_P(XCdrOptionalTest, octet_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    serialize_the_optional_value(expected_streams, encoding, endianness, octet_value);
+    serialize_optional(expected_streams, encoding, endianness, octet_value, true);
 
-    serialize_optional(expected_streams, encoding, endianness, octet_value);
+    serialize_optional(expected_streams, encoding, endianness, octet_value, false);
 }
 
 /*!
@@ -2284,9 +2068,9 @@ TEST_P(XCdrOptionalTest, char_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    serialize_the_optional_value(expected_streams, encoding, endianness, char_value);
+    serialize_optional(expected_streams, encoding, endianness, char_value, true);
 
-    serialize_optional(expected_streams, encoding, endianness, char_value);
+    serialize_optional(expected_streams, encoding, endianness, char_value, false);
 }
 
 /*!
@@ -2384,9 +2168,9 @@ TEST_P(XCdrOptionalTest, wchar_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    serialize_the_optional_value(expected_streams, encoding, endianness, wchar_value);
+    serialize_optional(expected_streams, encoding, endianness, wchar_value, true);
 
-    serialize_optional(expected_streams, encoding, endianness, wchar_value);
+    serialize_optional(expected_streams, encoding, endianness, wchar_value, false);
 }
 
 /*!
@@ -2481,9 +2265,9 @@ TEST_P(XCdrOptionalTest, null_align_1_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    null_align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value);
+    null_align_serialize_optional(expected_streams, encoding, endianness, align_value, true);
 
-    null_align_serialize_optional(expected_streams, encoding, endianness, align_value);
+    null_align_serialize_optional(expected_streams, encoding, endianness, align_value, false);
 
 }
 
@@ -2581,9 +2365,9 @@ TEST_P(XCdrOptionalTest, null_align_2_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    null_align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value);
+    null_align_serialize_optional(expected_streams, encoding, endianness, align_value, true);
 
-    null_align_serialize_optional(expected_streams, encoding, endianness, align_value);
+    null_align_serialize_optional(expected_streams, encoding, endianness, align_value, false);
 }
 
 /*!
@@ -2676,9 +2460,9 @@ TEST_P(XCdrOptionalTest, null_align_4_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    null_align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value);
+    null_align_serialize_optional(expected_streams, encoding, endianness, align_value, true);
 
-    null_align_serialize_optional(expected_streams, encoding, endianness, align_value);
+    null_align_serialize_optional(expected_streams, encoding, endianness, align_value, false);
 }
 
 /*!
@@ -2794,9 +2578,9 @@ TEST_P(XCdrOptionalTest, short_align_1_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, short_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, short_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, short_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, short_value, false);
 }
 
 /*!
@@ -2917,9 +2701,9 @@ TEST_P(XCdrOptionalTest, short_align_2_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, short_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, short_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, short_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, short_value, false);
 }
 
 /*!
@@ -3035,9 +2819,9 @@ TEST_P(XCdrOptionalTest, short_align_4_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, short_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, short_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, short_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, short_value, false);
 }
 
 /*!
@@ -3153,9 +2937,9 @@ TEST_P(XCdrOptionalTest, ushort_align_1_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, ushort_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, ushort_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, ushort_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, ushort_value, false);
 }
 
 /*!
@@ -3277,9 +3061,9 @@ TEST_P(XCdrOptionalTest, ushort_align_2_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, ushort_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, ushort_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, ushort_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, ushort_value, false);
 }
 
 /*!
@@ -3395,9 +3179,9 @@ TEST_P(XCdrOptionalTest, ushort_align_4_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, ushort_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, ushort_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, ushort_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, ushort_value, false);
 }
 
 /*!
@@ -3515,9 +3299,9 @@ TEST_P(XCdrOptionalTest, long_align_1_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, long_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, long_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, long_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, long_value, false);
 }
 
 /*!
@@ -3637,9 +3421,9 @@ TEST_P(XCdrOptionalTest, long_align_2_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, long_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, long_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, long_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, long_value, false);
 }
 
 /*!
@@ -3753,9 +3537,9 @@ TEST_P(XCdrOptionalTest, long_align_4_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, long_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, long_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, long_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, long_value, false);
 }
 
 /*!
@@ -3873,9 +3657,9 @@ TEST_P(XCdrOptionalTest, ulong_align_1_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, ulong_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, ulong_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, ulong_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, ulong_value, false);
 }
 
 /*!
@@ -3995,9 +3779,9 @@ TEST_P(XCdrOptionalTest, ulong_align_2_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, ulong_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, ulong_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, ulong_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, ulong_value, false);
 }
 
 /*!
@@ -4111,9 +3895,9 @@ TEST_P(XCdrOptionalTest, ulong_align_4_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, ulong_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, ulong_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, ulong_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, ulong_value, false);
 }
 
 /*!
@@ -4241,9 +4025,9 @@ TEST_P(XCdrOptionalTest, longlong_align_1_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, longlong_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, longlong_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, longlong_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, longlong_value, false);
 }
 
 /*!
@@ -4373,9 +4157,9 @@ TEST_P(XCdrOptionalTest, longlong_align_2_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, longlong_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, longlong_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, longlong_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, longlong_value, false);
 }
 /*!
  * @test Test a structure with a field of unsigned long type and an optional of long long type.
@@ -4499,9 +4283,9 @@ TEST_P(XCdrOptionalTest, longlong_align_4_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, longlong_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, longlong_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, longlong_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, longlong_value, false);
 }
 
 /*!
@@ -4629,9 +4413,9 @@ TEST_P(XCdrOptionalTest, ulonglong_align_1_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, ulonglong_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, ulonglong_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, ulonglong_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, ulonglong_value, false);
 }
 
 /*!
@@ -4761,9 +4545,9 @@ TEST_P(XCdrOptionalTest, ulonglong_align_2_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, ulonglong_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, ulonglong_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, ulonglong_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, ulonglong_value, false);
 }
 
 /*!
@@ -4887,9 +4671,9 @@ TEST_P(XCdrOptionalTest, ulonglong_align_4_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, ulonglong_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, ulonglong_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, ulonglong_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, ulonglong_value, false);
 }
 
 /*!
@@ -5007,9 +4791,9 @@ TEST_P(XCdrOptionalTest, float_align_1_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, float_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, float_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, float_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, float_value, false);
 }
 
 /*!
@@ -5129,9 +4913,9 @@ TEST_P(XCdrOptionalTest, float_align_2_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, float_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, float_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, float_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, float_value, false);
 }
 
 /*!
@@ -5245,9 +5029,9 @@ TEST_P(XCdrOptionalTest, float_align_4_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, float_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, float_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, float_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, float_value, false);
 }
 
 /*!
@@ -5375,9 +5159,9 @@ TEST_P(XCdrOptionalTest, double_align_1_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, double_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, double_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, double_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, double_value, false);
 }
 
 /*!
@@ -5507,9 +5291,9 @@ TEST_P(XCdrOptionalTest, double_align_2_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, double_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, double_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, double_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, double_value, false);
 }
 
 /*!
@@ -5633,9 +5417,9 @@ TEST_P(XCdrOptionalTest, double_align_4_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, double_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, double_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, double_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, double_value, false);
 }
 
 /*!
@@ -5773,11 +5557,11 @@ TEST_P(XCdrOptionalTest, longdouble_align_1_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    longdouble_align_serialize_the_optional_value(expected_streams_begin, expected_streams_end, encoding, endianness,
-            align_value, longdouble_value);
+    longdouble_align_serialize_optional(expected_streams_begin, expected_streams_end, encoding, endianness,
+            align_value, longdouble_value, true);
 
     longdouble_align_serialize_optional(expected_streams_begin, expected_streams_end, encoding, endianness,
-            align_value, longdouble_value);
+            align_value, longdouble_value, false);
 }
 
 /*!
@@ -5917,11 +5701,11 @@ TEST_P(XCdrOptionalTest, longdouble_align_2_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    longdouble_align_serialize_the_optional_value(expected_streams_begin, expected_streams_end, encoding, endianness,
-            align_value, longdouble_value);
+    longdouble_align_serialize_optional(expected_streams_begin, expected_streams_end, encoding, endianness,
+            align_value, longdouble_value, true);
 
     longdouble_align_serialize_optional(expected_streams_begin, expected_streams_end, encoding, endianness,
-            align_value, longdouble_value);
+            align_value, longdouble_value, false);
 }
 
 /*!
@@ -6055,11 +5839,11 @@ TEST_P(XCdrOptionalTest, longdouble_align_4_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    longdouble_align_serialize_the_optional_value(expected_streams_begin, expected_streams_end, encoding, endianness,
-            align_value, longdouble_value);
+    longdouble_align_serialize_optional(expected_streams_begin, expected_streams_end, encoding, endianness,
+            align_value, longdouble_value, true);
 
     longdouble_align_serialize_optional(expected_streams_begin, expected_streams_end, encoding, endianness,
-            align_value, longdouble_value);
+            align_value, longdouble_value, false);
 }
 
 /*!
@@ -6174,9 +5958,9 @@ TEST_P(XCdrOptionalTest, boolean_align_1_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, boolean_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, boolean_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, boolean_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, boolean_value, false);
 }
 
 /*!
@@ -6293,9 +6077,9 @@ TEST_P(XCdrOptionalTest, boolean_align_2_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, boolean_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, boolean_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, boolean_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, boolean_value, false);
 }
 
 /*!
@@ -6406,9 +6190,9 @@ TEST_P(XCdrOptionalTest, boolean_align_4_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, boolean_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, boolean_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, boolean_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, boolean_value, false);
 }
 
 /*!
@@ -6522,9 +6306,9 @@ TEST_P(XCdrOptionalTest, octet_align_1_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, octet_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, octet_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, octet_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, octet_value, false);
 }
 
 /*!
@@ -6640,9 +6424,9 @@ TEST_P(XCdrOptionalTest, octet_align_2_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, octet_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, octet_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, octet_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, octet_value, false);
 }
 
 /*!
@@ -6752,9 +6536,9 @@ TEST_P(XCdrOptionalTest, octet_align_4_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, octet_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, octet_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, octet_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, octet_value, false);
 }
 
 /*!
@@ -6869,9 +6653,9 @@ TEST_P(XCdrOptionalTest, char_align_1_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, char_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, char_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, char_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, char_value, false);
 }
 
 /*!
@@ -6988,9 +6772,9 @@ TEST_P(XCdrOptionalTest, char_align_2_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, char_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, char_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, char_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, char_value, false);
 }
 
 /*!
@@ -7101,9 +6885,9 @@ TEST_P(XCdrOptionalTest, char_align_4_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, char_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, char_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, char_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, char_value, false);
 }
 
 /*!
@@ -7219,9 +7003,9 @@ TEST_P(XCdrOptionalTest, wchar_align_1_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, wchar_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, wchar_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, wchar_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, wchar_value, false);
 }
 
 /*!
@@ -7343,9 +7127,9 @@ TEST_P(XCdrOptionalTest, wchar_align_2_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, wchar_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, wchar_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, wchar_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, wchar_value, false);
 }
 
 /*!
@@ -7461,9 +7245,9 @@ TEST_P(XCdrOptionalTest, wchar_align_4_optional)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
-    align_serialize_the_optional_value(expected_streams, encoding, endianness, align_value, wchar_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, wchar_value, true);
 
-    align_serialize_optional(expected_streams, encoding, endianness, align_value, wchar_value);
+    align_serialize_optional(expected_streams, encoding, endianness, align_value, wchar_value, false);
 }
 
 /*!

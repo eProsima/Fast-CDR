@@ -817,8 +817,8 @@ TEST_P(XCdrBasicTypesTest, long)
  */
 TEST_P(XCdrBasicTypesTest, ulong)
 {
-    constexpr uint32_t ulong_value {0xCDCDCDDC};
-    constexpr uint8_t ival {0xCD};
+    constexpr uint32_t ulong_value {0x1D1D1DDC};
+    constexpr uint8_t ival {0x1D};
     constexpr uint8_t fval {0xDC};
 
     //{ Defining expected XCDR streams
@@ -1001,8 +1001,8 @@ TEST_P(XCdrBasicTypesTest, longlong)
  */
 TEST_P(XCdrBasicTypesTest, ulonglong)
 {
-    constexpr uint64_t ulonglong_value {0xCDCDCDCDCDCDCDDCull};
-    constexpr uint8_t ival {0xCD};
+    constexpr uint64_t ulonglong_value {0x1D1D1D1D1D1D1DDCull};
+    constexpr uint8_t ival {0x1D};
     constexpr uint8_t fval {0xDC};
 
     //{ Defining expected XCDR streams
@@ -5022,8 +5022,8 @@ TEST_P(XCdrBasicTypesTest, long_align_4)
 TEST_P(XCdrBasicTypesTest, ulong_align_1)
 {
     const uint8_t align_value {0xAB};
-    constexpr uint32_t ulong_value {0xCDCDCDDC};
-    constexpr uint8_t ival {0xCD};
+    constexpr uint32_t ulong_value {0x1D1D1DDC};
+    constexpr uint8_t ival {0x1D};
     constexpr uint8_t fval {0xDC};
 
     //{ Defining expected XCDR streams
@@ -5137,8 +5137,8 @@ TEST_P(XCdrBasicTypesTest, ulong_align_2)
     const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
-    constexpr uint32_t ulong_value {0xCDCDCDDC};
-    constexpr uint8_t ival {0xCD};
+    constexpr uint32_t ulong_value {0x1D1D1DDC};
+    constexpr uint8_t ival {0x1D};
     constexpr uint8_t fval {0xDC};
 
     //{ Defining expected XCDR streams
@@ -5252,8 +5252,8 @@ TEST_P(XCdrBasicTypesTest, ulong_align_4)
     const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
-    constexpr uint32_t ulong_value {0xCDCDCDDC};
-    constexpr uint8_t ival {0xCD};
+    constexpr uint32_t ulong_value {0x1D1D1DDC};
+    constexpr uint8_t ival {0x1D};
     constexpr uint8_t fval {0xDC};
 
     //{ Defining expected XCDR streams
@@ -5724,8 +5724,8 @@ TEST_P(XCdrBasicTypesTest, longlong_align_4)
 TEST_P(XCdrBasicTypesTest, ulonglong_align_1)
 {
     const uint8_t align_value {0xAB};
-    constexpr uint64_t ulonglong_value {0xCDCDCDCDCDCDCDDCull};
-    constexpr uint8_t ival {0xCD};
+    constexpr uint64_t ulonglong_value {0x1D1D1D1D1D1D1DDCull};
+    constexpr uint8_t ival {0x1D};
     constexpr uint8_t fval {0xDC};
 
     //{ Defining expected XCDR streams
@@ -5851,8 +5851,8 @@ TEST_P(XCdrBasicTypesTest, ulonglong_align_2)
     const uint16_t align_value {0xABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
-    constexpr uint64_t ulonglong_value {0xCDCDCDCDCDCDCDDCull};
-    constexpr uint8_t ival {0xCD};
+    constexpr uint64_t ulonglong_value {0x1D1D1D1D1D1D1DDCull};
+    constexpr uint8_t ival {0x1D};
     constexpr uint8_t fval {0xDC};
 
     //{ Defining expected XCDR streams
@@ -5978,8 +5978,8 @@ TEST_P(XCdrBasicTypesTest, ulonglong_align_4)
     const uint32_t align_value {0xABABABBA};
     constexpr uint8_t iava {0xAB};
     constexpr uint8_t fava {0xBA};
-    constexpr uint64_t ulonglong_value {0xCDCDCDCDCDCDCDDCull};
-    constexpr uint8_t ival {0xCD};
+    constexpr uint64_t ulonglong_value {0x1D1D1D1D1D1D1DDCull};
+    constexpr uint8_t ival {0x1D};
     constexpr uint8_t fval {0xDC};
 
     //{ Defining expected XCDR streams

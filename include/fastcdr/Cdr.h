@@ -168,6 +168,8 @@ public:
     /*!
      * @brief This function reads the encapsulation of the CDR stream.
      *        If the CDR stream contains an encapsulation, then this function should be called before starting to deserialize.
+     *        CdrVersion and EncodingAlgorithmFlag internal values will be changed to the ones specified by the
+     *        encapsulation.
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      * @exception exception::BadParamException This exception is thrown when trying to deserialize an invalid value.
@@ -1193,6 +1195,7 @@ public:
      * @param num_elements Number of the elements in the array.
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+     * @note Due to internal representation differences, WIN32 and *NIX like systems are not compatible.
      */
     Cdr_DllAPI Cdr& serialize_array(
             const long double* ldouble_t,
@@ -1640,10 +1643,7 @@ public:
     Cdr& deserialize(
             wchar_t& wchar)
     {
-        uint16_t ret;
-        deserialize(ret);
-        wchar = static_cast<wchar_t>(ret);
-        return *this;
+        return deserialize(reinterpret_cast<uint16_t&>(wchar));
     }
 
     /*!
@@ -2309,6 +2309,7 @@ public:
      * @param num_elements Number of the elements in the array.
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+     * @note Due to internal representation differences, WIN32 and *NIX like systems are not compatible.
      */
     Cdr_DllAPI Cdr& deserialize_array(
             long double* ldouble_t,

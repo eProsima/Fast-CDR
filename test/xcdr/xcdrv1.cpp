@@ -432,7 +432,7 @@ TEST(XCdrv1PLTest, exception_long_header)
     cdr.serialize_encapsulation();
     Cdr::state enc_state(cdr);
     cdr.begin_serialize_type(enc_state, encoding);
-    long value {1};
+    int32_t value {1};
     EXPECT_THROW(cdr.serialize_member(MemberId(16383), value, Cdr::XCdrHeaderSelection::SHORT_HEADER),
             exception::BadParamException);
     //}

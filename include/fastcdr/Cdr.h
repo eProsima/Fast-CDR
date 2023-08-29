@@ -1643,7 +1643,10 @@ public:
     Cdr& deserialize(
             wchar_t& wchar)
     {
-        return deserialize(reinterpret_cast<uint16_t&>(wchar));
+        uint16_t ret;
+        deserialize(ret);
+        wchar = static_cast<wchar_t>(ret);
+        return *this;
     }
 
     /*!

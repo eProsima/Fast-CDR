@@ -528,7 +528,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize(
+    Cdr_DllAPI Cdr& serialize(
             const uint8_t& octet_t)
     {
         return serialize(static_cast<char>(octet_t));
@@ -549,7 +549,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize(
+    Cdr_DllAPI Cdr& serialize(
             const int8_t int8)
     {
         return serialize(static_cast<char>(int8));
@@ -561,7 +561,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize(
+    Cdr_DllAPI Cdr& serialize(
             const uint16_t ushort_t)
     {
         return serialize(static_cast<int16_t>(ushort_t));
@@ -582,7 +582,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize(
+    Cdr_DllAPI Cdr& serialize(
             const uint32_t ulong_t)
     {
         return serialize(static_cast<int32_t>(ulong_t));
@@ -603,7 +603,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize(
+    Cdr_DllAPI Cdr& serialize(
             const wchar_t wchar)
     {
         return serialize(static_cast<uint16_t>(wchar));
@@ -615,7 +615,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize(
+    Cdr_DllAPI Cdr& serialize(
             const uint64_t ulonglong_t)
     {
         return serialize(static_cast<int64_t>(ulonglong_t));
@@ -673,7 +673,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    Cdr& serialize(
+    Cdr_DllAPI Cdr& serialize(
             char* string_t)
     {
         return serialize(static_cast<const char*>(string_t));
@@ -2618,7 +2618,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
      * position that exceeds the internal memory size.
      */
-    Cdr& begin_serialize_type(
+    Cdr_DllAPI Cdr& begin_serialize_type(
             Cdr::state& current_state,
             EncodingAlgorithmFlag type_encoding)
     {
@@ -2632,7 +2632,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
      * position that exceeds the internal memory size.
      */
-    Cdr& end_serialize_type(
+    Cdr_DllAPI Cdr& end_serialize_type(
             Cdr::state& current_state)
     {
         return (this->*end_serialize_type_)(current_state);
@@ -2646,7 +2646,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
      * position that exceeds the internal memory size.
      */
-    Cdr& deserialize_type(
+    Cdr_DllAPI Cdr& deserialize_type(
             EncodingAlgorithmFlag type_encoding,
             std::function<bool (Cdr&, const MemberId&)> functor)
     {
@@ -2683,7 +2683,7 @@ public:
      * @exception exception::BadParamException This exception is thrown when a member id is already set without being
      * encoded.
      */
-    Cdr& operator <<(
+    Cdr_DllAPI Cdr& operator <<(
             const MemberId& member_id)
     {
         if (next_member_id_ != MEMBER_ID_INVALID)

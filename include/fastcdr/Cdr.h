@@ -2812,11 +2812,11 @@ private:
 
     /*!
      * @brief This function resizes the internal buffer. It only applies if the FastBuffer object was created with the default constructor.
-     * @param minSizeInc Minimun size increase for the internal buffer
+     * @param min_size_inc Minimun size increase for the internal buffer
      * @return True if the resize was succesful, false if it was not
      */
     bool resize(
-            size_t minSizeInc);
+            size_t min_size_inc);
 
     Cdr_DllAPI const char* read_string(
             uint32_t& length);

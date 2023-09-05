@@ -151,20 +151,20 @@ public:
 
     /*!
      * @brief This function increments the position where the iterator points.
-     * @param numBytes Number of bytes the iterator moves the position.
+     * @param num_bytes Number of bytes the iterator moves the position.
      */
     inline
     void operator +=(
-            size_t numBytes)
+            size_t num_bytes)
     {
-        current_position_ += numBytes;
+        current_position_ += num_bytes;
     }
 
     inline
     void operator -=(
-            size_t numBytes)
+            size_t num_bytes)
     {
-        current_position_ -= numBytes;
+        current_position_ -= num_bytes;
     }
 
     /*!
@@ -339,11 +339,11 @@ public:
 
     /*!
      * @brief This function resizes the raw buffer. It will call the user's defined function for this purpose.
-     * @param minSizeInc The minimun growth expected of the current raw buffer.
+     * @param min_size_inc The minimun growth expected of the current raw buffer.
      * @return True if the operation works. False if it does not.
      */
     bool resize(
-            size_t minSizeInc);
+            size_t min_size_inc);
 
 private:
 

@@ -42,9 +42,9 @@ constexpr uint8_t operator ""_8u(
 inline size_t alignment_on_state(
         const FastBuffer::iterator& origin,
         const FastBuffer::iterator& offset,
-        size_t dataSize)
+        size_t data_size)
 {
-    return (dataSize - ((offset - origin) % dataSize)) & (dataSize - 1);
+    return (data_size - ((offset - origin) % data_size)) & (data_size - 1);
 }
 
 inline uint32_t Cdr::get_long_lc(
@@ -453,9 +453,9 @@ bool Cdr::move_alignment_forward(
 }
 
 bool Cdr::resize(
-        size_t minSizeInc)
+        size_t min_size_inc)
 {
-    if (cdr_buffer_.resize(minSizeInc))
+    if (cdr_buffer_.resize(min_size_inc))
     {
         offset_ << cdr_buffer_.begin();
         origin_ << cdr_buffer_.begin();

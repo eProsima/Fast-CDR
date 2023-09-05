@@ -57,15 +57,15 @@ bool FastBuffer::reserve(
 }
 
 bool FastBuffer::resize(
-        size_t minSizeInc)
+        size_t min_size_inc)
 {
     size_t incBufferSize = BUFFER_START_LENGTH;
 
     if (m_internalBuffer)
     {
-        if (minSizeInc > BUFFER_START_LENGTH)
+        if (min_size_inc > BUFFER_START_LENGTH)
         {
-            incBufferSize = minSizeInc;
+            incBufferSize = min_size_inc;
         }
 
         if (buffer_ == NULL)

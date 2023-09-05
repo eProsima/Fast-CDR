@@ -155,13 +155,13 @@ public:
     /*!
      * @brief This constructor creates an eprosima::fastcdr::Cdr object that can serialize/deserialize
      * the assigned buffer.
-     * @param cdrBuffer A reference to the buffer that contains (or will contain) the CDR representation.
+     * @param cdr_buffer A reference to the buffer that contains (or will contain) the CDR representation.
      * @param endianness The initial endianness that will be used. The default value is the endianness of the system.
      * @param cdr_version Represents the type of encoding algorithm that will be used for the encoding.
      * The default value is CdrVersion::XCDRv2.
      */
     Cdr_DllAPI Cdr(
-            FastBuffer& cdrBuffer,
+            FastBuffer& cdr_buffer,
             const Endianness endianness = DEFAULT_ENDIAN,
             const CdrVersion cdr_version = XCDRv2);
 
@@ -267,14 +267,14 @@ public:
     /*!
      * @brief Get the number of bytes needed to align a position to certain data size.
      * @param current_alignment Position to be aligned.
-     * @param dataSize Size of next data to process (should be power of two).
+     * @param data_size Size of next data to process (should be power of two).
      * @return Number of required alignment bytes.
      */
     inline static size_t alignment(
             size_t current_alignment,
-            size_t dataSize)
+            size_t data_size)
     {
-        return (dataSize - (current_alignment % dataSize)) & (dataSize - 1);
+        return (data_size - (current_alignment % data_size)) & (data_size - 1);
     }
 
     /*!
@@ -2600,7 +2600,7 @@ public:
             if (current_state.member_size_ != offset_ - prev_offset)
             {
                 throw exception::BadParamException(
-                          "Member size provided by member header is not equal to at the real decoded member size");
+                          "Member size provided by member header is not equal to the real decoded member size");
             }
         }
         else

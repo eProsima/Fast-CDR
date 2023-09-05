@@ -21,7 +21,7 @@ namespace eprosima {
 namespace fastcdr {
 namespace exception {
 /*!
- * @brief This class is thrown as an exception when accessing to the value of a null optional.
+ * @brief This class is thrown as an exception when accessing the value of a null optional.
  * @ingroup EXCEPTIONMODULE
  */
 class BadOptionalAccessException : public Exception

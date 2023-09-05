@@ -3215,7 +3215,7 @@ Cdr& Cdr::xcdr2_deserialize_type(
                         (XCdrHeaderSelection::SHORT_HEADER == current_state.header_serialized_ ? 4 : 8)))
                 {
                     throw BadParamException(
-                              "Member size provided by member header is not equal to the real decoded member");
+                              "Member size provided by member header is not equal to the real decoded size");
                 }
             }
 

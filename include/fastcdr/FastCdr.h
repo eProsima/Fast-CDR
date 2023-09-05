@@ -74,18 +74,18 @@ public:
      * @brief This constructor creates a eprosima::fastcdr::FastCdr object that can serialize/deserialize
      * the assigned buffer.
      *
-     * @param cdrBuffer A reference to the buffer that contains (or will contain) the CDR representation.
+     * @param cdr_buffer A reference to the buffer that contains (or will contain) the CDR representation.
      */
     FastCdr(
-            FastBuffer& cdrBuffer);
+            FastBuffer& cdr_buffer);
 
     /*!
      * @brief This function skips a number of bytes in the CDR stream buffer.
-     * @param numBytes The number of bytes that will be jumped.
+     * @param num_bytes The number of bytes that will be jumped.
      * @return True is returned when the jump operation works successfully. Otherwise, false is returned.
      */
     bool jump(
-            size_t numBytes);
+            size_t num_bytes);
 
     /*!
      * @brief This function resets the current position in the buffer to the begining.
@@ -2055,7 +2055,7 @@ private:
     }
 
     bool resize(
-            size_t minSizeInc);
+            size_t min_size_inc);
 
     const char* read_string(
             uint32_t& length);

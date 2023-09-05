@@ -164,7 +164,7 @@ TEST_P(XCdrv1Test, auto_selection_on_decode)
 }
 
 /*!
- * @test Test the decoder can get the XCDR version from the encapsulation.
+ * @test Test the encoder doesn't execute a POP(origin=0) when serializing a MMEMBER
  * @code{.idl}
  * struct AutoSelectStruct
  * {

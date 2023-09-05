@@ -121,7 +121,7 @@ TEST_P(XCdrv2Test, auto_selection_on_decode)
         void*)>{reinterpret_cast<char*>(calloc(100, sizeof(char))), free};
     FastBuffer fast_buffer(buffer.get(), 100);
 
-    //{ Encode a ushort and a ulong.
+    //{ Encode an ushort and an ulong.
     Cdr cdr(fast_buffer, endianness, CdrVersion::XCDRv2);
     const uint16_t us {0x01FC};
     const uint32_t ul {0x01FC1FCD};

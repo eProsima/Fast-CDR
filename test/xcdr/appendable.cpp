@@ -125,7 +125,7 @@ public:
     bool operator ==(
             const AppendableLessElement& other) const
     {
-        // 'value3' is not deserialized.
+        // 'value3' is not serialized.
         return value1 == other.value1 && value2 == other.value2 && value3 != other.value3;
     }
 

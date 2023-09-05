@@ -10,6 +10,9 @@ on:
     - cron: '0 0 * * *'
 
   push:
+    branches:
+      - master
+      - 1.0.x
 
   workflow_dispatch:
     inputs:
@@ -26,7 +29,8 @@ on:
 
   pull_request:
     branches:
-      - 'master'
+      - master
+      - 1.0.x
     paths-ignore:
       - '**.md'
       - '**.txt'

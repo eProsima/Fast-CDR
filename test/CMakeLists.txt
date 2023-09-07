@@ -13,16 +13,10 @@
 # limitations under the License.
 
 find_package(GTest CONFIG REQUIRED)
-include(${PROJECT_SOURCE_DIR}/cmake/common/gtest.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/testing/GoogleTest.cmake)
 
-###############################################################################
-# Unit tests
-###############################################################################
-set(UNITTESTS_SOURCE SimpleTest.cpp ResizeTest.cpp)
-add_executable(UnitTests ${UNITTESTS_SOURCE})
-set_common_compile_options(UnitTests)
-target_link_libraries(UnitTests fastcdr GTest::gtest_main)
-add_gtest(UnitTests SOURCES ${UNITTESTS_SOURCE})
+add_subdirectory(cdr)
+add_subdirectory(xcdr)
 
 ###############################################################################
 # CMake modules tests
@@ -32,7 +26,7 @@ set(build_dir "${fastcdr_BINARY_DIR}/test/force_cxx")
 set(module_dir "${fastcdr_SOURCE_DIR}/cmake/common")
 set(script "${CMAKE_CURRENT_LIST_DIR}/cmake/build.cmake")
 
-# The C++ sources use fold expressions which were introduced in C++17 
+# The C++ sources use fold expressions which were introduced in C++17
 
 # Tests that C++17 sources can be built enforcing C++17 through CMake
 add_test(NAME cmake.force_standard.positive.builtin

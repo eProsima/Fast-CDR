@@ -217,6 +217,7 @@ endif()
 # Add an option to toggle the generation of the API documentation.
 option(BUILD_DOCUMENTATION "Use doxygen to create product documentation" OFF)
 option(CHECK_DOCUMENTATION "Use doxygen to check code documentation" OFF)
+option(GENERATE_PDF_DOC "Use doxygen to generate API Reference PDF" OFF)
 
 if(EPROSIMA_INSTALLER)
     set(BUILD_DOCUMENTATION ON)
@@ -269,6 +270,11 @@ if(BUILD_DOCUMENTATION)
     else()
         set(USE_DOT YES)
     endif()
+    if(GENERATE_PDF_DOC)
+        set(GENERATE_LATEX YES)
+    else()
+        set(GENERATE_LATEX NO)
+    endif()
     # Configure the template doxyfile for or specific project
     configure_file(doxyfile.in ${PROJECT_BINARY_DIR}/doxyfile @ONLY IMMEDIATE)
     # Add custom target to run doxygen when ever the project is build
@@ -278,6 +284,15 @@ if(BUILD_DOCUMENTATION)
         COMMENT "Generating API documentation with doxygen" VERBATIM)
 
     add_dependencies(doxygen docdirs)
+
+    if(GENERATE_PDF_DOC)
+        add_custom_target(make_pdf ALL
+            COMMAND "make" "pdf"
+            WORKING_DIRECTORY ${PROJECT_BINARY_DIR}/doxygen/latex
+            COMMENT "Generating API reference PDF" VERBATIM)
+
+        add_dependencies(make_pdf doxygen)
+    endif()
 
     ### README html ########################
 
@@ -340,6 +355,7 @@ if(BUILD_DOCUMENTATION)
         COMPONENT documentation
         )
 
+<<<<<<< HEAD
 #    if(NOT CHECK_DOCUMENTATION)
 #        install(DIRECTORY ${PROJECT_BINARY_DIR}/doc/manual
 #            DESTINATION ${DOC_INSTALL_DIR}
@@ -352,6 +368,14 @@ if(BUILD_DOCUMENTATION)
     set(CPACK_COMPONENT_DOCUMENTATION_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} documentation")
 
     set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} documentation)
+=======
+    if(GENERATE_PDF_DOC)
+        install(FILES "${PROJECT_BINARY_DIR}/doxygen/latex/refman.pdf"
+        DESTINATION ${DOC_INSTALL_DIR}
+        RENAME fastcdr-${PROJECT_VERSION}-api-reference.pdf
+        COMPONENT documentation)
+    endif()
+>>>>>>> 8c78438 (Fix Fast CDR API reference PDF generation (#161))
 endif()
 
 if(MSVC OR MSVC_IDE)

@@ -353,27 +353,18 @@ if(BUILD_DOCUMENTATION)
         COMPONENT documentation
         )
 
-<<<<<<< HEAD
-#    if(NOT CHECK_DOCUMENTATION)
-#        install(DIRECTORY ${PROJECT_BINARY_DIR}/doc/manual
-#            DESTINATION ${DOC_INSTALL_DIR}
-#            COMPONENT documentation
-#            )
-#    endif()
-
-    ### Documentation component
-    set(CPACK_COMPONENT_DOCUMENTATION_DISPLAY_NAME "Documentation")
-    set(CPACK_COMPONENT_DOCUMENTATION_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} documentation")
-
-    set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} documentation)
-=======
     if(GENERATE_PDF_DOC)
         install(FILES "${PROJECT_BINARY_DIR}/doxygen/latex/refman.pdf"
         DESTINATION ${DOC_INSTALL_DIR}
         RENAME fastcdr-${PROJECT_VERSION}-api-reference.pdf
         COMPONENT documentation)
     endif()
->>>>>>> 8c78438 (Fix Fast CDR API reference PDF generation (#161))
+
+    ### Documentation component
+    set(CPACK_COMPONENT_DOCUMENTATION_DISPLAY_NAME "Documentation")
+    set(CPACK_COMPONENT_DOCUMENTATION_DESCRIPTION "eProsima ${PROJECT_NAME_LARGE} documentation")
+
+    set(CPACK_COMPONENTS_ALL ${CPACK_COMPONENTS_ALL} documentation)
 endif()
 
 if(MSVC OR MSVC_IDE)

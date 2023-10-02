@@ -16,59 +16,13 @@
 #define _FASTCDR_XCDR_OPTIONAL_HPP_
 
 #include <new>
-#include <type_traits>
 #include <utility>
 
+#include "detail/optional.hpp"
 #include "../exceptions/BadOptionalAccessException.hpp"
 
 namespace eprosima {
 namespace fastcdr {
-
-namespace detail {
-template<class T, typename = void>
-struct optional_storage
-{
-    union
-    {
-        char dummy_;
-        T val_;
-    };
-
-    bool engaged_ { false };
-
-    optional_storage()
-    {
-    }
-
-    ~optional_storage()
-    {
-        if (engaged_)
-        {
-            val_.~T();
-        }
-    }
-
-};
-
-/* *INDENT-OFF* */
-template<class T>
-struct optional_storage<T, typename std::enable_if<std::is_trivially_destructible<T>{}>::type>
-{
-    union
-    {
-        char dummy_; T val_;
-    };
-
-    bool engaged_ { false };
-
-    optional_storage()
-    {
-    }
-
-    ~optional_storage() = default;
-};
-/* *INDENT-ON* */
-} // namespace detail
 
 //! An empty class type used to indicate optional type with uninitialized state.
 struct nullopt_t
@@ -394,9 +348,9 @@ public:
 private:
 
     detail::optional_storage<T> storage_;
-};       // namespace fastcdr
+};
 
-}        // namespace fastcdr
-}        // namespace eprosima
+} // namespace fastcdr
+} // namespace eprosima
 
 #endif //_FASTCDR_XCDR_OPTIONAL_HPP_

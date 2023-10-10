@@ -35,6 +35,7 @@
 #include "exceptions/Exception.h"
 #include "exceptions/NotEnoughMemoryException.h"
 #include "FastBuffer.h"
+#include "xcdr/external.hpp"
 #include "xcdr/MemberId.hpp"
 #include "xcdr/optional.hpp"
 
@@ -2677,6 +2678,27 @@ public:
     }
 
     /*!
+     * @brief Encodes an external in the buffer.
+     * @param[in] value A reference to the external which will be encoded in the buffer.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::BadParamException This exception is thrown when external is null.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to encode into a buffer
+     * position that exceeds the internal memory size.
+     */
+    template<class _T>
+    Cdr& serialize(
+            const external<_T>& value)
+    {
+        if (!value)
+        {
+            throw exception::BadParamException("External member is null");
+        }
+
+        serialize(*value);
+        return *this;
+    }
+
+    /*!
      * @brief Tells the encoder the member identifier for the next member to be encoded.
      * @param[in] member_id Member identifier.
      * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -2706,6 +2728,62 @@ public:
     Cdr& deserialize(
             optional<_T>& value)
     {
+        bool is_present = true;
+        if (CdrVersion::XCDRv2 == cdr_version_ && EncodingAlgorithmFlag::PL_CDR2 != current_encoding_)
+        {
+            deserialize(is_present);
+        }
+        value.reset(is_present);
+        if (is_present)
+        {
+            deserialize(*value);
+        }
+        return *this;
+    }
+
+    /*!
+     * @brief Decodes an external from the buffer.
+     * @param[out] value A reference to the variable where the external will be stored.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::BadParamException This exception is thrown when the external is locked.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
+     * position that exceeds the internal memory size.
+     */
+    template<class _T>
+    Cdr& deserialize(
+            external<_T>& value)
+    {
+        if (value.is_locked())
+        {
+            throw exception::BadParamException("External member is locked");
+        }
+
+        if (!value)
+        {
+            value = external<_T>{new _T()};
+        }
+
+        deserialize(*value);
+        return *this;
+    }
+
+    /*!
+     * @brief Decodes an optional of an external from the buffer.
+     * @param[out] value A reference to the variable where the optional will be stored.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::BadParamException This exception is thrown when the external is locked.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
+     * position that exceeds the internal memory size.
+     */
+    template<class _T>
+    Cdr& deserialize(
+            optional<external<_T>>& value)
+    {
+        if (value.has_value() && value.value().is_locked())
+        {
+            throw exception::BadParamException("External member is locked");
+        }
+
         bool is_present = true;
         if (CdrVersion::XCDRv2 == cdr_version_ && EncodingAlgorithmFlag::PL_CDR2 != current_encoding_)
         {

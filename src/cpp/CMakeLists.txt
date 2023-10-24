@@ -30,6 +30,7 @@ set(${PROJECT_NAME}_source_files
     exceptions/BadOptionalAccessException.cpp
     exceptions/BadParamException.cpp
     exceptions/Exception.cpp
+    exceptions/LockedExternalAccessException.cpp
     exceptions/NotEnoughMemoryException.cpp
     FastCdr.rc
     )

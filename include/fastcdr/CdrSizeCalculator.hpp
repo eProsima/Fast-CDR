@@ -27,6 +27,8 @@
 #include "CdrEncoding.hpp"
 #include "cdr/fixed_size_string.hpp"
 #include "detail/container_recursive_inspector.hpp"
+#include "exceptions/BadParamException.h"
+#include "xcdr/external.hpp"
 #include "xcdr/MemberId.hpp"
 #include "xcdr/optional.hpp"
 
@@ -749,6 +751,26 @@ public:
         }
 
         return calculated_size;
+    }
+
+    /*!
+     * @brief Specific template which calculates the encoded size of an instance of an external type.
+     * @param[in] data Reference to the instance.
+     * @param[inout] current_alignment Current alignment in the encoding.
+     * @exception exception::BadParamException This exception is thrown when the external is null.
+     * @return Encoded size of the instance.
+     */
+    template<class _T>
+    size_t calculate_serialized_size(
+            const external<_T>& data,
+            size_t& current_alignment)
+    {
+        if (!data)
+        {
+            throw exception::BadParamException("External member is null");
+        }
+
+        return calculate_serialized_size(*data, current_alignment);
     }
 
     /*!

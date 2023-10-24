@@ -280,7 +280,7 @@ TEST(XCdrExternalAPITest, assignment)
     ASSERT_EQ((*not_empty_ext2).text(), "test3");
     ASSERT_FALSE(not_empty_ext2.is_locked());
 
-    // Calling assignment over an empty external with an locked external;
+    // Calling assignment over an empty external with a locked external;
     ExternalClass* __locked_ext {new ExternalClass("test")};
     external<ExternalClass> _locked_ext {__locked_ext, true};
     external<ExternalClass> empty_ext3;
@@ -293,7 +293,7 @@ TEST(XCdrExternalAPITest, assignment)
     ASSERT_EQ((*empty_ext3).text(), "test");
     ASSERT_FALSE(empty_ext3.is_locked());
 
-    // Calling assignment over an external with an locked external;
+    // Calling assignment over an external with a locked external;
     external<ExternalClass> not_empty_ext3 {new ExternalClass("test")};
     not_empty_ext3 = _locked_ext;
 
@@ -309,8 +309,8 @@ TEST(XCdrExternalAPITest, assignment)
     EXPECT_THROW(locked_ext = _locked_ext, exception::LockedExternalAccessException);
 }
 
-//! @test Tests the deference object functions.
-TEST(XCdrExternalAPITest, deference_object)
+//! @test Tests the dereference object functions.
+TEST(XCdrExternalAPITest, dereference_object)
 {
     external<ExternalClass> ext {new ExternalClass("test")};
 
@@ -345,8 +345,8 @@ TEST(XCdrExternalAPITest, get_shared_pointer)
     ASSERT_EQ(ext.get_shared_ptr()->text(), "test2");
 }
 
-//! @test Tests the deference object member functions.
-TEST(XCdrExternalAPITest, deference_member)
+//! @test Tests the dereference object member functions.
+TEST(XCdrExternalAPITest, dereference_member)
 {
     external<ExternalClass> ext {new ExternalClass("test")};
 
@@ -731,7 +731,7 @@ void serialize_optional_external(
     Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
     //}
 
-    //{ Encode optional not present.
+    //{ Encode optional present.
     cdr.set_encoding_flag(encoding);
     cdr.serialize_encapsulation();
     Cdr::state enc_state(cdr);
@@ -842,7 +842,7 @@ TEST_P(XCdrExternalTest, null_external)
         Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
         //}
 
-        //{ Encode optional not present.
+        //{ Encode null external.
         cdr.set_encoding_flag(encoding);
         cdr.serialize_encapsulation();
         Cdr::state enc_state(cdr);

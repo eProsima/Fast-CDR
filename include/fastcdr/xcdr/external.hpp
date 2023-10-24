@@ -102,13 +102,13 @@ public:
     //! Destructor
     ~external() = default;
 
-    //! Deference object.
+    //! Dereference object.
     T& operator *() noexcept
     {
         return *pointer_;
     }
 
-    //! Deference object.
+    //! Dereference object.
     const T& operator *() const noexcept
     {
         return *pointer_;
@@ -132,13 +132,13 @@ public:
         return pointer_;
     }
 
-    //! Deference object member.
+    //! Dereference object member.
     T* operator ->() noexcept
     {
         return pointer_.get();
     }
 
-    //! Deference object member.
+    //! Dereference object member.
     const T* operator ->() const noexcept
     {
         return pointer_.get();

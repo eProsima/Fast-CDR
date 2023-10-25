@@ -3341,7 +3341,7 @@ private:
     EncodingAlgorithmFlag current_encoding_ {EncodingAlgorithmFlag::PLAIN_CDR2};
 
     //! @brief This attribute stores the option flags when the CDR type is DDS_CDR;
-    std::array<uint8_t, 2> options_ {0};
+    std::array<uint8_t, 2> options_{{0}};
 
     //! @brief The endianness that will be applied over the buffer.
     uint8_t endianness_ {Endianness::LITTLE_ENDIANNESS};

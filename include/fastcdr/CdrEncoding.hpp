@@ -15,6 +15,8 @@
 #ifndef _FASTCDR_CDRENCODING_HPP_
 #define _FASTCDR_CDRENCODING_HPP_
 
+#include <cstdint>
+
 namespace eprosima {
 namespace fastcdr {
 

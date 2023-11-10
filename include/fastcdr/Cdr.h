@@ -2760,7 +2760,7 @@ public:
 
         if (!value)
         {
-            value = external<_T>{new _T()};
+            value = external<_T>{new external<_T>::type()};
         }
 
         deserialize(*value);

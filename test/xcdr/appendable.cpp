@@ -204,10 +204,8 @@ public:
         return value1 == other.value1 && value2 == other.value2;
     }
 
-    //! First being serialized.
     uint32_t value1 {0};
 
-    //! Third being serialized.
     uint16_t value2 {0};
 };
 

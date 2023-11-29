@@ -3049,7 +3049,6 @@ Cdr& Cdr::xcdr1_begin_serialize_type(
             EncodingAlgorithmFlag::PL_CDR == current_encoding_);
     assert(EncodingAlgorithmFlag::PLAIN_CDR == type_encoding ||
             EncodingAlgorithmFlag::PL_CDR == type_encoding);
-    assert(offset_ == cdr_buffer_.begin() ? current_encoding_ == type_encoding : true);
     current_state.previous_encoding_ = current_encoding_;
     current_encoding_ = type_encoding;
     return *this;
@@ -3084,7 +3083,6 @@ Cdr& Cdr::xcdr2_begin_serialize_type(
     assert(EncodingAlgorithmFlag::PLAIN_CDR2 == type_encoding ||
             EncodingAlgorithmFlag::DELIMIT_CDR2 == type_encoding ||
             EncodingAlgorithmFlag::PL_CDR2 == type_encoding);
-    assert(offset_ == cdr_buffer_.begin() ? current_encoding_ == type_encoding : true);
     if (EncodingAlgorithmFlag::PLAIN_CDR2 != type_encoding)
     {
         uint32_t dheader {0};
@@ -3121,7 +3119,6 @@ Cdr& Cdr::xcdr1_deserialize_type(
 {
     assert(EncodingAlgorithmFlag::PLAIN_CDR == type_encoding ||
             EncodingAlgorithmFlag::PL_CDR == type_encoding);
-    assert(offset_ == cdr_buffer_.begin() ? current_encoding_ == type_encoding : true);
     Cdr::state current_state(*this);
 
     if (EncodingAlgorithmFlag::PL_CDR == type_encoding)
@@ -3158,9 +3155,9 @@ Cdr& Cdr::xcdr1_deserialize_type(
         {
             ++next_member_id_.id;
         }
-
-        next_member_id_ = current_state.next_member_id_;
     }
+
+    next_member_id_ = current_state.next_member_id_;
 
     return *this;
 }
@@ -3172,7 +3169,6 @@ Cdr& Cdr::xcdr2_deserialize_type(
     assert(EncodingAlgorithmFlag::PLAIN_CDR2 == type_encoding ||
             EncodingAlgorithmFlag::DELIMIT_CDR2 == type_encoding ||
             EncodingAlgorithmFlag::PL_CDR2 == type_encoding);
-    assert(offset_ == cdr_buffer_.begin() ? current_encoding_ == type_encoding : true);
 
 
     if (EncodingAlgorithmFlag::PLAIN_CDR2 != type_encoding)
@@ -3274,7 +3270,6 @@ Cdr& Cdr::cdr_begin_serialize_type(
 {
     static_cast<void>(type_encoding);
     assert(EncodingAlgorithmFlag::PLAIN_CDR == type_encoding);
-    assert(offset_ == cdr_buffer_.begin() ? current_encoding_ == type_encoding : true);
     current_state.previous_encoding_ = current_encoding_;
     current_encoding_ = type_encoding;
     return *this;
@@ -3293,7 +3288,6 @@ Cdr& Cdr::cdr_deserialize_type(
 {
     static_cast<void>(type_encoding);
     assert(EncodingAlgorithmFlag::PLAIN_CDR == type_encoding);
-    assert(offset_ == cdr_buffer_.begin() ? current_encoding_ == type_encoding : true);
 
     Cdr::state current_state(*this);
     next_member_id_ = MemberId(0);

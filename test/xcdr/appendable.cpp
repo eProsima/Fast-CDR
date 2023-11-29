@@ -185,6 +185,77 @@ void deserialize(
 } // namespace fastcdr
 } // namespace eprosima
 
+struct MutableElement
+{
+public:
+
+    MutableElement() = default;
+
+    MutableElement(
+            uint8_t value)
+    {
+        value1 = value;
+        value2 = value;
+    }
+
+    bool operator ==(
+            const MutableElement& other) const
+    {
+        return value1 == other.value1 && value2 == other.value2;
+    }
+
+    uint32_t value1 {0};
+
+    uint16_t value2 {0};
+};
+
+namespace eprosima {
+namespace fastcdr {
+
+template<>
+void serialize(
+        Cdr& cdr,
+        const MutableElement& data)
+{
+    Cdr::state current_status(cdr);
+    cdr.begin_serialize_type(current_status,
+            CdrVersion::XCDRv2 ==
+            cdr.get_cdr_version() ? EncodingAlgorithmFlag::PL_CDR2 : EncodingAlgorithmFlag::PL_CDR);
+    cdr << MemberId(0) << data.value1;
+    cdr << MemberId(1) << data.value2;
+    cdr.end_serialize_type(current_status);
+}
+
+template<>
+void deserialize(
+        Cdr& cdr,
+        MutableElement& data)
+{
+    cdr.deserialize_type( CdrVersion::XCDRv2 ==
+            cdr.get_cdr_version() ? EncodingAlgorithmFlag::PL_CDR2 : EncodingAlgorithmFlag::PL_CDR,
+            [&data](Cdr& cdr_inner, const MemberId& mid) -> bool
+            {
+                bool ret_value = true;
+                switch (mid.id)
+                {
+                    case 0:
+                        cdr_inner >> data.value1;
+                        break;
+                    case 1:
+                        cdr_inner >> data.value2;
+                        break;
+                    default:
+                        ret_value = false;
+                        break;
+                }
+
+                return ret_value;
+            });
+}
+
+} // namespace fastcdr
+} // namespace eprosima
+
 /*!
  * @test Test an appendable structure where the encoded version has more members that the decoded one.
  * @code{.idl}
@@ -662,7 +733,7 @@ TEST_P(XCdrAppendableTest, inner_less_serialized_elements)
         ival, 0x00,             // UShort
         0x00, 0x00,             // Alignment
         ival, 0x00, 0x00, 0x00, // ULong
-        ival, 0x00             // UShort
+        ival, 0x00              // UShort
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
@@ -674,7 +745,7 @@ TEST_P(XCdrAppendableTest, inner_less_serialized_elements)
         0x00, 0x00,             // Alignment
         0x00, 0x00, 0x00, 0x06, // DHEADER
         0x00, 0x00, 0x00, ival, // ULong
-        0x00, ival             // UShort
+        0x00, ival              // UShort
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
@@ -749,6 +820,141 @@ TEST_P(XCdrAppendableTest, inner_less_serialized_elements)
     ASSERT_EQ(enc_state_end, dec_state_end);
     ASSERT_EQ(value, dvalue1);
     ASSERT_EQ(value, dvalue2); // This works on XCdrv1 because the octet is jumped as alignment.
+    //}
+}
+
+/*!
+ * @test Test an inner mutable structure.
+ * Regresion test for redmine ticket #20044.
+ * @code{.idl}
+ * @mutable
+ * struct MutableElement
+ * {
+ *     unsigned long value1;
+ *     unsigned short value2;
+ * };
+ *
+ * @appendable
+ * struct AppendableWithMutable // Encoded version
+ * {
+ *     MutableElement value1;
+ *     unsigned short value2;
+ * };
+ * @endcode
+ */
+TEST_P(XCdrAppendableTest, inner_mutable)
+{
+    constexpr uint8_t ival {0xCD};
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x04, // ShortMemberHeader
+        0x00, 0x00, 0x00, ival, // ULong
+        0x00, 0x01, 0x00, 0x02, // ShortMemberHeader
+        0x00, ival,             // UShort
+        0x00, 0x00,             // Alignment
+        0x3F, 0x02, 0x00, 0x00, // Sentinel
+        0x00, ival              // UShort
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x04, 0x00, // ShortMemberHeader
+        ival, 0x00, 0x00, 0x00, // ULong
+        0x01, 0x00, 0x02, 0x00, // ShortMemberHeader
+        ival, 0x00,             // UShort
+        0x00, 0x00,             // Alignment
+        0x02, 0x3F, 0x00, 0x00, // Sentinel
+        ival, 0x00              // UShort
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x14, // DHEADER
+        0x00, 0x00, 0x00, 0x0E, // DHEADER
+        0x20, 0x00, 0x00, 0x00, // EMHEADER1(M) without NEXTINT
+        0x00, 0x00, 0x00, ival, // ULong
+        0x10, 0x00, 0x00, 0x01, // EMHEADER1(M) without NEXTINT
+        0x00, ival,             // UShort
+        0x00, ival              // UShort
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        0x14, 0x00, 0x00, 0x00, // DHEADER
+        0x0E, 0x00, 0x00, 0x00, // DHEADER
+        0x00, 0x00, 0x00, 0x20, // EMHEADER1(M) without NEXTINT
+        ival, 0x00, 0x00, 0x00, // ULong
+        0x01, 0x00, 0x00, 0x10, // EMHEADER1(M) without NEXTINT
+        ival, 0x00,             // UShort
+        ival, 0x00              // UShort
+    };
+    //}
+
+    EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+
+    //{ Prepare buffer
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode
+    MutableElement value { ival };
+    uint16_t value2 { ival };
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    Cdr::state enc_state(cdr);
+    cdr.begin_serialize_type(enc_state, encoding);
+    cdr << MemberId(0) << value;
+    cdr << MemberId(1) << value2;
+    cdr.end_serialize_type(enc_state);
+    Cdr::state enc_state_end(cdr);
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(),
+            expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding
+    MutableElement dvalue;
+    uint16_t dvalue2 { 0 };
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId& mid)->bool
+            {
+                bool ret_value = true;
+
+                switch (mid.id)
+                {
+                    case 0:
+                        cdr_inner >> dvalue;
+                        break;
+                    case 1:
+                        cdr_inner >> dvalue2;
+                        break;
+                    default:
+                        ret_value = false;
+                        break;
+                }
+
+                return ret_value;
+            });
+    Cdr::state dec_state_end(cdr);
+    ASSERT_EQ(enc_state_end, dec_state_end);
+    ASSERT_EQ(value, dvalue);
+    ASSERT_EQ(value2, dvalue2);
     //}
 }
 

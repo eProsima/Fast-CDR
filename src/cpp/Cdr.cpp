@@ -2374,7 +2374,8 @@ void Cdr::xcdr1_serialize_short_member_header(
 
     make_alignment(alignment(4));
 
-    uint16_t flags_and_member_id = static_cast<uint16_t>(member_id.must_understand ? 0x4000 : 0x0) | static_cast<uint16_t>(member_id.id);
+    uint16_t flags_and_member_id = static_cast<uint16_t>(member_id.must_understand ? 0x4000 : 0x0) |
+            static_cast<uint16_t>(member_id.id);
     serialize(flags_and_member_id);
     uint16_t size = 0;
     serialize(size);
@@ -2399,7 +2400,8 @@ void Cdr::xcdr1_serialize_long_member_header(
 {
     make_alignment(alignment(4));
 
-    uint16_t flags_and_extended_pid = static_cast<uint16_t>(member_id.must_understand ? 0x4000 : 0x0) | static_cast<uint16_t>(PID_EXTENDED);
+    uint16_t flags_and_extended_pid = static_cast<uint16_t>(member_id.must_understand ? 0x4000 : 0x0) |
+            static_cast<uint16_t>(PID_EXTENDED);
     serialize(flags_and_extended_pid);
     uint16_t size = PID_EXTENDED_LENGTH;
     serialize(size);
@@ -2446,7 +2448,8 @@ void Cdr::xcdr1_change_to_long_member_header(
     {
         throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
-    uint16_t flags_and_extended_pid = static_cast<uint16_t>(member_id.must_understand ? 0x4000 : 0x0) | static_cast<uint16_t>(PID_EXTENDED);
+    uint16_t flags_and_extended_pid = static_cast<uint16_t>(member_id.must_understand ? 0x4000 : 0x0) |
+            static_cast<uint16_t>(PID_EXTENDED);
     serialize(flags_and_extended_pid);
     uint16_t size = PID_EXTENDED_LENGTH;
     serialize(size);

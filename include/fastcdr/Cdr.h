@@ -163,7 +163,7 @@ public:
      */
     Cdr_DllAPI Cdr(
             FastBuffer& cdr_buffer,
-            const Endianness endianness = DEFAULT_ENDIAN,
+            const Endianness endianness = DEFAULT_ENDIAN == BIG_ENDIANNESS ? LITTLE_ENDIANNESS : BIG_ENDIANNESS,
             const CdrVersion cdr_version = XCDRv2);
 
     /*!

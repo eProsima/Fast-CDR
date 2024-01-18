@@ -2761,7 +2761,7 @@ public:
         if (!value)
         {
             value = external<_T>{new
-#if !defined(_MSC_VER) || _MSC_VER >= 1920
+#if !defined(_MSC_VER)
                                  _T()
 #else
                                  external<_T>::type()

@@ -2156,6 +2156,44 @@ Cdr& Cdr::deserialize_array(
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
+Cdr& Cdr::serialize_bool_array(
+        const std::vector<bool>& vector_t)
+{
+    state state_before_error(*this);
+
+    size_t total_size = vector_t.size() * sizeof(bool);
+
+    if (((end_ - offset_) >= total_size) || resize(total_size))
+    {
+        // Save last datasize.
+        last_data_size_ = sizeof(bool);
+
+        for (size_t count = 0; count < vector_t.size(); ++count)
+        {
+            uint8_t value = 0;
+            std::vector<bool>::const_reference ref = vector_t[count];
+
+            if (ref)
+            {
+                value = 1;
+            }
+            offset_++ << value;
+        }
+    }
+    else
+    {
+        set_state(state_before_error);
+        throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+    }
+
+    if (CdrVersion::XCDRv2 == cdr_version_)
+    {
+        serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
+    }
+
+    return *this;
+}
+
 Cdr& Cdr::serialize_bool_sequence(
         const std::vector<bool>& vector_t)
 {
@@ -2191,6 +2229,46 @@ Cdr& Cdr::serialize_bool_sequence(
     if (CdrVersion::XCDRv2 == cdr_version_)
     {
         serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
+    }
+
+    return *this;
+}
+
+Cdr& Cdr::deserialize_bool_array(
+        std::vector<bool>& vector_t)
+{
+    state state_before_error(*this);
+
+    size_t total_size = vector_t.size() * sizeof(bool);
+
+    if ((end_ - offset_) >= total_size)
+    {
+        // Save last datasize.
+        last_data_size_ = sizeof(bool);
+
+        for (uint32_t count = 0; count < vector_t.size(); ++count)
+        {
+            uint8_t value = 0;
+            offset_++ >> value;
+
+            if (value == 1)
+            {
+                vector_t[count] = true;
+            }
+            else if (value == 0)
+            {
+                vector_t[count] = false;
+            }
+            else
+            {
+                throw BadParamException("Unexpected byte value in Cdr::deserialize_bool_sequence, expected 0 or 1");
+            }
+        }
+    }
+    else
+    {
+        set_state(state_before_error);
+        throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
     return *this;

@@ -2760,13 +2760,7 @@ public:
 
         if (!value)
         {
-            value = external<_T>{new
-#if !defined(_MSC_VER) || _MSC_VER >= 1920
-                                 _T()
-#else
-                                 external<_T>::type()
-#endif // if _MSC_VER >= 1920
-            };
+            value = external<_T>{new typename external<_T>::type()};
         }
 
         deserialize(*value);

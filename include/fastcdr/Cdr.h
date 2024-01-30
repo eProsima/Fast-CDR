@@ -3012,6 +3012,22 @@ public:
         return *this;
     }
 
+    void set_serialized_member_size()
+    {
+        serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
+    }
+
+    /*!
+     * @brief This function returns the extra bytes regarding the allignment.
+     * @param data_size The size of the data that will be serialized.
+     * @return The size needed for the alignment.
+     */
+    inline size_t alignment(
+            size_t data_size) const
+    {
+        return data_size > last_data_size_ ? (data_size - ((offset_ - origin_) % data_size)) & (data_size - 1) : 0;
+    }
+
 private:
 
     Cdr(
@@ -3085,17 +3101,6 @@ private:
             Endianness endianness)
     {
         return deserialize_array(array_t->data(), num_elements * array_t->size(), endianness);
-    }
-
-    /*!
-     * @brief This function returns the extra bytes regarding the allignment.
-     * @param data_size The size of the data that will be serialized.
-     * @return The size needed for the alignment.
-     */
-    inline size_t alignment(
-            size_t data_size) const
-    {
-        return data_size > last_data_size_ ? (data_size - ((offset_ - origin_) % data_size)) & (data_size - 1) : 0;
     }
 
     /*!

@@ -3382,5 +3382,34 @@ Cdr& Cdr::cdr_deserialize_type(
     return *this;
 }
 
+Cdr::state Cdr::allocate_xcdrv2_dheader()
+{
+    Cdr::state dheader_state(*this);
+
+    if (CdrVersion::XCDRv2 == cdr_version_)
+    {
+        // Serialize DHEADER
+        uint32_t dheader {0};
+        serialize(dheader);
+    }
+
+    return dheader_state;
+}
+
+void Cdr::set_xcdrv2_dheader(
+        const Cdr::state& dheader_state)
+{
+    if (CdrVersion::XCDRv2 == cdr_version_)
+    {
+        auto offset = offset_;
+        Cdr::state state_after(*this);
+        set_state(dheader_state);
+        size_t dheader = offset - offset_ - (4 + alignment(sizeof(uint32_t)));    /* DHEADER */
+        serialize(static_cast<uint32_t>(dheader));
+        set_state(state_after);
+        serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
+    }
+}
+
 } // namespace fastcdr
 } // namespace eprosima

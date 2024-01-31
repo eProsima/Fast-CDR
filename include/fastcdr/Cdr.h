@@ -266,7 +266,7 @@ public:
     Cdr_DllAPI size_t get_serialized_data_length() const;
 
     /*!
-     * @brief Get the number of bytes needed to align a position to certain data size.
+     * @brief Returns the number of bytes needed to align a position to certain data size.
      * @param current_alignment Position to be aligned.
      * @param data_size Size of next data to process (should be power of two).
      * @return Number of required alignment bytes.
@@ -748,26 +748,17 @@ public:
     Cdr& serialize(
             const std::array<_T, _Size>& array_t)
     {
-        Cdr::state dheader_state(*this);
-
-        if (CdrVersion::XCDRv2 == cdr_version_ && !is_multi_array_primitive(&array_t))
+        if (!is_multi_array_primitive(&array_t))
         {
-            // Serialize DHEADER
-            uint32_t dheader {0};
-            serialize(dheader);
+            Cdr::state dheader_state {allocate_xcdrv2_dheader()};
+
+            serialize_array(array_t.data(), array_t.size());
+
+            set_xcdrv2_dheader(dheader_state);
         }
-
-        serialize_array(array_t.data(), array_t.size());
-
-        if (CdrVersion::XCDRv2 == cdr_version_ && !is_multi_array_primitive(&array_t))
+        else
         {
-            auto offset = offset_;
-            Cdr::state state_after(*this);
-            set_state(dheader_state);
-            size_t dheader = offset - offset_ - (4 + alignment(sizeof(uint32_t)));/* DHEADER */
-            serialize(static_cast<uint32_t>(dheader));
-            set_state(state_after);
-            serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
+            serialize_array(array_t.data(), array_t.size());
         }
 
         return *this;
@@ -784,14 +775,7 @@ public:
     Cdr& serialize(
             const std::vector<_T>& vector_t)
     {
-        Cdr::state dheader_state(*this);
-
-        if (CdrVersion::XCDRv2 == cdr_version_)
-        {
-            // Serialize DHEADER
-            uint32_t dheader {0};
-            serialize(dheader);
-        }
+        Cdr::state dheader_state {allocate_xcdrv2_dheader()};
 
         serialize(static_cast<int32_t>(vector_t.size()));
 
@@ -805,16 +789,7 @@ public:
             ex.raise();
         }
 
-        if (CdrVersion::XCDRv2 == cdr_version_)
-        {
-            auto offset = offset_;
-            Cdr::state state_after(*this);
-            set_state(dheader_state);
-            size_t dheader = offset - offset_ - (4 + alignment(sizeof(uint32_t)));/* DHEADER */
-            serialize(static_cast<uint32_t>(dheader));
-            set_state(state_after);
-            serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
-        }
+        set_xcdrv2_dheader(dheader_state);
 
         return *this;
     }
@@ -876,14 +851,7 @@ public:
     Cdr& serialize(
             const std::map<_K, _T>& map_t)
     {
-        Cdr::state dheader_state(*this);
-
-        if (CdrVersion::XCDRv2 == cdr_version_)
-        {
-            // Serialize DHEADER
-            uint32_t dheader {0};
-            serialize(dheader);
-        }
+        Cdr::state dheader_state {allocate_xcdrv2_dheader()};
 
         serialize(static_cast<int32_t>(map_t.size()));
 
@@ -901,16 +869,7 @@ public:
             ex.raise();
         }
 
-        if (CdrVersion::XCDRv2 == cdr_version_)
-        {
-            auto offset = offset_;
-            Cdr::state state_after(*this);
-            set_state(dheader_state);
-            size_t dheader = offset - offset_ - (4 + alignment(sizeof(uint32_t)));/* DHEADER */
-            serialize(static_cast<uint32_t>(dheader));
-            set_state(state_after);
-            serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
-        }
+        set_xcdrv2_dheader(dheader_state);
 
         return *this;
     }
@@ -1300,27 +1259,11 @@ public:
     Cdr& serialize_array(
             const std::vector<_T>& value)
     {
-        Cdr::state dheader_state(*this);
-
-        if (CdrVersion::XCDRv2 == cdr_version_)
-        {
-            // Serialize DHEADER
-            uint32_t dheader {0};
-            serialize(dheader);
-        }
+        Cdr::state dheader_state {allocate_xcdrv2_dheader()};
 
         serialize_array(value.data(), value.size());
 
-        if (CdrVersion::XCDRv2 == cdr_version_)
-        {
-            auto offset = offset_;
-            Cdr::state state_after(*this);
-            set_state(dheader_state);
-            size_t dheader = offset - offset_ - (4 + alignment(sizeof(uint32_t)));/* DHEADER */
-            serialize(static_cast<uint32_t>(dheader));
-            set_state(state_after);
-            serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
-        }
+        set_xcdrv2_dheader(dheader_state);
 
         return *this;
     }
@@ -1385,14 +1328,7 @@ public:
             const _T* sequence_t,
             size_t num_elements)
     {
-        Cdr::state dheader_state(*this);
-
-        if (CdrVersion::XCDRv2 == cdr_version_)
-        {
-            // Serialize DHEADER
-            uint32_t dheader {0};
-            serialize(dheader);
-        }
+        Cdr::state dheader_state {allocate_xcdrv2_dheader()};
 
         serialize(static_cast<int32_t>(num_elements));
 
@@ -1406,16 +1342,7 @@ public:
             ex.raise();
         }
 
-        if (CdrVersion::XCDRv2 == cdr_version_)
-        {
-            auto offset = offset_;
-            Cdr::state state_after(*this);
-            set_state(dheader_state);
-            size_t dheader = offset - offset_ - (4 + alignment(sizeof(uint32_t)));/* DHEADER */
-            serialize(static_cast<uint32_t>(dheader));
-            set_state(state_after);
-            serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
-        }
+        set_xcdrv2_dheader(dheader_state);
 
         return *this;
     }
@@ -3012,21 +2939,21 @@ public:
         return *this;
     }
 
-    void set_serialized_member_size()
-    {
-        serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
-    }
+    /*!
+     * @brief Encodes an empty DHEADER if the encoding version is XCDRv2.
+     * After serializing the members's type, @ref set_xcdrv2_dheader must be called to set the correct DHEADER value
+     * using the @ref state returned by this function.
+     */
+    state allocate_xcdrv2_dheader();
 
     /*!
-     * @brief This function returns the extra bytes regarding the allignment.
-     * @param data_size The size of the data that will be serialized.
-     * @return The size needed for the alignment.
+     * @brief Uses the @ref state to calculate the member's type size and serialize the value in the previous allocated
+     * DHEADER.
+     *
+     * @param[in] state @ref state used to calculate the member's type size.
      */
-    inline size_t alignment(
-            size_t data_size) const
-    {
-        return data_size > last_data_size_ ? (data_size - ((offset_ - origin_) % data_size)) & (data_size - 1) : 0;
-    }
+    void set_xcdrv2_dheader(
+            const state& state);
 
 private:
 
@@ -3101,6 +3028,18 @@ private:
             Endianness endianness)
     {
         return deserialize_array(array_t->data(), num_elements * array_t->size(), endianness);
+    }
+
+    /*!
+     * @brief Returns the number of bytes needed to align the current position (having as reference the origin) to
+     * certain data size.
+     * @param data_size The size of the data that will be serialized.
+     * @return The size needed for the alignment.
+     */
+    inline size_t alignment(
+            size_t data_size) const
+    {
+        return data_size > last_data_size_ ? (data_size - ((offset_ - origin_) % data_size)) & (data_size - 1) : 0;
     }
 
     /*!
@@ -3593,13 +3532,16 @@ private:
     //! Align for types equal or greater than 64bits.
     size_t align64_ {4};
 
-
+    /*!
+     * When serializing a member's type using XCDRv2, this enumerator is used to inform the type was serialized with a
+     * DHEADER and the algorithm could optimize the XCDRv2 member header.
+     */
     enum SerializedMemberSizeForNextInt
     {
-        NO_SERIALIZED_MEMBER_SIZE,
-        SERIALIZED_MEMBER_SIZE,
-        SERIALIZED_MEMBER_SIZE_4,
-        SERIALIZED_MEMBER_SIZE_8
+        NO_SERIALIZED_MEMBER_SIZE,     //! Default. No serialized member size in a DHEADER.
+        SERIALIZED_MEMBER_SIZE,        //! Serialized member size in a DHEADER.
+        SERIALIZED_MEMBER_SIZE_4,      //! Serialized member size (which is a multiple of 4) in a DHEADER.
+        SERIALIZED_MEMBER_SIZE_8       //! Serialized member size (which is a multiple of 8) in a DHEADER.
     }
     //! Specifies if a DHEADER was serialized. Used to optimize XCDRv2 member headers.
     serialized_member_size_ {NO_SERIALIZED_MEMBER_SIZE};

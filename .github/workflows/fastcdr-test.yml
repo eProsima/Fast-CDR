@@ -57,17 +57,17 @@ jobs:
 
     steps:
     - name: Sync eProsima/Fast-CDR repository
-      uses: eProsima/eProsima-CI/external/checkout@feature/ctest2junit_translation
+      uses: eProsima/eProsima-CI/external/checkout@v0
       with:
           path: src/Fast-CDR
 
     - name: Get minimum supported version of CMake
-      uses: eProsima/eProsima-CI/external/get-cmake@feature/ctest2junit_translation
+      uses: eProsima/eProsima-CI/external/get-cmake@v0
       with:
         cmakeVersion: '3.22.6'
 
     - name: Install Colcon dependencies
-      uses: eProsima/eProsima-CI/multiplatform/install_colcon@feature/ctest2junit_translation
+      uses: eProsima/eProsima-CI/multiplatform/install_colcon@v0
 
     # Temporal step as this platform will be discontinued soon
     - name: Install Gtest Backwards Compatibility
@@ -80,10 +80,10 @@ jobs:
 
     - name: Install Gtest
       if: ${{ matrix.runner-image != 'ubuntu-20.04' }}
-      uses: eProsima/eProsima-CI/multiplatform/install_gtest@feature/ctest2junit_translation
+      uses: eProsima/eProsima-CI/multiplatform/install_gtest@v0
 
     - name: Colcon build
-      uses: eProsima/eProsima-CI/multiplatform/colcon_build@feature/ctest2junit_translation
+      uses: eProsima/eProsima-CI/multiplatform/colcon_build@v0
       with:
         colcon_build_args_default: --event-handlers=console_direct+
         cmake_args: ${{ inputs.cmake_args }}
@@ -93,7 +93,7 @@ jobs:
 
     - name: Colcon test
       id: test
-      uses: eProsima/eProsima-CI/multiplatform/colcon_test@feature/ctest2junit_translation
+      uses: eProsima/eProsima-CI/multiplatform/colcon_test@v0
       with:
         colcon_test_args_default: --event-handlers=console_direct+ --return-code-on-test-failure
         ctest_args: ${{ inputs.ctest_args }}
@@ -102,7 +102,7 @@ jobs:
         workspace: ${{ github.workspace }}
 
     - name: Test summary
-      uses: eProsima/eProsima-CI/multiplatform/junit_summary@feature/ctest2junit_translation
+      uses: eProsima/eProsima-CI/multiplatform/junit_summary@v0
       if: ${{ !cancelled() && !contains(github.event.pull_request.labels.*.name, 'no-test') }}
       with:
         junit_reports_dir: "${{ steps.test.outputs.ctest_results_path }}"
@@ -112,7 +112,7 @@ jobs:
         show_skipped: 'False'
 
     - name: Test Report
-      uses: eProsima/eProsima-CI/external/test-reporter@feature/ctest2junit_translation
+      uses: eProsima/eProsima-CI/external/test-reporter@v0
       if: ${{ !cancelled() && !contains(github.event.pull_request.labels.*.name, 'no-test') }}
       with:
         name: "Report: ${{ matrix.runner-image }}"

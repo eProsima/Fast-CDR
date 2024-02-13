@@ -101,6 +101,16 @@ jobs:
         packages_names: fastcdr
         workspace: ${{ github.workspace }}
 
+    - name: Test summary
+      uses: eProsima/eProsima-CI/multiplatform/junit_summary@feature/ctest2junit_translation
+      if: ${{ !cancelled() && !contains(github.event.pull_request.labels.*.name, 'no-test') }}
+      with:
+        junit_reports_dir: "${{ steps.test.outputs.ctest_results_path }}"
+        print_summary: 'True'
+        show_failed: 'True'
+        show_disabled: 'False'
+        show_skipped: 'False'
+
     - name: Test Report
       uses: eProsima/eProsima-CI/external/test-reporter@feature/ctest2junit_translation
       if: ${{ !cancelled() && !contains(github.event.pull_request.labels.*.name, 'no-test') }}

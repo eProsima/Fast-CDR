@@ -64,7 +64,7 @@ jobs:
     - name: Get minimum supported version of CMake
       uses: eProsima/eProsima-CI/external/get-cmake@feature/ctest2junit_translation
       with:
-        cmakeVersion: '3.20.6'
+        cmakeVersion: '3.22.6'
 
     - name: Install Colcon dependencies
       uses: eProsima/eProsima-CI/multiplatform/install_colcon@feature/ctest2junit_translation

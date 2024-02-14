@@ -13,6 +13,7 @@ on:
     branches:
       - master
       - 1.0.x
+      - 1.1.x
 
   workflow_dispatch:
     inputs:
@@ -31,6 +32,7 @@ on:
     branches:
       - master
       - 1.0.x
+      - 1.1.x
     paths-ignore:
       - '**.md'
       - '**.txt'

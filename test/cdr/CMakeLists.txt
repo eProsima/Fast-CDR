@@ -21,6 +21,14 @@ target_link_libraries(FixedSizeStringTests fastcdr GTest::gtest_main)
 gtest_discover_tests(FixedSizeStringTests)
 
 ###############################################################################
+# array_as_std_vector tests
+###############################################################################
+add_executable(ArrayAsSTDVectorTests array_as_std_vector.cpp)
+set_common_compile_options(ArrayAsSTDVectorTests)
+target_link_libraries(ArrayAsSTDVectorTests fastcdr GTest::gtest_main)
+gtest_discover_tests(ArrayAsSTDVectorTests)
+
+###############################################################################
 # Old cdr unit tests
 ###############################################################################
 set(UNITTESTS_SOURCE SimpleTest.cpp ResizeTest.cpp)

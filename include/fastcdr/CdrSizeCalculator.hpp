@@ -61,6 +61,16 @@ public:
             CdrVersion cdr_version);
 
     /*!
+     * @brief Constructor.
+     * @param[in] cdr_version Represents the version of the encoding algorithm that will be used for the encoding.
+     * The default value is CdrVersion::XCDRv2.
+     * @param[in] encoding Represents the initial encoding.
+     */
+    Cdr_DllAPI CdrSizeCalculator(
+            CdrVersion cdr_version,
+            EncodingAlgorithmFlag encoding);
+
+    /*!
      * @brief Retrieves the version of the encoding algorithm used by the instance.
      * @return Configured CdrVersion.
      */
@@ -1055,6 +1065,53 @@ public:
             size_t& current_alignment)
     {
         return calculate_array_serialized_size(data->data(), num_elements * data->size(), current_alignment);
+    }
+
+    /*!
+     * @brief Specific template which calculates the encoded size of an std::vector of primitives as an array.
+     * @param[in] data Reference to the instance.
+     * @param[inout] current_alignment Current alignment in the encoding.
+     * @return Encoded size of the instance.
+     */
+    template<class _T, typename std::enable_if<std::is_enum<_T>::value ||
+            std::is_arithmetic<_T>::value>::type* = nullptr>
+    size_t calculate_array_serialized_size(
+            const std::vector<_T>& data,
+            size_t& current_alignment)
+    {
+        return calculate_array_serialized_size(data.data(), data.size(), current_alignment);
+    }
+
+    /*!
+     * @brief Specific template which calculates the encoded size of an std::vector of non-primitives as an array.
+     * @param[in] data Reference to the instance.
+     * @param[inout] current_alignment Current alignment in the encoding.
+     * @return Encoded size of the instance.
+     */
+    template<class _T, typename std::enable_if<!std::is_enum<_T>::value &&
+            !std::is_arithmetic<_T>::value>::type* = nullptr>
+    size_t calculate_array_serialized_size(
+            const std::vector<_T>& data,
+            size_t& current_alignment)
+    {
+        size_t initial_alignment {current_alignment};
+
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            // DHEADER
+            current_alignment += 4 + alignment(current_alignment, 4);
+        }
+
+        size_t calculated_size {current_alignment - initial_alignment};
+        calculated_size += calculate_array_serialized_size(data.data(), data.size(), current_alignment);
+
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            // Inform DHEADER can be joined with NEXTINT
+            serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
+        }
+
+        return calculated_size;
     }
 
     /*!

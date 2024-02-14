@@ -2944,7 +2944,7 @@ public:
      * After serializing the members's type, @ref set_xcdrv2_dheader must be called to set the correct DHEADER value
      * using the @ref state returned by this function.
      */
-    state allocate_xcdrv2_dheader();
+    Cdr_DllAPI state allocate_xcdrv2_dheader();
 
     /*!
      * @brief Uses the @ref state to calculate the member's type size and serialize the value in the previous allocated
@@ -2952,7 +2952,7 @@ public:
      *
      * @param[in] state @ref state used to calculate the member's type size.
      */
-    void set_xcdrv2_dheader(
+    Cdr_DllAPI void set_xcdrv2_dheader(
             const state& state);
 
 private:

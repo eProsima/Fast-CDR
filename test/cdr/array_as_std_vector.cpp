@@ -1,4 +1,4 @@
-// Copyright 2023 Proyectos y Sistemas de Mantenimiento SL (eProsima).
+// Copyright 2024 Proyectos y Sistemas de Mantenimiento SL (eProsima).
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -264,8 +264,6 @@ TEST_P(CdrArrayAsSTDVectorTest, array_ulong_as_std_vector)
     Cdr::Endianness endianness = std::get<1>(GetParam());
 
     serialize_array(expected_streams, encoding, endianness, array_value);
-
-    serialize_array(expected_streams, encoding, endianness, array_value);
 }
 
 /*!
@@ -419,8 +417,6 @@ TEST_P(CdrArrayAsSTDVectorTest, array_struct)
 
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
-
-    serialize_array(expected_streams, encoding, endianness, array_value);
 
     serialize_array(expected_streams, encoding, endianness, array_value);
 }

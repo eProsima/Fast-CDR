@@ -76,15 +76,15 @@ jobs:
 
     # Temporal step as this platform will be discontinued soon
     - name: Install Gtest Backwards Compatibility
-      if: ${{ matrix.runner-image == 'ubuntu-20.04' }}
+      if: ${{ matrix.runner-image == 'ubuntu-20.04' || matrix.runner-image == 'macos-13' }}
       run: |
-          git clone --branch release-1.12.1 https://github.com/google/googletest.git && \
+          git clone --branch release-1.12.1 https://github.com/google/googletest.git src/googletest && \
           colcon build \
             --event-handlers=console_direct+ \
             --packages-select googletest-distribution
 
     - name: Install Gtest
-      if: ${{ matrix.runner-image != 'ubuntu-20.04' }}
+      if: ${{ matrix.runner-image != 'ubuntu-20.04' && matrix.runner-image != 'macos-13' }}
       uses: eProsima/eProsima-CI/multiplatform/install_gtest@feature/fastdds_mac_ci_support
 
     - name: Colcon build

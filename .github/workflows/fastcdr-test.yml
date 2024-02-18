@@ -86,6 +86,7 @@ jobs:
     - name: Colcon build
       uses: eProsima/eProsima-CI/multiplatform/colcon_build@feature/fastdds_mac_ci_support
       with:
+        colcon_meta_file: ${{ github.workspace }}/src/Fast-CDR/.github/workflows/config/colcon.meta
         colcon_build_args_default: --event-handlers=console_direct+
         cmake_args: ${{ inputs.cmake_args }}
         cmake_args_default: -DBUILD_TESTING=ON

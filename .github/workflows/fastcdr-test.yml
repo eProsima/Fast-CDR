@@ -10,6 +10,10 @@ on:
     - cron: '0 0 * * *'
 
   push:
+    branches:
+      - master
+      - 1.0.x
+      - 1.1.x
 
   workflow_dispatch:
     inputs:
@@ -26,7 +30,8 @@ on:
 
   pull_request:
     branches:
-      - 'master'
+      - master
+      - 1.1.x
       - 1.0.x
     paths-ignore:
       - '**.md'
@@ -61,7 +66,7 @@ jobs:
     - name: Get minimum supported version of CMake
       uses: eProsima/eProsima-CI/external/get-cmake@v0
       with:
-        cmakeVersion: '3.22.6'
+        cmakeVersion: '3.15.7'
 
     - name: Install Colcon dependencies
       uses: eProsima/eProsima-CI/multiplatform/install_colcon@v0
@@ -79,24 +84,14 @@ jobs:
       if: ${{ matrix.runner-image != 'ubuntu-20.04' }}
       uses: eProsima/eProsima-CI/multiplatform/install_gtest@v0
 
-<<<<<<< HEAD
-    - name: Build
-      run: |
-        colcon build \
-            --event-handlers=console_direct+ \
-            --packages-select fastcdr \
-            --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo -DEPROSIMA_BUILD_TESTS=ON \
-            ${{ inputs.cmake_args }}
-=======
     - name: Colcon build
       uses: eProsima/eProsima-CI/multiplatform/colcon_build@v0
       with:
         colcon_build_args_default: --event-handlers=console_direct+
         cmake_args: ${{ inputs.cmake_args }}
-        cmake_args_default: -DBUILD_TESTING=ON
+        cmake_args_default: -DEPROSIMA_BUILD_TESTS=ON
         cmake_build_type: RelWithDebInfo
         workspace: ${{ github.workspace }}
->>>>>>> c045c23 (Migrate to eProsima-CI (#195))
 
     - name: Colcon test
       id: test
@@ -104,7 +99,7 @@ jobs:
       with:
         colcon_test_args_default: --event-handlers=console_direct+ --return-code-on-test-failure
         ctest_args: ${{ inputs.ctest_args }}
-        ctest_args_default: --repeat until-pass:3 --timeout 300 --output-junit junit/junit.xml
+        ctest_args_default: --repeat until-pass:3 --timeout 300
         packages_names: fastcdr
         workspace: ${{ github.workspace }}
 

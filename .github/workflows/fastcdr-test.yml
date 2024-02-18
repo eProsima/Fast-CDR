@@ -54,20 +54,21 @@ jobs:
           - 'ubuntu-20.04'
           - 'ubuntu-22.04'
           - 'windows-2019'
+          - 'macos-13'
 
     steps:
     - name: Sync eProsima/Fast-CDR repository
-      uses: eProsima/eProsima-CI/external/checkout@v0
+      uses: eProsima/eProsima-CI/external/checkout@feature/fastdds_mac_ci_support
       with:
           path: src/Fast-CDR
 
     - name: Get minimum supported version of CMake
-      uses: eProsima/eProsima-CI/external/get-cmake@v0
+      uses: eProsima/eProsima-CI/external/get-cmake@feature/fastdds_mac_ci_support
       with:
         cmakeVersion: '3.22.6'
 
     - name: Install Colcon dependencies
-      uses: eProsima/eProsima-CI/multiplatform/install_colcon@v0
+      uses: eProsima/eProsima-CI/multiplatform/install_colcon@feature/fastdds_mac_ci_support
 
     # Temporal step as this platform will be discontinued soon
     - name: Install Gtest Backwards Compatibility
@@ -80,10 +81,10 @@ jobs:
 
     - name: Install Gtest
       if: ${{ matrix.runner-image != 'ubuntu-20.04' }}
-      uses: eProsima/eProsima-CI/multiplatform/install_gtest@v0
+      uses: eProsima/eProsima-CI/multiplatform/install_gtest@feature/fastdds_mac_ci_support
 
     - name: Colcon build
-      uses: eProsima/eProsima-CI/multiplatform/colcon_build@v0
+      uses: eProsima/eProsima-CI/multiplatform/colcon_build@feature/fastdds_mac_ci_support
       with:
         colcon_build_args_default: --event-handlers=console_direct+
         cmake_args: ${{ inputs.cmake_args }}
@@ -93,7 +94,7 @@ jobs:
 
     - name: Colcon test
       id: test
-      uses: eProsima/eProsima-CI/multiplatform/colcon_test@v0
+      uses: eProsima/eProsima-CI/multiplatform/colcon_test@feature/fastdds_mac_ci_support
       with:
         colcon_test_args_default: --event-handlers=console_direct+ --return-code-on-test-failure
         ctest_args: ${{ inputs.ctest_args }}
@@ -102,7 +103,7 @@ jobs:
         workspace: ${{ github.workspace }}
 
     - name: Test summary
-      uses: eProsima/eProsima-CI/multiplatform/junit_summary@v0
+      uses: eProsima/eProsima-CI/multiplatform/junit_summary@feature/fastdds_mac_ci_support
       if: ${{ !cancelled() && !contains(github.event.pull_request.labels.*.name, 'no-test') }}
       with:
         junit_reports_dir: "${{ steps.test.outputs.ctest_results_path }}"
@@ -112,7 +113,7 @@ jobs:
         show_skipped: 'False'
 
     - name: Test Report
-      uses: eProsima/eProsima-CI/external/test-reporter@v0
+      uses: eProsima/eProsima-CI/external/test-reporter@feature/fastdds_mac_ci_support
       if: ${{ !cancelled() && !contains(github.event.pull_request.labels.*.name, 'no-test') }}
       with:
         name: "Report: ${{ matrix.runner-image }}"

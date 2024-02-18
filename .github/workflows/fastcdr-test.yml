@@ -62,6 +62,10 @@ jobs:
       with:
           path: src/Fast-CDR
 
+    - uses: eProsima/eProsima-CI/external/setup-python@feature/fastdds_mac_ci_support
+      with:
+        python-version: '3.11'
+
     - name: Get minimum supported version of CMake
       uses: eProsima/eProsima-CI/external/get-cmake@feature/fastdds_mac_ci_support
       with:

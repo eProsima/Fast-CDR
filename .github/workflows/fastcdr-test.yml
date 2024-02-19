@@ -60,31 +60,31 @@ jobs:
 
     steps:
     - name: Sync eProsima/Fast-CDR repository
-      uses: eProsima/eProsima-CI/external/checkout@feature/fastdds_mac_ci_support
+      uses: eProsima/eProsima-CI/external/checkout@v0
       with:
         path: src/Fast-CDR
 
     - name: Sync GTest
-      uses: eProsima/eProsima-CI/external/checkout@feature/fastdds_mac_ci_support
+      uses: eProsima/eProsima-CI/external/checkout@v0
       with:
         path: src/googletest
         repository: google/googletest
         ref: 'release-1.12.1'
 
-    - uses: eProsima/eProsima-CI/external/setup-python@feature/fastdds_mac_ci_support
+    - uses: eProsima/eProsima-CI/external/setup-python@v0
       with:
         python-version: '3.11'
 
     - name: Get minimum supported version of CMake
-      uses: eProsima/eProsima-CI/external/get-cmake@feature/fastdds_mac_ci_support
+      uses: eProsima/eProsima-CI/external/get-cmake@v0
       with:
         cmakeVersion: '3.22.6'
 
     - name: Install Colcon dependencies
-      uses: eProsima/eProsima-CI/multiplatform/install_colcon@feature/fastdds_mac_ci_support
+      uses: eProsima/eProsima-CI/multiplatform/install_colcon@v0
 
     - name: Colcon build
-      uses: eProsima/eProsima-CI/multiplatform/colcon_build@feature/fastdds_mac_ci_support
+      uses: eProsima/eProsima-CI/multiplatform/colcon_build@v0
       with:
         colcon_meta_file: ${{ github.workspace }}/src/Fast-CDR/.github/workflows/config/colcon.meta
         colcon_build_args_default: --event-handlers=console_direct+
@@ -95,7 +95,7 @@ jobs:
 
     - name: Colcon test
       id: test
-      uses: eProsima/eProsima-CI/multiplatform/colcon_test@feature/fastdds_mac_ci_support
+      uses: eProsima/eProsima-CI/multiplatform/colcon_test@v0
       with:
         colcon_test_args_default: --event-handlers=console_direct+ --return-code-on-test-failure
         ctest_args: ${{ inputs.ctest_args }}
@@ -104,7 +104,7 @@ jobs:
         workspace: ${{ github.workspace }}
 
     - name: Test summary
-      uses: eProsima/eProsima-CI/multiplatform/junit_summary@feature/fastdds_mac_ci_support
+      uses: eProsima/eProsima-CI/multiplatform/junit_summary@v0
       if: ${{ !cancelled() && !contains(github.event.pull_request.labels.*.name, 'no-test') }}
       with:
         junit_reports_dir: ${{ steps.test.outputs.ctest_results_path }}
@@ -114,7 +114,7 @@ jobs:
         show_skipped: 'False'
 
     - name: Test Report
-      uses: eProsima/eProsima-CI/external/test-reporter@feature/fastdds_mac_ci_support
+      uses: eProsima/eProsima-CI/external/test-reporter@v0
       if: ${{ !cancelled() && !contains(github.event.pull_request.labels.*.name, 'no-test') }}
       with:
         name: "Report: ${{ matrix.runner-image }}"
@@ -125,7 +125,7 @@ jobs:
 
     - name: Archive Test Results
       if: always()
-      uses: actions/upload-artifact@v1
+      uses: eProsima/eProsima-CI/external/upload-artifact@v0
       with:
         name: test-results-${{ matrix.runner-image }}
         path: log/latest_test/fastcdr

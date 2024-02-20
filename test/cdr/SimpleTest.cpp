@@ -1915,16 +1915,16 @@ TEST(CDRTests, CWString)
     // Deserialization.
     Cdr cdr_des_bigendi(cdrbuffer_bigendi, eprosima::fastcdr::Cdr::Endianness::BIG_ENDIANNESS);
 
-    wchar_t* c_string_bigendi = NULL;
+    wchar_t* c_wstring_bigendi {nullptr};
 
     EXPECT_NO_THROW(
     {
-        cdr_des_bigendi.deserialize(c_string_bigendi);
+        cdr_des_bigendi.deserialize(c_wstring_bigendi);
     });
 
-    EXPECT_EQ(wcscmp(c_string_bigendi, c_wstring_t), 0);
+    EXPECT_EQ(wcscmp(c_wstring_bigendi, c_wstring_t), 0);
 
-    free(c_string_bigendi);
+    free(c_wstring_bigendi);
 
     // Check bad case without space
     char buffer_bad[1];

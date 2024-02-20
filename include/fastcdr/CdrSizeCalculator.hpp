@@ -1115,6 +1115,21 @@ public:
     }
 
     /*!
+     * @brief Specific template which calculates the encoded size of an std::vector of bool as an array.
+     * @param[in] data Reference to the instance.
+     * @param[inout] current_alignment Current alignment in the encoding.
+     * @return Encoded size of the instance.
+     */
+    TEMPLATE_SPEC
+    size_t calculate_array_serialized_size(
+            const std::vector<bool>& data,
+            size_t& current_alignment)
+    {
+        current_alignment += data.size();
+        return data.size();
+    }
+
+    /*!
      * @brief Generic template which calculates the encoded size of the constructed type's member of a unknown type.
      * @tparam _T Member's type.
      * @param[in] id Member's identifier.

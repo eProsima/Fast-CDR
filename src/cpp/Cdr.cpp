@@ -1643,13 +1643,8 @@ Cdr& Cdr::deserialize(
         // Allocate memory.
         string_t = reinterpret_cast<wchar_t*>(calloc(length + 1, sizeof(wchar_t))); // WStrings never serialize terminating zero
 
-        for (size_t idx = 0; idx < length; ++idx)
-        {
-            uint16_t temp;
-            offset_ >> temp;
-            string_t[idx] = static_cast<wchar_t>(temp);
-            offset_ += sizeof(uint16_t);
-        }
+        deserialize_array(string_t, length);
+
         return *this;
     }
 

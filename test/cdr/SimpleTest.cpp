@@ -1900,6 +1900,32 @@ TEST(CDRTests, CWString)
 
     free(c_string_value);
 
+    // Check the big endianness case
+    char buffer_bigendi[BUFFER_LENGTH];
+
+    // Serialization.
+    FastBuffer cdrbuffer_bigendi(buffer_bigendi, BUFFER_LENGTH);
+    Cdr cdr_ser_bigendi(cdrbuffer_bigendi, eprosima::fastcdr::Cdr::Endianness::BIG_ENDIANNESS);
+
+    EXPECT_NO_THROW(
+    {
+        cdr_ser_bigendi.serialize(c_wstring_t);
+    });
+
+    // Deserialization.
+    Cdr cdr_des_bigendi(cdrbuffer_bigendi, eprosima::fastcdr::Cdr::Endianness::BIG_ENDIANNESS);
+
+    wchar_t* c_wstring_bigendi {nullptr};
+
+    EXPECT_NO_THROW(
+    {
+        cdr_des_bigendi.deserialize(c_wstring_bigendi);
+    });
+
+    EXPECT_EQ(wcscmp(c_wstring_bigendi, c_wstring_t), 0);
+
+    free(c_wstring_bigendi);
+
     // Check bad case without space
     char buffer_bad[1];
 

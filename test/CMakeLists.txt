@@ -12,7 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-find_package(GTest CONFIG REQUIRED)
+# Require C++ 14 for testing (since ROS 2 requires it anyways)
+set(FORCE_CXX "14")
+check_stdcxx(${FORCE_CXX})
+
+# Find GTest
+include(${PROJECT_SOURCE_DIR}/cmake/common/find_or_add_gtest.cmake)
+find_or_add_gtest()
+
+# Include functions to find and add tests dinamically
 include(${PROJECT_SOURCE_DIR}/cmake/testing/GoogleTest.cmake)
 
 add_subdirectory(cdr)

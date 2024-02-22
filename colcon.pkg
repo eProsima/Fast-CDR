@@ -1,5 +1,8 @@
-{
-    "name": "fastcdr",
-    "type": "cmake",
-    "dependencies" : ["googletest-distribution"]
-}
+name: fastcdr
+type: cmake
+dependencies:
+    # Needed for test compilation in ROS 2 CI
+    - ament_cmake_gtest
+    - ament_cmake
+    # Needed for test compilation in eProsima CI
+    - googletest-distribution

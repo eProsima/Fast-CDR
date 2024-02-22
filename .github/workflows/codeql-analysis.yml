@@ -15,11 +15,17 @@ on:
   push:
     branches:
       - master
+      - 2.2.x
+      - 2.1.x
+      - 1.1.x
       - 1.0.x
   pull_request:
     # The branches below must be a subset of the branches above
     branches:
       - master
+      - 2.2.x
+      - 2.1.x
+      - 1.1.x
       - 1.0.x
   schedule:
     - cron: '45 16 * * 0'
@@ -40,7 +46,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL

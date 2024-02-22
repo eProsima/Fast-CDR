@@ -13,7 +13,6 @@
 # limitations under the License.
 
 # Require C++ 14 for testing (since ROS 2 requires it anyways)
-include(${PROJECT_SOURCE_DIR}/cmake/common/check_configuration.cmake)
 set(FORCE_CXX "14")
 check_stdcxx(${FORCE_CXX})
 

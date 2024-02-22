@@ -20,7 +20,7 @@ check_stdcxx(${FORCE_CXX})
 include(${PROJECT_SOURCE_DIR}/cmake/common/find_or_add_gtest.cmake)
 find_or_add_gtest()
 
-# Inclue functions to find and add tests dinamically
+# Include functions to find and add tests dinamically
 include(${PROJECT_SOURCE_DIR}/cmake/testing/GoogleTest.cmake)
 
 add_subdirectory(cdr)

@@ -12,6 +12,8 @@ on:
   push:
     branches:
       - master
+      - 2.2.x
+      - 2.1.x
       - 1.1.x
       - 1.0.x
 
@@ -31,6 +33,8 @@ on:
   pull_request:
     branches:
       - master
+      - 2.2.x
+      - 2.1.x
       - 1.1.x
       - 1.0.x
     paths-ignore:

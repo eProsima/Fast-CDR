@@ -132,7 +132,11 @@ enable_testing()
 include(CTest)
 
 if (BUILD_TESTING)
-    add_subdirectory(test)
+    if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.22)
+        add_subdirectory(test)
+    else()
+        message(INFO "Tests are disabled because the version of CMake is less than 3.22")
+    endif()
 endif()
 
 ###############################################################################

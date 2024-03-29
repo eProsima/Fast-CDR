@@ -196,8 +196,7 @@ static void EXPECT_LONG_DOUBLE_EQ(
         const long double val1,
         const long double val2)
 {
-	static_cast<void>(val1);
-	static_cast<void>(val2);
+    EXPECT_TRUE(val1 == val2);
 }
 
 static void EXPECT_ARRAY_LONG_DOUBLE_EQ(

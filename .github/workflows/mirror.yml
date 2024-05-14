@@ -26,7 +26,7 @@ jobs:
   mirror_job_1_x:
     if: github.ref == 'refs/heads/1.1.x'
     runs-on: ubuntu-latest
-    name: Mirror master branch to API & ABI compatible minor version branches
+    name: Mirror 1.1.x branch to API & ABI compatible minor version branches
     strategy:
       fail-fast: false
       matrix:

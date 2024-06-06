@@ -2238,7 +2238,6 @@ Cdr& Cdr::begin_serialize_type(
     return (this->*begin_serialize_type_)(current_state, type_encoding);
 }
 
-
 Cdr& Cdr::end_serialize_type(
         Cdr::state& current_state)
 {

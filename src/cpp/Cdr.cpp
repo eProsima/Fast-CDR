@@ -2263,7 +2263,6 @@ Cdr& Cdr::operator <<(
     return *this;
 }
 
-
 Cdr& Cdr::serialize_bool_array(
         const std::vector<bool>& vector_t)
 {

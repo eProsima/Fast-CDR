@@ -1,0 +1,4 @@
+names:
+    fastcdr:
+        cmake-args:
+            - "-DBUILD_TESTING=ON"

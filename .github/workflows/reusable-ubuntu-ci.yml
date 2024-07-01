@@ -96,6 +96,19 @@ jobs:
       with:
         api_token: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Install Python dependencies
+      uses: eProsima/eProsima-CI/multiplatform/install_python_packages@v0
+      with:
+        packages: vcstool
+        upgrade: false
+        
+    - name: Fetch Fast DDS CI dependencies
+      uses: eProsima/eProsima-CI/multiplatform/vcs_import@v0
+      with:
+        vcs_repos_file: ${{ github.workspace }}/src/fastcdr/.github/workflows/config/test.repos
+        destination_workspace: src
+        skip_existing: 'true'
+
     - name: Colcon build
       uses: eProsima/eProsima-CI/multiplatform/colcon_build@v0
       with:

@@ -1,7 +1,6 @@
 names:
     fastcdr:
-        ctest-args:
-        [
+        ctest-args: [
             "--repeat", "until-pass:3",
             "--timeout", "300",
             "--output-junit", "junit/junit.xml"

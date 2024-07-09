@@ -7,7 +7,7 @@ on:
 
 jobs:
   nightly-mac-ci-master:
-    uses: eProsima/Fast-CDR/.github/workflows/reusable-mac-ci.yml@master
+    uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@master
     with:
       os-version: 'macos-13'
       label: 'nightly-mac-ci-master'
@@ -17,7 +17,7 @@ jobs:
       use-ccache: false
 
   nightly-mac-ci-2_2_x:
-    uses: eProsima/Fast-CDR/.github/workflows/reusable-mac-ci.yml@2.2.x
+    uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@2.2.x
     with:
       os-version: 'macos-13'
       label: 'nightly-mac-ci-2.2.x'
@@ -27,7 +27,7 @@ jobs:
       use-ccache: false
 
   nightly-mac-ci-2_1_x:
-    uses: eProsima/Fast-CDR/.github/workflows/reusable-mac-ci.yml@2.1.x
+    uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@2.1.x
     with:
       os-version: 'macos-13'
       label: 'nightly-mac-ci-2.1.x'
@@ -37,7 +37,7 @@ jobs:
       use-ccache: false
 
   nightly-mac-ci-1_1_x:
-    uses: eProsima/Fast-CDR/.github/workflows/reusable-mac-ci.yml@1.1.x
+    uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@1.1.x
     with:
       os-version: 'macos-13'
       label: 'nightly-mac-ci-1.1.x'
@@ -47,7 +47,7 @@ jobs:
       use-ccache: false
 
   nightly-mac-ci-1_0_x:
-    uses: eProsima/Fast-CDR/.github/workflows/reusable-mac-ci.yml@1.0.x
+    uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@1.0.x
     with:
       os-version: 'mac-13'
       label: 'nightly-mac-ci-1.0.x'

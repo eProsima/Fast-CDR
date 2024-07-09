@@ -13,7 +13,7 @@ jobs:
         vs-toolset:
           - 'v141'
           - 'v142'
-    uses: eProsima/Fast-CDR/.github/workflows/reusable-windows-ci.yml@master
+    uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@master
     with:
       os-version: 'windows-2019'
       vs-toolset: ${{ matrix.vs-toolset }}
@@ -30,7 +30,7 @@ jobs:
         vs-toolset:
           - 'v141'
           - 'v142'
-    uses: eProsima/Fast-CDR/.github/workflows/reusable-windows-ci.yml@2.2.x
+    uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@2.2.x
     with:
       os-version: 'windows-2019'
       vs-toolset: ${{ matrix.vs-toolset }}
@@ -47,7 +47,7 @@ jobs:
         vs-toolset:
           - 'v141'
           - 'v142'
-    uses: eProsima/Fast-CDR/.github/workflows/reusable-windows-ci.yml@2.1.x
+    uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@2.1.x
     with:
       os-version: 'windows-2019'
       vs-toolset: ${{ matrix.vs-toolset }}
@@ -64,7 +64,7 @@ jobs:
         vs-toolset:
           - 'v141'
           - 'v142'
-    uses: eProsima/Fast-CDR/.github/workflows/reusable-windows-ci.yml@1.1.x
+    uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@1.1.x
     with:
       os-version: 'windows-2019'
       vs-toolset: ${{ matrix.vs-toolset }}
@@ -81,7 +81,7 @@ jobs:
         vs-toolset:
           - 'v141'
           - 'v142'
-    uses: eProsima/Fast-CDR/.github/workflows/reusable-windows-ci.yml@1.0.x
+    uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@1.0.x
     with:
       os-version: 'windows-2019'
       vs-toolset: ${{ matrix.vs-toolset }}

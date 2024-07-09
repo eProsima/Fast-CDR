@@ -56,7 +56,7 @@ jobs:
           - 'v141'
           - 'v142'
     if: ${{ !(github.event_name == 'pull_request') || !contains(github.event.pull_request.labels.*.name, 'conflicts') }}
-    uses: ./.github/workflows/reusable-windows-ci.yml
+    uses: ./.github/workflows/reusable-ci.yml
     with:
       # It would be desirable to have a matrix of windows OS for this job, but due to the issue opened in this ticket:
       # https://github.com/orgs/community/discussions/128118 , it has been set as a single OS job.

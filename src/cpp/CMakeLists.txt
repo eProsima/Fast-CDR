@@ -173,9 +173,9 @@ endif()
 include(CMakePackageConfigHelpers)
 
 if(BUILD_SHARED_LIBS)
-    set(FASTRTPS_PACKAGE_OPT_BIN_DIR_CONDITION "if(MSVC OR MSVC_IDE)")
+    set(FASTCDR_PACKAGE_OPT_BIN_DIR_CONDITION "if(MSVC OR MSVC_IDE)")
 else()
-    set(FASTRTPS_PACKAGE_OPT_BIN_DIR_CONDITION "if(0)")
+    set(FASTCDR_PACKAGE_OPT_BIN_DIR_CONDITION "if(0)")
 endif()
 
 configure_package_config_file(${PROJECT_SOURCE_DIR}/cmake/packaging/Config.cmake.in

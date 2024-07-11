@@ -5,10 +5,10 @@
 [![Issues](https://img.shields.io/github/issues/eProsima/Fast-CDR.svg)](https://github.com/eProsima/Fast-CDR/issues)
 [![Forks](https://img.shields.io/github/forks/eProsima/Fast-CDR.svg)](https://github.com/eProsima/Fast-CDR/network/members)
 [![Stars](https://img.shields.io/github/stars/eProsima/Fast-CDR.svg)](https://github.com/eProsima/Fast-CDR/stargazers)
-[![Linux ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_linux/badge/icon?subject=%20%20%20Linux%20CI%20)](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_linux)
+[![Fast CDR Ubuntu CI (nightly)](https://github.com/eProsima/Fast-CDR/actions/workflows/nightly-ubuntu-ci.yml/badge.svg)](https://github.com/eProsima/Fast-CDR/actions/workflows/nightly-ubuntu-ci.yml)
 [![Linux arm64 ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_linux_aarch64/badge/icon?subject=%20%20%20Linux-aarch64%20CI%20)](http://jenkins.eprosima.com:8080/view/Nightly/job/nightly_fastcdr_master_linux_aarch64/)
-[![Windows ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_windows/label=windows-secure,platform=x64,toolset=v141/badge/icon?subject=%20%20%20%20Windows%20CI%20)](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_windows/label=windows-secure,platform=x64,toolset=v141)
-[![Mac ci](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_mac/badge/icon?subject=%20%20%20%20%20%20%20Mac%20CI%20)](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_master_mac)
+[![Fast CDR Windows CI (nightly)](https://github.com/eProsima/Fast-CDR/actions/workflows/nightly-windows-ci.yml/badge.svg)](https://github.com/eProsima/Fast-CDR/actions/workflows/nightly-windows-ci.yml)
+[![Fast CDR MacOS CI (nightly)](https://github.com/eProsima/Fast-CDR/actions/workflows/nightly-mac-ci.yml/badge.svg)](https://github.com/eProsima/Fast-CDR/actions/workflows/nightly-mac-ci.yml)
 [![Coverage](https://img.shields.io/jenkins/coverage/cobertura.svg?jobUrl=http%3A%2F%2Fjenkins.eprosima.com%3A8080%2Fjob%2Fnightly_fastcdr_coverage_linux)](http://jenkins.eprosima.com:8080/job/nightly_fastcdr_coverage_linux)
 
 **eProsima Fast CDR** is a C++ library that provides two serialization mechanisms.

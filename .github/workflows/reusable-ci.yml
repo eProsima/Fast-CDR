@@ -126,7 +126,7 @@ jobs:
       if: ${{ inputs.run-tests == true  && inputs.os-version == 'windows-2019' }}
       uses: eProsima/eProsima-CI/windows/merge_yaml_metas@v0
       with:
-        metas: "@('${{ github.workspace }}/src/fastcdr/.github/workflows/config/build.meta', '${{ github.workspace }}/src/fastcdr/.github/workflows/config/windows_test.meta')"
+        metas: "@('${{ github.workspace }}/src/fastcdr/.github/workflows/config/build.meta', '${{ github.workspace }}/src/fastcdr/.github/workflows/config/test.meta')"
         path: '${{ github.workspace }}/src/fastcdr/.github/workflows/config/build_test.meta'
 
     - name: Colcon test
@@ -139,6 +139,7 @@ jobs:
         ctest_args: ${{ inputs.ctest-args }}
         packages_names: fastcdr
         workspace: ${{ github.workspace }}
+        test_report_artifact: ${{ inputs.label }}
 
     - name: Fast CDR Test summary
       uses: eProsima/eProsima-CI/multiplatform/junit_summary@v0

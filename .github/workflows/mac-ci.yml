@@ -1,0 +1,59 @@
+name: Fast CDR Mac CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      os-version:
+        description: 'OS version to run the workflow'
+        required: false
+        default: 'macos-13'
+        type: string
+      colcon-args:
+        description: 'Extra arguments for colcon cli'
+        required: false
+        type: string
+      cmake-args:
+        description: 'Extra arguments for cmake cli'
+        required: false
+        type: string
+      ctest-args:
+        description: 'Extra arguments for ctest cli'
+        required: false
+        type: string
+      fastcdr-branch:
+        description: 'Branch or tag of Fast CDR repository'
+        type: string
+        required: true
+      run-tests:
+        description: 'Run test suite of Fast CDR'
+        required: false
+        type: boolean
+        default: true
+
+  pull_request:
+    types:
+      - review_requested
+    paths-ignore:
+      - '**.md'
+      - '**.txt'
+      - '!**/CMakeLists.txt'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mac-ci:
+    if: ${{ !(github.event_name == 'pull_request') || !contains(github.event.pull_request.labels.*.name, 'conflicts') }}
+    uses: ./.github/workflows/reusable-ci.yml
+    with:
+      # It would be desirable to have a matrix of macos OS for this job, but due to the issue opened in this ticket:
+      # https://github.com/orgs/community/discussions/128118 , it has been set as a single OS job.
+      os-version: ${{ inputs.os-version || 'macos-13' }}
+      label: ${{ format('mac-ci-{0}', inputs.fastcdr-branch || github.ref) }}
+      colcon-args: ${{ inputs.colcon-args }}
+      cmake-args: ${{ inputs.cmake-args }}
+      ctest-args: ${{ inputs.ctest-args }}
+      fastcdr-branch: ${{ inputs.fastcdr-branch || github.ref }}
+      run-build: ${{ !(github.event_name == 'pull_request') || !contains(github.event.pull_request.labels.*.name, 'skip-ci') }}
+      run-tests: ${{ (inputs.run-tests == true) || ((github.event_name == 'pull_request') && (!contains(github.event.pull_request.labels.*.name, 'no-test'))) }}

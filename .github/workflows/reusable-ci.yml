@@ -1,0 +1,159 @@
+name: Fast CDR reusable CI workflow
+
+on:
+  workflow_call:
+    inputs:
+      os-version:
+        description: 'The OS image for the workflow'
+        required: false
+        default: 'ubuntu-22.04'
+        type: string
+      vs-toolset:
+        description: 'Windows Visual Studio toolset to use (only Windows)'
+        required: false
+        type: string
+      label:
+        description: 'ID associated to the workflow'
+        required: true
+        type: string
+      colcon-args:
+        description: 'Extra arguments for colcon cli'
+        required: false
+        type: string
+      cmake-args:
+        description: 'Extra arguments for cmake cli'
+        required: false
+        type: string
+      ctest-args:
+        description: 'Extra arguments for ctest cli'
+        required: false
+        type: string
+      fastcdr-branch:
+        description: 'Branch or tag of Fast CDR repository'
+        required: true
+        type: string
+      run-build:
+        description: 'Build Fast CDR (CI skipped otherwise)'
+        required: false
+        type: boolean
+        default: true
+      run-tests:
+        description: 'Run test suite of Fast CDR'
+        required: false
+        type: boolean
+        default: true
+      use-ccache:
+        description: 'Use CCache to speed up the build'
+        required: false
+        type: boolean
+        default: false
+env:
+    toolset: ${{ inputs.vs-toolset && format('-T {0}', inputs.vs-toolset) || '' }}
+    test-meta: ${{ inputs.os-version == 'windows-2019'  && format('{0}/src/fastcdr/.github/workflows/config/build_test.meta', github.workspace) || format('{0}/src/fastcdr/.github/workflows/config/build.meta {0}/src/fastcdr/.github/workflows/config/test.meta', github.workspace)  }}
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  fastcdr_test:
+    runs-on: ${{ inputs.os-version }}
+    if: ${{ inputs.run-build == true }}
+    strategy:
+      fail-fast: false
+      matrix:
+        cmake-build-type:
+          - 'RelWithDebInfo'
+
+    steps:
+    - name: Add ci-pending label if PR
+      if: ${{ github.event_name == 'pull_request' }}
+      uses: eProsima/eProsima-CI/external/add_labels@v0
+      with:
+        labels: ci-pending
+        number: ${{ github.event.number }}
+        repo: eProsima/Fast-CDR
+
+    - name: Sync eProsima/Fast-CDR repository
+      uses: eProsima/eProsima-CI/external/checkout@v0
+      with:
+        path: src/fastcdr
+        ref: ${{ inputs.fastcdr-branch }}
+
+    - name: Install Fix Python version
+      uses: eProsima/eProsima-CI/external/setup-python@v0
+      with:
+        python-version: '3.11'
+
+    - name: Get minimum supported version of CMake
+      uses: eProsima/eProsima-CI/external/get-cmake@v0
+      with:
+        cmakeVersion: '3.22.6'
+
+    - name: Install Colcon dependencies
+      uses: eProsima/eProsima-CI/multiplatform/install_colcon@v0
+
+    - name: Setup CCache
+      uses: eProsima/eProsima-CI/external/setup-ccache-action@v0
+      if: ${{ inputs.use-ccache == true }}
+      with:
+        api_token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Install Python dependencies
+      uses: eProsima/eProsima-CI/multiplatform/install_python_packages@v0
+      with:
+        packages: vcstool
+        upgrade: false
+
+    - name: Fetch Fast DDS CI dependencies
+      uses: eProsima/eProsima-CI/multiplatform/vcs_import@v0
+      with:
+        vcs_repos_file: ${{ github.workspace }}/src/fastcdr/.github/workflows/config/test.repos
+        destination_workspace: src
+        skip_existing: 'true'
+
+    - name: Colcon build
+      uses: eProsima/eProsima-CI/multiplatform/colcon_build@v0
+      with:
+        colcon_meta_file: ${{ github.workspace }}/src/fastcdr/.github/workflows/config/build.meta
+        colcon_build_args: ${{ inputs.colcon-args }}
+        colcon_build_args_default: --event-handlers=console_direct+
+        cmake_args: ${{ inputs.cmake-args }}
+        cmake_args_default: ${{ env.toolset }}
+        cmake_build_type: ${{ matrix.cmake-build-type }}
+        workspace: ${{ github.workspace }}
+
+    - name: Prepare build test meta file
+      if: ${{ inputs.run-tests == true  && inputs.os-version == 'windows-2019' }}
+      uses: eProsima/eProsima-CI/windows/merge_yaml_metas@v0
+      with:
+        metas: "@('${{ github.workspace }}/src/fastcdr/.github/workflows/config/build.meta', '${{ github.workspace }}/src/fastcdr/.github/workflows/config/test.meta')"
+        path: '${{ github.workspace }}/src/fastcdr/.github/workflows/config/build_test.meta'
+
+    - name: Colcon test
+      id: test_fastcdr
+      if: ${{ inputs.run-tests == true }}
+      uses: eProsima/eProsima-CI/multiplatform/colcon_test@v0
+      with:
+        colcon_meta_file: ${{ env.test-meta }}
+        colcon_test_args_default: --event-handlers=console_direct+
+        ctest_args: ${{ inputs.ctest-args }}
+        packages_names: fastcdr
+        workspace: ${{ github.workspace }}
+        test_report_artifact: ${{ inputs.label }}
+
+    - name: Fast CDR Test summary
+      uses: eProsima/eProsima-CI/multiplatform/junit_summary@v0
+      if: ${{ !cancelled() && inputs.run-tests == true }}
+      with:
+        junit_reports_dir: ${{ steps.test_fastcdr.outputs.ctest_results_path }}
+        print_summary: 'True'
+        show_failed: 'True'
+        show_disabled: 'False'
+        show_skipped: 'False'
+
+    - name: Archive Test Results
+      if: always()
+      uses: eProsima/eProsima-CI/external/upload-artifact@v0
+      with:
+        name: test-results-${{ inputs.label }}
+        path: log/latest_test/fastcdr

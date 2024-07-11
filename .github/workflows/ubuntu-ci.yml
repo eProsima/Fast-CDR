@@ -55,7 +55,7 @@ jobs:
       # It would be desirable to have a matrix of ubuntu OS for this job, but due to the issue opened in this ticket:
       # https://github.com/orgs/community/discussions/128118 , it has been set as a single OS job.
       os-version: ${{ inputs.os-version || 'ubuntu-22.04' }}
-      label: 'ubuntu-ci-${{ inputs.fastcdr-branch }}'
+      label: ${{ format('ubuntu-ci-{0}', inputs.fastcdr-branch || github.ref) }}
       colcon-args: ${{ inputs.colcon-args }}
       cmake-args: ${{ inputs.cmake-args }}
       ctest-args: ${{ inputs.ctest-args }}

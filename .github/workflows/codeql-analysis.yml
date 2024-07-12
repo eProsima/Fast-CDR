@@ -16,7 +16,6 @@ on:
     branches:
       - master
       - 2.2.x
-      - 2.1.x
       - 1.1.x
       - 1.0.x
   pull_request:
@@ -24,7 +23,6 @@ on:
     branches:
       - master
       - 2.2.x
-      - 2.1.x
       - 1.1.x
       - 1.0.x
   schedule:

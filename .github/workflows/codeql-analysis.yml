@@ -39,10 +39,18 @@ jobs:
         # Learn more:
         # https://docs.github.com/en/free-pro-team@latest/github/finding-security-vulnerabilities-and-errors-in-your-code/configuring-code-scanning#changing-the-languages-that-are-analyzed
 
-    env:
-      fastcdr-branch: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.fastcdr-branch || github.event_name == 'pull_request' && github.ref || github.event_name == 'schedule' && matrix.supported-branches || '2.2.x' }}
-
     steps:
+    - name: Set environment fastcdr branch value
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "fastcdr-branch=${{ github.event.inputs.fastcdr-branch }}" >> $GITHUB_ENV
+        elif [ "${{ github.event_name }}" == "pull_request" ]; then
+          echo "fastcdr-branch=${{ github.ref }}" >> $GITHUB_ENV
+        elif [ "${{ github.event_name }}" == "schedule" ]; then
+          echo "fastcdr-branch=${{ matrix.supported-branches }}" >> $GITHUB_ENV
+        else
+          echo "fastcdr-branch=2.2.x" >> $GITHUB_ENV
+
     - name: Checkout repository
       uses: actions/checkout@v4
       with:

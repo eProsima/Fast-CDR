@@ -49,7 +49,6 @@ on:
         default: false
 env:
     toolset: ${{ inputs.vs-toolset && format('-T {0}', inputs.vs-toolset) || '' }}
-    test-meta: ${{ inputs.os-version == 'windows-2019'  && format('{0}/src/fastcdr/.github/workflows/config/build_test.meta', github.workspace) || format('{0}/src/fastcdr/.github/workflows/config/build.meta {0}/src/fastcdr/.github/workflows/config/test.meta', github.workspace)  }}
 defaults:
   run:
     shell: bash
@@ -122,19 +121,12 @@ jobs:
         cmake_build_type: ${{ matrix.cmake-build-type }}
         workspace: ${{ github.workspace }}
 
-    - name: Prepare build test meta file
-      if: ${{ inputs.run-tests == true  && inputs.os-version == 'windows-2019' }}
-      uses: eProsima/eProsima-CI/windows/merge_yaml_metas@v0
-      with:
-        metas: "@('${{ github.workspace }}/src/fastcdr/.github/workflows/config/build.meta', '${{ github.workspace }}/src/fastcdr/.github/workflows/config/test.meta')"
-        path: '${{ github.workspace }}/src/fastcdr/.github/workflows/config/build_test.meta'
-
     - name: Colcon test
       id: test_fastcdr
       if: ${{ inputs.run-tests == true }}
       uses: eProsima/eProsima-CI/multiplatform/colcon_test@v0
       with:
-        colcon_meta_file: ${{ env.test-meta }}
+        colcon_meta_file: ${{ github.workspace }}/src/fastcdr/.github/workflows/config/build.meta ${{ github.workspace }}/src/fastcdr/.github/workflows/config/test.meta
         colcon_test_args_default: --event-handlers=console_direct+
         ctest_args: ${{ inputs.ctest-args }}
         packages_names: fastcdr

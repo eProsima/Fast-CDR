@@ -2,12 +2,12 @@
 <?xml-model href="http://download.ros.org/schema/package_format2.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>fastcdr</name>
-  <version>2.2.2</version>
+  <version>2.2.3</version>
   <description>
     *eProsima Fast CDR* is a C++ serialization library implementing the Common Data Representation (CDR) mechanism defined by the Object Management Group (OMG) consortium. CDR is the serialization mechanism used in DDS for the DDS Interoperability Wire Protocol (DDSI-RTPS).
   </description>
   <maintainer email="miguelcompany@eprosima.com">Miguel Company</maintainer>
-  <maintainer email="eduardoponz@eprosima.com">Eduardo Ponz</maintainer>
+  <maintainer email="raul@eprosima.com">Raúl Sánchez-Mateos</maintainer>
   <license file="LICENSE">Apache 2.0</license>
 
   <url type="website">https://www.eprosima.com/</url>

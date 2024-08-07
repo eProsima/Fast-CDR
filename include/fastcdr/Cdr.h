@@ -2024,6 +2024,8 @@ public:
 
             deserialize(sequence_length);
 
+            map_t.clear();
+
             try
             {
                 for (uint32_t i = 0; i < sequence_length; ++i)

@@ -2251,6 +2251,35 @@ TEST(CDRTests, Complete)
     free(c_wstring_value);
 }
 
+// Regression test for Fast DDS issue #5136
+// A non-empty map should be cleared before deserializing in XCDRv1
+TEST(CDRTests, DeserializeIntoANonEmptyMapInXCDRv1)
+{
+    char buffer[14] =
+    {
+        0x00, 0x00, 0x00, 0x01,  // Map length
+        0x00, 0x02,              // Key
+        0x00, 0x00,              // Alignment
+        0x00, 0x00, 0x00, 0x01,  // Length
+        65,  0x00                // 'A'
+    };
+
+    std::map<uint16_t, std::string> initialized_map{
+        {1, "a"}
+    };
+
+    FastBuffer cdr_buffer(buffer, 14);
+    Cdr cdr_ser_map(
+        cdr_buffer,
+        eprosima::fastcdr::Cdr::Endianness::BIG_ENDIANNESS,
+        XCDRv1);
+
+    // Deserialization in a non-empty map
+    cdr_ser_map >> initialized_map;
+    ASSERT_EQ(initialized_map.size(), 1u);
+    ASSERT_EQ(initialized_map.at(2), "A");
+}
+
 TEST(FastCDRTests, Octet)
 {
     // Check good case.

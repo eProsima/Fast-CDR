@@ -35,7 +35,7 @@ endif()
 ###############################################################################
 # Project                                                                     #
 ###############################################################################
-project(fastcdr VERSION 2.2.3 LANGUAGES CXX)
+project(fastcdr VERSION 2.2.4 LANGUAGES CXX)
 
 set(PROJECT_NAME_STYLED "FastCDR")
 set(PROJECT_NAME_LARGE "Fast CDR")

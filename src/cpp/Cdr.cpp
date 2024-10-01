@@ -50,18 +50,18 @@ inline size_t alignment_on_state(
 inline uint32_t Cdr::get_long_lc(
         SerializedMemberSizeForNextInt serialized_member_size)
 {
-    uint32_t lc = 0x40000000;
+    uint32_t lc {0x40000000};
 
     switch (serialized_member_size)
     {
         case SERIALIZED_MEMBER_SIZE_8:
-            lc =  0x70000000;
+            lc =  0x70000000u;
             break;
         case SERIALIZED_MEMBER_SIZE_4:
-            lc =  0x60000000;
+            lc =  0x60000000u;
             break;
         case SERIALIZED_MEMBER_SIZE:
-            lc = 0x50000000;
+            lc = 0x50000000u;
             break;
         default:
             break;
@@ -73,17 +73,20 @@ inline uint32_t Cdr::get_long_lc(
 inline uint32_t Cdr::get_short_lc(
         size_t member_serialized_size)
 {
-    uint32_t lc = 0x0;
+    uint32_t lc {0xFFFFFFFFu};
     switch (member_serialized_size)
     {
+        case 1:
+            lc = 0x00000000u;
+            break;
         case 2:
-            lc = 0x10000000;
+            lc = 0x10000000u;
             break;
         case 4:
-            lc = 0x20000000;
+            lc = 0x20000000u;
             break;
         case 8:
-            lc = 0x30000000;
+            lc = 0x30000000u;
             break;
         default:
             break;
@@ -2986,7 +2989,7 @@ Cdr& Cdr::xcdr2_end_serialize_member(
         {
             const size_t member_serialized_size = last_offset - offset_ -
                     (current_state.header_serialized_ == XCdrHeaderSelection::SHORT_HEADER ? 4 : 8);
-            if (8 < member_serialized_size)
+            if (8 < member_serialized_size || 0xFFFFFFFFu == get_short_lc(member_serialized_size))
             {
                 switch (current_state.header_serialized_)
                 {
@@ -3196,8 +3199,9 @@ Cdr& Cdr::xcdr1_deserialize_type(
     assert(EncodingAlgorithmFlag::PLAIN_CDR == type_encoding ||
             EncodingAlgorithmFlag::PL_CDR == type_encoding);
     Cdr::state current_state(*this);
+    current_encoding_ = type_encoding;
 
-    if (EncodingAlgorithmFlag::PL_CDR == type_encoding)
+    if (EncodingAlgorithmFlag::PL_CDR == current_encoding_)
     {
         while (xcdr1_deserialize_member_header(next_member_id_, current_state))
         {
@@ -3234,6 +3238,7 @@ Cdr& Cdr::xcdr1_deserialize_type(
     }
 
     next_member_id_ = current_state.next_member_id_;
+    current_encoding_ = current_state.previous_encoding_;
 
     return *this;
 }
@@ -3253,8 +3258,9 @@ Cdr& Cdr::xcdr2_deserialize_type(
         deserialize(dheader);
 
         Cdr::state current_state(*this);
+        current_encoding_ = type_encoding;
 
-        if (EncodingAlgorithmFlag::PL_CDR2 == type_encoding)
+        if (EncodingAlgorithmFlag::PL_CDR2 == current_encoding_)
         {
             while (offset_ - current_state.offset_ != dheader)
             {
@@ -3306,10 +3312,13 @@ Cdr& Cdr::xcdr2_deserialize_type(
 
             next_member_id_ = current_state.next_member_id_;
         }
+
+        current_encoding_ = current_state.previous_encoding_;
     }
     else
     {
         Cdr::state current_state(*this);
+        current_encoding_ = type_encoding;
         next_member_id_ = MemberId(0);
 
         while (offset_ != end_ && functor(*this, next_member_id_))
@@ -3318,6 +3327,7 @@ Cdr& Cdr::xcdr2_deserialize_type(
         }
 
         next_member_id_ = current_state.next_member_id_;
+        current_encoding_ = current_state.previous_encoding_;
     }
 
     return *this;

@@ -19,6 +19,7 @@ set(XCDR_TEST_SOURCE
     appendable.cpp
     basic_types.cpp
     external.cpp
+    final.cpp
     mutable.cpp
     optional.cpp
     xcdrv1.cpp

@@ -256,6 +256,99 @@ void deserialize(
 } // namespace fastcdr
 } // namespace eprosima
 
+struct ApInnerStructure
+{
+public:
+
+    ApInnerStructure() = default;
+
+    ApInnerStructure(
+            eprosima::fastcdr::EncodingAlgorithmFlag e1,
+            eprosima::fastcdr::EncodingAlgorithmFlag e2
+            )
+        : enc_xcdrv1(e1)
+        , enc_xcdrv2(e2)
+    {
+    }
+
+    ApInnerStructure(
+            eprosima::fastcdr::EncodingAlgorithmFlag e1,
+            eprosima::fastcdr::EncodingAlgorithmFlag e2,
+            uint8_t value
+            )
+        : value1(value)
+        , enc_xcdrv1(e1)
+        , enc_xcdrv2(e2)
+    {
+    }
+
+    bool operator ==(
+            const ApInnerStructure& other) const
+    {
+        return value1 == other.value1 &&
+               value2.has_value() == other.value2.has_value() &&
+               (!value2.has_value() || value2.value() == other.value2.value());
+    }
+
+    //! First being serialized.
+    uint32_t value1 {0};
+
+    //! Second being serialized.
+    eprosima::fastcdr::optional<uint32_t> value2;
+
+    eprosima::fastcdr::EncodingAlgorithmFlag enc_xcdrv1 {eprosima::fastcdr::EncodingAlgorithmFlag::PLAIN_CDR};
+
+    eprosima::fastcdr::EncodingAlgorithmFlag enc_xcdrv2 {eprosima::fastcdr::EncodingAlgorithmFlag::PLAIN_CDR2};
+};
+
+namespace eprosima {
+namespace fastcdr {
+
+template<>
+void serialize(
+        Cdr& cdr,
+        const ApInnerStructure& data)
+{
+    Cdr::state current_status(cdr);
+    cdr.begin_serialize_type(current_status, cdr.get_cdr_version() == eprosima::fastcdr::CdrVersion::XCDRv1
+                             ? data.enc_xcdrv1
+                             : data.enc_xcdrv2);
+    cdr << MemberId(0) << data.value1;
+    cdr << MemberId(1) << data.value2;
+    cdr.end_serialize_type(current_status);
+}
+
+template<>
+void deserialize(
+        Cdr& cdr,
+        ApInnerStructure& data)
+{
+    cdr.deserialize_type(cdr.get_cdr_version() == eprosima::fastcdr::CdrVersion::XCDRv1
+                         ? data.enc_xcdrv1
+                         : data.enc_xcdrv2,
+            [&data](Cdr& cdr_inner, const MemberId& mid) -> bool
+            {
+                bool ret_value {true};
+                switch (mid.id)
+                {
+                    case 0:
+                        cdr_inner >> data.value1;
+                        break;
+                    case 1:
+                        cdr_inner >> data.value2;
+                        break;
+                    default:
+                        ret_value = false;
+                        break;
+                }
+
+                return ret_value;
+            });
+}
+
+} // namespace fastcdr
+} // namespace eprosima
+
 /*!
  * @test Test an appendable structure where the encoded version has more members that the decoded one.
  * @code{.idl}
@@ -955,6 +1048,262 @@ TEST_P(XCdrAppendableTest, inner_mutable)
     ASSERT_EQ(enc_state_end, dec_state_end);
     ASSERT_EQ(value, dvalue);
     ASSERT_EQ(value2, dvalue2);
+    //}
+}
+
+/*!
+ * @test Test an inner final structure inside a appendable structure.
+ * @code{.idl}
+ * @final
+ * struct InnerFinalStructure
+ * {
+ *     @id(0)
+ *     unsigned long value1;
+ *     @id(1) @optional
+ *     unsigned long value2;
+ * };
+ *
+ * @appendable
+ * struct AppendableWithInnerFinalStruct
+ * {
+ *     @id(1)
+ *     unsigned long value1;
+ *     @id(2)
+ *     InnerFinalStructure value2;
+ * };
+ * @endcode
+ */
+TEST_P(XCdrAppendableTest, inner_final_structure)
+{
+    constexpr uint8_t ival {0xCD};
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, ival, // ULong
+        0x00, 0x00, 0x00, ival, // ULong
+        0x00, 0x01, 0x00, 0x00, // ShortMemberHeader (optional)
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        ival, 0x00, 0x00, 0x00, // ULong
+        ival, 0x00, 0x00, 0x00, // ULong
+        0x01, 0x00, 0x00, 0x00, // ShortMemberHeader (optional)
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x09, // DHEADER
+        0x00, 0x00, 0x00, ival, // ULong
+        0x00, 0x00, 0x00, ival, // ULong
+        0x00,                   // Optional not present
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        0x09, 0x00, 0x00, 0x00, // DHEADER
+        ival, 0x00, 0x00, 0x00, // ULong
+        ival, 0x00, 0x00, 0x00, // ULong
+        0x00,                   // Optional not present
+    };
+    //}
+
+    EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+
+    //{ Prepare buffer
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode
+    uint32_t value1 {ival};
+    ApInnerStructure value2 {eprosima::fastcdr::EncodingAlgorithmFlag::PLAIN_CDR,
+                             eprosima::fastcdr::EncodingAlgorithmFlag::PLAIN_CDR2, ival};
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    Cdr::state enc_state(cdr);
+    cdr.begin_serialize_type(enc_state, encoding);
+    cdr << MemberId(1) << value1;
+    cdr << MemberId(2) << value2;
+    cdr.end_serialize_type(enc_state);
+    Cdr::state enc_state_end(cdr);
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(),
+            expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding
+    uint32_t dvalue1 {0};
+    ApInnerStructure dvalue2 {eprosima::fastcdr::EncodingAlgorithmFlag::PLAIN_CDR,
+                              eprosima::fastcdr::EncodingAlgorithmFlag::PLAIN_CDR2, ival};
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId& mid)->bool
+            {
+                bool ret_value {true};
+
+                switch (mid.id)
+                {
+                    case 0:
+                        cdr_inner >> dvalue1;
+                        break;
+                    case 1:
+                        cdr_inner >> dvalue2;
+                        break;
+                    default:
+                        ret_value = false;
+                        break;
+                }
+
+                return ret_value;
+            });
+    ASSERT_EQ(value1, dvalue1);
+    ASSERT_EQ(value2, dvalue2);
+    Cdr::state dec_state_end(cdr);
+    ASSERT_EQ(enc_state_end, dec_state_end);
+    //}
+}
+
+/*!
+ * @test Test an inner mutable structure inside a appendable structure.
+ * @code{.idl}
+ * @mutable
+ * struct InnerMutableStructure
+ * {
+ *     @id(0)
+ *     unsigned long value1;
+ *     @id(1) @optional
+ *     unsigned long value2;
+ * };
+ *
+ * @appendable
+ * struct AppendableWithInnerMutableStruct
+ * {
+ *     @id(1)
+ *     unsigned long value1;
+ *     @id(2)
+ *     InnerMutableStructure value2;
+ * };
+ * @endcode
+ */
+TEST_P(XCdrAppendableTest, inner_mutable_structure)
+{
+    constexpr uint8_t ival {0xCD};
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, ival, // ULong
+        0x00, 0x00, 0x00, 0x04, // ShortMemberHeader
+        0x00, 0x00, 0x00, ival, // ULong
+        0x3F, 0x02, 0x00, 0x00, // Sentinel
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        ival, 0x00, 0x00, 0x00, // ULong
+        0x00, 0x00, 0x04, 0x00, // ShortMemberHeader
+        ival, 0x00, 0x00, 0x00, // ULong
+        0x02, 0x3F, 0x00, 0x00, // Sentinel
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x10, // DHEADER
+        0x00, 0x00, 0x00, ival, // ULong
+        0x00, 0x00, 0x00, 0x08, // DHEADER
+        0x20, 0x00, 0x00, 0x00, // EMHEADER1(M) without NEXTINT
+        0x00, 0x00, 0x00, ival, // ULong
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        0x10, 0x00, 0x00, 0x00, // DHEADER
+        ival, 0x00, 0x00, 0x00, // ULong
+        0x08, 0x00, 0x00, 0x00, // DHEADER
+        0x00, 0x00, 0x00, 0x20, // EMHEADER1(M) without NEXTINT
+        ival, 0x00, 0x00, 0x00, // ULong
+    };
+    //}
+
+    EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+
+    //{ Prepare buffer
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode
+    uint32_t value1 {ival};
+    ApInnerStructure value2 {eprosima::fastcdr::EncodingAlgorithmFlag::PL_CDR,
+                             eprosima::fastcdr::EncodingAlgorithmFlag::PL_CDR2, ival};
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    Cdr::state enc_state(cdr);
+    cdr.begin_serialize_type(enc_state, encoding);
+    cdr << MemberId(1) << value1;
+    cdr << MemberId(2) << value2;
+    cdr.end_serialize_type(enc_state);
+    Cdr::state enc_state_end(cdr);
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(),
+            expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding
+    uint32_t dvalue1 {0};
+    ApInnerStructure dvalue2 {eprosima::fastcdr::EncodingAlgorithmFlag::PL_CDR,
+                              eprosima::fastcdr::EncodingAlgorithmFlag::PL_CDR2, ival};
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId& mid)->bool
+            {
+                bool ret_value {true};
+
+                switch (mid.id)
+                {
+                    case 0:
+                        cdr_inner >> dvalue1;
+                        break;
+                    case 1:
+                        cdr_inner >> dvalue2;
+                        break;
+                    default:
+                        ret_value = false;
+                        break;
+                }
+
+                return ret_value;
+            });
+    ASSERT_EQ(value1, dvalue1);
+    ASSERT_EQ(value2, dvalue2);
+    Cdr::state dec_state_end(cdr);
+    ASSERT_EQ(enc_state_end, dec_state_end);
     //}
 }
 

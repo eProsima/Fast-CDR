@@ -35,9 +35,9 @@ CdrSizeCalculator::CdrSizeCalculator(
 CdrSizeCalculator::CdrSizeCalculator(
         CdrVersion cdr_version,
         EncodingAlgorithmFlag encoding)
-    : cdr_version_(cdr_version)
-    , current_encoding_(encoding)
+    : CdrSizeCalculator(cdr_version)
 {
+    current_encoding_ = encoding;
 }
 
 CdrVersion CdrSizeCalculator::get_cdr_version() const

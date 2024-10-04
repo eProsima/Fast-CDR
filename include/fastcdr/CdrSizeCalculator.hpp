@@ -487,6 +487,7 @@ public:
     {
         size_t calculated_size {4 + alignment(current_alignment, 4) + data.size() + 1};
         current_alignment += calculated_size;
+        serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
 
         return calculated_size;
     }

@@ -1658,7 +1658,7 @@ Cdr& Cdr::deserialize(
 const char* Cdr::read_string(
         uint32_t& length)
 {
-    const char* ret_value = "";
+    const char* ret_value = nullptr;
     state state_before_error(*this);
 
     *this >> length;

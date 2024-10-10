@@ -452,7 +452,7 @@ FastCdr& FastCdr::deserialize(
 const char* FastCdr::read_string(
         uint32_t& length)
 {
-    const char* ret_value = "";
+    const char* ret_value = nullptr;
     state state_before_error(*this);
 
     *this >> length;

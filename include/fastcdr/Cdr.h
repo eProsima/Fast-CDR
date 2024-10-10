@@ -1793,7 +1793,7 @@ public:
     {
         uint32_t length = 0;
         const char* str = read_string(length);
-        value = std::string(str, length);
+        value.assign(str, length);
         return *this;
     }
 

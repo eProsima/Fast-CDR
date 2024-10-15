@@ -14,6 +14,12 @@
 **eProsima Fast CDR** is a C++ library that provides two serialization mechanisms.
 One is the standard CDR serialization mechanism, while the other is a faster implementation that modifies the standard.
 
+## Commercial support
+
+Looking for commercial support? Write us to info@eprosima.com
+
+Find more about us at [eProsima’s webpage](https://eprosima.com/).
+
 ## Build
 
 **eProsima Fast CDR** provides [CMake][cmake] scripts to build and install it (please read the [installation guide](https://fast-dds.docs.eprosima.com/en/latest/installation/sources/sources_linux.html#cmake-installation) for more details).

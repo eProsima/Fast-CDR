@@ -141,6 +141,7 @@ Cdr::Cdr(
     , offset_(cdr_buffer.begin())
     , origin_(cdr_buffer.begin())
     , end_(cdr_buffer.end())
+    , initial_state_(*this)
 {
     switch (cdr_version_)
     {
@@ -272,7 +273,21 @@ Cdr& Cdr::read_encapsulation()
         if (CdrVersion::CORBA_CDR < cdr_version_)
         {
             deserialize(options_);
+
+            uint8_t option_align {static_cast<uint8_t>(options_[1] & 0x3u)};
+
+            if (0 < option_align)
+            {
+                auto length {end_ - cdr_buffer_.begin()};
+                auto alignment = ((length + 3u) & ~3u) - length;
+
+                if (0 == alignment)
+                {
+                    end_ -= option_align;
+                }
+            }
         }
+
     }
     catch (Exception& ex)
     {
@@ -326,6 +341,7 @@ Cdr& Cdr::serialize_encapsulation()
     }
 
     reset_alignment();
+    encapsulation_serialized_ = true;
     return *this;
 }
 
@@ -365,6 +381,25 @@ void Cdr::set_dds_cdr_options(
         const std::array<uint8_t, 2>& options)
 {
     options_ = options;
+
+    if (CdrVersion::XCDRv1 == cdr_version_ ||
+            CdrVersion::XCDRv2 == cdr_version_)
+    {
+        auto length {offset_ - cdr_buffer_.begin()};
+        auto alignment = ((length + 3u) & ~3u) - length;
+        options_[1] = static_cast<uint8_t>(options_[1] & 0xC) + static_cast<uint8_t>(alignment & 0x3);
+    }
+
+    if (encapsulation_serialized_ && CdrVersion::CORBA_CDR < cdr_version_)
+    {
+        state previous_state(*this);
+        set_state(initial_state_);
+
+        jump(2);
+        serialize(options_);
+
+        set_state(previous_state);
+    }
 }
 
 void Cdr::change_endianness(

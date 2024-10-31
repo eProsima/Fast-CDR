@@ -3548,6 +3548,12 @@ private:
     //! Specifies if a DHEADER was serialized. Used to optimize XCDRv2 member headers.
     serialized_member_size_ {NO_SERIALIZED_MEMBER_SIZE};
 
+    //! Stores the initial state.
+    state initial_state_;
+
+    //! Whether the encapsulation was serialized.
+    bool encapsulation_serialized_ {false};
+
 
     uint32_t get_long_lc(
             SerializedMemberSizeForNextInt serialized_member_size);

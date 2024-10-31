@@ -65,6 +65,7 @@ void xcdrv1_serialize_the_value(
     cdr.begin_serialize_type(enc_state, encoding);
     cdr.serialize_member(MemberId(1), value, header_selection);
     cdr.end_serialize_type(enc_state);
+    cdr.set_dds_cdr_options({0, 0});
     Cdr::state enc_state_end(cdr);
     //}
 
@@ -132,6 +133,7 @@ TEST_P(XCdrv1Test, auto_selection_on_decode)
     cdr << MemberId(0) << us;
     cdr << MemberId(1) << ul;
     cdr.end_serialize_type(enc_state);
+    cdr.set_dds_cdr_options({0, 0});
     //}
 
     //{ Decode an ushort and an ulong.
@@ -258,6 +260,7 @@ TEST_P(XCdrv1Test, push_origin_zero)
     cdr << MemberId(0) << uc;
     cdr << MemberId(1) << longlong_value;
     cdr.end_serialize_type(enc_state);
+    cdr.set_dds_cdr_options({0, 0});
     //}
 
     //{ Test encoded content

@@ -63,6 +63,7 @@ void xcdrv2_serialize_the_value(
     cdr.begin_serialize_type(enc_state, encoding);
     cdr.serialize_member(MemberId(1), value, header_selection);
     cdr.end_serialize_type(enc_state);
+    cdr.set_dds_cdr_options({0, 0});
     Cdr::state enc_state_end(cdr);
     //}
 
@@ -132,6 +133,7 @@ TEST_P(XCdrv2Test, auto_selection_on_decode)
     cdr << MemberId(0) << us;
     cdr << MemberId(1) << ul;
     cdr.end_serialize_type(enc_state);
+    cdr.set_dds_cdr_options({0, 0});
     //}
 
     //{ Decode an ushort and an ulong.
@@ -181,14 +183,14 @@ TEST_P(XCdrv2PLTest, pl_octet_member)
     XCdrStreamValues expected_streams;
     expected_streams[0 + Cdr::XCdrHeaderSelection::SHORT_HEADER] =
     {
-        0x00, 0x0b, 0x00, 0x00, // Encapsulation
+        0x00, 0x0b, 0x00, 0x03, // Encapsulation
         0x05, 0x00, 0x00, 0x00, // DHEADER
         0x01, 0x00, 0x00, 0x00, // EMHEADER1(M) without NEXTINT
         octet_value             // Octet
     };
     expected_streams[0 + Cdr::XCdrHeaderSelection::LONG_HEADER] =
     {
-        0x00, 0x0b, 0x00, 0x00, // Encapsulation
+        0x00, 0x0b, 0x00, 0x03, // Encapsulation
         0x09, 0x00, 0x00, 0x00, // DHEADER
         0x01, 0x00, 0x00, 0x40, // EMHEADER1(M) with NEXTINT
         0x01, 0x00, 0x00, 0x00, // Member size
@@ -196,14 +198,14 @@ TEST_P(XCdrv2PLTest, pl_octet_member)
     };
     expected_streams[0 + Cdr::XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT] =
     {
-        0x00, 0x0b, 0x00, 0x00, // Encapsulation
+        0x00, 0x0b, 0x00, 0x03, // Encapsulation
         0x05, 0x00, 0x00, 0x00, // DHEADER
         0x01, 0x00, 0x00, 0x00, // EMHEADER1(M) without NEXTINT
         octet_value             // Octet
     };
     expected_streams[0 + Cdr::XCdrHeaderSelection::AUTO_WITH_LONG_HEADER_BY_DEFAULT] =
     {
-        0x00, 0x0b, 0x00, 0x00, // Encapsulation
+        0x00, 0x0b, 0x00, 0x03, // Encapsulation
         0x05, 0x00, 0x00, 0x00, // DHEADER
         0x01, 0x00, 0x00, 0x00, // EMHEADER1(M) without NEXTINT
         octet_value             // Octet

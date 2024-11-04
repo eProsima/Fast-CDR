@@ -14,6 +14,7 @@
 
 #include <cstring>
 #include <limits>
+#include <string>
 
 #include <fastcdr/Cdr.h>
 
@@ -884,6 +885,27 @@ Cdr& Cdr::serialize(
     }
 
     return *this;
+}
+
+TEMPLATE_SPEC
+Cdr& Cdr::serialize(
+        const std::string& string_t)
+{
+    // An empty string is serialized as a 0 length string.
+    if (string_t.empty())
+    {
+        return serialize(static_cast<uint32_t>(0));
+    }
+
+    // Check there are no null characters in the string.
+    const char* c_str = string_t.c_str();
+    const auto str_len = strlen(c_str);
+    if (string_t.size() > str_len)
+    {
+        throw BadParamException("The string contains null characters");
+    }
+
+    return serialize_sequence(c_str, str_len + 1);
 }
 
 Cdr& Cdr::serialize_array(

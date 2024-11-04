@@ -706,10 +706,7 @@ public:
      */
     TEMPLATE_SPEC
     Cdr& serialize(
-            const std::string& string_t)
-    {
-        return serialize(string_t.c_str());
-    }
+            const std::string& string_t);
 
     /*!
      * @brief This function serializes a std::wstring.

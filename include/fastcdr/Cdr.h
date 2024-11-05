@@ -703,8 +703,9 @@ public:
      * @param string_t The string that will be serialized in the buffer.
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+     * @exception exception::BadParamException This exception is thrown when trying to serialize a string with null characters.
      */
-    TEMPLATE_SPEC
+    TEMPLATE_SPEC Cdr_DllAPI
     Cdr& serialize(
             const std::string& string_t);
 

@@ -453,13 +453,13 @@ void serialize_external(
     XCdrStreamValues expected_streams;
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x01, // Encapsulation
         0x00, 0x00, 0x00, 0x03, // String length
         valA, valB, 0x00        // String
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        0x00, 0x01, 0x00, 0x01, // Encapsulation
         0x03, 0x00, 0x00, 0x00, // String length
         valA, valB, 0x00        // String
     };
@@ -487,19 +487,19 @@ void serialize_external(
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        0x00, 0x06, 0x00, 0x01, // Encapsulation
         0x00, 0x00, 0x00, 0x03, // String length
         valA, valB, 0x00        // String
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        0x00, 0x07, 0x00, 0x01, // Encapsulation
         0x03, 0x00, 0x00, 0x00, // String length
         valA, valB, 0x00        // String
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        0x00, 0x08, 0x00, 0x01, // Encapsulation
         0x00, 0x00, 0x00, 0x0B, // DHEADER
         0x00, 0x00, 0x00, 0x07, // DHEADER
         0x00, 0x00, 0x00, 0x03, // String length
@@ -507,7 +507,7 @@ void serialize_external(
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        0x00, 0x09, 0x00, 0x01, // Encapsulation
         0x0B, 0x00, 0x00, 0x00, // DHEADER
         0x07, 0x00, 0x00, 0x00, // DHEADER
         0x03, 0x00, 0x00, 0x00, // String length
@@ -515,7 +515,7 @@ void serialize_external(
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x0A, 0x00, 0x00, // Encapsulation
+        0x00, 0x0A, 0x00, 0x01, // Encapsulation
         0x00, 0x00, 0x00, 0x13, // DHEADER
         0x50, 0x00, 0x00, 0x01, // EMHEADER1(M) with NEXTINT
         0x00, 0x00, 0x00, 0x0B, // DHEADER
@@ -525,7 +525,7 @@ void serialize_external(
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x0B, 0x00, 0x00, // Encapsulation
+        0x00, 0x0B, 0x00, 0x01, // Encapsulation
         0x13, 0x00, 0x00, 0x00, // DHEADER
         0x01, 0x00, 0x00, 0x50, // EMHEADER1(M) with NEXTINT
         0x0B, 0x00, 0x00, 0x00, // DHEADER
@@ -567,6 +567,7 @@ void serialize_external(
         cdr << MemberId(1) << ext_value;
     }
     cdr.end_serialize_type(enc_state);
+    cdr.set_dds_cdr_options({0, 0});
     Cdr::state enc_state_end(cdr);
     //}
 
@@ -621,14 +622,14 @@ void serialize_optional_external(
     XCdrStreamValues expected_streams;
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x01, // Encapsulation
         0x00, 0x01, 0x00, 0x07, // ShortMemberHeader
         0x00, 0x00, 0x00, 0x03, // String length
         valA, valB, 0x00        // String
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        0x00, 0x01, 0x00, 0x01, // Encapsulation
         0x01, 0x00, 0x07, 0x00, // ShortMemberHeader
         0x03, 0x00, 0x00, 0x00, // String length
         valA, valB, 0x00        // String
@@ -657,7 +658,7 @@ void serialize_optional_external(
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        0x00, 0x06, 0x00, 0x01, // Encapsulation
         0x01,                   // Present
         0x00, 0x00, 0x00,       // Alignment
         0x00, 0x00, 0x00, 0x03, // String length
@@ -665,7 +666,7 @@ void serialize_optional_external(
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        0x00, 0x07, 0x00, 0x01, // Encapsulation
         0x01,                   // Present
         0x00, 0x00, 0x00,       // Alignment
         0x03, 0x00, 0x00, 0x00, // String length
@@ -673,7 +674,7 @@ void serialize_optional_external(
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        0x00, 0x08, 0x00, 0x01, // Encapsulation
         0x00, 0x00, 0x00, 0x0F, // DHEADER
         0x01,                   // Present
         0x00, 0x00, 0x00,       // Alignment
@@ -683,7 +684,7 @@ void serialize_optional_external(
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        0x00, 0x09, 0x00, 0x01, // Encapsulation
         0x0F, 0x00, 0x00, 0x00, // DHEADER
         0x01,                   // Present
         0x00, 0x00, 0x00,       // Alignment
@@ -693,7 +694,7 @@ void serialize_optional_external(
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x0A, 0x00, 0x00, // Encapsulation
+        0x00, 0x0A, 0x00, 0x01, // Encapsulation
         0x00, 0x00, 0x00, 0x13, // DHEADER
         0x50, 0x00, 0x00, 0x01, // EMHEADER1(M) with NEXTINT
         0x00, 0x00, 0x00, 0x0B, // DHEADER
@@ -703,7 +704,7 @@ void serialize_optional_external(
     };
     expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x0B, 0x00, 0x00, // Encapsulation
+        0x00, 0x0B, 0x00, 0x01, // Encapsulation
         0x13, 0x00, 0x00, 0x00, // DHEADER
         0x01, 0x00, 0x00, 0x50, // EMHEADER1(M) with NEXTINT
         0x0B, 0x00, 0x00, 0x00, // DHEADER
@@ -745,6 +746,7 @@ void serialize_optional_external(
         cdr << MemberId(1) << ext_value;
     }
     cdr.end_serialize_type(enc_state);
+    cdr.set_dds_cdr_options({0, 0});
     Cdr::state enc_state_end(cdr);
     //}
 
@@ -1006,23 +1008,23 @@ TEST_P(XCdrExternalTest, null_optional)
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        0x00, 0x06, 0x00, 0x03, // Encapsulation
         0x00                    // Not present
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        0x00, 0x07, 0x00, 0x03, // Encapsulation
         0x00                    // Not present
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        0x00, 0x08, 0x00, 0x03, // Encapsulation
         0x00, 0x00, 0x00, 0x01, // DHEADER
         0x00                    // Not present
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        0x00, 0x09, 0x00, 0x03, // Encapsulation
         0x01, 0x00, 0x00, 0x00, // DHEADER
         0x00                    // Not present
     };
@@ -1069,6 +1071,7 @@ TEST_P(XCdrExternalTest, null_optional)
         cdr.begin_serialize_type(enc_state, encoding);
         cdr.serialize_member(MemberId(1), opt_value);
         cdr.end_serialize_type(enc_state);
+        cdr.set_dds_cdr_options({0, 0});
         Cdr::state enc_state_end(cdr);
         //}
 
@@ -1119,6 +1122,7 @@ TEST_P(XCdrExternalTest, null_optional)
         cdr.begin_serialize_type(enc_state, encoding);
         cdr << MemberId(1) << opt_value;
         cdr.end_serialize_type(enc_state);
+        cdr.set_dds_cdr_options({0, 0});
         Cdr::state enc_state_end(cdr);
         //}
 

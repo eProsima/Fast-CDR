@@ -381,21 +381,21 @@ TEST_P(XCdrAppendableTest, more_serialized_elements)
     XCdrStreamValues expected_streams;
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x01, // Encapsulation
         0x00, 0x00, 0x00, ival, // ULong
         0x00, ival,             // UShort
         ival,                   // Octet
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        0x00, 0x01, 0x00, 0x01, // Encapsulation
         ival, 0x00, 0x00, 0x00, // ULong
         ival, 0x00,             // UShort
         ival,                   // Octet
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        0x00, 0x08, 0x00, 0x01, // Encapsulation
         0x00, 0x00, 0x00, 0x7,  // DHEADER
         0x00, 0x00, 0x00, ival, // ULong
         0x00, ival,             // UShort
@@ -403,7 +403,7 @@ TEST_P(XCdrAppendableTest, more_serialized_elements)
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        0x00, 0x09, 0x00, 0x01, // Encapsulation
         0x07, 0x00, 0x00, 0x00, // DHEADER
         ival, 0x00, 0x00, 0x00, // ULong
         ival, 0x00,             // UShort
@@ -435,6 +435,7 @@ TEST_P(XCdrAppendableTest, more_serialized_elements)
     cdr << MemberId(2) << value2;
     cdr << MemberId(3) << value3;
     cdr.end_serialize_type(enc_state);
+    cdr.set_dds_cdr_options({0, 0});
     Cdr::state enc_state_end(cdr);
     //}
 
@@ -516,26 +517,26 @@ TEST_P(XCdrAppendableTest, less_serialized_elements)
     XCdrStreamValues expected_streams;
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x02, // Encapsulation
         0x00, 0x00, 0x00, ival, // ULong
         0x00, ival              // UShort
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        0x00, 0x01, 0x00, 0x02, // Encapsulation
         ival, 0x00, 0x00, 0x00, // ULong
         ival, 0x00              // UShort
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        0x00, 0x08, 0x00, 0x02, // Encapsulation
         0x00, 0x00, 0x00, 0x6,  // DHEADER
         0x00, 0x00, 0x00, ival, // ULong
         0x00, ival              // UShort
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        0x00, 0x09, 0x00, 0x02, // Encapsulation
         0x06, 0x00, 0x00, 0x00, // DHEADER
         ival, 0x00, 0x00, 0x00, // ULong
         ival, 0x00              // UShort
@@ -564,6 +565,137 @@ TEST_P(XCdrAppendableTest, less_serialized_elements)
     cdr << MemberId(1) << value1;
     cdr << MemberId(2) << value2;
     cdr.end_serialize_type(enc_state);
+    cdr.set_dds_cdr_options({0, 0});
+    Cdr::state enc_state_end(cdr);
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(),
+            expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding
+    uint32_t dvalue1 {0};
+    uint16_t dvalue2 {0};
+    uint8_t dvalue3 {0};
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId& mid)->bool
+            {
+                bool ret_value = true;
+
+                switch (mid.id)
+                {
+                    case 0:
+                        cdr_inner >> dvalue1;
+                        break;
+                    case 1:
+                        cdr_inner >> dvalue2;
+                        break;
+                    case 2:
+                        cdr_inner >> dvalue3;
+                        break;
+                    default:
+                        ret_value = false;
+                        break;
+                }
+
+                return ret_value;
+            });
+    Cdr::state dec_state_end(cdr);
+    ASSERT_EQ(enc_state_end, dec_state_end);
+    ASSERT_EQ(value1, dvalue1);
+    ASSERT_EQ(value2, dvalue2);
+    ASSERT_EQ(0, dvalue3);
+    //}
+}
+
+/*!
+ * @test Test an appendable structure where the encoded version has less members that the decoded one.
+ * The decoded buffer takes into account the extra padding in order to reach the next 4-byte aligned offset.
+ * @code{.idl}
+ * @appendable
+ * struct AppendableStruct // Encoded version
+ * {
+ *     @id(1)
+ *     unsigned long value1;
+ *     @id(2)
+ *     unsigned short value2;
+ * };
+ *
+ * @appendable
+ * struct AppendableStruct // Decoded version
+ * {
+ *     @id(1)
+ *     unsigned long value1;
+ *     @id(2)
+ *     unsigned short value2;
+ *     @id(3)
+ *     octet value3;
+ * };
+ * @endcode
+ */
+TEST_P(XCdrAppendableTest, less_serialized_elements_extra_padding)
+{
+    constexpr uint8_t ival {0xCD};
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x02, // Encapsulation
+        0x00, 0x00, 0x00, ival, // ULong
+        0x00, ival              // UShort
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x02, // Encapsulation
+        ival, 0x00, 0x00, 0x00, // ULong
+        ival, 0x00              // UShort
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x02, // Encapsulation
+        0x00, 0x00, 0x00, 0x6,  // DHEADER
+        0x00, 0x00, 0x00, ival, // ULong
+        0x00, ival              // UShort
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x02, // Encapsulation
+        0x06, 0x00, 0x00, 0x00, // DHEADER
+        ival, 0x00, 0x00, 0x00, // ULong
+        ival, 0x00              // UShort
+    };
+    //}
+
+    EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+
+    //{ Prepare buffer
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    auto alignment {((expected_streams[tested_stream].size() + 3u) & ~3u) - expected_streams[tested_stream].size()};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size() + alignment);
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode
+    uint32_t value1 { ival };
+    uint16_t value2 { ival };
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    Cdr::state enc_state(cdr);
+    cdr.begin_serialize_type(enc_state, encoding);
+    cdr << MemberId(1) << value1;
+    cdr << MemberId(2) << value2;
+    cdr.end_serialize_type(enc_state);
+    cdr.set_dds_cdr_options({0, 0});
     Cdr::state enc_state_end(cdr);
     //}
 
@@ -652,7 +784,7 @@ TEST_P(XCdrAppendableTest, inner_more_serialized_elements)
     XCdrStreamValues expected_streams;
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x01, // Encapsulation
         0x00, 0x00, 0x00, ival, // ULong
         0x00, ival,             // UShort
         ival,                   // Octet
@@ -663,7 +795,7 @@ TEST_P(XCdrAppendableTest, inner_more_serialized_elements)
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        0x00, 0x01, 0x00, 0x01, // Encapsulation
         ival, 0x00, 0x00, 0x00, // ULong
         ival, 0x00,             // UShort
         ival,                   // Octet
@@ -674,7 +806,7 @@ TEST_P(XCdrAppendableTest, inner_more_serialized_elements)
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        0x00, 0x08, 0x00, 0x01, // Encapsulation
         0x00, 0x00, 0x00, 0x17, // DHEADER
         0x00, 0x00, 0x00, 0x07, // DHEADER
         0x00, 0x00, 0x00, ival, // ULong
@@ -688,7 +820,7 @@ TEST_P(XCdrAppendableTest, inner_more_serialized_elements)
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        0x00, 0x09, 0x00, 0x01, // Encapsulation
         0x17, 0x00, 0x00, 0x00, // DHEADER
         0x07, 0x00, 0x00, 0x00, // DHEADER
         ival, 0x00, 0x00, 0x00, // ULong
@@ -723,6 +855,7 @@ TEST_P(XCdrAppendableTest, inner_more_serialized_elements)
     cdr << MemberId(1) << value;
     cdr << MemberId(2) << value;
     cdr.end_serialize_type(enc_state);
+    cdr.set_dds_cdr_options({0, 0});
     Cdr::state enc_state_end(cdr);
     //}
 
@@ -812,7 +945,7 @@ TEST_P(XCdrAppendableTest, inner_less_serialized_elements)
     XCdrStreamValues expected_streams;
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x02, // Encapsulation
         0x00, 0x00, 0x00, ival, // ULong
         0x00, ival,             // UShort
         0x00, 0x00,             // Alignment
@@ -821,7 +954,7 @@ TEST_P(XCdrAppendableTest, inner_less_serialized_elements)
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        0x00, 0x01, 0x00, 0x02, // Encapsulation
         ival, 0x00, 0x00, 0x00, // ULong
         ival, 0x00,             // UShort
         0x00, 0x00,             // Alignment
@@ -830,7 +963,7 @@ TEST_P(XCdrAppendableTest, inner_less_serialized_elements)
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        0x00, 0x08, 0x00, 0x02, // Encapsulation
         0x00, 0x00, 0x00, 0x16, // DHEADER
         0x00, 0x00, 0x00, 0x06, // DHEADER
         0x00, 0x00, 0x00, ival, // ULong
@@ -842,7 +975,7 @@ TEST_P(XCdrAppendableTest, inner_less_serialized_elements)
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        0x00, 0x09, 0x00, 0x02, // Encapsulation
         0x16, 0x00, 0x00, 0x00, // DHEADER
         0x06, 0x00, 0x00, 0x00, // DHEADER
         ival, 0x00, 0x00, 0x00, // ULong
@@ -875,6 +1008,7 @@ TEST_P(XCdrAppendableTest, inner_less_serialized_elements)
     cdr << MemberId(1) << value;
     cdr << MemberId(2) << value;
     cdr.end_serialize_type(enc_state);
+    cdr.set_dds_cdr_options({0, 0});
     Cdr::state enc_state_end(cdr);
     //}
 
@@ -943,7 +1077,7 @@ TEST_P(XCdrAppendableTest, inner_mutable)
     XCdrStreamValues expected_streams;
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x02, // Encapsulation
         0x00, 0x00, 0x00, 0x04, // ShortMemberHeader
         0x00, 0x00, 0x00, ival, // ULong
         0x00, 0x01, 0x00, 0x02, // ShortMemberHeader
@@ -954,7 +1088,7 @@ TEST_P(XCdrAppendableTest, inner_mutable)
     };
     expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        0x00, 0x01, 0x00, 0x02, // Encapsulation
         0x00, 0x00, 0x04, 0x00, // ShortMemberHeader
         ival, 0x00, 0x00, 0x00, // ULong
         0x01, 0x00, 0x02, 0x00, // ShortMemberHeader
@@ -1009,6 +1143,7 @@ TEST_P(XCdrAppendableTest, inner_mutable)
     cdr << MemberId(0) << value;
     cdr << MemberId(1) << value2;
     cdr.end_serialize_type(enc_state);
+    cdr.set_dds_cdr_options({0, 0});
     Cdr::state enc_state_end(cdr);
     //}
 
@@ -1095,7 +1230,7 @@ TEST_P(XCdrAppendableTest, inner_final_structure)
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
     {
-        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        0x00, 0x08, 0x00, 0x03, // Encapsulation
         0x00, 0x00, 0x00, 0x09, // DHEADER
         0x00, 0x00, 0x00, ival, // ULong
         0x00, 0x00, 0x00, ival, // ULong
@@ -1103,7 +1238,7 @@ TEST_P(XCdrAppendableTest, inner_final_structure)
     };
     expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
     {
-        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        0x00, 0x09, 0x00, 0x03, // Encapsulation
         0x09, 0x00, 0x00, 0x00, // DHEADER
         ival, 0x00, 0x00, 0x00, // ULong
         ival, 0x00, 0x00, 0x00, // ULong
@@ -1134,6 +1269,7 @@ TEST_P(XCdrAppendableTest, inner_final_structure)
     cdr << MemberId(1) << value1;
     cdr << MemberId(2) << value2;
     cdr.end_serialize_type(enc_state);
+    cdr.set_dds_cdr_options({0, 0});
     Cdr::state enc_state_end(cdr);
     //}
 
@@ -1264,6 +1400,7 @@ TEST_P(XCdrAppendableTest, inner_mutable_structure)
     cdr << MemberId(1) << value1;
     cdr << MemberId(2) << value2;
     cdr.end_serialize_type(enc_state);
+    cdr.set_dds_cdr_options({0, 0});
     Cdr::state enc_state_end(cdr);
     //}
 

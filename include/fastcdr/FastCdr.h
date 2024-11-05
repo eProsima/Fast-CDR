@@ -15,10 +15,9 @@
 #ifndef _FASTCDR_FASTCDR_H_
 #define _FASTCDR_FASTCDR_H_
 
-#include "fastcdr_dll.h"
-#include "FastBuffer.h"
-#include "exceptions/NotEnoughMemoryException.h"
-#include <stdint.h>
+#include <array>
+#include <cstdint>
+#include <cstring>
 #include <string>
 #include <vector>
 
@@ -28,7 +27,10 @@
 #include <stdlib.h>
 #endif // if !__APPLE__ && !__FreeBSD__ && !__VXWORKS__
 
-#include <array>
+#include "fastcdr_dll.h"
+#include "FastBuffer.h"
+#include "exceptions/NotEnoughMemoryException.h"
+#include "exceptions/BadParamException.h"
 
 namespace eprosima {
 namespace fastcdr {
@@ -883,12 +885,27 @@ public:
      * @param string_t The string that will be serialized in the buffer.
      * @return Reference to the eprosima::fastcdr::FastCdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
+     * @exception exception::BadParamException This exception is thrown when trying to serialize a string with null characters.
      */
     inline
     FastCdr& serialize(
             const std::string& string_t)
     {
-        return serialize(string_t.c_str());
+        // An empty string is serialized as a 0 length string.
+        if (string_t.empty())
+        {
+            return serialize(static_cast<uint32_t>(0));
+        }
+
+        // Check there are no null characters in the string.
+        const char* c_str = string_t.c_str();
+        const auto str_len = strlen(c_str);
+        if (string_t.size() > str_len)
+        {
+            throw exception::BadParamException("The string contains null characters");
+        }
+
+        return serialize(c_str);
     }
 
     /*!

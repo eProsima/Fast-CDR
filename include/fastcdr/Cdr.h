@@ -19,6 +19,7 @@
 #include <bitset>
 #include <cassert>
 #include <cstdint>
+#include <cstring>
 #include <functional>
 #include <map>
 #include <string>
@@ -705,9 +706,26 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      * @exception exception::BadParamException This exception is thrown when trying to serialize a string with null characters.
      */
-    TEMPLATE_SPEC Cdr_DllAPI
+    TEMPLATE_SPEC
     Cdr& serialize(
-            const std::string& string_t);
+            const std::string& string_t)
+    {
+        // An empty string is serialized as a 0 length string.
+        if (string_t.empty())
+        {
+            return serialize(static_cast<uint32_t>(0));
+        }
+
+        // Check there are no null characters in the string.
+        const char* c_str = string_t.c_str();
+        const auto str_len = strlen(c_str);
+        if (string_t.size() > str_len)
+        {
+            throw exception::BadParamException("The string contains null characters");
+        }
+
+        return serialize_sequence(c_str, str_len + 1);
+    }
 
     /*!
      * @brief This function serializes a std::wstring.

@@ -7081,3 +7081,33 @@ TEST(FastCDRTests, ZeroSequenceAtTheEnd)
         cdr_des_bool >> value >> bool_zero_sequence;
     });
 }
+
+TEST(CDRTests, StringWithNullChars)
+{
+    std::string str{ "Hello World" };
+    str[5] = '\0';
+    char buffer[256];
+    FastBuffer cdrbuffer(buffer, 256);
+    Cdr cdr_ser(cdrbuffer);
+
+    EXPECT_THROW(
+    {
+        cdr_ser << str;
+    },
+        BadParamException);
+}
+
+TEST(FastCDRTests, StringWithNullChars)
+{
+    std::string str{ "Hello World" };
+    str[5] = '\0';
+    char buffer[256];
+    FastBuffer cdrbuffer(buffer, 256);
+    FastCdr cdr_ser(cdrbuffer);
+
+    EXPECT_THROW(
+    {
+        cdr_ser << str;
+    },
+        BadParamException);
+}

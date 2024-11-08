@@ -19,6 +19,7 @@
 #include <bitset>
 #include <cassert>
 #include <cstdint>
+#include <cstring>
 #include <functional>
 #include <map>
 #include <string>
@@ -703,12 +704,27 @@ public:
      * @param string_t The string that will be serialized in the buffer.
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+     * @exception exception::BadParamException This exception is thrown when trying to serialize a string with null characters.
      */
     TEMPLATE_SPEC
     Cdr& serialize(
             const std::string& string_t)
     {
-        return serialize(string_t.c_str());
+        // An empty string is serialized as a 0 length string.
+        if (string_t.empty())
+        {
+            return serialize(static_cast<uint32_t>(0));
+        }
+
+        // Check there are no null characters in the string.
+        const char* c_str = string_t.c_str();
+        const auto str_len = strlen(c_str);
+        if (string_t.size() > str_len)
+        {
+            throw exception::BadParamException("The string contains null characters");
+        }
+
+        return serialize_sequence(c_str, str_len + 1);
     }
 
     /*!

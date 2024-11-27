@@ -6,12 +6,12 @@ on:
       os-version:
         description: 'OS version to run the workflow'
         required: false
-        default: 'windows-13'
+        default: 'windows-2019'
         type: string
       vs-toolset:
-        description: 'Visual Studio toolset to use'
+        description: 'Visual Studio toolset to use (Default: v141 and v142)'
         required: false
-        default: 'v142'
+        default: ''
         type: string
       colcon-args:
         description: 'Extra arguments for colcon cli'

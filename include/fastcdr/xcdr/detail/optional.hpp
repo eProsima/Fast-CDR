@@ -47,7 +47,7 @@ struct optional_storage
 
 /* *INDENT-OFF* */
 template<class T>
-struct optional_storage<T, typename std::enable_if<std::is_trivially_destructible<T>{}>::type>
+struct optional_storage<T, typename std::enable_if<std::is_trivially_destructible<T>::value>::type>
 {
     union
     {

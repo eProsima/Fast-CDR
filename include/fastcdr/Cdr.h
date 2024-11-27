@@ -689,12 +689,6 @@ public:
     Cdr& serialize(
             const std::string& string_t)
     {
-        // An empty string is serialized as a 0 length string.
-        if (string_t.empty())
-        {
-            return serialize(static_cast<uint32_t>(0));
-        }
-
         // Check there are no null characters in the string.
         const char* c_str = string_t.c_str();
         const auto str_len = strlen(c_str);

@@ -7111,3 +7111,29 @@ TEST(FastCDRTests, StringWithNullChars)
     },
         BadParamException);
 }
+
+TEST(CDRTests, EmptyStringSerializationSize)
+{
+    std::string str;
+    char buffer[256];
+    FastBuffer cdrbuffer(buffer, 256);
+    Cdr cdr_ser(cdrbuffer);
+    EXPECT_NO_THROW(
+    {
+        cdr_ser << str;
+    });
+    EXPECT_EQ(cdr_ser.get_serialized_data_length(), 5u);
+}
+
+TEST(FastCDRTests, EmptyStringSerializationSize)
+{
+    std::string str;
+    char buffer[256];
+    FastBuffer cdrbuffer(buffer, 256);
+    FastCdr cdr_ser(cdrbuffer);
+    EXPECT_NO_THROW(
+    {
+        cdr_ser << str;
+    });
+    EXPECT_EQ(cdr_ser.get_serialized_data_length(), 5u);
+}

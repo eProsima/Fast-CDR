@@ -60,7 +60,7 @@ jobs:
     with:
       # It would be desirable to have a matrix of windows OS for this job, but due to the issue opened in this ticket:
       # https://github.com/orgs/community/discussions/128118 , it has been set as a single OS job.
-      os-version: ${{ inputs.os-version || 'windows-2019' }}
+      os-version: ${{ inputs.os-version || 'windows-2022' }}
       vs-toolset: ${{ inputs.vs-toolset || matrix.vs-toolset }}
       label: ${{ format('windows-{0}-ci-{1}', matrix.vs-toolset, inputs.fastcdr-branch || github.ref) }}
       colcon-args: ${{ inputs.colcon-args }}

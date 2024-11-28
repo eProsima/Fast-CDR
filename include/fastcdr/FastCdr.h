@@ -1552,7 +1552,7 @@ public:
     {
         uint32_t length = 0;
         const char* str = read_string(length);
-        string_t = std::string(str, length);
+        string_t.assign(str, length);
         return *this;
     }
 

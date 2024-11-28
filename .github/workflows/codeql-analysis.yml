@@ -12,21 +12,17 @@
 name: "CodeQL"
 
 on:
-  push:
-    branches:
-      - master
-      - 2.2.x
-      - 1.1.x
-      - 1.0.x
-  pull_request:
-    # The branches below must be a subset of the branches above
-    branches:
-      - master
-      - 2.2.x
-      - 1.1.x
-      - 1.0.x
+  workflow_dispatch:
+    inputs:
+      fastcdr-branch:
+        description: 'Branch or tag of Fast CDR repository'
+        required: true
+        type: string
   schedule:
-    - cron: '45 16 * * 0'
+    - cron: '0 1 * * *'
+  pull_request:
+    types:
+      - review_requested
 
 jobs:
   analyze:
@@ -38,13 +34,27 @@ jobs:
       matrix:
         os: [windows-2019, ubuntu-22.04, macos-13, ]
         language: [ 'cpp' ]
+        supported-branches: [master, 2.2.x, 1.1.x, 1.0.x]
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python' ]
         # Learn more:
         # https://docs.github.com/en/free-pro-team@latest/github/finding-security-vulnerabilities-and-errors-in-your-code/configuring-code-scanning#changing-the-languages-that-are-analyzed
 
     steps:
+    - name: Set environment fastcdr branch value
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "fastcdr-branch=${{ github.event.inputs.fastcdr-branch }}" >> $GITHUB_ENV
+        elif [ "${{ github.event_name }}" == "pull_request" ]; then
+          echo "fastcdr-branch=${{ github.ref }}" >> $GITHUB_ENV
+        elif [ "${{ github.event_name }}" == "schedule" ]; then
+          echo "fastcdr-branch=${{ matrix.supported-branches }}" >> $GITHUB_ENV
+        else
+          echo "fastcdr-branch=2.2.x" >> $GITHUB_ENV
+
     - name: Checkout repository
       uses: actions/checkout@v4
+      with:
+        ref: ${{ env.fastcdr-branch }}
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL

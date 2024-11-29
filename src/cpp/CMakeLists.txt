@@ -37,6 +37,7 @@ if(APPLE)
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
 endif()
 
+<<<<<<< HEAD
 # Create libraries
 if(MSVC OR MSVC_IDE AND EPROSIMA_INSTALLER AND IS_TOP_LEVEL)
     generate_msvc_libraries(i86Win32VS2013)
@@ -49,6 +50,32 @@ elseif(NOT EPROSIMA_INSTALLER)
     # Create library
     add_library(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCES})
     set_common_compile_options(${PROJECT_NAME})
+=======
+# Create library
+add_library(${PROJECT_NAME} ${${PROJECT_NAME}_source_files})
+set_common_compile_options(${PROJECT_NAME})
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+    )
+
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE
+    ${PROJECT_NAME_UPPER}_SOURCE
+    INTERFACE
+    $<$<BOOL:${WIN32}>:${PROJECT_NAME_UPPER}_NO_LIB>
+    PUBLIC
+    $<$<TARGET_EXISTS:${PROJECT_NAME}>:$<$<STREQUAL:$<TARGET_PROPERTY:${PROJECT_NAME},TYPE>,SHARED_LIBRARY>:${PROJECT_NAME_UPPER}_DYN_LINK>>
+    )
+
+# Define public headers
+target_include_directories(${PROJECT_NAME} PUBLIC
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include> $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>
+    $<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>
+    )
+
+if(MSVC OR MSVC_IDE)
+>>>>>>> 0cb11a4 (Fix cmake generator evaluation (#251))
     set_target_properties(${PROJECT_NAME} PROPERTIES
         VERSION ${PROJECT_VERSION}
         SOVERSION ${PROJECT_VERSION_MAJOR}

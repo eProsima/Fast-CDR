@@ -1245,12 +1245,14 @@ public:
         if (CdrVersion::XCDRv2 == cdr_version_ && EncodingAlgorithmFlag::PL_CDR2 == current_encoding_ &&
                 0 < calculated_size)
         {
-            if (8 < calculated_size)
+            if (8 < calculated_size ||
+                    (1 != calculated_size && 2 != calculated_size && 4 != calculated_size &&
+                    8 != calculated_size))
             {
                 extra_size = 8; // Long EMHEADER.
                 if (NO_SERIALIZED_MEMBER_SIZE != serialized_member_size_)
                 {
-                    extra_size -= 4; // Join NEXTINT and DHEADER.
+                    calculated_size -= 4; // Join NEXTINT and DHEADER.
                 }
             }
             else

@@ -47,6 +47,11 @@ on:
         required: false
         type: boolean
         default: false
+      add-label:
+        description: 'Add the ci-pending label to the PR'
+        required: false
+        type: boolean
+        default: false
 env:
     toolset: ${{ inputs.vs-toolset && format('-T {0}', inputs.vs-toolset) || '' }}
 defaults:
@@ -65,7 +70,7 @@ jobs:
 
     steps:
     - name: Add ci-pending label if PR
-      if: ${{ github.event_name == 'pull_request' }}
+      if: ${{ github.event_name == 'pull_request' && inputs.add-label == true}}
       uses: eProsima/eProsima-CI/external/add_labels@v0
       with:
         labels: ci-pending

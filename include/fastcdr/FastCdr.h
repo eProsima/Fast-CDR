@@ -1554,8 +1554,13 @@ public:
             std::string& string_t)
     {
         uint32_t length = 0;
+<<<<<<< HEAD
         const char* str = readString(length);
         string_t = std::string(str, length);
+=======
+        const char* str = read_string(length);
+        string_t.assign(str, length);
+>>>>>>> 5b8025b (Use assign for deserialize instead of temporary std::string (#241))
         return *this;
     }
 

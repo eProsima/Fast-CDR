@@ -2473,6 +2473,7 @@ public:
             std::string& string_t,
             Endianness endianness)
     {
+<<<<<<< HEAD
         bool auxSwap = m_swapBytes;
         m_swapBytes = (m_swapBytes && (static_cast<Endianness>(m_endianness) == endianness)) ||
                 (!m_swapBytes && (static_cast<Endianness>(m_endianness) != endianness));
@@ -2488,6 +2489,11 @@ public:
             ex.raise();
         }
 
+=======
+        uint32_t length = 0;
+        const char* str = read_string(length);
+        value.assign(str, length);
+>>>>>>> 5b8025b (Use assign for deserialize instead of temporary std::string (#241))
         return *this;
     }
 

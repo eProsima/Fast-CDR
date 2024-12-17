@@ -26,16 +26,6 @@ jobs:
       run-tests: true
       use-ccache: false
 
-  nightly-mac-ci-1_1_x:
-    uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@1.1.x
-    with:
-      os-version: 'macos-13'
-      label: 'nightly-mac-ci-1.1.x'
-      fastcdr-branch: '1.1.x'
-      run-build: true
-      run-tests: true
-      use-ccache: false
-
   nightly-mac-ci-1_0_x:
     uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@1.0.x
     with:

@@ -40,23 +40,6 @@ jobs:
       run-tests: true
       use-ccache: false
 
-  nightly-windows-ci-1_1_x:
-    strategy:
-      fail-fast: false
-      matrix:
-        vs-toolset:
-          - 'v141'
-          - 'v142'
-    uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@1.1.x
-    with:
-      os-version: 'windows-2019'
-      vs-toolset: ${{ matrix.vs-toolset }}
-      label: 'nightly-windows-${{ matrix.vs-toolset }}-ci-1.1.x'
-      fastcdr-branch: '1.1.x'
-      run-build: true
-      run-tests: true
-      use-ccache: false
-
   nightly-windows-ci-1_0_x:
     strategy:
       fail-fast: false

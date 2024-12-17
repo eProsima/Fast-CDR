@@ -26,16 +26,6 @@ jobs:
       run-tests: true
       use-ccache: false
 
-  nightly-ubuntu-ci-1_1_x:
-    uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@1.1.x
-    with:
-      os-version: 'ubuntu-22.04'
-      label: 'nightly-ubuntu-ci-1.1.x'
-      fastcdr-branch: '1.1.x'
-      run-build: true
-      run-tests: true
-      use-ccache: false
-
   nightly-ubuntu-ci-1_0_x:
     uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@1.0.x
     with:

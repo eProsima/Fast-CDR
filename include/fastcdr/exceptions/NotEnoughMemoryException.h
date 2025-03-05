@@ -24,7 +24,7 @@ namespace exception {
  * @brief This class is thrown as an exception when the buffer's internal memory reachs its size limit.
  * @ingroup EXCEPTIONMODULE
  */
-class NotEnoughMemoryException : public Exception
+class Cdr_DllAPI NotEnoughMemoryException : public Exception
 {
 public:
 
@@ -33,7 +33,7 @@ public:
      *
      * @param message An error message. This message pointer is copied.
      */
-    Cdr_DllAPI NotEnoughMemoryException(
+    NotEnoughMemoryException(
             const char* const& message) noexcept;
 
     /*!
@@ -41,7 +41,7 @@ public:
      *
      * @param ex NotEnoughMemoryException that will be copied.
      */
-    Cdr_DllAPI NotEnoughMemoryException(
+    NotEnoughMemoryException(
             const NotEnoughMemoryException& ex) noexcept;
 
     /*!
@@ -49,7 +49,7 @@ public:
      *
      * @param ex NotEnoughMemoryException that will be moved.
      */
-    Cdr_DllAPI NotEnoughMemoryException(
+    NotEnoughMemoryException(
             NotEnoughMemoryException&& ex) noexcept;
 
     /*!
@@ -57,7 +57,7 @@ public:
      *
      * @param ex NotEnoughMemoryException that will be copied.
      */
-    Cdr_DllAPI NotEnoughMemoryException& operator =(
+    NotEnoughMemoryException& operator =(
             const NotEnoughMemoryException& ex) noexcept;
 
     /*!
@@ -65,17 +65,17 @@ public:
      *
      * @param ex NotEnoughMemoryException that will be moved.
      */
-    Cdr_DllAPI NotEnoughMemoryException& operator =(
+    NotEnoughMemoryException& operator =(
             NotEnoughMemoryException&& ex) noexcept;
 
     //! @brief Default destructor
-    virtual Cdr_DllAPI ~NotEnoughMemoryException() noexcept;
+    virtual ~NotEnoughMemoryException() noexcept;
 
     //! @brief This function throws the object as exception.
-    Cdr_DllAPI void raise() const override;
+    void raise() const override;
 
     //! @brief Default message used in the library.
-    static Cdr_DllAPI const char* const NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT;
+    static const char* const NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT;
 };
 }         //namespace exception
 }     //namespace fastcdr

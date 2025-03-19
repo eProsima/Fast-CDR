@@ -26,6 +26,8 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
+message (STATUS "BUILDING CORRECT FASTCDR BRANCH")
+
 # Set BUILD_TESTING to OFF by default.
 if(NOT BUILD_TESTING)
     message(STATUS "Tests not compiled by default")

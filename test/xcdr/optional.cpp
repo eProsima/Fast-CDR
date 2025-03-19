@@ -556,6 +556,19 @@ TEST(XCdrOptionalTest, bad_optional_access)
     ASSERT_THROW(opt.value(), exception::BadOptionalAccessException);
 }
 
+TEST(XCdrOptionalTest, optional_no_bad_array_new_length)
+{
+    struct CustomObject
+    {
+        CustomObject() = default;
+
+        std::vector<int32_t> values;
+    };
+
+    optional<CustomObject> src_optional;
+    ASSERT_NO_THROW(optional<CustomObject> dst_optional(src_optional));
+}
+
 /*!
  * @test Test encoding of an empty optional field of octet type
  * @code{.idl}

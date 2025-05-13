@@ -15,6 +15,7 @@ Please, refer to the [master branch](https://github.com/eProsima/Fast-CDR/blob/m
 |2.10|1.0|[1.0.x](https://github.com/eProsima/Fast-CDR/tree/1.0.x)|[v1.0.28](https://github.com/eProsima/Fast-CDR/releases/tag/v1.0.28)|
 |2.6|1.0|[1.0.x](https://github.com/eProsima/Fast-CDR/tree/1.0.x)|[v1.0.28](https://github.com/eProsima/Fast-CDR/releases/tag/v1.0.28)|
 
+## *eProsima Fast DDS* and *Fast CDR* previously supported versions compatibility
 
 |Fast DDS Version|Fast CDR Version|Fast CDR Version branch|Fast CDR Latest Release|Release Date|EOL Date|
 |----------------|----------------|-----------------------|-----------------------|------------|--------|

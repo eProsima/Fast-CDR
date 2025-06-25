@@ -53,8 +53,8 @@ jobs:
       fail-fast: false
       matrix:
         vs-toolset:
-          - 'v141'
           - 'v142'
+          - 'v143'
     if: ${{ !(github.event_name == 'pull_request') || !contains(github.event.pull_request.labels.*.name, 'conflicts') }}
     uses: ./.github/workflows/reusable-ci.yml
     with:

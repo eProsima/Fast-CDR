@@ -1,0 +1,58 @@
+name: Fast CDR Windows CI (nightly)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 1 * * *'
+
+jobs:
+  nightly-windows-ci-master:
+    strategy:
+      fail-fast: false
+      matrix:
+        vs-toolset:
+          - 'v142'
+          - 'v143'
+    uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@master
+    with:
+      os-version: 'windows-2022'
+      vs-toolset: ${{ matrix.vs-toolset }}
+      label: 'nightly-windows-${{ matrix.vs-toolset }}-ci-master'
+      fastcdr-branch: 'master'
+      run-build: true
+      run-tests: true
+      use-ccache: false
+
+  nightly-windows-ci-2_2_x:
+    strategy:
+      fail-fast: false
+      matrix:
+        vs-toolset:
+          - 'v142'
+          - 'v143'
+    uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@2.2.x
+    with:
+      os-version: 'windows-2022'
+      vs-toolset: ${{ matrix.vs-toolset }}
+      label: 'nightly-windows-${{ matrix.vs-toolset }}-ci-2.2.x'
+      fastcdr-branch: '2.2.x'
+      run-build: true
+      run-tests: true
+      use-ccache: false
+
+  nightly-windows-ci-1_0_x:
+    strategy:
+      fail-fast: false
+      matrix:
+        vs-toolset:
+          - 'v142'
+          - 'v143'
+    uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@1.0.x
+    with:
+      os-version: 'windows-2022'
+      vs-toolset: ${{ matrix.vs-toolset }}
+      label: 'nightly-windows-${{ matrix.vs-toolset }}-ci-1.0.x'
+      fastcdr-branch: '1.0.x'
+      run-build: true
+      run-tests: true
+      use-ccache: false

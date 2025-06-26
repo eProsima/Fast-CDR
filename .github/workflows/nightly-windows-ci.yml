@@ -11,8 +11,8 @@ jobs:
       fail-fast: false
       matrix:
         vs-toolset:
-          - 'v141'
           - 'v142'
+          - 'v143'
     uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@master
     with:
       os-version: 'windows-2022'
@@ -28,8 +28,8 @@ jobs:
       fail-fast: false
       matrix:
         vs-toolset:
-          - 'v141'
           - 'v142'
+          - 'v143'
     uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@2.2.x
     with:
       os-version: 'windows-2022'
@@ -45,8 +45,8 @@ jobs:
       fail-fast: false
       matrix:
         vs-toolset:
-          - 'v141'
           - 'v142'
+          - 'v143'
     uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@1.0.x
     with:
       os-version: 'windows-2022'

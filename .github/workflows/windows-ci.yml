@@ -9,7 +9,7 @@ on:
         default: 'windows-2022'
         type: string
       vs-toolset:
-        description: 'Visual Studio toolset to use (Default: v141 and v142)'
+        description: 'Visual Studio toolset to use (Default: v142 and v143)'
         required: false
         default: ''
         type: string

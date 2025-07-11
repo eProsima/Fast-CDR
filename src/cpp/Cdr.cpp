@@ -893,6 +893,44 @@ Cdr& Cdr::serialize(
     return *this;
 }
 
+Cdr& Cdr::serialize(const char *string_t, size_t size)
+{
+    uint32_t length = 0;
+
+    if(string_t != nullptr)
+    {
+        length = size_to_uint32(size) + 1;
+    }
+
+    if (length > 0)
+    {
+        Cdr::state state_before_error(*this);
+        serialize(length);
+
+        if (((end_ - offset_) >= length) || resize(length))
+        {
+            // Save last datasize.
+            last_data_size_ = sizeof(uint8_t);
+
+            offset_.memcopy(string_t, length);
+            offset_ += length;
+        }
+        else
+        {
+            set_state(state_before_error);
+            throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        }
+    }
+    else
+    {
+        serialize(length);
+    }
+
+    serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
+
+    return *this;
+}
+
 Cdr& Cdr::serialize(
         const wchar_t* string_t)
 {

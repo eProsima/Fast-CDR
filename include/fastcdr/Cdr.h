@@ -670,6 +670,16 @@ public:
             const char* string_t);
 
     /*!
+     * @brief This function serializes a string with size.
+     * @param string_t The pointer to the string that will be serialized in the buffer.
+     * @param size The size of the string, support scenarios where string data contains null characters.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+     */
+    Cdr_DllAPI Cdr& serialize(
+            const char* string_t, size_t size);
+
+    /*!
      * @brief This function serializes a wstring.
      * @param string_t The pointer to the wstring that will be serialized in the buffer.
      * @return Reference to the eprosima::fastcdr::Cdr object.
@@ -683,7 +693,6 @@ public:
      * @param string_t The string that will be serialized in the buffer.
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
-     * @exception exception::BadParamException This exception is thrown when trying to serialize a string with null characters.
      */
     TEMPLATE_SPEC
     Cdr& serialize(
@@ -694,7 +703,7 @@ public:
         const auto str_len = strlen(c_str);
         if (string_t.size() > str_len)
         {
-            throw exception::BadParamException("The string contains null characters");
+            return serialize(c_str, string_t.size()); 
         }
 
         return serialize_sequence(c_str, str_len + 1);

@@ -113,6 +113,16 @@ void serialize(
 }
 
 template<>
+void serialize_array(
+        Cdr& cdr,
+        InnerBasicTypesShortStruct const* array_ptr,
+        unsigned long array_size)
+
+{
+    cdr.serialize_array(array_ptr, array_size);
+}
+
+template<>
 void deserialize(
         Cdr& cdr,
         InnerBasicTypesShortStruct& data)
@@ -155,6 +165,16 @@ void deserialize(
 
                 return ret_value;
             });
+}
+
+template<>
+void deserialize_array(
+        Cdr& cdr,
+        InnerBasicTypesShortStruct* array_ptr,
+        unsigned long array_size)
+
+{
+    cdr.deserialize_array(array_ptr, array_size);
 }
 
 } // namespace fastcdr

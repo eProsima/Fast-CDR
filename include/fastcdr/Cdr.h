@@ -807,9 +807,9 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
     template<class _T, typename std::enable_if<
-            !std::is_enum<_T>::value &&
-            !std::is_arithmetic<_T>::value &&
-            !is_complex_array_or_string<std::vector<_T>>::value>::type* = nullptr>
+                !std::is_enum<_T>::value &&
+                !std::is_arithmetic<_T>::value &&
+                !is_complex_array_or_string<std::vector<_T>>::value>::type* = nullptr>
     Cdr& serialize(
             const std::vector<_T>& vector_t)
     {
@@ -839,9 +839,9 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
     template<class _T, typename std::enable_if<
-            !std::is_enum<_T>::value &&
-            !std::is_arithmetic<_T>::value &&
-            is_complex_array_or_string<std::vector<_T>>::value>::type* = nullptr>
+                !std::is_enum<_T>::value &&
+                !std::is_arithmetic<_T>::value &&
+                is_complex_array_or_string<std::vector<_T>>::value>::type* = nullptr>
     Cdr& serialize(
             const std::vector<_T>& vector_t)
     {
@@ -871,9 +871,9 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
     template<class _T, typename std::enable_if<
-            (std::is_enum<_T>::value ||
-            std::is_arithmetic<_T>::value) &&
-            !is_complex_array_or_string<std::vector<_T>>::value>::type* = nullptr>
+                (std::is_enum<_T>::value ||
+                std::is_arithmetic<_T>::value) &&
+                !is_complex_array_or_string<std::vector<_T>>::value>::type* = nullptr>
     Cdr& serialize(
             const std::vector<_T>& vector_t)
     {
@@ -1887,7 +1887,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
     template<class _T, size_t _Size,
-        typename std::enable_if<
+            typename std::enable_if<
                 static_is_multi_array_primitive<std::array<_T, _Size> const*>::value>::type* = nullptr>
     Cdr& deserialize(
             std::array<_T, _Size>& array_t)
@@ -1902,7 +1902,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
     template<class _T, size_t _Size,
-        typename std::enable_if<
+            typename std::enable_if<
                 !static_is_multi_array_primitive<std::array<_T, _Size> const*>::value &&
                 is_complex_array_or_string<std::array<_T, _Size>>::value>::type* = nullptr>
     Cdr& deserialize(
@@ -1941,7 +1941,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
     template<class _T, size_t _Size,
-        typename std::enable_if<
+            typename std::enable_if<
                 !static_is_multi_array_primitive<std::array<_T, _Size> const*>::value &&
                 !is_complex_array_or_string<std::array<_T, _Size>>::value>::type* = nullptr>
     Cdr& deserialize(
@@ -1976,9 +1976,9 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
     template<class _T, typename std::enable_if<
-            !std::is_enum<_T>::value &&
-            !std::is_arithmetic<_T>::value &&
-            !is_complex_array_or_string<std::vector<_T>>::value>::type* = nullptr>
+                !std::is_enum<_T>::value &&
+                !std::is_arithmetic<_T>::value &&
+                !is_complex_array_or_string<std::vector<_T>>::value>::type* = nullptr>
     Cdr& deserialize(
             std::vector<_T>& vector_t)
     {
@@ -2051,9 +2051,9 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
     template<class _T, typename std::enable_if<
-            !std::is_enum<_T>::value &&
-            !std::is_arithmetic<_T>::value &&
-            is_complex_array_or_string<std::vector<_T>>::value>::type* = nullptr>
+                !std::is_enum<_T>::value &&
+                !std::is_arithmetic<_T>::value &&
+                is_complex_array_or_string<std::vector<_T>>::value>::type* = nullptr>
     Cdr& deserialize(
             std::vector<_T>& vector_t)
     {
@@ -2131,9 +2131,9 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
     template<class _T, typename std::enable_if<
-            (std::is_enum<_T>::value ||
-            std::is_arithmetic<_T>::value) &&
-            !is_complex_array_or_string<std::vector<_T>>::value>::type* = nullptr>
+                (std::is_enum<_T>::value ||
+                std::is_arithmetic<_T>::value) &&
+                !is_complex_array_or_string<std::vector<_T>>::value>::type* = nullptr>
     Cdr& deserialize(
             std::vector<_T>& vector_t)
     {

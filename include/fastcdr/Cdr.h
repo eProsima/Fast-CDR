@@ -31,6 +31,7 @@
 
 #include "CdrEncoding.hpp"
 #include "cdr/fixed_size_string.hpp"
+#include "detail/container_introspection_helpers.hpp"
 #include "detail/container_recursive_inspector.hpp"
 #include "exceptions/BadParamException.h"
 #include "exceptions/Exception.h"
@@ -55,6 +56,18 @@ template<class _T>
 extern void serialize(
         Cdr&,
         const _T&);
+
+template<class _T>
+extern void serialize_array(
+        Cdr&,
+        const _T*,
+        const size_t);
+
+template<class _T>
+extern void deserialize_array(
+        Cdr&,
+        _T*,
+        const size_t);
 
 template<class _T>
 extern void deserialize(
@@ -733,22 +746,56 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    template<class _T, size_t _Size>
+    template<class _T, size_t _Size,
+            typename std::enable_if<
+                static_is_multi_array_primitive<std::array<_T, _Size> const*>::value>::type* = nullptr>
     Cdr& serialize(
             const std::array<_T, _Size>& array_t)
     {
-        if (!is_multi_array_primitive(&array_t))
-        {
-            Cdr::state dheader_state {allocate_xcdrv2_dheader()};
+        serialize_array(array_t.data(), array_t.size());
+        return *this;
+    }
 
-            serialize_array(array_t.data(), array_t.size());
+    /*!
+     * @brief This function template serializes an array.
+     * @param array_t The array that will be serialized in the buffer.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+     */
+    template<class _T, size_t _Size,
+            typename std::enable_if<
+                !static_is_multi_array_primitive<std::array<_T, _Size> const*>::value &&
+                is_complex_array_or_string<std::array<_T, _Size>>::value>::type* = nullptr>
+    Cdr& serialize(
+            const std::array<_T, _Size>& array_t)
+    {
+        Cdr::state dheader_state {allocate_xcdrv2_dheader()};
 
-            set_xcdrv2_dheader(dheader_state);
-        }
-        else
-        {
-            serialize_array(array_t.data(), array_t.size());
-        }
+        serialize_array(array_t.data(), array_t.size());
+
+        set_xcdrv2_dheader(dheader_state);
+
+        return *this;
+    }
+
+    /*!
+     * @brief This function template serializes an array.
+     * @param array_t The array that will be serialized in the buffer.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+     */
+    template<class _T, size_t _Size,
+            typename std::enable_if<
+                !static_is_multi_array_primitive<std::array<_T, _Size> const*>::value &&
+                !is_complex_array_or_string<std::array<_T, _Size>>::value>::type* = nullptr>
+    Cdr& serialize(
+            const std::array<_T, _Size>& array_t)
+    {
+        Cdr::state dheader_state {allocate_xcdrv2_dheader()};
+
+        eprosima::fastcdr::serialize_array(*this, array_t.data(), array_t.size());
+
+        set_xcdrv2_dheader(dheader_state);
 
         return *this;
     }
@@ -759,8 +806,42 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    template<class _T, typename std::enable_if<!std::is_enum<_T>::value &&
-            !std::is_arithmetic<_T>::value>::type* = nullptr>
+    template<class _T, typename std::enable_if<
+                !std::is_enum<_T>::value &&
+                !std::is_arithmetic<_T>::value &&
+                !is_complex_array_or_string<std::vector<_T>>::value>::type* = nullptr>
+    Cdr& serialize(
+            const std::vector<_T>& vector_t)
+    {
+        Cdr::state dheader_state {allocate_xcdrv2_dheader()};
+
+        serialize(static_cast<int32_t>(vector_t.size()));
+
+        try
+        {
+            eprosima::fastcdr::serialize_array(*this, vector_t.data(), vector_t.size());
+        }
+        catch (exception::Exception& ex)
+        {
+            set_state(dheader_state);
+            ex.raise();
+        }
+
+        set_xcdrv2_dheader(dheader_state);
+
+        return *this;
+    }
+
+    /*!
+     * @brief This function template serializes a sequence of non-primitive.
+     * @param vector_t The sequence that will be serialized in the buffer.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
+     */
+    template<class _T, typename std::enable_if<
+                !std::is_enum<_T>::value &&
+                !std::is_arithmetic<_T>::value &&
+                is_complex_array_or_string<std::vector<_T>>::value>::type* = nullptr>
     Cdr& serialize(
             const std::vector<_T>& vector_t)
     {
@@ -789,8 +870,10 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value ||
-            std::is_arithmetic<_T>::value>::type* = nullptr>
+    template<class _T, typename std::enable_if<
+                (std::is_enum<_T>::value ||
+                std::is_arithmetic<_T>::value) &&
+                !is_complex_array_or_string<std::vector<_T>>::value>::type* = nullptr>
     Cdr& serialize(
             const std::vector<_T>& vector_t)
     {
@@ -1803,11 +1886,29 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    template<class _T, size_t _Size>
+    template<class _T, size_t _Size,
+            typename std::enable_if<
+                static_is_multi_array_primitive<std::array<_T, _Size> const*>::value>::type* = nullptr>
     Cdr& deserialize(
             std::array<_T, _Size>& array_t)
     {
-        if (CdrVersion::XCDRv2 == cdr_version_ && !is_multi_array_primitive(&array_t))
+        return deserialize_array(array_t.data(), array_t.size());
+    }
+
+    /*!
+     * @brief This function template deserializes an array.
+     * @param array_t The variable that will store the array read from the buffer.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+     */
+    template<class _T, size_t _Size,
+            typename std::enable_if<
+                !static_is_multi_array_primitive<std::array<_T, _Size> const*>::value &&
+                is_complex_array_or_string<std::array<_T, _Size>>::value>::type* = nullptr>
+    Cdr& deserialize(
+            std::array<_T, _Size>& array_t)
+    {
+        if (CdrVersion::XCDRv2 == cdr_version_)
         {
             uint32_t dheader {0};
             deserialize(dheader);
@@ -1834,13 +1935,125 @@ public:
     }
 
     /*!
+     * @brief This function template deserializes an array.
+     * @param array_t The variable that will store the array read from the buffer.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+     */
+    template<class _T, size_t _Size,
+            typename std::enable_if<
+                !static_is_multi_array_primitive<std::array<_T, _Size> const*>::value &&
+                !is_complex_array_or_string<std::array<_T, _Size>>::value>::type* = nullptr>
+    Cdr& deserialize(
+            std::array<_T, _Size>& array_t)
+    {
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            uint32_t dheader {0};
+            deserialize(dheader);
+
+            auto offset = offset_;
+
+            eprosima::fastcdr::deserialize_array(*this, array_t.data(), _Size);
+
+            if (offset_ - offset != dheader)
+            {
+                throw exception::BadParamException("Member size greater than size specified by DHEADER");
+            }
+        }
+        else
+        {
+            eprosima::fastcdr::deserialize_array(*this, array_t.data(), _Size);
+        }
+
+        return *this;
+    }
+
+    /*!
      * @brief This function template deserializes a sequence of non-primitive.
      * @param vector_t The variable that will store the sequence read from the buffer.
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    template<class _T, typename std::enable_if<!std::is_enum<_T>::value &&
-            !std::is_arithmetic<_T>::value>::type* = nullptr>
+    template<class _T, typename std::enable_if<
+                !std::is_enum<_T>::value &&
+                !std::is_arithmetic<_T>::value &&
+                !is_complex_array_or_string<std::vector<_T>>::value>::type* = nullptr>
+    Cdr& deserialize(
+            std::vector<_T>& vector_t)
+    {
+        uint32_t sequence_length {0};
+
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            uint32_t dheader {0};
+            deserialize(dheader);
+
+            auto offset = offset_;
+
+            deserialize(sequence_length);
+
+            if (0 == sequence_length)
+            {
+                vector_t.clear();
+                return *this;
+            }
+            else
+            {
+                vector_t.resize(sequence_length);
+            }
+
+            eprosima::fastcdr::deserialize_array(*this, vector_t.data(), vector_t.size());
+
+            if (offset_ - offset != dheader)
+            {
+                throw exception::BadParamException("Member size differs from the size specified by DHEADER");
+            }
+        }
+        else
+        {
+            state state_before_error(*this);
+
+            deserialize(sequence_length);
+
+            if (sequence_length == 0)
+            {
+                vector_t.clear();
+                return *this;
+            }
+
+            if ((end_ - offset_) < sequence_length)
+            {
+                set_state(state_before_error);
+                throw exception::NotEnoughMemoryException(
+                          exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            }
+
+            try
+            {
+                vector_t.resize(sequence_length);
+                eprosima::fastcdr::deserialize_array(*this, vector_t.data(), vector_t.size());
+            }
+            catch (exception::Exception& ex)
+            {
+                set_state(state_before_error);
+                ex.raise();
+            }
+        }
+
+        return *this;
+    }
+
+    /*!
+     * @brief This function template deserializes a sequence of non-primitive.
+     * @param vector_t The variable that will store the sequence read from the buffer.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+     */
+    template<class _T, typename std::enable_if<
+                !std::is_enum<_T>::value &&
+                !std::is_arithmetic<_T>::value &&
+                is_complex_array_or_string<std::vector<_T>>::value>::type* = nullptr>
     Cdr& deserialize(
             std::vector<_T>& vector_t)
     {
@@ -1917,8 +2130,10 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    template<class _T, typename std::enable_if<std::is_enum<_T>::value ||
-            std::is_arithmetic<_T>::value>::type* = nullptr>
+    template<class _T, typename std::enable_if<
+                (std::is_enum<_T>::value ||
+                std::is_arithmetic<_T>::value) &&
+                !is_complex_array_or_string<std::vector<_T>>::value>::type* = nullptr>
     Cdr& deserialize(
             std::vector<_T>& vector_t)
     {

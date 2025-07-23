@@ -13,6 +13,17 @@
 # limitations under the License.
 
 ###############################################################################
+# container_introspection tests
+###############################################################################
+add_executable(ContainerIntrospectionTests container_introspection.cpp)
+set_common_compile_options(ContainerIntrospectionTests)
+message(STATUS "fastcdr include dir: ${CMAKE_CURRENT_SOURCE_DIR}")
+target_include_directories(ContainerIntrospectionTests
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../../include)
+target_link_libraries(ContainerIntrospectionTests GTest::gtest_main)
+gtest_discover_tests(ContainerIntrospectionTests)
+
+###############################################################################
 # fixed_size_string tests
 ###############################################################################
 add_executable(FixedSizeStringTests fixed_size_string.cpp)

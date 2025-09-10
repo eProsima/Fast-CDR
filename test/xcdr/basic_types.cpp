@@ -11195,6 +11195,101 @@ TEST_P(XCdrBasicTypesTest, struct_with_strings)
         ASSERT_EQ(enc_state_end, dec_state_end);
         //}
     }
+
+    {
+        //{ Prepare buffer
+        uint8_t tested_stream = 0 + encoding + endianness;
+        auto buffer =
+                std::unique_ptr<char, void (*)(
+            void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+        FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+        Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+        //}
+
+        //{ Encode
+        cdr.set_encoding_flag(encoding);
+        cdr.serialize_encapsulation();
+        Cdr::state enc_state(cdr);
+        cdr.begin_serialize_type(enc_state, encoding);
+        cdr << MemberId(1) << var_field1;
+        cdr << MemberId(2) << var_field2;
+        cdr << MemberId(3) << var_field3;
+        cdr.end_serialize_type(enc_state);
+        cdr.set_dds_cdr_options({0, 0});
+        Cdr::state enc_state_end(cdr);
+        //}
+
+        //{ Test encoded content
+        ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
+        ASSERT_EQ(cdr.get_serialized_data_length(), calculated_size);
+        ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(),
+                expected_streams[tested_stream].size()));
+        //}
+
+        //{ Decoding
+        // Strings have default string values longer than the serialized ones
+        std::string dvar_field1("ABC");
+        std::wstring dvar_field2(L"ABC");
+        fixed_string<20> dvar_field3("ABC");
+        EXPECT_TRUE(var_field1.size() < dvar_field1.size());
+        EXPECT_TRUE(var_field2.size() < dvar_field2.size());
+        EXPECT_TRUE(var_field3.size() < dvar_field3.size());
+
+        cdr.reset();
+        cdr.read_encapsulation();
+        ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+        ASSERT_EQ(cdr.endianness(), endianness);
+        cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId& mid)->bool
+                {
+                    bool ret_value = true;
+
+                    if (EncodingAlgorithmFlag::PL_CDR == cdr_inner.get_encoding_flag() ||
+                    EncodingAlgorithmFlag::PL_CDR2 == cdr_inner.get_encoding_flag())
+                    {
+                        switch (mid.id)
+                        {
+                            case 1:
+                                cdr_inner >> dvar_field1;
+                                break;
+                            case 2:
+                                cdr_inner >> dvar_field2;
+                                break;
+                            case 3:
+                                cdr_inner >> dvar_field3;
+                                break;
+                            default:
+                                ret_value = false;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (mid.id)
+                        {
+                            case 0:
+                                cdr_inner >> dvar_field1;
+                                break;
+                            case 1:
+                                cdr_inner >> dvar_field2;
+                                break;
+                            case 2:
+                                cdr_inner >> dvar_field3;
+                                break;
+                            default:
+                                ret_value = false;
+                                break;
+                        }
+                    }
+
+                    return ret_value;
+                });
+        ASSERT_EQ(var_field1, dvar_field1);
+        ASSERT_EQ(var_field2, dvar_field2);
+        ASSERT_EQ(var_field3, dvar_field3);
+        Cdr::state dec_state_end(cdr);
+        ASSERT_EQ(enc_state_end, dec_state_end);
+        //}
+    }
 }
 
 /*!

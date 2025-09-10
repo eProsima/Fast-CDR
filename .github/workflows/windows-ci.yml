@@ -6,10 +6,10 @@ on:
       os-version:
         description: 'OS version to run the workflow'
         required: false
-        default: 'windows-2019'
+        default: 'windows-2022'
         type: string
       vs-toolset:
-        description: 'Visual Studio toolset to use (Default: v141 and v142)'
+        description: 'Visual Studio toolset to use (Default: v142 and v143)'
         required: false
         default: ''
         type: string
@@ -53,14 +53,14 @@ jobs:
       fail-fast: false
       matrix:
         vs-toolset:
-          - 'v141'
           - 'v142'
+          - 'v143'
     if: ${{ !(github.event_name == 'pull_request') || !contains(github.event.pull_request.labels.*.name, 'conflicts') }}
     uses: ./.github/workflows/reusable-ci.yml
     with:
       # It would be desirable to have a matrix of windows OS for this job, but due to the issue opened in this ticket:
       # https://github.com/orgs/community/discussions/128118 , it has been set as a single OS job.
-      os-version: ${{ inputs.os-version || 'windows-2019' }}
+      os-version: ${{ inputs.os-version || 'windows-2022' }}
       vs-toolset: ${{ inputs.vs-toolset || matrix.vs-toolset }}
       label: ${{ format('windows-{0}-ci-{1}', matrix.vs-toolset, inputs.fastcdr-branch || github.ref) }}
       colcon-args: ${{ inputs.colcon-args }}

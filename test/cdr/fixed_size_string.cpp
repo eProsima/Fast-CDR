@@ -263,3 +263,36 @@ TEST_F(FixedSizeStringTests, greater_than_operator_std_string)
     ASSERT_FALSE(fixed_string_short > std_string_long);
     ASSERT_TRUE(fixed_string_short > std_string_short);
 }
+
+TEST_F(FixedSizeStringTests, assign)
+{
+    constexpr size_t MAX_FIXED_STRING_SIZE = 10;
+    fixed_string<MAX_FIXED_STRING_SIZE> fixed_s;
+    std::string std_string = "test string";
+    std::string max_allowed_std_string = "test strin";
+    std::string allowed_std_string = "test st";
+
+    ASSERT_TRUE(std_string.size() > MAX_FIXED_STRING_SIZE);
+    ASSERT_TRUE(max_allowed_std_string.size() == MAX_FIXED_STRING_SIZE);
+    ASSERT_TRUE(allowed_std_string.size() < MAX_FIXED_STRING_SIZE);
+
+    fixed_s.assign(std_string.c_str(), std_string.size());
+    ASSERT_EQ(fixed_s.size(), MAX_FIXED_STRING_SIZE);
+    ASSERT_EQ(fixed_s, max_allowed_std_string);
+
+    fixed_s.assign(max_allowed_std_string.c_str(), max_allowed_std_string.size());
+    ASSERT_EQ(fixed_s.size(), MAX_FIXED_STRING_SIZE);
+    ASSERT_EQ(fixed_s, max_allowed_std_string);
+
+    fixed_s.assign(allowed_std_string.c_str(), allowed_std_string.size());
+    ASSERT_EQ(fixed_s.size(), allowed_std_string.size());
+    ASSERT_EQ(fixed_s, allowed_std_string);
+
+    fixed_s.assign(nullptr, 5);
+    ASSERT_EQ(fixed_s.size(), 0u);
+    ASSERT_EQ(fixed_s, "");
+
+    fixed_s.assign(nullptr, 0);
+    ASSERT_EQ(fixed_s.size(), 0u);
+    ASSERT_EQ(fixed_s, "");
+}

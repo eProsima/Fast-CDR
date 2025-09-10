@@ -85,6 +85,7 @@ public:
         {
             memcpy(string_data, c_array, string_len);
         }
+        string_data[string_len] = '\0';
         return *this;
     }
 

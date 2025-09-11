@@ -20,6 +20,7 @@
 #include <gtest/gtest.h>
 
 #include <fastcdr/Cdr.h>
+#include <fastcdr/CdrSizeCalculator.hpp>
 #include "utility.hpp"
 
 using namespace eprosima::fastcdr;
@@ -263,6 +264,131 @@ void deserialize(
                         break;
                     case 1:
                         cdr_inner >> data.value2;
+                        break;
+                    default:
+                        ret_value = false;
+                        break;
+                }
+
+                return ret_value;
+            });
+}
+
+} // namespace fastcdr
+} // namespace eprosima
+
+struct SizeThreeStruct
+{
+public:
+
+    SizeThreeStruct() = default;
+
+    SizeThreeStruct(
+            eprosima::fastcdr::EncodingAlgorithmFlag e1,
+            eprosima::fastcdr::EncodingAlgorithmFlag e2
+            )
+        : enc_xcdrv1(e1)
+        , enc_xcdrv2(e2)
+    {
+    }
+
+    SizeThreeStruct(
+            eprosima::fastcdr::EncodingAlgorithmFlag e1,
+            eprosima::fastcdr::EncodingAlgorithmFlag e2,
+            uint8_t value1,
+            uint8_t value2,
+            uint8_t value3
+            )
+        : aval(value1)
+        , bval(value2)
+        , cval(value3)
+        , enc_xcdrv1(e1)
+        , enc_xcdrv2(e2)
+    {
+    }
+
+    bool operator ==(
+            const SizeThreeStruct& other) const
+    {
+        return aval == other.aval &&
+               bval == other.bval &&
+               cval == other.cval;
+    }
+
+    uint8_t aval;
+    uint8_t bval;
+    uint8_t cval;
+
+    eprosima::fastcdr::EncodingAlgorithmFlag enc_xcdrv1 {eprosima::fastcdr::EncodingAlgorithmFlag::PLAIN_CDR};
+
+    eprosima::fastcdr::EncodingAlgorithmFlag enc_xcdrv2 {eprosima::fastcdr::EncodingAlgorithmFlag::PLAIN_CDR2};
+};
+
+namespace eprosima {
+namespace fastcdr {
+
+template<>
+size_t calculate_serialized_size(
+        eprosima::fastcdr::CdrSizeCalculator& calculator,
+        const SizeThreeStruct& data,
+        size_t& current_alignment)
+{
+    eprosima::fastcdr::EncodingAlgorithmFlag previous_encoding = calculator.get_encoding();
+    eprosima::fastcdr::EncodingAlgorithmFlag new_encoding = calculator.get_cdr_version() ==
+            eprosima::fastcdr::CdrVersion::XCDRv1
+                             ? data.enc_xcdrv1
+                             : data.enc_xcdrv2;
+    size_t calculated_size {calculator.begin_calculate_type_serialized_size(new_encoding, current_alignment)};
+
+
+    calculated_size += calculator.calculate_member_serialized_size(eprosima::fastcdr::MemberId(
+                        0), data.aval, current_alignment);
+    calculated_size += calculator.calculate_member_serialized_size(eprosima::fastcdr::MemberId(
+                        1), data.bval, current_alignment);
+    calculated_size += calculator.calculate_member_serialized_size(eprosima::fastcdr::MemberId(
+                        2), data.cval, current_alignment);
+
+    calculated_size += calculator.end_calculate_type_serialized_size(previous_encoding, current_alignment);
+
+    return calculated_size;
+}
+
+template<>
+void serialize(
+        Cdr& cdr,
+        const SizeThreeStruct& data)
+{
+    Cdr::state current_status(cdr);
+    cdr.begin_serialize_type(current_status, cdr.get_cdr_version() == eprosima::fastcdr::CdrVersion::XCDRv1
+                             ? data.enc_xcdrv1
+                             : data.enc_xcdrv2);
+    cdr << MemberId(0) << data.aval;
+    cdr << MemberId(1) << data.bval;
+    cdr << MemberId(2) << data.cval;
+    cdr.end_serialize_type(current_status);
+}
+
+template<>
+void deserialize(
+        Cdr& cdr,
+        SizeThreeStruct& data)
+{
+    cdr.deserialize_type(cdr.get_cdr_version() == eprosima::fastcdr::CdrVersion::XCDRv1
+                         ? data.enc_xcdrv1
+                         : data.enc_xcdrv2,
+            [&data](Cdr& cdr_inner, const MemberId& mid) -> bool
+            {
+                bool ret_value {true};
+                switch (mid.id)
+                {
+                    case 0:
+                        cdr_inner >> data.aval;
+                        break;
+                    case 1:
+                        cdr_inner >> data.bval;
+                        break;
+                    case 2:
+                        cdr_inner >> data.cval;
                         break;
                     default:
                         ret_value = false;
@@ -1231,6 +1357,139 @@ TEST_P(XCdrMutableTest, inner_appendable_structure)
             });
     ASSERT_EQ(value1, dvalue1);
     ASSERT_EQ(value2, dvalue2);
+    Cdr::state dec_state_end(cdr);
+    ASSERT_EQ(enc_state_end, dec_state_end);
+    //}
+}
+
+/*!
+ * @test Test a mutable structure with a field of optional final 3-bytes size struct type.
+ * @code{.idl}
+ * @final
+ * struct SizeThreeStruct
+ * {
+ *     octet aval;
+ *     octet bval;
+ *     octet cval;
+ * };
+ *
+ * @mutable
+ * struct SizeThreeOptionalStruct
+ * {
+ *     @optional SizeThreeStruct opt_val;
+ * };
+ * @endcode
+ */
+TEST_P(XCdrMutableTest, inner_size_three_final_structure)
+{
+    constexpr uint8_t aval {0xAA};
+    constexpr uint8_t bval {0xBB};
+    constexpr uint8_t cval {0xCC};
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x02, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x03, // ShortMemberHeader
+        aval, bval, cval,       // SizeThreeStruct
+        0x00,                   // Alignment
+        0x3F, 0x02, 0x00, 0x00, // Sentinel
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x03, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x03, 0x00, // ShortMemberHeader
+        aval, bval, cval,       // SizeThreeStruct
+        0x00,                   // Alignment
+        0x02, 0x3F, 0x00, 0x00, // Sentinel
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x0A, 0x00, 0x01, // Encapsulation
+        0x00, 0x00, 0x00, 0x0B, // DHEADER
+        0x40, 0x00, 0x00, 0x00, // EMHEADER1(M) with NEXTINT
+        0x00, 0x00, 0x00, 0x03, // NEXTINT
+        aval, bval, cval        // SizeThreeStruct
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x0B, 0x00, 0x01, // Encapsulation
+        0x0B, 0x00, 0x00, 0x00, // DHEADER
+        0x00, 0x00, 0x00, 0x40, // EMHEADER1(M) with NEXTINT
+        0x03, 0x00, 0x00, 0x00, // NEXTINT
+        aval, bval, cval        // SizeThreeStruct
+    };
+    //}
+
+    EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+    SizeThreeStruct value {eprosima::fastcdr::EncodingAlgorithmFlag::PLAIN_CDR,
+                           eprosima::fastcdr::EncodingAlgorithmFlag::PLAIN_CDR2, aval, bval, cval};
+    optional<SizeThreeStruct> opt_value {value};
+
+    // Calculate encoded size
+    CdrSizeCalculator calculator(get_version_from_algorithm(encoding));
+    size_t current_alignment {0};
+    size_t calculated_size {calculator.begin_calculate_type_serialized_size(encoding, current_alignment)};
+    calculated_size += calculator.calculate_member_serialized_size(MemberId(0), opt_value, current_alignment);
+    calculated_size += calculator.end_calculate_type_serialized_size(encoding, current_alignment);
+    calculated_size += 4; // Encapsulation
+    //}
+
+    //{ Prepare buffer
+    uint8_t tested_stream = 0 + encoding + endianness;
+    auto buffer =
+            std::unique_ptr<char, void (*)(
+        void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+    FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+    Cdr cdr(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    //}
+
+    //{ Encode
+    cdr.set_encoding_flag(encoding);
+    cdr.serialize_encapsulation();
+    Cdr::state enc_state(cdr);
+    cdr.begin_serialize_type(enc_state, encoding);
+    cdr << MemberId(0) << opt_value;
+    cdr.end_serialize_type(enc_state);
+    cdr.set_dds_cdr_options({0, 0});
+    Cdr::state enc_state_end(cdr);
+    //}
+
+    //{ Test encoded content
+    ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
+    ASSERT_EQ(cdr.get_serialized_data_length(), calculated_size);
+    ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(),
+            expected_streams[tested_stream].size()));
+    //}
+
+    //{ Decoding
+    SizeThreeStruct dvalue {eprosima::fastcdr::EncodingAlgorithmFlag::PLAIN_CDR,
+                            eprosima::fastcdr::EncodingAlgorithmFlag::PLAIN_CDR2, aval, bval, cval};
+    optional<SizeThreeStruct> opt_dvalue {dvalue};
+
+    cdr.reset();
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+    cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId& mid)->bool
+            {
+                bool ret_value {true};
+
+                switch (mid.id)
+                {
+                    case 0:
+                        cdr_inner >> opt_dvalue;
+                        break;
+                    default:
+                        ret_value = false;
+                        break;
+                }
+
+                return ret_value;
+            });
+    ASSERT_EQ(opt_value, opt_dvalue);
     Cdr::state dec_state_end(cdr);
     ASSERT_EQ(enc_state_end, dec_state_end);
     //}

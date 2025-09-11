@@ -334,7 +334,8 @@ size_t calculate_serialized_size(
         size_t& current_alignment)
 {
     eprosima::fastcdr::EncodingAlgorithmFlag previous_encoding = calculator.get_encoding();
-    eprosima::fastcdr::EncodingAlgorithmFlag new_encoding = calculator.get_cdr_version() == eprosima::fastcdr::CdrVersion::XCDRv1
+    eprosima::fastcdr::EncodingAlgorithmFlag new_encoding = calculator.get_cdr_version() ==
+            eprosima::fastcdr::CdrVersion::XCDRv1
                              ? data.enc_xcdrv1
                              : data.enc_xcdrv2;
     size_t calculated_size {calculator.begin_calculate_type_serialized_size(new_encoding, current_alignment)};
@@ -1424,7 +1425,7 @@ TEST_P(XCdrMutableTest, inner_size_three_final_structure)
     EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
     Cdr::Endianness endianness = std::get<1>(GetParam());
     SizeThreeStruct value {eprosima::fastcdr::EncodingAlgorithmFlag::PLAIN_CDR,
-                             eprosima::fastcdr::EncodingAlgorithmFlag::PLAIN_CDR2, aval, bval, cval};
+                           eprosima::fastcdr::EncodingAlgorithmFlag::PLAIN_CDR2, aval, bval, cval};
     optional<SizeThreeStruct> opt_value {value};
 
     // Calculate encoded size
@@ -1465,7 +1466,7 @@ TEST_P(XCdrMutableTest, inner_size_three_final_structure)
 
     //{ Decoding
     SizeThreeStruct dvalue {eprosima::fastcdr::EncodingAlgorithmFlag::PLAIN_CDR,
-                             eprosima::fastcdr::EncodingAlgorithmFlag::PLAIN_CDR2, aval, bval, cval};
+                            eprosima::fastcdr::EncodingAlgorithmFlag::PLAIN_CDR2, aval, bval, cval};
     optional<SizeThreeStruct> opt_dvalue {dvalue};
 
     cdr.reset();

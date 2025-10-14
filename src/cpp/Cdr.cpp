@@ -1081,7 +1081,7 @@ Cdr& Cdr::serialize_array(
     if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
         // Align and save last datasize.
-		make_alignment(align);
+        make_alignment(align);
         last_data_size_ = align64_;
 
         if (swap_bytes_)
@@ -1129,7 +1129,7 @@ Cdr& Cdr::serialize_array(
     if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
         // Align and save last datasize.
-		make_alignment(align);
+        make_alignment(align);
         last_data_size_ = sizeof(*float_t);
 
         if (swap_bytes_)
@@ -1173,7 +1173,7 @@ Cdr& Cdr::serialize_array(
     if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
         // Align and save last datasize.
-		make_alignment(align);
+        make_alignment(align);
         last_data_size_ = align64_;
 
         if (swap_bytes_)
@@ -1222,7 +1222,7 @@ Cdr& Cdr::serialize_array(
     if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
         // Align and save last datasize.
-		make_alignment(align);
+        make_alignment(align);
         last_data_size_ = align64_;
 
 #if FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16

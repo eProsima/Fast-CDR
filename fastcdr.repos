@@ -2,4 +2,4 @@ repositories:
     fastcdr:
         type: git
         url: https://github.com/eProsima/Fast-CDR.git
-        version: master
+        version: v2.3.3

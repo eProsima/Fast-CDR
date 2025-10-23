@@ -460,3 +460,51 @@ INSTANTIATE_TEST_SUITE_P(
         Cdr::XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT,
         Cdr::XCdrHeaderSelection::AUTO_WITH_LONG_HEADER_BY_DEFAULT
         ));
+
+
+/*!
+ * @test Regression test for optional string with extra alignment send by RTI (#23838)
+ * @code{.idl}
+ * struct OptinalStringWithExtraAlignment
+ * {
+ *     @optional string<100> str;
+ * };
+ * @endcode
+ */
+TEST(XCdrTest, optional_string_with_extra_alignment)
+{
+    std::array<char, 16> fail_case_buffer {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x08, 0x00, // ShortMemberHeader
+        0x03, 0x00, 0x00, 0x00, // String length
+        0x65, 0x66, 0x00,       // String
+        0x00                    // Extra alignment byte
+    };
+
+    EncodingAlgorithmFlag encoding = EncodingAlgorithmFlag::PLAIN_CDR;
+    Cdr::Endianness endianness = Cdr::Endianness::LITTLE_ENDIANNESS;
+    FastBuffer fast_buffer(fail_case_buffer.data(), 16);
+    Cdr cdr(fast_buffer, endianness, CdrVersion::XCDRv1);
+    cdr.read_encapsulation();
+    ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+    ASSERT_EQ(cdr.endianness(), endianness);
+
+    optional<fixed_string<100>> dvalue;
+    cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId& mid)->bool
+            {
+                bool ret_value = true;
+
+                switch (mid.id)
+                {
+                    case 0:
+                        cdr_inner >> dvalue;
+                        break;
+                    default:
+                        ret_value = false;
+                }
+
+                return ret_value;
+            });
+    ASSERT_TRUE(dvalue.has_value());
+    ASSERT_EQ("AB", dvalue.value());
+}

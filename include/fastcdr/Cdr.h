@@ -2736,9 +2736,10 @@ public:
             if (member_size < diff)
             {
                 throw exception::BadParamException(
-                          "Member size provided by member header is not equal to the real decoded member size");
+                          "Member size provided by member header is lower than real decoded member size");
             }
 
+            // Skip unused bytes
             offset_ += (member_size - diff);
         }
         else

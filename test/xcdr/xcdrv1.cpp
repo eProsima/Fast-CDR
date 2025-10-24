@@ -461,13 +461,13 @@ INSTANTIATE_TEST_SUITE_P(
         Cdr::XCdrHeaderSelection::AUTO_WITH_LONG_HEADER_BY_DEFAULT
         ));
 
-
 /*!
- * @test Regression test for optional string with extra alignment send by RTI (#23838)
+ * @test Regression test for optional string with extra alignment sent by RTI (#23838)
  * @code{.idl}
  * struct OptinalStringWithExtraAlignment
  * {
  *     @optional string<100> str;
+ *     unsigned short value;
  * };
  * @endcode
  */

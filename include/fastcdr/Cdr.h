@@ -2731,11 +2731,16 @@ public:
             {
                 deserialize(member_value);
             }
-            if (current_state.member_size_ != offset_ - prev_offset)
+            size_t member_size {current_state.member_size_};
+            size_t diff {offset_ - prev_offset};
+            if (member_size < diff)
             {
                 throw exception::BadParamException(
-                          "Member size provided by member header is not equal to the real decoded member size");
+                          "Member size provided by member header is lower than real decoded member size");
             }
+
+            // Skip unused bytes
+            offset_ += (member_size - diff);
         }
         else
         {

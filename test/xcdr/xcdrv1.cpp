@@ -473,23 +473,25 @@ INSTANTIATE_TEST_SUITE_P(
  */
 TEST(XCdrTest, optional_string_with_extra_alignment)
 {
-    std::array<char, 16> fail_case_buffer {
+    std::array<char, 18> fail_case_buffer {
         0x00, 0x01, 0x00, 0x00, // Encapsulation
         0x00, 0x00, 0x08, 0x00, // ShortMemberHeader
         0x03, 0x00, 0x00, 0x00, // String length
-        0x65, 0x66, 0x00,       // String
-        0x00                    // Extra alignment byte
+        0x41, 0x42, 0x00,       // String
+        0x00,                   // Extra alignment byte
+        0x30, 0x00              // Short
     };
 
     EncodingAlgorithmFlag encoding = EncodingAlgorithmFlag::PLAIN_CDR;
     Cdr::Endianness endianness = Cdr::Endianness::LITTLE_ENDIANNESS;
-    FastBuffer fast_buffer(fail_case_buffer.data(), 16);
+    FastBuffer fast_buffer(fail_case_buffer.data(), fail_case_buffer.size());
     Cdr cdr(fast_buffer, endianness, CdrVersion::XCDRv1);
     cdr.read_encapsulation();
     ASSERT_EQ(cdr.get_encoding_flag(), encoding);
     ASSERT_EQ(cdr.endianness(), endianness);
 
     optional<fixed_string<100>> dvalue;
+    uint16_t short_dvalue {0};
     cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId& mid)->bool
             {
                 bool ret_value = true;
@@ -499,6 +501,9 @@ TEST(XCdrTest, optional_string_with_extra_alignment)
                     case 0:
                         cdr_inner >> dvalue;
                         break;
+                    case 1:
+                        cdr_inner >> short_dvalue;
+                        break;
                     default:
                         ret_value = false;
                 }
@@ -506,5 +511,6 @@ TEST(XCdrTest, optional_string_with_extra_alignment)
                 return ret_value;
             });
     ASSERT_TRUE(dvalue.has_value());
-    ASSERT_EQ("AB", dvalue.value());
+    ASSERT_STREQ("AB", dvalue.value());
+    ASSERT_EQ(0x30, short_dvalue);
 }

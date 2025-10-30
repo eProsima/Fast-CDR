@@ -2265,7 +2265,7 @@ TEST(CDRTests, DeserializeIntoANonEmptyMapInXCDRv1)
     };
 
     std::map<uint16_t, std::string> initialized_map{
-        {1, "a"}
+        {static_cast<uint16_t>(1u), "a"}
     };
 
     FastBuffer cdr_buffer(buffer, 14);

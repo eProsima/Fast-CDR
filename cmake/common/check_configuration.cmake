@@ -194,6 +194,7 @@ function(set_common_compile_options target)
         target_compile_options(${target} PRIVATE /W4)
     else()
         target_compile_options(${target} PRIVATE -Wall
+            -Werror
             -Wextra
             -Wshadow
             $<$<COMPILE_LANGUAGE:CXX>:-Wnon-virtual-dtor>

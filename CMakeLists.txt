@@ -47,19 +47,6 @@ message(STATUS "Configuring ${PROJECT_NAME_LARGE}")
 message(STATUS "Version: ${PROJECT_VERSION}")
 
 ###############################################################################
-# CCache on Windows on CI
-###############################################################################
-if (MSVC AND CMAKE_CXX_COMPILER_LAUNCHER STREQUAL "ccache")
-    foreach(config DEBUG RELWITHDEBINFO)
-        foreach(lang C CXX)
-            set(flags_var "CMAKE_${lang}_FLAGS_${config}")
-            string(REPLACE "/Zi" "/Z7" ${flags_var} "${${flags_var}}")
-            set(${flags_var} "${${flags_var}}")
-        endforeach()
-    endforeach()
-endif()
-
-###############################################################################
 # GCC colors if using CCache
 ###############################################################################
 if("${CMAKE_CXX_COMPILER_LAUNCHER}" STREQUAL "ccache" AND

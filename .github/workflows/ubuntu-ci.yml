@@ -6,7 +6,7 @@ on:
       os-version:
         description: 'OS version to run the workflow'
         required: false
-        default: 'ubuntu-20.04'
+        default: 'ubuntu-22.04'
         type: string
       colcon-args:
         description: 'Extra arguments for colcon cli'
@@ -54,7 +54,7 @@ jobs:
     with:
       # It would be desirable to have a matrix of ubuntu OS for this job, but due to the issue opened in this ticket:
       # https://github.com/orgs/community/discussions/128118 , it has been set as a single OS job.
-      os-version: ${{ inputs.os-version || 'ubuntu-20.04' }}
+      os-version: ${{ inputs.os-version || 'ubuntu-22.04' }}
       label: ${{ format('ubuntu-ci-{0}', inputs.fastcdr-branch || github.ref) }}
       colcon-args: ${{ inputs.colcon-args }}
       cmake-args: ${{ inputs.cmake-args }}

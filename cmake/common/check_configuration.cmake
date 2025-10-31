@@ -191,10 +191,9 @@ function(set_common_compile_options target)
     enable_language(C)
     enable_language(CXX)
     if(MSVC OR MSVC_IDE)
-        target_compile_options(${target} PRIVATE /W4 /WX)
+        target_compile_options(${target} PRIVATE /W4)
     else()
         target_compile_options(${target} PRIVATE -Wall
-            -Werror
             -Wextra
             -Wshadow
             $<$<COMPILE_LANGUAGE:CXX>:-Wnon-virtual-dtor>

@@ -387,7 +387,10 @@ void Cdr::set_dds_cdr_options(
     {
         auto length {offset_ - cdr_buffer_.begin()};
         auto alignment = ((length + 3u) & ~3u) - length;
-        options_[1] = static_cast<uint8_t>(options_[1] & 0xC) + static_cast<uint8_t>(alignment & 0x3);
+        options_[1] = static_cast<uint8_t>(
+            static_cast<uint8_t>(options_[1] & 0xC) +
+            static_cast<uint8_t>(alignment & 0x3)
+        );
     }
 
     if (encapsulation_serialized_ && CdrVersion::CORBA_CDR < cdr_version_)

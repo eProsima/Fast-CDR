@@ -1,6 +1,6 @@
 name: fastcdr
 type: cmake
-dependencies:
+test-dependencies:
     # Needed for test compilation in ROS 2 CI
     - ament_cmake_gtest
     - ament_cmake

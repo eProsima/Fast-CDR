@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-{
-    "name": "fastcdr",
-    "type": "cmake",
-    "dependencies" : ["googletest-distribution"]
-}
-=======
 name: fastcdr
 type: cmake
 test-dependencies:
@@ -13,4 +6,3 @@ test-dependencies:
     - ament_cmake
     # Needed for test compilation in eProsima CI
     - googletest-distribution
->>>>>>> 88eb2ab (Change colcon.pkg dependencies to be test-dependencies (#293))

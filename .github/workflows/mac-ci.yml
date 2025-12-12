@@ -6,7 +6,7 @@ on:
       os-version:
         description: 'OS version to run the workflow'
         required: false
-        default: 'macos-13'
+        default: 'macos-15-intel'
         type: string
       colcon-args:
         description: 'Extra arguments for colcon cli'
@@ -49,7 +49,7 @@ jobs:
     with:
       # It would be desirable to have a matrix of macos OS for this job, but due to the issue opened in this ticket:
       # https://github.com/orgs/community/discussions/128118 , it has been set as a single OS job.
-      os-version: ${{ inputs.os-version || 'macos-13' }}
+      os-version: ${{ inputs.os-version || 'macos-15-intel' }}
       label: ${{ format('mac-ci-{0}', inputs.fastcdr-branch || github.ref) }}
       colcon-args: ${{ inputs.colcon-args }}
       cmake-args: ${{ inputs.cmake-args }}

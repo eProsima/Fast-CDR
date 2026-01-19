@@ -36,7 +36,6 @@ endif()
 # Project                                                                     #
 ###############################################################################
 project(fastcdr VERSION 2.3.4 LANGUAGES CXX)
-include(GNUInstallDirs)
 
 set(PROJECT_NAME_STYLED "FastCDR")
 set(PROJECT_NAME_LARGE "Fast CDR")
@@ -91,6 +90,7 @@ option(APPEND_PROJECT_NAME_TO_INCLUDEDIR
   overriding this package from a merged catkin, ament, or colcon workspace."
   OFF)
 
+include(GNUInstallDirs)
 set(BIN_INSTALL_DIR "${CMAKE_INSTALL_BINDIR}" CACHE PATH "Installation directory for binaries")
 set(_include_dir "${CMAKE_INSTALL_INCLUDEDIR}")
 if(APPEND_PROJECT_NAME_TO_INCLUDEDIR)
@@ -100,8 +100,7 @@ set(INCLUDE_INSTALL_DIR "${_include_dir}" CACHE PATH "Installation directory for
 unset(_include_dir)
 set(LIB_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}" CACHE PATH "Installation directory for libraries")
 set(DATA_INSTALL_DIR "${CMAKE_INSTALL_DATAROOTDIR}" CACHE PATH "Installation directory for data")
-set(DOC_DIR "${CMAKE_INSTALL_DOCDIR}")
-set(DOC_INSTALL_DIR ${DOC_DIR} CACHE PATH "Installation directory for documentation")
+set(DOC_INSTALL_DIR ${CMAKE_INSTALL_DOCDIR} CACHE PATH "Installation directory for documentation")
 set(LICENSE_INSTALL_DIR ${DATA_INSTALL_DIR}/${PROJECT_NAME} CACHE PATH "Installation directory for licenses")
 
 ###############################################################################

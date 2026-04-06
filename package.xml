@@ -17,8 +17,7 @@
   <buildtool_depend>cmake</buildtool_depend>
   <doc_depend>doxygen</doc_depend>
 
-  <test_depend>ament_cmake_gtest</test_depend>
-  <test_depend>ament_cmake</test_depend>
+  <test_depend>libgtest-dev</test_depend>
 
   <export>
     <build_type>cmake</build_type>

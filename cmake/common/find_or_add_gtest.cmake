@@ -13,28 +13,6 @@
 # limitations under the License.
 
 macro(find_or_add_gtest)
-    # Check if building on an ament context, i.e. ROS 2
-    # Thanks to https://github.com/facontidavide/PlotJuggler/blob/main/CMakeLists.txt#L66
-    find_package(ament_cmake QUIET)
-
-    # This is a ROS 2 build
-    if(ament_cmake_FOUND)
-        # Find all GTest vendor required packages
-        find_package(ament_cmake REQUIRED)
-        find_package(gtest_vendor REQUIRED)
-        find_package(ament_cmake_gtest REQUIRED)
-
-        # Find GTest
-        ament_find_gtest()
-
-        # Add aliases for GTest libraries so we can use them as targets independently of the context
-        add_library(GTest::gtest ALIAS gtest)
-        add_library(GTest::gtest_main ALIAS gtest_main)
-        target_link_libraries(gtest_main gtest)
-
-    # This is a non-ROS 2 build
-    else()
-        # Find GTest normally
-        find_package(GTest CONFIG REQUIRED)
-    endif()
+    # Find GTest normally
+    find_package(GTest CONFIG REQUIRED)
 endmacro()

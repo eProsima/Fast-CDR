@@ -195,3 +195,17 @@ install(FILES ${PROJECT_BINARY_DIR}/cmake/config/${PROJECT_NAME}-config.cmake
     DESTINATION ${INSTALL_DESTINATION_PATH}
     COMPONENT cmake
     )
+
+###############################################################################
+# Create pkg-config file
+###############################################################################
+cmake_path(APPEND includedir_for_pc_file "\${prefix}" "${CMAKE_INSTALL_INCLUDEDIR}")
+cmake_path(APPEND libdir_for_pc_file "\${prefix}" "${CMAKE_INSTALL_LIBDIR}")
+configure_file(
+    "${PROJECT_SOURCE_DIR}/fastcdr.pc.in"
+    "${PROJECT_BINARY_DIR}/fastcdr.pc"
+    @ONLY)
+install(FILES "${PROJECT_BINARY_DIR}/fastcdr.pc"
+    DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig"
+    COMPONENT pkgconfig
+    )

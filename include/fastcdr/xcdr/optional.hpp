@@ -92,10 +92,10 @@ public:
 
     //! Destructor
     ~optional()
-#if defined(__GNUC__) && __GNUC__ == 12
+#if defined(__GNUC__) && __GNUC__ >= 12
     __attribute__(
         (noinline))
-#endif // if defined(__GNUC__) && __GNUC__ == 12
+#endif // if defined(__GNUC__) && __GNUC__ >= 12
     = default;
 
     /*!
@@ -212,10 +212,10 @@ public:
     //! Assigns content from an optional.
     optional& operator =(
             const optional& opt)
-#if defined(__GNUC__) && __GNUC__ == 12
+#if defined(__GNUC__) && __GNUC__ >= 12
     __attribute__(
             (noinline))
-#endif // if defined(__GNUC__) && __GNUC__ == 12
+#endif // if defined(__GNUC__) && __GNUC__ >= 12
     {
         reset();
         storage_.engaged_ = opt.storage_.engaged_;
@@ -229,10 +229,10 @@ public:
     //! Assigns content from an optional.
     optional& operator =(
             optional&& opt)
-#if defined(__GNUC__) && __GNUC__ == 12
+#if defined(__GNUC__) && __GNUC__ >= 12
     __attribute__(
             (noinline))
-#endif // if defined(__GNUC__) && __GNUC__ == 12
+#endif // if defined(__GNUC__) && __GNUC__ >= 12
     {
         reset();
         storage_.engaged_ = opt.storage_.engaged_;

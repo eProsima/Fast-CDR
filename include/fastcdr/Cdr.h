@@ -720,7 +720,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to encode into a buffer
      * position that exceeds the internal memory size.
      */
-    template <size_t MAX_CHARS>
+    template<size_t MAX_CHARS>
     Cdr& serialize(
             const fixed_string<MAX_CHARS>& value)
     {
@@ -1787,7 +1787,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
      * position that exceeds the internal memory size.
      */
-    template <size_t MAX_CHARS>
+    template<size_t MAX_CHARS>
     Cdr& deserialize(
             fixed_string<MAX_CHARS>& value)
     {
@@ -2727,6 +2727,52 @@ public:
             MemberId member_id;
             xcdr1_deserialize_member_header(member_id, current_state);
             auto prev_offset = offset_;
+            member_value.reset(0 < current_state.member_size_);
+            if (0 < current_state.member_size_)
+            {
+                deserialize(member_value);
+            }
+            size_t member_size {current_state.member_size_};
+            size_t diff {offset_ - prev_offset};
+            if (member_size < diff)
+            {
+                throw exception::BadParamException(
+                          "Member size provided by member header is lower than real decoded member size");
+            }
+
+            // Skip unused bytes
+            offset_ += (member_size - diff);
+        }
+        else
+        {
+            deserialize(member_value);
+        }
+        return *this;
+    }
+
+    /*!
+     * @brief Decodes an optional member of an external according to the encoding algorithm used.
+     * @param[out] member_value A reference of the variable where the optional member value will be stored.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
+     * position that exceeds the internal memory size.
+     */
+    template<class _T>
+    Cdr& deserialize_member(
+            optional<external<_T>>& member_value)
+    {
+        if (member_value.has_value() && member_value.value().is_locked())
+        {
+            throw exception::BadParamException("External member is locked");
+        }
+
+        if (EncodingAlgorithmFlag::PLAIN_CDR == current_encoding_)
+        {
+            Cdr::state current_state(*this);
+            MemberId member_id;
+            xcdr1_deserialize_member_header(member_id, current_state);
+            auto prev_offset = offset_;
+            member_value.reset(0 < current_state.member_size_);
             if (0 < current_state.member_size_)
             {
                 deserialize(member_value);

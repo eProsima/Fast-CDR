@@ -1065,7 +1065,11 @@ public:
             size_t num_elements,
             size_t& current_alignment)
     {
-        return calculate_array_serialized_size(data->data(), num_elements * data->size(), current_alignment);
+        if (0 == num_elements)
+        {
+            return 0;
+        }
+        return calculate_array_serialized_size(data->data(), num_elements * _N, current_alignment);
     }
 
     /*!

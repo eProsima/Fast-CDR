@@ -720,7 +720,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to encode into a buffer
      * position that exceeds the internal memory size.
      */
-    template <size_t MAX_CHARS>
+    template<size_t MAX_CHARS>
     Cdr& serialize(
             const fixed_string<MAX_CHARS>& value)
     {
@@ -1787,7 +1787,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
      * position that exceeds the internal memory size.
      */
-    template <size_t MAX_CHARS>
+    template<size_t MAX_CHARS>
     Cdr& deserialize(
             fixed_string<MAX_CHARS>& value)
     {

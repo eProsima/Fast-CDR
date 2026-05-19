@@ -480,7 +480,7 @@ public:
      * @param[inout] current_alignment Current alignment in the encoding.
      * @return Encoded size of the instance.
      */
-    template <size_t MAX_CHARS>
+    template<size_t MAX_CHARS>
     size_t calculate_serialized_size(
             const fixed_string<MAX_CHARS>& data,
             size_t& current_alignment)
@@ -1065,7 +1065,11 @@ public:
             size_t num_elements,
             size_t& current_alignment)
     {
-        return calculate_array_serialized_size(data->data(), num_elements * data->size(), current_alignment);
+        if (num_elements == 0 || data == nullptr)
+        {
+            return 0;
+        }
+        return calculate_array_serialized_size(data->data(), num_elements * _N, current_alignment);
     }
 
     /*!

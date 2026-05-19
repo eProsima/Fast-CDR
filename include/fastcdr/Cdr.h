@@ -2973,6 +2973,10 @@ private:
             const std::array<_T, _Size>* array_t,
             size_t num_elements)
     {
+        if (num_elements == 0)
+        {
+            return *this;
+        }
         return serialize_array(array_t->data(), num_elements * array_t->size());
     }
 

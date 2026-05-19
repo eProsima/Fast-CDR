@@ -2973,7 +2973,7 @@ private:
             const std::array<_T, _Size>* array_t,
             size_t num_elements)
     {
-        if (num_elements == 0)
+        if (num_elements == 0 || array_t == nullptr)
         {
             return *this;
         }
@@ -2992,6 +2992,10 @@ private:
             std::array<_T, _Size>* array_t,
             size_t num_elements)
     {
+        if (num_elements == 0 || array_t == nullptr)
+        {
+            return *this;
+        }
         return deserialize_array(array_t->data(), num_elements * array_t->size());
     }
 
@@ -3009,6 +3013,10 @@ private:
             size_t num_elements,
             Endianness endianness)
     {
+        if (num_elements == 0 || array_t == nullptr)
+        {
+            return *this;
+        }
         return deserialize_array(array_t->data(), num_elements * array_t->size(), endianness);
     }
 

@@ -1065,7 +1065,7 @@ public:
             size_t num_elements,
             size_t& current_alignment)
     {
-        if (0 == num_elements)
+        if (num_elements == 0 || data == nullptr)
         {
             return 0;
         }

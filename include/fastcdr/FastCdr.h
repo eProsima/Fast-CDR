@@ -655,7 +655,8 @@ public:
             return *this;
         }
 
-        throw exception::NotEnoughMemoryException(exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        throw exception::NotEnoughMemoryException(
+                  exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
     /*!
@@ -702,7 +703,8 @@ public:
             return *this;
         }
 
-        throw exception::NotEnoughMemoryException(exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        throw exception::NotEnoughMemoryException(
+                  exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
     /*!
@@ -736,7 +738,8 @@ public:
             return *this;
         }
 
-        throw exception::NotEnoughMemoryException(exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        throw exception::NotEnoughMemoryException(
+                  exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
     /*!
@@ -783,7 +786,8 @@ public:
             return *this;
         }
 
-        throw exception::NotEnoughMemoryException(exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        throw exception::NotEnoughMemoryException(
+                  exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
     /*!
@@ -804,7 +808,8 @@ public:
             return *this;
         }
 
-        throw exception::NotEnoughMemoryException(exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        throw exception::NotEnoughMemoryException(
+                  exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
     /*!
@@ -825,7 +830,8 @@ public:
             return *this;
         }
 
-        throw exception::NotEnoughMemoryException(exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        throw exception::NotEnoughMemoryException(
+                  exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
     /*!
@@ -850,7 +856,8 @@ public:
             return *this;
         }
 
-        throw exception::NotEnoughMemoryException(exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        throw exception::NotEnoughMemoryException(
+                  exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
     /*!
@@ -1306,7 +1313,8 @@ public:
             return *this;
         }
 
-        throw exception::NotEnoughMemoryException(exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        throw exception::NotEnoughMemoryException(
+                  exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
     /*!
@@ -1353,7 +1361,8 @@ public:
             return *this;
         }
 
-        throw exception::NotEnoughMemoryException(exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        throw exception::NotEnoughMemoryException(
+                  exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
     /*!
@@ -1387,7 +1396,8 @@ public:
             return *this;
         }
 
-        throw exception::NotEnoughMemoryException(exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        throw exception::NotEnoughMemoryException(
+                  exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
     /*!
@@ -1437,7 +1447,8 @@ public:
             return *this;
         }
 
-        throw exception::NotEnoughMemoryException(exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        throw exception::NotEnoughMemoryException(
+                  exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
     /*!
@@ -1458,7 +1469,8 @@ public:
             return *this;
         }
 
-        throw exception::NotEnoughMemoryException(exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        throw exception::NotEnoughMemoryException(
+                  exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
     /*!
@@ -1479,7 +1491,8 @@ public:
             return *this;
         }
 
-        throw exception::NotEnoughMemoryException(exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        throw exception::NotEnoughMemoryException(
+                  exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
     /*!
@@ -1503,7 +1516,8 @@ public:
             return *this;
         }
 
-        throw exception::NotEnoughMemoryException(exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+        throw exception::NotEnoughMemoryException(
+                  exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
     /*!

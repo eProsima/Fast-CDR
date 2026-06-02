@@ -435,7 +435,7 @@ using XCdrStreamValues =
                 1 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS>;
 
 
-class XCdrExternalTest : public ::testing::TestWithParam< std::tuple<EncodingAlgorithmFlag, Cdr::Endianness>>
+class XCdrExternalTest : public ::testing::TestWithParam<std::tuple<EncodingAlgorithmFlag, Cdr::Endianness>>
 {
 };
 
@@ -1154,6 +1154,150 @@ TEST_P(XCdrExternalTest, null_optional)
                 });
         ASSERT_FALSE(dopt_value.has_value());
         //}
+    }
+
+}
+
+/*!
+ * @test Test encoding of an empty optional field of an external.
+ * @code{.idl}
+ * struct ExternalClass
+ * {
+ *     string var_str;
+ * };
+ *
+ * struct NullOptional
+ * {
+ *     @optional @external
+ *     ExternalClass var_ext;
+ * };
+ * @endcode
+ */
+TEST(XCdrExternalTest, null_optional_on_initiated_value)
+{
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        0x00, 0x01, 0x00, 0x00  // ShortMemberHeader
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        0x01, 0x00, 0x00, 0x00  // ShortMemberHeader
+    };
+    //}
+
+    optional<external<ExternalClass>> opt_value;
+
+    for (uint8_t tested_stream {0}; tested_stream < 2; ++tested_stream)
+    {
+
+        //{ Calculate encoded size.
+        CdrSizeCalculator calculator(get_version_from_algorithm(EncodingAlgorithmFlag::PLAIN_CDR));
+        size_t current_alignment {0};
+        size_t calculated_size {calculator.begin_calculate_type_serialized_size(EncodingAlgorithmFlag::PLAIN_CDR,
+                                        current_alignment)};
+        calculated_size += calculator.calculate_member_serialized_size(MemberId(1), opt_value, current_alignment);
+        calculated_size += calculator.end_calculate_type_serialized_size(EncodingAlgorithmFlag::PLAIN_CDR,
+                        current_alignment);
+        calculated_size += 4; // Encapsulation
+        //}
+
+
+        {
+
+            //{ Prepare buffer
+            auto buffer =
+                    std::unique_ptr<char, void (*)(
+                void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+            FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+            Cdr cdr(fast_buffer,
+                    0 == tested_stream ? Cdr::Endianness::BIG_ENDIANNESS : Cdr::Endianness::LITTLE_ENDIANNESS,
+                    get_version_from_algorithm(EncodingAlgorithmFlag::PLAIN_CDR));
+            //}
+
+            //{ Encode optional not present.
+            cdr.set_encoding_flag(EncodingAlgorithmFlag::PLAIN_CDR);
+            cdr.serialize_encapsulation();
+            Cdr::state enc_state(cdr);
+            cdr.begin_serialize_type(enc_state, EncodingAlgorithmFlag::PLAIN_CDR);
+            cdr.serialize_member(MemberId(1), opt_value);
+            cdr.end_serialize_type(enc_state);
+            cdr.set_dds_cdr_options({0, 0});
+            Cdr::state enc_state_end(cdr);
+            //}
+
+            //{ Test encoded content
+            ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
+            ASSERT_EQ(cdr.get_serialized_data_length(), calculated_size);
+            ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(),
+                    expected_streams[tested_stream].size()));
+            //}
+
+            //{ Decoding optional not present
+            optional<external<ExternalClass>> dopt_value {{new ExternalClass("CD")}};
+            cdr.reset();
+            cdr.read_encapsulation();
+            ASSERT_EQ(cdr.get_encoding_flag(), EncodingAlgorithmFlag::PLAIN_CDR);
+            ASSERT_EQ(cdr.endianness(),
+                    0 == tested_stream ? Cdr::Endianness::BIG_ENDIANNESS : Cdr::Endianness::LITTLE_ENDIANNESS);
+            cdr.deserialize_type(EncodingAlgorithmFlag::PLAIN_CDR, [&](Cdr& cdr_inner, const MemberId&)->bool
+                    {
+                        cdr_inner.deserialize_member(dopt_value);
+
+                        return false;
+                    });
+            ASSERT_FALSE(dopt_value.has_value());
+            //}
+        }
+
+        {
+            //{ Prepare buffer
+            auto buffer =
+                    std::unique_ptr<char, void (*)(
+                void*)>{reinterpret_cast<char*>(calloc(expected_streams[tested_stream].size(), sizeof(char))), free};
+            FastBuffer fast_buffer(buffer.get(), expected_streams[tested_stream].size());
+            Cdr cdr(fast_buffer,
+                    0 == tested_stream ? Cdr::Endianness::BIG_ENDIANNESS : Cdr::Endianness::LITTLE_ENDIANNESS,
+                    get_version_from_algorithm(EncodingAlgorithmFlag::PLAIN_CDR));
+            //}
+
+            //{ Encode optional not present.
+            cdr.set_encoding_flag(EncodingAlgorithmFlag::PLAIN_CDR);
+            cdr.serialize_encapsulation();
+            Cdr::state enc_state(cdr);
+            cdr.begin_serialize_type(enc_state, EncodingAlgorithmFlag::PLAIN_CDR);
+            cdr << MemberId(1) << opt_value;
+            cdr.end_serialize_type(enc_state);
+            cdr.set_dds_cdr_options({0, 0});
+            Cdr::state enc_state_end(cdr);
+            //}
+
+            //{ Test encoded content
+            ASSERT_EQ(cdr.get_serialized_data_length(), expected_streams[tested_stream].size());
+            ASSERT_EQ(cdr.get_serialized_data_length(), calculated_size);
+            ASSERT_EQ(0, memcmp(buffer.get(), expected_streams[tested_stream].data(),
+                    expected_streams[tested_stream].size()));
+            //}
+
+            //{ Decoding optional not present
+            optional<external<ExternalClass>> dopt_value{{ new ExternalClass("CD") }};
+            cdr.reset();
+            cdr.read_encapsulation();
+            ASSERT_EQ(cdr.get_encoding_flag(), EncodingAlgorithmFlag::PLAIN_CDR);
+            ASSERT_EQ(cdr.endianness(),
+                    0 == tested_stream ? Cdr::Endianness::BIG_ENDIANNESS : Cdr::Endianness::LITTLE_ENDIANNESS);
+            cdr.deserialize_type(EncodingAlgorithmFlag::PLAIN_CDR, [&](Cdr& cdr_inner, const MemberId&)->bool
+                    {
+                        cdr_inner >> dopt_value;
+
+                        return false;
+                    });
+            ASSERT_FALSE(dopt_value.has_value());
+            //}
+        }
     }
 
 }

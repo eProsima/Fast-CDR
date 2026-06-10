@@ -48,6 +48,17 @@ typedef enum : uint8_t
     PL_CDR2 = 0xa
 } EncodingAlgorithmFlag;
 
+//! @brief This enumeration represents Cdr's behavior when there is type inconsistency between the serialized data and the type used to deserialize the data.
+typedef enum
+{
+    //! @brief Cdr will fail deserialization if there is type inconsistency.
+    FAIL = 0,
+    //! @brief Cdr will use default values for the fields that are not compatible between the serialized data and the type used to deserialize the data.
+    DEFAULT_VALUE = 1,
+    //! @brief Cdr will trims the serialized data so it can be assigned to the type used for deserialization.
+    TRIM = 2
+} CdrTypeConsistencyFlag;
+
 } // namespace fastcdr
 } // namespace eprosima
 

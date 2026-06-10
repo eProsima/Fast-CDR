@@ -22,6 +22,7 @@ set(XCDR_TEST_SOURCE
     final.cpp
     mutable.cpp
     optional.cpp
+    type_consistency.cpp
     xcdrv1.cpp
     xcdrv2.cpp
     )

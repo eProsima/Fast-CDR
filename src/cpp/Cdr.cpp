@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <cstring>
+#include <cwchar>
 #include <limits>
 
 #include <fastcdr/Cdr.h>
@@ -263,7 +264,8 @@ Cdr& Cdr::read_encapsulation()
                 }
                 break;
             default:
-                throw BadParamException("Unexpected encoding algorithm received in Cdr::read_encapsulation for DDS CDR");
+                throw BadParamException(
+                          "Unexpected encoding algorithm received in Cdr::read_encapsulation for DDS CDR");
         }
         reset_callbacks();
 
@@ -1331,7 +1333,14 @@ Cdr& Cdr::deserialize(
         // Save last datasize.
         last_data_size_ = sizeof(char_t);
 
-        offset_++ >> char_t;
+        if (!fake_mode)
+        {
+            offset_++ >> char_t;
+        }
+        else
+        {
+            offset_++;
+        }
         return *this;
     }
 
@@ -1350,16 +1359,23 @@ Cdr& Cdr::deserialize(
         make_alignment(align);
         last_data_size_ = sizeof(short_t);
 
-        if (swap_bytes_)
+        if (!fake_mode)
         {
-            char* dst = reinterpret_cast<char*>(&short_t);
+            if (swap_bytes_)
+            {
+                char* dst = reinterpret_cast<char*>(&short_t);
 
-            offset_++ >> dst[1];
-            offset_++ >> dst[0];
+                offset_++ >> dst[1];
+                offset_++ >> dst[0];
+            }
+            else
+            {
+                offset_ >> short_t;
+                offset_ += sizeof(short_t);
+            }
         }
         else
         {
-            offset_ >> short_t;
             offset_ += sizeof(short_t);
         }
 
@@ -1381,18 +1397,25 @@ Cdr& Cdr::deserialize(
         make_alignment(align);
         last_data_size_ = sizeof(long_t);
 
-        if (swap_bytes_)
+        if (!fake_mode)
         {
-            char* dst = reinterpret_cast<char*>(&long_t);
+            if (swap_bytes_)
+            {
+                char* dst = reinterpret_cast<char*>(&long_t);
 
-            offset_++ >> dst[3];
-            offset_++ >> dst[2];
-            offset_++ >> dst[1];
-            offset_++ >> dst[0];
+                offset_++ >> dst[3];
+                offset_++ >> dst[2];
+                offset_++ >> dst[1];
+                offset_++ >> dst[0];
+            }
+            else
+            {
+                offset_ >> long_t;
+                offset_ += sizeof(long_t);
+            }
         }
         else
         {
-            offset_ >> long_t;
             offset_ += sizeof(long_t);
         }
 
@@ -1414,22 +1437,29 @@ Cdr& Cdr::deserialize(
         make_alignment(align);
         last_data_size_ = align64_;
 
-        if (swap_bytes_)
+        if (!fake_mode)
         {
-            char* dst = reinterpret_cast<char*>(&longlong_t);
+            if (swap_bytes_)
+            {
+                char* dst = reinterpret_cast<char*>(&longlong_t);
 
-            offset_++ >> dst[7];
-            offset_++ >> dst[6];
-            offset_++ >> dst[5];
-            offset_++ >> dst[4];
-            offset_++ >> dst[3];
-            offset_++ >> dst[2];
-            offset_++ >> dst[1];
-            offset_++ >> dst[0];
+                offset_++ >> dst[7];
+                offset_++ >> dst[6];
+                offset_++ >> dst[5];
+                offset_++ >> dst[4];
+                offset_++ >> dst[3];
+                offset_++ >> dst[2];
+                offset_++ >> dst[1];
+                offset_++ >> dst[0];
+            }
+            else
+            {
+                offset_ >> longlong_t;
+                offset_ += sizeof(longlong_t);
+            }
         }
         else
         {
-            offset_ >> longlong_t;
             offset_ += sizeof(longlong_t);
         }
 
@@ -1451,18 +1481,25 @@ Cdr& Cdr::deserialize(
         make_alignment(align);
         last_data_size_ = sizeof(float_t);
 
-        if (swap_bytes_)
+        if (!fake_mode)
         {
-            char* dst = reinterpret_cast<char*>(&float_t);
+            if (swap_bytes_)
+            {
+                char* dst = reinterpret_cast<char*>(&float_t);
 
-            offset_++ >> dst[3];
-            offset_++ >> dst[2];
-            offset_++ >> dst[1];
-            offset_++ >> dst[0];
+                offset_++ >> dst[3];
+                offset_++ >> dst[2];
+                offset_++ >> dst[1];
+                offset_++ >> dst[0];
+            }
+            else
+            {
+                offset_ >> float_t;
+                offset_ += sizeof(float_t);
+            }
         }
         else
         {
-            offset_ >> float_t;
             offset_ += sizeof(float_t);
         }
 
@@ -1484,22 +1521,30 @@ Cdr& Cdr::deserialize(
         make_alignment(align);
         last_data_size_ = align64_;
 
-        if (swap_bytes_)
+        if (!fake_mode)
         {
-            char* dst = reinterpret_cast<char*>(&double_t);
+            if (swap_bytes_)
+            {
+                char* dst = reinterpret_cast<char*>(&double_t);
 
-            offset_++ >> dst[7];
-            offset_++ >> dst[6];
-            offset_++ >> dst[5];
-            offset_++ >> dst[4];
-            offset_++ >> dst[3];
-            offset_++ >> dst[2];
-            offset_++ >> dst[1];
-            offset_++ >> dst[0];
+                offset_++ >> dst[7];
+                offset_++ >> dst[6];
+                offset_++ >> dst[5];
+                offset_++ >> dst[4];
+                offset_++ >> dst[3];
+                offset_++ >> dst[2];
+                offset_++ >> dst[1];
+                offset_++ >> dst[0];
+            }
+            else
+            {
+                offset_ >> double_t;
+                offset_ += sizeof(double_t);
+            }
         }
         else
         {
-            offset_ >> double_t;
+
             offset_ += sizeof(double_t);
         }
 
@@ -1521,63 +1566,79 @@ Cdr& Cdr::deserialize(
         make_alignment(align);
         last_data_size_ = align64_;
 
-        if (swap_bytes_)
+        if (!fake_mode)
         {
+            if (swap_bytes_)
+            {
 #if FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
-            __float128 tmp = ldouble_t;
-            char* dst = reinterpret_cast<char*>(&tmp);
+                __float128 tmp = ldouble_t;
+                char* dst = reinterpret_cast<char*>(&tmp);
 #else
-            char* dst = reinterpret_cast<char*>(&ldouble_t);
+                char* dst = reinterpret_cast<char*>(&ldouble_t);
 #endif // FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
 #if FASTCDR_HAVE_FLOAT128 || FASTCDR_SIZEOF_LONG_DOUBLE == 16
-            offset_++ >> dst[15];
-            offset_++ >> dst[14];
-            offset_++ >> dst[13];
-            offset_++ >> dst[12];
-            offset_++ >> dst[11];
-            offset_++ >> dst[10];
-            offset_++ >> dst[9];
-            offset_++ >> dst[8];
-            offset_++ >> dst[7];
-            offset_++ >> dst[6];
-            offset_++ >> dst[5];
-            offset_++ >> dst[4];
-            offset_++ >> dst[3];
-            offset_++ >> dst[2];
-            offset_++ >> dst[1];
-            offset_++ >> dst[0];
+                offset_++ >> dst[15];
+                offset_++ >> dst[14];
+                offset_++ >> dst[13];
+                offset_++ >> dst[12];
+                offset_++ >> dst[11];
+                offset_++ >> dst[10];
+                offset_++ >> dst[9];
+                offset_++ >> dst[8];
+                offset_++ >> dst[7];
+                offset_++ >> dst[6];
+                offset_++ >> dst[5];
+                offset_++ >> dst[4];
+                offset_++ >> dst[3];
+                offset_++ >> dst[2];
+                offset_++ >> dst[1];
+                offset_++ >> dst[0];
 #if FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
-            ldouble_t = static_cast<long double>(tmp);
+                ldouble_t = static_cast<long double>(tmp);
 #endif // FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
 #else
 #if FASTCDR_SIZEOF_LONG_DOUBLE == 8
-            offset_ += 8;
-            offset_++ >> dst[7];
-            offset_++ >> dst[6];
-            offset_++ >> dst[5];
-            offset_++ >> dst[4];
-            offset_++ >> dst[3];
-            offset_++ >> dst[2];
-            offset_++ >> dst[1];
-            offset_++ >> dst[0];
+                offset_ += 8;
+                offset_++ >> dst[7];
+                offset_++ >> dst[6];
+                offset_++ >> dst[5];
+                offset_++ >> dst[4];
+                offset_++ >> dst[3];
+                offset_++ >> dst[2];
+                offset_++ >> dst[1];
+                offset_++ >> dst[0];
 #else
 #error unsupported long double type and no __float128 available
 #endif // FASTCDR_SIZEOF_LONG_DOUBLE == 8
 #endif // FASTCDR_HAVE_FLOAT128 || FASTCDR_SIZEOF_LONG_DOUBLE == 16
+            }
+            else
+            {
+#if FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
+                __float128 tmp;
+                offset_ >> tmp;
+                offset_ += 16;
+                ldouble_t = static_cast<long double>(tmp);
+#else
+#if FASTCDR_SIZEOF_LONG_DOUBLE == 8 || FASTCDR_SIZEOF_LONG_DOUBLE == 16
+#if FASTCDR_SIZEOF_LONG_DOUBLE == 8
+                offset_ += 8;
+#endif // FASTCDR_SIZEOF_LONG_DOUBLE == 8
+                offset_ >> ldouble_t;
+                offset_ += sizeof(ldouble_t);
+#endif // FASTCDR_SIZEOF_LONG_DOUBLE == 8 || FASTCDR_SIZEOF_LONG_DOUBLE == 16
+#endif // FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
+            }
         }
         else
         {
 #if FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
-            __float128 tmp;
-            offset_ >> tmp;
             offset_ += 16;
-            ldouble_t = static_cast<long double>(tmp);
 #else
 #if FASTCDR_SIZEOF_LONG_DOUBLE == 8 || FASTCDR_SIZEOF_LONG_DOUBLE == 16
 #if FASTCDR_SIZEOF_LONG_DOUBLE == 8
             offset_ += 8;
 #endif // FASTCDR_SIZEOF_LONG_DOUBLE == 8
-            offset_ >> ldouble_t;
             offset_ += sizeof(ldouble_t);
 #endif // FASTCDR_SIZEOF_LONG_DOUBLE == 8 || FASTCDR_SIZEOF_LONG_DOUBLE == 16
 #endif // FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
@@ -1599,17 +1660,24 @@ Cdr& Cdr::deserialize(
         // Save last datasize.
         last_data_size_ = sizeof(uint8_t);
 
-        offset_++ >> value;
+        if (!fake_mode)
+        {
+            offset_++ >> value;
 
-        if (value == 1)
-        {
-            bool_t = true;
-            return *this;
+            if (value == 1)
+            {
+                bool_t = true;
+                return *this;
+            }
+            else if (value == 0)
+            {
+                bool_t = false;
+                return *this;
+            }
         }
-        else if (value == 0)
+        else
         {
-            bool_t = false;
-            return *this;
+            offset_++;
         }
 
         throw BadParamException("Unexpected byte value in Cdr::deserialize(bool), expected 0 or 1");
@@ -1637,10 +1705,13 @@ Cdr& Cdr::deserialize(
         last_data_size_ = sizeof(uint8_t);
 
         // Allocate memory.
-        string_t =
-                reinterpret_cast<char*>(calloc(length + ((&offset_)[length - 1] == '\0' ? 0 : 1),
-                sizeof(char)));
-        memcpy(string_t, &offset_, length);
+        if (!fake_mode)
+        {
+            string_t =
+                    reinterpret_cast<char*>(calloc(length + ((&offset_)[length - 1] == '\0' ? 0 : 1),
+                    sizeof(char)));
+            memcpy(string_t, &offset_, length);
+        }
         offset_ += length;
         return *this;
     }
@@ -1666,10 +1737,136 @@ Cdr& Cdr::deserialize(
     {
         // Save last datasize.
         last_data_size_ = sizeof(uint16_t);
-        // Allocate memory.
-        string_t = reinterpret_cast<wchar_t*>(calloc(length + 1, sizeof(wchar_t))); // WStrings never serialize terminating zero
 
-        deserialize_array(string_t, length);
+        if (!fake_mode)
+        {
+            // Allocate memory.
+            string_t = reinterpret_cast<wchar_t*>(calloc(length + 1, sizeof(wchar_t))); // WStrings never serialize terminating zero
+
+            deserialize_array(string_t, length);
+        }
+
+        return *this;
+    }
+
+    set_state(state_before_error);
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+}
+
+Cdr& Cdr::deserialize(
+        char*& string_t,
+        CdrTypeConsistencyFlag consistency_flag,
+        uint32_t max_length)
+{
+    uint32_t length {0};
+    Cdr::state state_before_error(*this);
+
+    deserialize(length);
+
+    if (length == 0)
+    {
+        string_t = nullptr;
+        return *this;
+    }
+    if ((end_ - offset_) >= length)
+    {
+        uint32_t length_to_read {length};
+
+        if (length > max_length)
+        {
+            switch (consistency_flag)
+            {
+                case CdrTypeConsistencyFlag::FAIL:
+                    string_t = nullptr;
+                    throw BadParamException(
+                              "Deserialized string length exceeds the maximum length allowed by the destination type");
+                case CdrTypeConsistencyFlag::DEFAULT_VALUE:
+                    string_t = nullptr;
+                    length_to_read = 0;
+                    break;
+                case CdrTypeConsistencyFlag::TRIM:
+                    length_to_read = max_length;
+                    break;
+            }
+        }
+
+        // Save last datasize.
+        last_data_size_ = sizeof(uint8_t);
+
+        if (0 < length_to_read && !fake_mode)
+        {
+            // Allocate memory.
+            string_t =
+                    reinterpret_cast<char*>(calloc(length_to_read + ((&offset_)[length_to_read - 1] == '\0' ? 0 : 1),
+                    sizeof(char)));
+            memcpy(string_t, &offset_, max_length);
+        }
+        offset_ += length;
+        return *this;
+
+    }
+
+    set_state(state_before_error);
+    throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+}
+
+Cdr& Cdr::deserialize(
+        wchar_t*& string_t,
+        CdrTypeConsistencyFlag consistency_flag,
+        uint32_t max_length)
+{
+
+    uint32_t length = 0;
+    Cdr::state state_before_error(*this);
+
+    deserialize(length);
+
+    if (length == 0)
+    {
+        string_t = nullptr;
+        return *this;
+    }
+    else if ((end_ - offset_) >= (length * 2))
+    {
+        uint32_t length_to_read {length};
+
+        if (length > max_length)
+        {
+            switch (consistency_flag)
+            {
+                case CdrTypeConsistencyFlag::FAIL:
+                    string_t = nullptr;
+                    throw BadParamException(
+                              "Deserialized wide string length exceeds the maximum length allowed by the destination type");
+                case CdrTypeConsistencyFlag::DEFAULT_VALUE:
+                    string_t = nullptr;
+                    length_to_read = 0;
+                    break;
+                case CdrTypeConsistencyFlag::TRIM:
+                    length_to_read = max_length;
+                    break;
+            }
+        }
+
+        // Save last datasize.
+        last_data_size_ = sizeof(uint16_t);
+
+        if (!fake_mode)
+        {
+            if (0 < length_to_read)
+            {
+                // Allocate memory.
+                string_t = reinterpret_cast<wchar_t*>(calloc(length_to_read + 1, sizeof(wchar_t))); // WStrings never serialize terminating zero
+
+                deserialize_array(string_t, length_to_read);
+            }
+
+            offset_ += (length - length_to_read) * 2;
+        }
+        else
+        {
+            offset_ += length * 2;
+        }
 
         return *this;
     }
@@ -1679,28 +1876,54 @@ Cdr& Cdr::deserialize(
 }
 
 const char* Cdr::read_string(
-        uint32_t& length)
+        uint32_t& length,
+        CdrTypeConsistencyFlag consistency_flag)
 {
     const char* ret_value = "";
+    uint32_t read_length {0};
     state state_before_error(*this);
 
-    *this >> length;
+    *this >> read_length;
 
-    if (length == 0)
+    if (read_length == 0)
     {
         return ret_value;
     }
-    else if ((end_ - offset_) >= length)
+    else if ((end_ - offset_) >= read_length)
     {
+        uint32_t length_to_read {read_length};
+
+        if (read_length > length)
+        {
+            switch (consistency_flag)
+            {
+                case CdrTypeConsistencyFlag::FAIL:
+                    throw BadParamException(
+                              "Deserialized string length exceeds the maximum length allowed by the destination type");
+                case CdrTypeConsistencyFlag::DEFAULT_VALUE:
+                    length_to_read = 0;
+                    break;
+                case CdrTypeConsistencyFlag::TRIM:
+                    length_to_read = length;
+                    break;
+            }
+        }
+
         // Save last datasize.
         last_data_size_ = sizeof(uint8_t);
 
-        ret_value = &offset_;
-        offset_ += length;
-        if (ret_value[length - 1] == '\0')
+        length = length_to_read;
+
+        if (length_to_read > 0 && !fake_mode)
         {
-            --length;
+            ret_value = &offset_;
+            if (ret_value[length - 1] == '\0')
+            {
+                --length;
+            }
         }
+
+        offset_ += read_length;
         return ret_value;
     }
 
@@ -1710,13 +1933,15 @@ const char* Cdr::read_string(
 }
 
 const std::wstring Cdr::read_wstring(
-        uint32_t& length)
+        uint32_t& length,
+        CdrTypeConsistencyFlag consistency_flag)
 {
     std::wstring ret_value = L"";
+    uint32_t read_length {0};
     state state_(*this);
 
-    *this >> length;
-    uint32_t bytes_length = length * 2;
+    *this >> read_length;
+    uint32_t bytes_length = read_length * 2;
 
     if (bytes_length == 0)
     {
@@ -1724,15 +1949,46 @@ const std::wstring Cdr::read_wstring(
     }
     else if ((end_ - offset_) >= bytes_length)
     {
+        uint32_t length_to_read {read_length};
+
+        if (read_length > length)
+        {
+            switch (consistency_flag)
+            {
+                case CdrTypeConsistencyFlag::FAIL:
+                    throw BadParamException(
+                              "Deserialized wstring length exceeds the maximum length allowed by the destination type");
+                case CdrTypeConsistencyFlag::DEFAULT_VALUE:
+                    length_to_read = 0;
+                    break;
+                case CdrTypeConsistencyFlag::TRIM:
+                    length_to_read = length;
+                    break;
+            }
+        }
+
         // Save last datasize.
         last_data_size_ = sizeof(uint16_t);
 
-        ret_value.resize(length);
-        deserialize_array(const_cast<wchar_t*>(ret_value.c_str()), length);
-        if (ret_value[length - 1] == L'\0')
+        length = length_to_read;
+
+        if (!fake_mode)
         {
-            --length;
-            ret_value.erase(length);
+            if (length_to_read > 0)
+            {
+                ret_value.resize(length);
+                deserialize_array(const_cast<wchar_t*>(ret_value.c_str()), length);
+                if (ret_value[length - 1] == L'\0')
+                {
+                    --length;
+                    ret_value.erase(length);
+                }
+            }
+            offset_ += (read_length - length_to_read) * 2;
+        }
+        else
+        {
+            offset_ += bytes_length;
         }
         return ret_value;
     }
@@ -1753,19 +2009,26 @@ Cdr& Cdr::deserialize_array(
         // Save last datasize.
         last_data_size_ = sizeof(*bool_t);
 
-        for (size_t count = 0; count < num_elements; ++count)
+        if (!fake_mode)
         {
-            uint8_t value = 0;
-            offset_++ >> value;
+            for (size_t count = 0; count < num_elements; ++count)
+            {
+                uint8_t value = 0;
+                offset_++ >> value;
 
-            if (value == 1)
-            {
-                bool_t[count] = true;
+                if (value == 1)
+                {
+                    bool_t[count] = true;
+                }
+                else if (value == 0)
+                {
+                    bool_t[count] = false;
+                }
             }
-            else if (value == 0)
-            {
-                bool_t[count] = false;
-            }
+        }
+        else
+        {
+            offset_ += num_elements;
         }
 
         return *this;
@@ -1785,7 +2048,10 @@ Cdr& Cdr::deserialize_array(
         // Save last datasize.
         last_data_size_ = sizeof(*char_t);
 
-        offset_.rmemcopy(char_t, total_size);
+        if (!fake_mode)
+        {
+            offset_.rmemcopy(char_t, total_size);
+        }
         offset_ += total_size;
         return *this;
     }
@@ -1812,20 +2078,27 @@ Cdr& Cdr::deserialize_array(
         make_alignment(align);
         last_data_size_ = sizeof(*short_t);
 
-        if (swap_bytes_)
+        if (!fake_mode)
         {
-            char* dst = reinterpret_cast<char*>(short_t);
-            char* end = dst + total_size;
-
-            for (; dst < end; dst += sizeof(*short_t))
+            if (swap_bytes_)
             {
-                offset_++ >> dst[1];
-                offset_++ >> dst[0];
+                char* dst = reinterpret_cast<char*>(short_t);
+                char* end = dst + total_size;
+
+                for (; dst < end; dst += sizeof(*short_t))
+                {
+                    offset_++ >> dst[1];
+                    offset_++ >> dst[0];
+                }
+            }
+            else
+            {
+                offset_.rmemcopy(short_t, total_size);
+                offset_ += total_size;
             }
         }
         else
         {
-            offset_.rmemcopy(short_t, total_size);
             offset_ += total_size;
         }
 
@@ -1854,22 +2127,29 @@ Cdr& Cdr::deserialize_array(
         make_alignment(align);
         last_data_size_ = sizeof(*long_t);
 
-        if (swap_bytes_)
+        if (!fake_mode)
         {
-            char* dst = reinterpret_cast<char*>(long_t);
-            char* end = dst + total_size;
-
-            for (; dst < end; dst += sizeof(*long_t))
+            if (swap_bytes_)
             {
-                offset_++ >> dst[3];
-                offset_++ >> dst[2];
-                offset_++ >> dst[1];
-                offset_++ >> dst[0];
+                char* dst = reinterpret_cast<char*>(long_t);
+                char* end = dst + total_size;
+
+                for (; dst < end; dst += sizeof(*long_t))
+                {
+                    offset_++ >> dst[3];
+                    offset_++ >> dst[2];
+                    offset_++ >> dst[1];
+                    offset_++ >> dst[0];
+                }
+            }
+            else
+            {
+                offset_.rmemcopy(long_t, total_size);
+                offset_ += total_size;
             }
         }
         else
         {
-            offset_.rmemcopy(long_t, total_size);
             offset_ += total_size;
         }
 
@@ -1916,26 +2196,33 @@ Cdr& Cdr::deserialize_array(
         make_alignment(align);
         last_data_size_ = align64_;
 
-        if (swap_bytes_)
+        if (!fake_mode)
         {
-            char* dst = reinterpret_cast<char*>(longlong_t);
-            char* end = dst + total_size;
-
-            for (; dst < end; dst += sizeof(*longlong_t))
+            if (swap_bytes_)
             {
-                offset_++ >> dst[7];
-                offset_++ >> dst[6];
-                offset_++ >> dst[5];
-                offset_++ >> dst[4];
-                offset_++ >> dst[3];
-                offset_++ >> dst[2];
-                offset_++ >> dst[1];
-                offset_++ >> dst[0];
+                char* dst = reinterpret_cast<char*>(longlong_t);
+                char* end = dst + total_size;
+
+                for (; dst < end; dst += sizeof(*longlong_t))
+                {
+                    offset_++ >> dst[7];
+                    offset_++ >> dst[6];
+                    offset_++ >> dst[5];
+                    offset_++ >> dst[4];
+                    offset_++ >> dst[3];
+                    offset_++ >> dst[2];
+                    offset_++ >> dst[1];
+                    offset_++ >> dst[0];
+                }
+            }
+            else
+            {
+                offset_.rmemcopy(longlong_t, total_size);
+                offset_ += total_size;
             }
         }
         else
         {
-            offset_.rmemcopy(longlong_t, total_size);
             offset_ += total_size;
         }
 
@@ -1964,22 +2251,29 @@ Cdr& Cdr::deserialize_array(
         make_alignment(align);
         last_data_size_ = sizeof(*float_t);
 
-        if (swap_bytes_)
+        if (!fake_mode)
         {
-            char* dst = reinterpret_cast<char*>(float_t);
-            char* end = dst + total_size;
-
-            for (; dst < end; dst += sizeof(*float_t))
+            if (swap_bytes_)
             {
-                offset_++ >> dst[3];
-                offset_++ >> dst[2];
-                offset_++ >> dst[1];
-                offset_++ >> dst[0];
+                char* dst = reinterpret_cast<char*>(float_t);
+                char* end = dst + total_size;
+
+                for (; dst < end; dst += sizeof(*float_t))
+                {
+                    offset_++ >> dst[3];
+                    offset_++ >> dst[2];
+                    offset_++ >> dst[1];
+                    offset_++ >> dst[0];
+                }
+            }
+            else
+            {
+                offset_.rmemcopy(float_t, total_size);
+                offset_ += total_size;
             }
         }
         else
         {
-            offset_.rmemcopy(float_t, total_size);
             offset_ += total_size;
         }
 
@@ -2008,26 +2302,33 @@ Cdr& Cdr::deserialize_array(
         make_alignment(align);
         last_data_size_ = align64_;
 
-        if (swap_bytes_)
+        if (!fake_mode)
         {
-            char* dst = reinterpret_cast<char*>(double_t);
-            char* end = dst + total_size;
-
-            for (; dst < end; dst += sizeof(*double_t))
+            if (swap_bytes_)
             {
-                offset_++ >> dst[7];
-                offset_++ >> dst[6];
-                offset_++ >> dst[5];
-                offset_++ >> dst[4];
-                offset_++ >> dst[3];
-                offset_++ >> dst[2];
-                offset_++ >> dst[1];
-                offset_++ >> dst[0];
+                char* dst = reinterpret_cast<char*>(double_t);
+                char* end = dst + total_size;
+
+                for (; dst < end; dst += sizeof(*double_t))
+                {
+                    offset_++ >> dst[7];
+                    offset_++ >> dst[6];
+                    offset_++ >> dst[5];
+                    offset_++ >> dst[4];
+                    offset_++ >> dst[3];
+                    offset_++ >> dst[2];
+                    offset_++ >> dst[1];
+                    offset_++ >> dst[0];
+                }
+            }
+            else
+            {
+                offset_.rmemcopy(double_t, total_size);
+                offset_ += total_size;
             }
         }
         else
         {
-            offset_.rmemcopy(double_t, total_size);
             offset_ += total_size;
         }
 
@@ -2057,89 +2358,101 @@ Cdr& Cdr::deserialize_array(
         make_alignment(align);
         last_data_size_ = align64_;
 
+        if (!fake_mode)
+        {
 #if FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
-        if (swap_bytes_)
-        {
-            for (size_t i = 0; i < num_elements; ++i)
+            if (swap_bytes_)
             {
-                __float128 tmp;
-                char* dst = reinterpret_cast<char*>(&tmp);
-                offset_++ >> dst[15];
-                offset_++ >> dst[14];
-                offset_++ >> dst[13];
-                offset_++ >> dst[12];
-                offset_++ >> dst[11];
-                offset_++ >> dst[10];
-                offset_++ >> dst[9];
-                offset_++ >> dst[8];
-                offset_++ >> dst[7];
-                offset_++ >> dst[6];
-                offset_++ >> dst[5];
-                offset_++ >> dst[4];
-                offset_++ >> dst[3];
-                offset_++ >> dst[2];
-                offset_++ >> dst[1];
-                offset_++ >> dst[0];
-                ldouble_t[i] = static_cast<long double>(tmp);
+                for (size_t i = 0; i < num_elements; ++i)
+                {
+                    __float128 tmp;
+                    char* dst = reinterpret_cast<char*>(&tmp);
+                    offset_++ >> dst[15];
+                    offset_++ >> dst[14];
+                    offset_++ >> dst[13];
+                    offset_++ >> dst[12];
+                    offset_++ >> dst[11];
+                    offset_++ >> dst[10];
+                    offset_++ >> dst[9];
+                    offset_++ >> dst[8];
+                    offset_++ >> dst[7];
+                    offset_++ >> dst[6];
+                    offset_++ >> dst[5];
+                    offset_++ >> dst[4];
+                    offset_++ >> dst[3];
+                    offset_++ >> dst[2];
+                    offset_++ >> dst[1];
+                    offset_++ >> dst[0];
+                    ldouble_t[i] = static_cast<long double>(tmp);
+                }
             }
-        }
-        else
-        {
-            for (size_t i = 0; i < num_elements; ++i)
+            else
             {
-                __float128 tmp;
-                offset_ >> tmp;
-                offset_ += 16;
-                ldouble_t[i] = static_cast<long double>(tmp);
+                for (size_t i = 0; i < num_elements; ++i)
+                {
+                    __float128 tmp;
+                    offset_ >> tmp;
+                    offset_ += 16;
+                    ldouble_t[i] = static_cast<long double>(tmp);
+                }
             }
-        }
 #else
 #if FASTCDR_SIZEOF_LONG_DOUBLE == 8 || FASTCDR_SIZEOF_LONG_DOUBLE == 16
-        if (swap_bytes_)
-        {
-            char* dst = reinterpret_cast<char*>(ldouble_t);
-            char* end = dst + num_elements * sizeof(*ldouble_t);
+            if (swap_bytes_)
+            {
+                char* dst = reinterpret_cast<char*>(ldouble_t);
+                char* end = dst + num_elements * sizeof(*ldouble_t);
 
-            for (; dst < end; dst += sizeof(*ldouble_t))
+                for (; dst < end; dst += sizeof(*ldouble_t))
+                {
+#if FASTCDR_SIZEOF_LONG_DOUBLE == 16
+                    offset_++ >> dst[15];
+                    offset_++ >> dst[14];
+                    offset_++ >> dst[13];
+                    offset_++ >> dst[12];
+                    offset_++ >> dst[11];
+                    offset_++ >> dst[10];
+                    offset_++ >> dst[9];
+                    offset_++ >> dst[8];
+#else
+                    offset_ += 8;
+#endif // FASTCDR_SIZEOF_LONG_DOUBLE == 16
+                    offset_++ >> dst[7];
+                    offset_++ >> dst[6];
+                    offset_++ >> dst[5];
+                    offset_++ >> dst[4];
+                    offset_++ >> dst[3];
+                    offset_++ >> dst[2];
+                    offset_++ >> dst[1];
+                    offset_++ >> dst[0];
+                }
+            }
+            else
             {
 #if FASTCDR_SIZEOF_LONG_DOUBLE == 16
-                offset_++ >> dst[15];
-                offset_++ >> dst[14];
-                offset_++ >> dst[13];
-                offset_++ >> dst[12];
-                offset_++ >> dst[11];
-                offset_++ >> dst[10];
-                offset_++ >> dst[9];
-                offset_++ >> dst[8];
+                offset_.rmemcopy(ldouble_t, total_size);
+                offset_ += total_size;
 #else
-                offset_ += 8;
+                for (size_t i = 0; i < num_elements; ++i)
+                {
+                    offset_ += 8; // ignore first 8 bytes
+                    offset_ >> ldouble_t[i];
+                    offset_ += 8;
+                }
 #endif // FASTCDR_SIZEOF_LONG_DOUBLE == 16
-                offset_++ >> dst[7];
-                offset_++ >> dst[6];
-                offset_++ >> dst[5];
-                offset_++ >> dst[4];
-                offset_++ >> dst[3];
-                offset_++ >> dst[2];
-                offset_++ >> dst[1];
-                offset_++ >> dst[0];
             }
+#endif // FASTCDR_SIZEOF_LONG_DOUBLE == 8 || FASTCDR_SIZEOF_LONG_DOUBLE == 16
+#endif // FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
         }
         else
         {
 #if FASTCDR_SIZEOF_LONG_DOUBLE == 16
-            offset_.rmemcopy(ldouble_t, total_size);
             offset_ += total_size;
 #else
-            for (size_t i = 0; i < num_elements; ++i)
-            {
-                offset_ += 8; // ignore first 8 bytes
-                offset_ >> ldouble_t[i];
-                offset_ += 8;
-            }
+            offset_ += 8 * num_elements;
+        }
 #endif // FASTCDR_SIZEOF_LONG_DOUBLE == 16
         }
-#endif // FASTCDR_SIZEOF_LONG_DOUBLE == 8 || FASTCDR_SIZEOF_LONG_DOUBLE == 16
-#endif // FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
 
         return *this;
     }
@@ -2298,22 +2611,48 @@ Cdr& Cdr::deserialize_bool_array(
 }
 
 Cdr& Cdr::deserialize_bool_sequence(
-        std::vector<bool>& vector_t)
+        std::vector<bool>& vector_t,
+        CdrTypeConsistencyFlag consistency_flag,
+        uint32_t max_length)
 {
     uint32_t sequence_length {0};
     state state_before_error(*this);
 
     *this >> sequence_length;
 
+    vector_t.clear();
+
     size_t total_size = sequence_length * sizeof(bool);
 
     if ((end_ - offset_) >= total_size)
     {
-        vector_t.resize(sequence_length);
+        uint32_t length_to_read {sequence_length};
+
+        if (sequence_length > max_length)
+        {
+            switch (consistency_flag)
+            {
+                case CdrTypeConsistencyFlag::FAIL:
+                    throw exception::BadParamException(
+                              "Serialized vector contains more elements than the destination array can hold");
+                case CdrTypeConsistencyFlag::DEFAULT_VALUE:
+                    length_to_read = 0;
+                    break;
+                case CdrTypeConsistencyFlag::TRIM:
+                    length_to_read = max_length;
+                    vector_t.resize(length_to_read);
+                    break;
+            }
+        }
+        else
+        {
+            vector_t.resize(sequence_length);
+        }
+
         // Save last datasize.
         last_data_size_ = sizeof(bool);
 
-        for (uint32_t count = 0; count < sequence_length; ++count)
+        for (uint32_t count = 0; count < length_to_read; ++count)
         {
             uint8_t value = 0;
             offset_++ >> value;
@@ -2331,6 +2670,8 @@ Cdr& Cdr::deserialize_bool_sequence(
                 throw BadParamException("Unexpected byte value in Cdr::deserialize_bool_sequence, expected 0 or 1");
             }
         }
+
+        offset_ += sequence_length - length_to_read;
     }
     else
     {

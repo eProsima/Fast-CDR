@@ -1,7 +1,10 @@
 # v2.4.0
 * Add STRICT_BOOL CMake option to enforce canonical bool serialization
 
+* Add context to `Cdr` class to allow for customization of external (de)serialization methods.
+
 # v2.3.0
+
 * Fix symbol visibility for exception classes
 
     `Exception` changed to be a base class without inheriting from `std::exception`.

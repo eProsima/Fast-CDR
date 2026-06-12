@@ -1,3 +1,5 @@
+# v2.4.0
+
 # v2.3.0
 * Fix symbol visibility for exception classes
 

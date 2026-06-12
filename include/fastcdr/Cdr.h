@@ -69,6 +69,20 @@ class Cdr
 {
 public:
 
+    /**
+     * @brief This structure represents the context of a CDR serialization.
+     *
+     * Can be used by external (de)serialization functions to customize the serialization of a type.
+     * The Cdr object can be instantiated with a shared pointer to a Context object, and a getter for the context is
+     * provided in the Cdr class so it can be accessed from the external (de)serialization functions.
+     */
+    struct Cdr_DllAPI Context
+    {
+        // Default virtual destructor to allow proper cleanup of derived classes, and to make sure the class
+        // is polymorphic so it can be used with dynamic_pointer_cast.
+        virtual ~Context() = default;
+    };
+
     /*!
      * @brief This enumeration represents endianness types.
      */

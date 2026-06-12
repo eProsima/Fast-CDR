@@ -22,6 +22,7 @@
 #include <cstring>
 #include <functional>
 #include <map>
+#include <memory>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -182,6 +183,21 @@ public:
             const CdrVersion cdr_version = XCDRv2);
 
     /*!
+     * @brief This constructor creates an eprosima::fastcdr::Cdr object that can serialize/deserialize
+     * the assigned buffer with a specific context.
+     * @param cdr_buffer A reference to the buffer that contains (or will contain) the CDR representation.
+     * @param context A shared pointer to the context that will be used for serialization/deserialization.
+     * @param endianness The initial endianness that will be used. The default value is the endianness of the system.
+     * @param cdr_version Represents the type of encoding algorithm that will be used for the encoding.
+     * The default value is CdrVersion::XCDRv2.
+     */
+    Cdr_DllAPI Cdr(
+            FastBuffer& cdr_buffer,
+            const std::shared_ptr<Context>& context,
+            const Endianness endianness = DEFAULT_ENDIAN,
+            const CdrVersion cdr_version = XCDRv2);
+
+    /*!
      * @brief This function reads the encapsulation of the CDR stream.
      *        If the CDR stream contains an encapsulation, then this function should be called before starting to deserialize.
      *        CdrVersion and EncodingAlgorithmFlag internal values will be changed to the ones specified by the
@@ -248,6 +264,12 @@ public:
      * @return The endianness.
      */
     Cdr_DllAPI Endianness endianness() const;
+
+    /*!
+     * @brief This function returns the context used by the CDR type.
+     * @return The context.
+     */
+    Cdr_DllAPI std::shared_ptr<Context> get_context() const;
 
     /*!
      * @brief This function skips a number of bytes in the CDR stream buffer.
@@ -3611,6 +3633,9 @@ private:
 
     //! Whether the encapsulation was serialized.
     bool encapsulation_serialized_ {false};
+
+    //! Custom serialization context.
+    std::shared_ptr<Context> context_;
 
 
     uint32_t get_long_lc(

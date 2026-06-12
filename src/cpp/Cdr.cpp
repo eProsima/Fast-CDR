@@ -275,7 +275,8 @@ Cdr& Cdr::read_encapsulation()
                 }
                 break;
             default:
-                throw BadParamException("Unexpected encoding algorithm received in Cdr::read_encapsulation for DDS CDR");
+                throw BadParamException(
+                          "Unexpected encoding algorithm received in Cdr::read_encapsulation for DDS CDR");
         }
         reset_callbacks();
 

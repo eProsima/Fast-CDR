@@ -3008,6 +3008,16 @@ private:
             size_t& num_elements);
 
     /*!
+     * @brief Serializes the canonical @c uint8_t representation of @p bool_t.
+     *
+     * When @c FASTCDR_STRICT_BOOL is defined the serialized value is guaranteed to be exactly @c 0 or @c 1.
+     *
+     * @param[in] bool_t The boolean value to serialize.
+     */
+    Cdr_DllAPI void serialize_bool(
+            bool bool_t);
+
+    /*!
      * @brief This function template detects the content type of the STD container array and serializes the array.
      * @param array_t The array that will be serialized in the buffer.
      * @param num_elements Number of the elements in the array.

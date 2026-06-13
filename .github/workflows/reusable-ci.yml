@@ -68,10 +68,13 @@ jobs:
       matrix:
         cmake-build-type:
           - 'RelWithDebInfo'
+        strict-bool:
+          - false
+          - true
 
     steps:
     - name: Add ci-pending label if PR
-      if: ${{ github.event_name == 'pull_request' && inputs.add-label == true}}
+      if: ${{ github.event_name == 'pull_request' && inputs.add-label == true && matrix.strict-bool == false }}
       uses: eProsima/eProsima-CI/external/add_labels@v0
       with:
         labels: ci-pending
@@ -122,7 +125,7 @@ jobs:
         colcon_meta_file: ${{ github.workspace }}/src/fastcdr/.github/workflows/config/build.meta
         colcon_build_args: ${{ inputs.colcon-args }}
         colcon_build_args_default: --event-handlers=console_direct+
-        cmake_args: ${{ inputs.cmake-args }}
+        cmake_args: ${{ inputs.cmake-args }} ${{ matrix.strict-bool == true && '-DSTRICT_BOOL=ON' || '' }}
         cmake_args_default: ${{ env.colcon-build-default-cmake-args }} ${{ env.toolset }}
         cmake_build_type: ${{ matrix.cmake-build-type }}
         workspace: ${{ github.workspace }}
@@ -137,7 +140,7 @@ jobs:
         ctest_args: ${{ inputs.ctest-args }}
         packages_names: fastcdr
         workspace: ${{ github.workspace }}
-        test_report_artifact: ${{ inputs.label }}
+        test_report_artifact: ${{ inputs.label }}${{ matrix.strict-bool == true && '-strict-bool' || '' }}
 
     - name: Fast CDR Test summary
       uses: eProsima/eProsima-CI/multiplatform/junit_summary@v0
@@ -153,5 +156,5 @@ jobs:
       if: always()
       uses: eProsima/eProsima-CI/external/upload-artifact@v0
       with:
-        name: test-results-${{ inputs.label }}
+        name: test-results-${{ inputs.label }}${{ matrix.strict-bool == true && '-strict-bool' || '' }}
         path: log/latest_test/fastcdr

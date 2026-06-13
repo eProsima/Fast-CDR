@@ -1,4 +1,5 @@
 # v2.4.0
+* Add STRICT_BOOL CMake option to enforce canonical bool serialization
 
 # v2.3.0
 * Fix symbol visibility for exception classes

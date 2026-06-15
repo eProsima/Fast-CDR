@@ -16,6 +16,7 @@
 #include <limits>
 
 #include <fastcdr/Cdr.h>
+#include "helpers/memory_helpers.hpp"
 
 namespace eprosima {
 namespace fastcdr {
@@ -821,14 +822,7 @@ Cdr& Cdr::serialize(
         // Save last datasize.
         last_data_size_ = sizeof(uint8_t);
 
-        if (bool_t)
-        {
-            offset_++ << static_cast<uint8_t>(1);
-        }
-        else
-        {
-            offset_++ << static_cast<uint8_t>(0);
-        }
+        serialize_bool(bool_t);
 
         return *this;
     }
@@ -929,13 +923,7 @@ Cdr& Cdr::serialize_array(
 
         for (size_t count = 0; count < num_elements; ++count)
         {
-            uint8_t value = 0;
-
-            if (bool_t[count])
-            {
-                value = 1;
-            }
-            offset_++ << value;
+            serialize_bool(bool_t[count]);
         }
 
         return *this;
@@ -2179,6 +2167,16 @@ Cdr& Cdr::operator <<(
     return *this;
 }
 
+inline void Cdr::serialize_bool(
+        bool bool_t)
+{
+#if FASTCDR_STRICT_BOOL
+    offset_++ <<  static_cast<uint8_t>(normalize_bool(bool_t));
+#else
+    offset_++ << (bool_t ? static_cast<uint8_t>(1) : static_cast<uint8_t>(0));
+#endif // if FASTCDR_STRICT_BOOL
+}
+
 Cdr& Cdr::serialize_bool_array(
         const std::vector<bool>& vector_t)
 {
@@ -2193,14 +2191,7 @@ Cdr& Cdr::serialize_bool_array(
 
         for (size_t count = 0; count < vector_t.size(); ++count)
         {
-            uint8_t value = 0;
-            std::vector<bool>::const_reference ref = vector_t[count];
-
-            if (ref)
-            {
-                value = 1;
-            }
-            offset_++ << value;
+            serialize_bool(vector_t[count]);
         }
     }
     else
@@ -2233,14 +2224,7 @@ Cdr& Cdr::serialize_bool_sequence(
 
         for (size_t count = 0; count < vector_t.size(); ++count)
         {
-            uint8_t value = 0;
-            std::vector<bool>::const_reference ref = vector_t[count];
-
-            if (ref)
-            {
-                value = 1;
-            }
-            offset_++ << value;
+            serialize_bool(vector_t[count]);
         }
     }
     else

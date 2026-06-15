@@ -64,6 +64,11 @@ endif()
 option(BUILD_SHARED_LIBS "Create shared libraries by default" ON)
 
 ###############################################################################
+# Strict bool
+###############################################################################
+option(STRICT_BOOL "Enforce bool values to 0/1 during serialization" OFF)
+
+###############################################################################
 # Test system configuration
 ###############################################################################
 include(${PROJECT_SOURCE_DIR}/cmake/common/check_configuration.cmake)

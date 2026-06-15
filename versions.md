@@ -1,4 +1,9 @@
+# Forthcoming
+
+* Add STRICT_BOOL CMake option to enforce canonical bool serialization
+
 # v2.3.0
+
 * Fix symbol visibility for exception classes
 
     `Exception` changed to be a base class without inheriting from `std::exception`.

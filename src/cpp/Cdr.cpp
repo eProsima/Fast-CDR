@@ -17,6 +17,7 @@
 #include <memory>
 
 #include <fastcdr/Cdr.h>
+#include <fastcdr/CdrContext.hpp>
 #include "helpers/memory_helpers.hpp"
 
 namespace eprosima {
@@ -142,7 +143,7 @@ Cdr::Cdr(
 
 Cdr::Cdr(
         FastBuffer& cdr_buffer,
-        const std::shared_ptr<Context>& context,
+        const std::shared_ptr<CdrContext>& context,
         const Endianness endianness,
         const CdrVersion cdr_version)
     : cdr_buffer_(cdr_buffer)
@@ -430,7 +431,7 @@ Cdr::Endianness Cdr::endianness() const
     return static_cast<Endianness>(endianness_);
 }
 
-std::shared_ptr<Cdr::Context> Cdr::get_context() const
+std::shared_ptr<CdrContext> Cdr::get_context() const
 {
     return context_;
 }

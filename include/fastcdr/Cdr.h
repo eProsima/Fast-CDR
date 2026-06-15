@@ -30,6 +30,7 @@
 
 #include "fastcdr_dll.h"
 
+#include "CdrContext.hpp"
 #include "CdrEncoding.hpp"
 #include "cdr/fixed_size_string.hpp"
 #include "detail/container_recursive_inspector.hpp"
@@ -69,20 +70,6 @@ extern void deserialize(
 class Cdr
 {
 public:
-
-    /**
-     * @brief This structure represents the context of a CDR serialization.
-     *
-     * Can be used by external (de)serialization functions to customize the serialization of a type.
-     * The Cdr object can be instantiated with a shared pointer to a Context object, and a getter for the context is
-     * provided in the Cdr class so it can be accessed from the external (de)serialization functions.
-     */
-    struct Cdr_DllAPI Context
-    {
-        // Default virtual destructor to allow proper cleanup of derived classes, and to make sure the class
-        // is polymorphic so it can be used with dynamic_pointer_cast.
-        virtual ~Context() = default;
-    };
 
     /*!
      * @brief This enumeration represents endianness types.
@@ -193,7 +180,7 @@ public:
      */
     Cdr_DllAPI Cdr(
             FastBuffer& cdr_buffer,
-            const std::shared_ptr<Context>& context,
+            const std::shared_ptr<CdrContext>& context,
             const Endianness endianness = DEFAULT_ENDIAN,
             const CdrVersion cdr_version = XCDRv2);
 
@@ -269,7 +256,7 @@ public:
      * @brief This function returns the context used by the CDR type.
      * @return The context.
      */
-    Cdr_DllAPI std::shared_ptr<Context> get_context() const;
+    Cdr_DllAPI std::shared_ptr<CdrContext> get_context() const;
 
     /*!
      * @brief This function skips a number of bytes in the CDR stream buffer.
@@ -3635,7 +3622,7 @@ private:
     bool encapsulation_serialized_ {false};
 
     //! Custom serialization context.
-    std::shared_ptr<Context> context_;
+    std::shared_ptr<CdrContext> context_;
 
 
     uint32_t get_long_lc(

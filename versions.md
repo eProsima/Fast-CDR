@@ -1,10 +1,9 @@
-<<<<<<< HEAD
-=======
-# v2.4.0
+# Forthcoming
+
 * Add STRICT_BOOL CMake option to enforce canonical bool serialization
 
->>>>>>> 32d7a75 (feat: add opt-in strict bool normalization (#315) (#319))
 # v2.3.0
+
 * Fix symbol visibility for exception classes
 
     `Exception` changed to be a base class without inheriting from `std::exception`.

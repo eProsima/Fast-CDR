@@ -56,4 +56,4 @@ jobs:
       ctest-args: ${{ inputs.ctest-args }}
       fastcdr-branch: ${{ inputs.fastcdr-branch || github.ref }}
       run-build: ${{ !(github.event_name == 'pull_request') || !contains(github.event.pull_request.labels.*.name, 'skip-ci') }}
-      run-tests: ${{ (inputs.run-tests == true) || ((github.event_name == 'pull_request') && (!contains(github.event.pull_request.labels.*.name, 'no-test'))) }}
+      run-tests: ${{ (inputs.run-tests == true) || ((github.event_name == 'pull_request') && (!contains(github.event.pull_request.labels.*.name, 'no-test')) && (!contains(github.event.pull_request.labels.*.name, 'skip-ci'))) }}

@@ -62,7 +62,6 @@ defaults:
 jobs:
   fastcdr_test:
     runs-on: ${{ inputs.os-version }}
-    if: ${{ inputs.run-build == true }}
     strategy:
       fail-fast: false
       matrix:
@@ -82,37 +81,43 @@ jobs:
         repo: eProsima/Fast-CDR
 
     - name: Sync eProsima/Fast-CDR repository
+      if: ${{ inputs.run-build == true }}
       uses: eProsima/eProsima-CI/external/checkout@v0
       with:
         path: src/fastcdr
         ref: ${{ inputs.fastcdr-branch }}
 
     - name: Install Fix Python version
+      if: ${{ inputs.run-build == true }}
       uses: eProsima/eProsima-CI/external/setup-python@v0
       with:
         python-version: '3.11'
 
     - name: Get minimum supported version of CMake
+      if: ${{ inputs.run-build == true }}
       uses: eProsima/eProsima-CI/external/get-cmake@v0
       with:
         cmakeVersion: '3.22.6'
 
     - name: Install Colcon dependencies
+      if: ${{ inputs.run-build == true }}
       uses: eProsima/eProsima-CI/multiplatform/install_colcon@v0
 
     - name: Setup CCache
+      if: ${{ inputs.run-build == true && inputs.use-ccache == true }}
       uses: eProsima/eProsima-CI/external/setup-ccache-action@v0
-      if: ${{ inputs.use-ccache == true }}
       with:
         api_token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Install Python dependencies
+      if: ${{ inputs.run-build == true }}
       uses: eProsima/eProsima-CI/multiplatform/install_python_packages@v0
       with:
         packages: vcstool
         upgrade: false
 
     - name: Fetch Fast DDS CI dependencies
+      if: ${{ inputs.run-build == true }}
       uses: eProsima/eProsima-CI/multiplatform/vcs_import@v0
       with:
         vcs_repos_file: ${{ github.workspace }}/src/fastcdr/.github/workflows/config/test.repos
@@ -120,6 +125,7 @@ jobs:
         skip_existing: 'true'
 
     - name: Colcon build
+      if: ${{ inputs.run-build == true }}
       uses: eProsima/eProsima-CI/multiplatform/colcon_build@v0
       with:
         colcon_meta_file: ${{ github.workspace }}/src/fastcdr/.github/workflows/config/build.meta
@@ -132,7 +138,7 @@ jobs:
 
     - name: Colcon test
       id: test_fastcdr
-      if: ${{ inputs.run-tests == true }}
+      if: ${{ inputs.run-build == true && inputs.run-tests == true }}
       uses: eProsima/eProsima-CI/multiplatform/colcon_test@v0
       with:
         colcon_meta_file: ${{ github.workspace }}/src/fastcdr/.github/workflows/config/build.meta ${{ github.workspace }}/src/fastcdr/.github/workflows/config/test.meta
@@ -144,7 +150,7 @@ jobs:
 
     - name: Fast CDR Test summary
       uses: eProsima/eProsima-CI/multiplatform/junit_summary@v0
-      if: ${{ !cancelled() && inputs.run-tests == true }}
+      if: ${{ !cancelled() && inputs.run-build == true && inputs.run-tests == true }}
       with:
         junit_reports_dir: ${{ steps.test_fastcdr.outputs.ctest_results_path }}
         print_summary: 'True'
@@ -153,7 +159,7 @@ jobs:
         show_skipped: 'False'
 
     - name: Archive Test Results
-      if: always()
+      if: ${{ !cancelled() && inputs.run-build == true && inputs.run-tests == true }}
       uses: eProsima/eProsima-CI/external/upload-artifact@v0
       with:
         name: test-results-${{ inputs.label }}${{ matrix.strict-bool == true && '-strict-bool' || '' }}

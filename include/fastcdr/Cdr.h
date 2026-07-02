@@ -1868,6 +1868,7 @@ public:
             std::vector<_T>& vector_t)
     {
         uint32_t sequence_length {0};
+        state state_before_error(*this);
 
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
@@ -1881,29 +1882,42 @@ public:
             if (0 == sequence_length)
             {
                 vector_t.clear();
-                return *this;
             }
             else
             {
-                vector_t.resize(sequence_length);
-            }
+                if ((end_ - offset_) < sequence_length)
+                {
+                    set_state(state_before_error);
+                    throw exception::NotEnoughMemoryException(
+                              exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+                }
 
-            uint32_t count {0};
-            while (offset_ - offset < dheader && count < sequence_length)
-            {
-                deserialize(vector_t.data()[count]);
-                ++count;
+                try
+                {
+                    vector_t.resize(sequence_length);
+
+                    uint32_t count {0};
+                    while (offset_ - offset < dheader && count < sequence_length)
+                    {
+                        deserialize(vector_t.data()[count]);
+                        ++count;
+                    }
+                }
+                catch (exception::Exception& ex)
+                {
+                    set_state(state_before_error);
+                    ex.raise();
+                }
             }
 
             if (offset_ - offset != dheader)
             {
+                set_state(state_before_error);
                 throw exception::BadParamException("Member size differs from the size specified by DHEADER");
             }
         }
         else
         {
-            state state_before_error(*this);
-
             deserialize(sequence_length);
 
             if (sequence_length == 0)

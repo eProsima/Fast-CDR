@@ -1845,7 +1845,6 @@ public:
             }
 
             uint32_t count {0};
-            auto offset = offset_;
             auto last_offset = offset_;
             last_offset += dheader;
 
@@ -1903,7 +1902,6 @@ public:
                           exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
             }
 
-            auto offset = offset_;
             auto last_offset = offset_;
             last_offset += dheader;
 
@@ -2059,7 +2057,6 @@ public:
                           exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
             }
 
-            auto offset = offset_;
             auto last_offset = offset_;
             last_offset += dheader;
 
@@ -2485,7 +2482,6 @@ public:
             }
 
             uint32_t count {0};
-            auto offset = offset_;
             auto last_offset = offset_;
             last_offset += dheader;
             try
@@ -2599,7 +2595,6 @@ public:
                           exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
             }
 
-            auto offset = offset_;
             auto last_offset = offset_;
             last_offset += dheader;
 

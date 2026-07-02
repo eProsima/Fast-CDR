@@ -212,27 +212,64 @@ static void EXPECT_ARRAY_LONG_DOUBLE_EQ(
 
 template<typename T>
 static void check_bad_length_deserialization(
-        const T& const_value)
+        const T& const_value,
+        bool requires_dheader)
 {
-    char buffer[sizeof(uint32_t) + 1];
-
-    // Serialize wrong length (4GB)
+    // XCDRv1
     {
-        FastBuffer buf(buffer, sizeof(buffer));
-        Cdr cdr(buf);
-        uint32_t bad_length = 0xFFFFFFFF;
+        char buffer[sizeof(uint32_t) + 1];
 
-        EXPECT_NO_THROW(cdr << bad_length);
+        // Serialize wrong length (4GB)
+        {
+            FastBuffer buf(buffer, sizeof(buffer));
+            Cdr cdr(buf, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::CdrVersion::XCDRv1);
+            uint32_t bad_length = 0xFFFFFFFF;
+
+            EXPECT_NO_THROW(cdr << bad_length);
+        }
+
+        // Deserializing should throw
+        {
+            FastBuffer buf(buffer, sizeof(buffer));
+            Cdr cdr(buf, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::CdrVersion::XCDRv1);
+            T value;
+
+            EXPECT_THROW(cdr >> value, NotEnoughMemoryException);
+            EXPECT_NE(value, const_value);
+        }
     }
 
-    // Deserializing should throw
+    // XCDRv2
     {
-        FastBuffer buf(buffer, sizeof(buffer));
-        Cdr cdr(buf);
-        T value;
+        char buffer[sizeof(uint32_t) + sizeof(uint32_t) + 1];
 
-        EXPECT_THROW(cdr >> value, NotEnoughMemoryException);
-        EXPECT_NE(value, const_value);
+        // Serialize wrong length (4GB)
+        {
+            uint32_t bad_length = 0xFFFFFFFF;
+            FastBuffer buf(buffer, sizeof(buffer));
+            Cdr cdr(buf, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::CdrVersion::XCDRv2);
+
+            if (requires_dheader)
+            {
+                auto dheader = cdr.allocate_xcdrv2_dheader();
+                EXPECT_NO_THROW(cdr << bad_length);
+                EXPECT_NO_THROW(cdr.set_xcdrv2_dheader(dheader));
+            }
+            else
+            {
+                EXPECT_NO_THROW(cdr << bad_length);
+            }
+        }
+
+        // Deserializing should throw
+        {
+            FastBuffer buf(buffer, sizeof(buffer));
+            Cdr cdr(buf, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::CdrVersion::XCDRv2);
+            T value;
+
+            EXPECT_THROW(cdr >> value, NotEnoughMemoryException);
+            EXPECT_NE(value, const_value);
+        }
     }
 }
 
@@ -619,14 +656,14 @@ TEST(CDRTests, String)
 {
     check_good_case(string_t);
     check_no_space(string_t, 1);
-    check_bad_length_deserialization(string_t);
+    check_bad_length_deserialization(string_t, false);
 }
 
 TEST(CDRTests, WString)
 {
     check_good_case(wstring_t);
     check_no_space(wstring_t, 1);
-    check_bad_length_deserialization(wstring_t);
+    check_bad_length_deserialization(wstring_t, true);
 }
 
 TEST(CDRTests, EmptyString)
@@ -837,112 +874,112 @@ TEST(CDRTests, STDVectorOctet)
 {
     check_good_case(octet_vector_t);
     check_no_space(octet_vector_t, 1);
-    check_bad_length_deserialization(octet_vector_t);
+    check_bad_length_deserialization(octet_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorChar)
 {
     check_good_case(char_vector_t);
     check_no_space(char_vector_t, 1);
-    check_bad_length_deserialization(char_vector_t);
+    check_bad_length_deserialization(char_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorWChar)
 {
     check_good_case(wchar_vector_t);
     check_no_space(wchar_vector_t, 1);
-    check_bad_length_deserialization(wchar_vector_t);
+    check_bad_length_deserialization(wchar_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorInt8)
 {
     check_good_case(int8_vector_t);
     check_no_space(int8_vector_t, 1);
-    check_bad_length_deserialization(int8_vector_t);
+    check_bad_length_deserialization(int8_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorUnsignedShort)
 {
     check_good_case(ushort_vector_t);
     check_no_space(ushort_vector_t, 1);
-    check_bad_length_deserialization(ushort_vector_t);
+    check_bad_length_deserialization(ushort_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorShort)
 {
     check_good_case(short_vector_t);
     check_no_space(short_vector_t, 1);
-    check_bad_length_deserialization(short_vector_t);
+    check_bad_length_deserialization(short_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorUnsignedLong)
 {
     check_good_case(ulong_vector_t);
     check_no_space(ulong_vector_t, 1);
-    check_bad_length_deserialization(ulong_vector_t);
+    check_bad_length_deserialization(ulong_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorLong)
 {
     check_good_case(long_vector_t);
     check_no_space(long_vector_t, 1);
-    check_bad_length_deserialization(long_vector_t);
+    check_bad_length_deserialization(long_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorUnsignedLongLong)
 {
     check_good_case(ulonglong_vector_t);
     check_no_space(ulonglong_vector_t, 1);
-    check_bad_length_deserialization(ulonglong_vector_t);
+    check_bad_length_deserialization(ulonglong_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorLongLong)
 {
     check_good_case(longlong_vector_t);
     check_no_space(longlong_vector_t, 1);
-    check_bad_length_deserialization(longlong_vector_t);
+    check_bad_length_deserialization(longlong_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorFloat)
 {
     check_good_case(float_vector_t);
     check_no_space(float_vector_t, 1);
-    check_bad_length_deserialization(float_vector_t);
+    check_bad_length_deserialization(float_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorDouble)
 {
     check_good_case(double_vector_t);
     check_no_space(double_vector_t, 1);
-    check_bad_length_deserialization(double_vector_t);
+    check_bad_length_deserialization(double_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorLongDouble)
 {
     check_good_case(ldouble_vector_t);
     check_no_space(ldouble_vector_t, 1);
-    check_bad_length_deserialization(ldouble_vector_t);
+    check_bad_length_deserialization(ldouble_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorBoolean)
 {
     check_good_case(bool_vector_t);
     check_no_space(bool_vector_t, 1);
-    check_bad_length_deserialization(bool_vector_t);
+    check_bad_length_deserialization(bool_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorString)
 {
     check_good_case(string_vector_t);
     check_no_space(string_vector_t, 1);
-    check_bad_length_deserialization(string_vector_t);
+    check_bad_length_deserialization(string_vector_t, true);
 }
 
 TEST(CDRTests, STDVectorWString)
 {
     check_good_case(wstring_vector_t);
     check_no_space(wstring_vector_t, 1);
-    check_bad_length_deserialization(wstring_vector_t);
+    check_bad_length_deserialization(wstring_vector_t, true);
 }
 
 TEST(CDRTests, STDTripleArrayUnsignedLong)

@@ -2218,11 +2218,6 @@ Cdr& Cdr::serialize_bool_array(
         throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
-    if (CdrVersion::XCDRv2 == cdr_version_)
-    {
-        serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
-    }
-
     return *this;
 }
 

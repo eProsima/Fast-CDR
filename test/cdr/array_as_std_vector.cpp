@@ -25,7 +25,7 @@ using XCdrStreamValues =
         std::array<std::vector<uint8_t>,
                 1 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS>;
 
-class CdrArrayAsSTDVectorTest : public ::testing::TestWithParam< std::tuple<EncodingAlgorithmFlag, Cdr::Endianness>>
+class CdrArrayAsSTDVectorTest : public ::testing::TestWithParam<std::tuple<EncodingAlgorithmFlag, Cdr::Endianness>>
 {
 };
 

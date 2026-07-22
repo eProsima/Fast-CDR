@@ -264,7 +264,8 @@ Cdr& Cdr::read_encapsulation()
                 }
                 break;
             default:
-                throw BadParamException("Unexpected encoding algorithm received in Cdr::read_encapsulation for DDS CDR");
+                throw BadParamException(
+                          "Unexpected encoding algorithm received in Cdr::read_encapsulation for DDS CDR");
         }
         reset_callbacks();
 
@@ -2198,11 +2199,6 @@ Cdr& Cdr::serialize_bool_array(
     {
         set_state(state_before_error);
         throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
-    }
-
-    if (CdrVersion::XCDRv2 == cdr_version_)
-    {
-        serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
     }
 
     return *this;

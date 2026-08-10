@@ -2311,7 +2311,7 @@ TEST(CDRTests, DeserializeIntoANonEmptyMapInXCDRv1)
         0x00, 0x00, 0x00, 0x01,  // Map length
         0x00, 0x02,              // Key
         0x00, 0x00,              // Alignment
-        0x00, 0x00, 0x00, 0x01,  // Length
+        0x00, 0x00, 0x00, 0x02,  // Length, including the null terminator
         65,  0x00                // 'A'
     };
 
@@ -7174,6 +7174,66 @@ TEST(FastCDRTests, StringWithNullChars)
             cdr_ser << str;
         },
         BadParamException);
+}
+
+TEST(CDRTests, UnterminatedStringDeserialization)
+{
+    char buffer[] = {0x05, 0x00, 0x00, 0x00, 'c', 'r', 'h', 'y', 'v'};
+    FastBuffer cdrbuffer(buffer, sizeof(buffer));
+    Cdr cdr_des(cdrbuffer, Cdr::LITTLE_ENDIANNESS);
+    std::string value;
+
+    EXPECT_THROW(cdr_des >> value, BadParamException);
+    EXPECT_EQ(cdr_des.get_serialized_data_length(), 0u);
+}
+
+TEST(FastCDRTests, UnterminatedStringDeserialization)
+{
+    char buffer[sizeof(uint32_t) + 5] = {};
+    FastBuffer cdrbuffer(buffer, sizeof(buffer));
+    FastCdr cdr_ser(cdrbuffer);
+    cdr_ser << static_cast<uint32_t>(5);
+    buffer[4] = 'c';
+    buffer[5] = 'r';
+    buffer[6] = 'h';
+    buffer[7] = 'y';
+    buffer[8] = 'v';
+    FastCdr cdr_des(cdrbuffer);
+    std::string value;
+
+    EXPECT_THROW(cdr_des >> value, BadParamException);
+    EXPECT_EQ(cdr_des.get_serialized_data_length(), 0u);
+}
+
+TEST(CDRTests, UnterminatedCStringDeserialization)
+{
+    char buffer[] = {0x05, 0x00, 0x00, 0x00, 'c', 'r', 'h', 'y', 'v'};
+    FastBuffer cdrbuffer(buffer, sizeof(buffer));
+    Cdr cdr_des(cdrbuffer, Cdr::LITTLE_ENDIANNESS);
+    char* value = nullptr;
+
+    EXPECT_THROW(cdr_des >> value, BadParamException);
+    EXPECT_EQ(value, nullptr);
+    EXPECT_EQ(cdr_des.get_serialized_data_length(), 0u);
+}
+
+TEST(FastCDRTests, UnterminatedCStringDeserialization)
+{
+    char buffer[sizeof(uint32_t) + 5] = {};
+    FastBuffer cdrbuffer(buffer, sizeof(buffer));
+    FastCdr cdr_ser(cdrbuffer);
+    cdr_ser << static_cast<uint32_t>(5);
+    buffer[4] = 'c';
+    buffer[5] = 'r';
+    buffer[6] = 'h';
+    buffer[7] = 'y';
+    buffer[8] = 'v';
+    FastCdr cdr_des(cdrbuffer);
+    char* value = nullptr;
+
+    EXPECT_THROW(cdr_des >> value, BadParamException);
+    EXPECT_EQ(value, nullptr);
+    EXPECT_EQ(cdr_des.get_serialized_data_length(), 0u);
 }
 
 TEST(CDRTests, EmptyStringSerializationSize)

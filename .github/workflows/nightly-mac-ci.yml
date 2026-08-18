@@ -16,6 +16,16 @@ jobs:
       run-tests: true
       use-ccache: false
 
+  nightly-mac-ci-2_3_x:
+    uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@2.3.x
+    with:
+      os-version: 'macos-15-intel'
+      label: 'nightly-mac-ci-2.3.x'
+      fastcdr-branch: '2.3.x'
+      run-build: true
+      run-tests: true
+      use-ccache: false
+
   nightly-mac-ci-2_2_x:
     uses: eProsima/Fast-CDR/.github/workflows/reusable-ci.yml@2.2.x
     with:

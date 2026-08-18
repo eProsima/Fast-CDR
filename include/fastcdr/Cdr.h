@@ -22,6 +22,7 @@
 #include <cstring>
 #include <functional>
 #include <map>
+#include <memory>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -29,6 +30,7 @@
 
 #include "fastcdr_dll.h"
 
+#include "CdrContext.hpp"
 #include "CdrEncoding.hpp"
 #include "cdr/fixed_size_string.hpp"
 #include "detail/container_recursive_inspector.hpp"
@@ -168,6 +170,21 @@ public:
             const CdrVersion cdr_version = XCDRv2);
 
     /*!
+     * @brief This constructor creates an eprosima::fastcdr::Cdr object that can serialize/deserialize
+     * the assigned buffer with a specific context.
+     * @param cdr_buffer A reference to the buffer that contains (or will contain) the CDR representation.
+     * @param context A shared pointer to the context that will be used for serialization/deserialization.
+     * @param endianness The initial endianness that will be used. The default value is the endianness of the system.
+     * @param cdr_version Represents the type of encoding algorithm that will be used for the encoding.
+     * The default value is CdrVersion::XCDRv2.
+     */
+    Cdr_DllAPI Cdr(
+            FastBuffer& cdr_buffer,
+            const std::shared_ptr<CdrContext>& context,
+            const Endianness endianness = DEFAULT_ENDIAN,
+            const CdrVersion cdr_version = XCDRv2);
+
+    /*!
      * @brief This function reads the encapsulation of the CDR stream.
      *        If the CDR stream contains an encapsulation, then this function should be called before starting to deserialize.
      *        CdrVersion and EncodingAlgorithmFlag internal values will be changed to the ones specified by the
@@ -234,6 +251,12 @@ public:
      * @return The endianness.
      */
     Cdr_DllAPI Endianness endianness() const;
+
+    /*!
+     * @brief This function returns the context used by the CDR type.
+     * @return The context.
+     */
+    Cdr_DllAPI std::shared_ptr<CdrContext> get_context() const;
 
     /*!
      * @brief This function skips a number of bytes in the CDR stream buffer.
@@ -1807,21 +1830,41 @@ public:
     Cdr& deserialize(
             std::array<_T, _Size>& array_t)
     {
+        state state_before_error(*this);
+
         if (CdrVersion::XCDRv2 == cdr_version_ && !is_multi_array_primitive(&array_t))
         {
             uint32_t dheader {0};
             deserialize(dheader);
 
-            uint32_t count {0};
-            auto offset = offset_;
-            while (offset_ - offset < dheader && count < _Size)
+            if ((end_ - offset_) < dheader)
             {
-                deserialize_array(&array_t.data()[count], 1);
-                ++count;
+                set_state(state_before_error);
+                throw exception::NotEnoughMemoryException(
+                          exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
             }
 
-            if (offset_ - offset != dheader)
+            uint32_t count {0};
+            auto last_offset = offset_;
+            last_offset += dheader;
+
+            try
             {
+                while (last_offset - offset_ > 0 && count < _Size)
+                {
+                    deserialize_array(&array_t.data()[count], 1);
+                    ++count;
+                }
+            }
+            catch (exception::Exception& ex)
+            {
+                set_state(state_before_error);
+                ex.raise();
+            }
+
+            if (last_offset - offset_ != 0)
+            {
+                set_state(state_before_error);
                 throw exception::BadParamException("Member size greater than size specified by DHEADER");
             }
         }
@@ -1845,42 +1888,64 @@ public:
             std::vector<_T>& vector_t)
     {
         uint32_t sequence_length {0};
+        state state_before_error(*this);
 
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
             uint32_t dheader {0};
             deserialize(dheader);
 
-            auto offset = offset_;
+            if (((end_ - offset_) < dheader) || (dheader < 4))
+            {
+                set_state(state_before_error);
+                throw exception::NotEnoughMemoryException(
+                          exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            }
+
+            auto last_offset = offset_;
+            last_offset += dheader;
 
             deserialize(sequence_length);
 
             if (0 == sequence_length)
             {
                 vector_t.clear();
-                return *this;
             }
             else
             {
-                vector_t.resize(sequence_length);
+                if ((last_offset - offset_) < sequence_length)
+                {
+                    set_state(state_before_error);
+                    throw exception::NotEnoughMemoryException(
+                              exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+                }
+
+                try
+                {
+                    vector_t.resize(sequence_length);
+
+                    uint32_t count {0};
+                    while (last_offset - offset_ > 0 && count < sequence_length)
+                    {
+                        deserialize(vector_t.data()[count]);
+                        ++count;
+                    }
+                }
+                catch (exception::Exception& ex)
+                {
+                    set_state(state_before_error);
+                    ex.raise();
+                }
             }
 
-            uint32_t count {0};
-            while (offset_ - offset < dheader && count < sequence_length)
+            if (last_offset - offset_ != 0)
             {
-                deserialize(vector_t.data()[count]);
-                ++count;
-            }
-
-            if (offset_ - offset != dheader)
-            {
+                set_state(state_before_error);
                 throw exception::BadParamException("Member size differs from the size specified by DHEADER");
             }
         }
         else
         {
-            state state_before_error(*this);
-
             deserialize(sequence_length);
 
             if (sequence_length == 0)
@@ -1978,38 +2043,56 @@ public:
     Cdr& deserialize(
             std::map<_K, _T>& map_t)
     {
+        state state_before_error(*this);
+
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
             uint32_t dheader {0};
             deserialize(dheader);
 
-            auto offset = offset_;
+            if (((end_ - offset_) < dheader) || (dheader < 4))
+            {
+                set_state(state_before_error);
+                throw exception::NotEnoughMemoryException(
+                          exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            }
+
+            auto last_offset = offset_;
+            last_offset += dheader;
 
             uint32_t map_length {0};
             deserialize(map_length);
 
             map_t.clear();
 
-            uint32_t count {0};
-            while (offset_ - offset < dheader && count < map_length)
+            try
             {
-                _K key;
-                _T val;
-                deserialize(key);
-                deserialize(val);
-                map_t.emplace(std::pair<_K, _T>(std::move(key), std::move(val)));
-                ++count;
+                uint32_t count {0};
+                while (last_offset - offset_ > 0 && count < map_length)
+                {
+                    _K key;
+                    _T val;
+                    deserialize(key);
+                    deserialize(val);
+                    map_t.emplace(std::pair<_K, _T>(std::move(key), std::move(val)));
+                    ++count;
+                }
+            }
+            catch (exception::Exception& ex)
+            {
+                set_state(state_before_error);
+                ex.raise();
             }
 
-            if (offset_ - offset != dheader)
+            if (last_offset - offset_ != 0)
             {
+                set_state(state_before_error);
                 throw exception::BadParamException("Member size greater than size specified by DHEADER");
             }
         }
         else
         {
             uint32_t sequence_length = 0;
-            state state_(*this);
 
             deserialize(sequence_length);
 
@@ -2028,7 +2111,7 @@ public:
             }
             catch (exception::Exception& ex)
             {
-                set_state(state_);
+                set_state(state_before_error);
                 ex.raise();
             }
         }
@@ -2384,21 +2467,40 @@ public:
     Cdr& deserialize_array(
             std::vector<_T>& value)
     {
+        state state_before_error(*this);
+
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
             uint32_t dheader {0};
             deserialize(dheader);
 
-            uint32_t count {0};
-            auto offset = offset_;
-            while (offset_ - offset < dheader && count < value.size())
+            if ((end_ - offset_) < dheader)
             {
-                deserialize_array(&value.data()[count], 1);
-                ++count;
+                set_state(state_before_error);
+                throw exception::NotEnoughMemoryException(
+                          exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
             }
 
-            if (offset_ - offset != dheader)
+            uint32_t count {0};
+            auto last_offset = offset_;
+            last_offset += dheader;
+            try
             {
+                while (last_offset - offset_ > 0 && count < value.size())
+                {
+                    deserialize_array(&value.data()[count], 1);
+                    ++count;
+                }
+            }
+            catch (exception::Exception& ex)
+            {
+                set_state(state_before_error);
+                ex.raise();
+            }
+
+            if (offset_ != last_offset)
+            {
+                set_state(state_before_error);
                 throw exception::BadParamException("Member size greater than size specified by DHEADER");
             }
         }
@@ -2479,28 +2581,50 @@ public:
             size_t& num_elements)
     {
         uint32_t sequence_length {0};
+        state state_before_error(*this);
 
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
             uint32_t dheader {0};
             deserialize(dheader);
 
-            auto offset = offset_;
+            if (((end_ - offset_) < dheader) || (dheader < 4))
+            {
+                set_state(state_before_error);
+                throw exception::NotEnoughMemoryException(
+                          exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            }
+
+            auto last_offset = offset_;
+            last_offset += dheader;
 
             deserialize(sequence_length);
+            if (0 == sequence_length)
+            {
+                sequence_t = NULL;
+                num_elements = 0;
+                return *this;
+            }
+
+            if ((last_offset - offset_) < sequence_length)
+            {
+                set_state(state_before_error);
+                throw exception::NotEnoughMemoryException(
+                          exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            }
 
             try
             {
                 sequence_t = reinterpret_cast<_T*>(calloc(sequence_length, sizeof(_T)));
 
                 uint32_t count {0};
-                while (offset_ - offset < dheader && count < sequence_length)
+                while (last_offset - offset_ > 0 && count < sequence_length)
                 {
                     deserialize(sequence_t[count]);
                     ++count;
                 }
 
-                if (offset_ - offset != dheader)
+                if (last_offset - offset_ != 0)
                 {
                     throw exception::BadParamException("Member size greater than size specified by DHEADER");
                 }
@@ -2509,13 +2633,12 @@ public:
             {
                 free(sequence_t);
                 sequence_t = NULL;
+                set_state(state_before_error);
                 ex.raise();
             }
         }
         else
         {
-            state state_before_error(*this);
-
             deserialize(sequence_length);
 
             if ((end_ - offset_) < sequence_length)
@@ -2727,6 +2850,52 @@ public:
             MemberId member_id;
             xcdr1_deserialize_member_header(member_id, current_state);
             auto prev_offset = offset_;
+            member_value.reset(0 < current_state.member_size_);
+            if (0 < current_state.member_size_)
+            {
+                deserialize(member_value);
+            }
+            size_t member_size {current_state.member_size_};
+            size_t diff {offset_ - prev_offset};
+            if (member_size < diff)
+            {
+                throw exception::BadParamException(
+                          "Member size provided by member header is lower than real decoded member size");
+            }
+
+            // Skip unused bytes
+            offset_ += (member_size - diff);
+        }
+        else
+        {
+            deserialize(member_value);
+        }
+        return *this;
+    }
+
+    /*!
+     * @brief Decodes an optional member of an external according to the encoding algorithm used.
+     * @param[out] member_value A reference of the variable where the optional member value will be stored.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
+     * position that exceeds the internal memory size.
+     */
+    template<class _T>
+    Cdr& deserialize_member(
+            optional<external<_T>>& member_value)
+    {
+        if (member_value.has_value() && member_value.value().is_locked())
+        {
+            throw exception::BadParamException("External member is locked");
+        }
+
+        if (EncodingAlgorithmFlag::PLAIN_CDR == current_encoding_)
+        {
+            Cdr::state current_state(*this);
+            MemberId member_id;
+            xcdr1_deserialize_member_header(member_id, current_state);
+            auto prev_offset = offset_;
+            member_value.reset(0 < current_state.member_size_);
             if (0 < current_state.member_size_)
             {
                 deserialize(member_value);
@@ -2960,6 +3129,16 @@ private:
     Cdr_DllAPI Cdr& deserialize_wstring_sequence(
             std::wstring*& sequence_t,
             size_t& num_elements);
+
+    /*!
+     * @brief Serializes the canonical @c uint8_t representation of @p bool_t.
+     *
+     * When @c FASTCDR_STRICT_BOOL is defined the serialized value is guaranteed to be exactly @c 0 or @c 1.
+     *
+     * @param[in] bool_t The boolean value to serialize.
+     */
+    Cdr_DllAPI void serialize_bool(
+            bool bool_t);
 
     /*!
      * @brief This function template detects the content type of the STD container array and serializes the array.
@@ -3541,6 +3720,9 @@ private:
 
     //! Whether the encapsulation was serialized.
     bool encapsulation_serialized_ {false};
+
+    //! Custom serialization context.
+    std::shared_ptr<CdrContext> context_;
 
 
     uint32_t get_long_lc(

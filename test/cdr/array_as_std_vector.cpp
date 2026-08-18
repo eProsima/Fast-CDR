@@ -25,7 +25,7 @@ using XCdrStreamValues =
         std::array<std::vector<uint8_t>,
                 1 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS>;
 
-class CdrArrayAsSTDVectorTest : public ::testing::TestWithParam< std::tuple<EncodingAlgorithmFlag, Cdr::Endianness>>
+class CdrArrayAsSTDVectorTest : public ::testing::TestWithParam<std::tuple<EncodingAlgorithmFlag, Cdr::Endianness>>
 {
 };
 
@@ -257,6 +257,75 @@ TEST_P(CdrArrayAsSTDVectorTest, array_ulong_as_std_vector)
         0x00, 0x0B, 0x00, 0x00, // Encapsulation
         fval, ival, ival, ival, // ULong
         fval, ival, ival, ival  // ULong
+    };
+    //}
+
+    EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+
+    serialize_array(expected_streams, encoding, endianness, array_value);
+}
+
+/*!
+ * @test Test an array of boolean type stored in a std::vector.
+ */
+TEST_P(CdrArrayAsSTDVectorTest, array_bool_as_std_vector)
+{
+    const std::vector<bool> array_value {true, false};
+    constexpr uint8_t tval {0x01};
+    constexpr uint8_t fval {0x00};
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        tval, fval              // Boolean
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        tval, fval              // Boolean
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x02, 0x00, 0x00, // Encapsulation
+        tval, fval              // Boolean
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x03, 0x00, 0x00, // Encapsulation
+        tval, fval              // Boolean
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        tval, fval              // Boolean
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        tval, fval              // Boolean
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        tval, fval              // Boolean
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        tval, fval              // Boolean
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x0A, 0x00, 0x00, // Encapsulation
+        tval, fval              // Boolean
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x0B, 0x00, 0x00, // Encapsulation
+        tval, fval              // Boolean
     };
     //}
 

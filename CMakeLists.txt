@@ -35,7 +35,7 @@ endif()
 ###############################################################################
 # Project                                                                     #
 ###############################################################################
-project(fastcdr VERSION 2.3.5 LANGUAGES CXX)
+project(fastcdr VERSION 2.4.0 LANGUAGES CXX)
 
 set(PROJECT_NAME_STYLED "FastCDR")
 set(PROJECT_NAME_LARGE "Fast CDR")
@@ -62,6 +62,11 @@ endif()
 # If set to true, this will cause all libraries to be built shared
 # unless the library was explicitly added as a static library.
 option(BUILD_SHARED_LIBS "Create shared libraries by default" ON)
+
+###############################################################################
+# Strict bool
+###############################################################################
+option(STRICT_BOOL "Enforce bool values to 0/1 during serialization" OFF)
 
 ###############################################################################
 # Test system configuration

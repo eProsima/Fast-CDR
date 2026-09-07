@@ -2363,8 +2363,8 @@ TEST(CDRTests, ReuseTargetMapInTwoDeserializations)
     {
         using map_type = std::map<uint16_t, std::string>;
 
-        const map_type first_map {{1, "first"}, {2, "second"}};
-        const map_type second_map {{1, "third"}};
+        const map_type first_map {{static_cast<uint16_t>(1u), "first"}, {static_cast<uint16_t>(2u), "second"}};
+        const map_type second_map {{static_cast<uint16_t>(1u), "third"}};
 
         for (CdrVersion version : {XCDRv1, XCDRv2})
         {
@@ -2438,8 +2438,8 @@ TEST(CDRTests, TargetMapPreservedWhenDeserializationFails)
     {
         using map_type = std::map<uint16_t, std::string>;
 
-        const map_type input_map {{1, "first"}, {2, "second"}};
-        const map_type initial_content {{3, "old"}};
+        const map_type input_map {{static_cast<uint16_t>(1u), "first"}, {static_cast<uint16_t>(2u), "second"}};
+        const map_type initial_content {{static_cast<uint16_t>(3u), "old"}};
 
         // XCDRv1: the exception is thrown while deserializing an element
         {

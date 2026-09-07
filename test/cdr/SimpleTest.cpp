@@ -2331,6 +2331,174 @@ TEST(CDRTests, DeserializeIntoANonEmptyMapInXCDRv1)
     ASSERT_EQ(initialized_map.at(2), "A");
 }
 
+// Regression tests for Fast CDR issue #339
+// Deserializing a map into a non-empty map should replace its content, both for
+// non-primitive and primitive mapped types. The content of the target map should
+// also be preserved when the deserialization fails.
+
+TEST(CDRTests, DeserializeIntoANonEmptyPrimitiveMapInXCDRv1)
+{
+    char buffer[BUFFER_LENGTH];
+
+    const std::map<std::string, double> input_map {{"value", 1.0}};
+
+    FastBuffer cdr_buffer(buffer, BUFFER_LENGTH);
+    Cdr cdr_ser_map(cdr_buffer, Cdr::DEFAULT_ENDIAN, XCDRv1);
+    cdr_ser_map << input_map;
+
+    std::map<std::string, double> initialized_map {{"other", 0.5}};
+
+    // Deserialization in a non-empty map
+    Cdr cdr_des_map(cdr_buffer, Cdr::DEFAULT_ENDIAN, XCDRv1);
+    ASSERT_NO_THROW(cdr_des_map >> initialized_map);
+    ASSERT_EQ(initialized_map.size(), 1u);
+    EXPECT_DOUBLE_EQ(initialized_map["value"], 1.0);
+}
+
+TEST(CDRTests, ReuseTargetMapInTwoDeserializations)
+{
+    char buffer[BUFFER_LENGTH];
+
+    // Case 1: map with non-primitive mapped type
+    {
+        using map_type = std::map<uint16_t, std::string>;
+
+        const map_type first_map {{1, "first"}, {2, "second"}};
+        const map_type second_map {{1, "third"}};
+
+        for (CdrVersion version : {XCDRv1, XCDRv2})
+        {
+            map_type target_map;
+
+            // First deserialization
+            {
+                FastBuffer cdr_buffer(buffer, BUFFER_LENGTH);
+                Cdr cdr_ser(cdr_buffer, Cdr::DEFAULT_ENDIAN, version);
+                cdr_ser << first_map;
+                Cdr cdr_des(cdr_buffer, Cdr::DEFAULT_ENDIAN, version);
+                ASSERT_NO_THROW(cdr_des >> target_map);
+            }
+
+            ASSERT_EQ(target_map, first_map);
+
+            // Second deserialization reusing the same (non-empty) map
+            {
+                FastBuffer cdr_buffer(buffer, BUFFER_LENGTH);
+                Cdr cdr_ser(cdr_buffer, Cdr::DEFAULT_ENDIAN, version);
+                cdr_ser << second_map;
+                Cdr cdr_des(cdr_buffer, Cdr::DEFAULT_ENDIAN, version);
+                ASSERT_NO_THROW(cdr_des >> target_map);
+            }
+
+            ASSERT_EQ(target_map, second_map);
+        }
+    }
+
+    // Case 2: map with primitive mapped type
+    {
+        using map_type = std::map<std::string, double>;
+
+        const map_type first_map {{"first", 1.0}, {"second", 2.0}};
+        const map_type second_map {{"first", 0.0}};
+
+        for (CdrVersion version : {XCDRv1, XCDRv2})
+        {
+            map_type target_map;
+
+            // First deserialization
+            {
+                FastBuffer cdr_buffer(buffer, BUFFER_LENGTH);
+                Cdr cdr_ser(cdr_buffer, Cdr::DEFAULT_ENDIAN, version);
+                cdr_ser << first_map;
+                Cdr cdr_des(cdr_buffer, Cdr::DEFAULT_ENDIAN, version);
+                ASSERT_NO_THROW(cdr_des >> target_map);
+            }
+
+            ASSERT_EQ(target_map, first_map);
+
+            // Second deserialization reusing the same (non-empty) map
+            {
+                FastBuffer cdr_buffer(buffer, BUFFER_LENGTH);
+                Cdr cdr_ser(cdr_buffer, Cdr::DEFAULT_ENDIAN, version);
+                cdr_ser << second_map;
+                Cdr cdr_des(cdr_buffer, Cdr::DEFAULT_ENDIAN, version);
+                ASSERT_NO_THROW(cdr_des >> target_map);
+            }
+
+            ASSERT_EQ(target_map, second_map);
+        }
+    }
+}
+
+TEST(CDRTests, TargetMapPreservedWhenDeserializationFails)
+{
+    char buffer[BUFFER_LENGTH];
+
+    // Case 1: map with non-primitive mapped type
+    {
+        using map_type = std::map<uint16_t, std::string>;
+
+        const map_type input_map {{1, "first"}, {2, "second"}};
+        const map_type initial_content {{3, "old"}};
+
+        // XCDRv1: the exception is thrown while deserializing an element
+        {
+            FastBuffer cdr_buffer(buffer, BUFFER_LENGTH);
+            Cdr cdr_ser(cdr_buffer, Cdr::DEFAULT_ENDIAN, XCDRv1);
+            cdr_ser << input_map;
+            size_t serialized_size = static_cast<size_t>(cdr_ser.get_current_position() - buffer);
+
+            // Simulate a truncated stream
+            FastBuffer truncated_buffer(buffer, serialized_size - 1);
+            Cdr cdr_des(truncated_buffer, Cdr::DEFAULT_ENDIAN, XCDRv1);
+
+            map_type target_map = initial_content;
+            EXPECT_THROW(cdr_des >> target_map, NotEnoughMemoryException);
+            EXPECT_EQ(target_map, initial_content);
+        }
+
+        // XCDRv2: DHEADER announces less bytes than the actual member size
+        {
+            FastBuffer cdr_buffer(buffer, BUFFER_LENGTH);
+            Cdr cdr_ser(cdr_buffer, Cdr::DEFAULT_ENDIAN, XCDRv2);
+            cdr_ser << input_map;
+
+            // Tamper with DHEADER to make it inconsistent with the member size
+            uint32_t dheader;
+            memcpy(&dheader, buffer, sizeof(dheader));
+            dheader -= 1;
+            memcpy(buffer, &dheader, sizeof(dheader));
+
+            Cdr cdr_des(cdr_buffer, Cdr::DEFAULT_ENDIAN, XCDRv2);
+
+            map_type target_map = initial_content;
+            EXPECT_THROW(cdr_des >> target_map, BadParamException);
+            EXPECT_EQ(target_map, initial_content);
+        }
+    }
+
+    // Case 2: map with primitive mapped type
+    {
+        using map_type = std::map<std::string, double>;
+
+        const map_type input_map {{"first", 1.0}, {"second", 2.0}};
+        const map_type initial_content {{"other", 0.5}};
+
+        FastBuffer cdr_buffer(buffer, BUFFER_LENGTH);
+        Cdr cdr_ser(cdr_buffer, Cdr::DEFAULT_ENDIAN, XCDRv1);
+        cdr_ser << input_map;
+        size_t serialized_size = static_cast<size_t>(cdr_ser.get_current_position() - buffer);
+
+        // The first element is deserialized before the exception is thrown
+        FastBuffer truncated_buffer(buffer, serialized_size - sizeof(double));
+        Cdr cdr_des(truncated_buffer, Cdr::DEFAULT_ENDIAN, XCDRv1);
+
+        map_type target_map = initial_content;
+        EXPECT_THROW(cdr_des >> target_map, NotEnoughMemoryException);
+        EXPECT_EQ(target_map, initial_content);
+    }
+}
+
 TEST(FastCDRTests, Octet)
 {
     // Check good case.

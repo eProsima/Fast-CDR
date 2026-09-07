@@ -2034,6 +2034,7 @@ public:
 
     /*!
      * @brief This function template deserializes a map of non-primitive.
+     * The content of the output map is only replaced when the whole deserialization succeeds.
      * @param map_t The variable that will store the map read from the buffer.
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
@@ -2044,6 +2045,7 @@ public:
             std::map<_K, _T>& map_t)
     {
         state state_before_error(*this);
+        std::map<_K, _T> map;
 
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
@@ -2063,8 +2065,6 @@ public:
             uint32_t map_length {0};
             deserialize(map_length);
 
-            map_t.clear();
-
             try
             {
                 uint32_t count {0};
@@ -2074,7 +2074,7 @@ public:
                     _T val;
                     deserialize(key);
                     deserialize(val);
-                    map_t.emplace(std::pair<_K, _T>(std::move(key), std::move(val)));
+                    map.emplace(std::pair<_K, _T>(std::move(key), std::move(val)));
                     ++count;
                 }
             }
@@ -2096,8 +2096,6 @@ public:
 
             deserialize(sequence_length);
 
-            map_t.clear();
-
             try
             {
                 for (uint32_t i = 0; i < sequence_length; ++i)
@@ -2106,7 +2104,7 @@ public:
                     _T value;
                     deserialize(key);
                     deserialize(value);
-                    map_t.emplace(std::pair<_K, _T>(std::move(key), std::move(value)));
+                    map.emplace(std::pair<_K, _T>(std::move(key), std::move(value)));
                 }
             }
             catch (exception::Exception& ex)
@@ -2116,11 +2114,14 @@ public:
             }
         }
 
+        map_t = std::move(map);
+
         return *this;
     }
 
     /*!
      * @brief This function template deserializes a map of primitive.
+     * The content of the output map is only replaced when the whole deserialization succeeds.
      * @param map_t The variable that will store the map read from the buffer.
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
@@ -2132,6 +2133,7 @@ public:
     {
         uint32_t sequence_length = 0;
         state state_(*this);
+        std::map<_K, _T> map;
 
         deserialize(sequence_length);
 
@@ -2143,7 +2145,7 @@ public:
                 _T value;
                 deserialize(key);
                 deserialize(value);
-                map_t.emplace(std::pair<_K, _T>(std::move(key), std::move(value)));
+                map.emplace(std::pair<_K, _T>(std::move(key), std::move(value)));
             }
         }
         catch (exception::Exception& ex)
@@ -2151,6 +2153,8 @@ public:
             set_state(state_);
             ex.raise();
         }
+
+        map_t = std::move(map);
 
         return *this;
     }

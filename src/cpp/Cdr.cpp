@@ -1683,6 +1683,7 @@ Cdr& Cdr::deserialize(
         else
         {
             offset_++;
+            return *this;
         }
 
         throw BadParamException("Unexpected byte value in Cdr::deserialize(bool), expected 0 or 1");
@@ -1760,7 +1761,7 @@ Cdr& Cdr::deserialize(
 
 Cdr& Cdr::deserialize(
         char*& string_t,
-        CdrTypeConsistencyFlag consistency_flag,
+        CdrTryConstructFlag consistency_flag,
         uint32_t max_length)
 {
     uint32_t length {0};
@@ -1775,21 +1776,31 @@ Cdr& Cdr::deserialize(
     }
     if ((end_ - offset_) >= length)
     {
-        uint32_t length_to_read {length};
+        // Number of visible characters, i.e. excluding the terminating null character when the
+        // encoder serialized one. The consistency policy is applied to this value because
+        // `max_length` bounds the characters the destination type can hold.
+        uint32_t visible_length {length};
 
-        if (length > max_length)
+        if ((&offset_)[length - 1] == '\0')
+        {
+            --visible_length;
+        }
+
+        uint32_t length_to_read {visible_length};
+
+        if (visible_length > max_length)
         {
             switch (consistency_flag)
             {
-                case CdrTypeConsistencyFlag::FAIL:
+                case CdrTryConstructFlag::FAIL:
                     string_t = nullptr;
                     throw BadParamException(
                               "Deserialized string length exceeds the maximum length allowed by the destination type");
-                case CdrTypeConsistencyFlag::DEFAULT_VALUE:
+                case CdrTryConstructFlag::DEFAULT_VALUE:
                     string_t = nullptr;
                     length_to_read = 0;
                     break;
-                case CdrTypeConsistencyFlag::TRIM:
+                case CdrTryConstructFlag::TRIM:
                     length_to_read = max_length;
                     break;
             }
@@ -1800,11 +1811,11 @@ Cdr& Cdr::deserialize(
 
         if (0 < length_to_read && !fake_mode)
         {
-            // Allocate memory.
-            string_t =
-                    reinterpret_cast<char*>(calloc(length_to_read + ((&offset_)[length_to_read - 1] == '\0' ? 0 : 1),
-                    sizeof(char)));
-            memcpy(string_t, &offset_, max_length);
+            // Allocate memory. The extra byte always reserved for the terminating null character
+            // is zeroed by calloc, so the result is null-terminated whether or not the stream
+            // carried a terminator and whether or not the string was trimmed.
+            string_t = reinterpret_cast<char*>(calloc(length_to_read + 1, sizeof(char)));
+            memcpy(string_t, &offset_, length_to_read);
         }
         offset_ += length;
         return *this;
@@ -1817,7 +1828,7 @@ Cdr& Cdr::deserialize(
 
 Cdr& Cdr::deserialize(
         wchar_t*& string_t,
-        CdrTypeConsistencyFlag consistency_flag,
+        CdrTryConstructFlag consistency_flag,
         uint32_t max_length)
 {
 
@@ -1839,15 +1850,15 @@ Cdr& Cdr::deserialize(
         {
             switch (consistency_flag)
             {
-                case CdrTypeConsistencyFlag::FAIL:
+                case CdrTryConstructFlag::FAIL:
                     string_t = nullptr;
                     throw BadParamException(
                               "Deserialized wide string length exceeds the maximum length allowed by the destination type");
-                case CdrTypeConsistencyFlag::DEFAULT_VALUE:
+                case CdrTryConstructFlag::DEFAULT_VALUE:
                     string_t = nullptr;
                     length_to_read = 0;
                     break;
-                case CdrTypeConsistencyFlag::TRIM:
+                case CdrTryConstructFlag::TRIM:
                     length_to_read = max_length;
                     break;
             }
@@ -1882,7 +1893,7 @@ Cdr& Cdr::deserialize(
 
 const char* Cdr::read_string(
         uint32_t& length,
-        CdrTypeConsistencyFlag consistency_flag)
+        CdrTryConstructFlag consistency_flag)
 {
     const char* ret_value = "";
     uint32_t read_length {0};
@@ -1892,23 +1903,34 @@ const char* Cdr::read_string(
 
     if (read_length == 0)
     {
+        length = 0;
         return ret_value;
     }
     else if ((end_ - offset_) >= read_length)
     {
-        uint32_t length_to_read {read_length};
+        // Number of visible characters, i.e. excluding the terminating null character when the
+        // encoder serialized one. The consistency policy is applied to this value because
+        // `length` bounds the characters the destination type can hold.
+        uint32_t visible_length {read_length};
 
-        if (read_length > length)
+        if ((&offset_)[read_length - 1] == '\0')
+        {
+            --visible_length;
+        }
+
+        uint32_t length_to_read {visible_length};
+
+        if (visible_length > length)
         {
             switch (consistency_flag)
             {
-                case CdrTypeConsistencyFlag::FAIL:
+                case CdrTryConstructFlag::FAIL:
                     throw BadParamException(
                               "Deserialized string length exceeds the maximum length allowed by the destination type");
-                case CdrTypeConsistencyFlag::DEFAULT_VALUE:
+                case CdrTryConstructFlag::DEFAULT_VALUE:
                     length_to_read = 0;
                     break;
-                case CdrTypeConsistencyFlag::TRIM:
+                case CdrTryConstructFlag::TRIM:
                     length_to_read = length;
                     break;
             }
@@ -1917,15 +1939,13 @@ const char* Cdr::read_string(
         // Save last datasize.
         last_data_size_ = sizeof(uint8_t);
 
-        length = length_to_read;
+        // In fake mode the stream is only consumed, so the returned pointer is left empty and the
+        // reported length must be zero to stay consistent with it.
+        length = fake_mode ? 0 : length_to_read;
 
-        if (length_to_read > 0 && !fake_mode)
+        if (length > 0)
         {
             ret_value = &offset_;
-            if (ret_value[length - 1] == '\0')
-            {
-                --length;
-            }
         }
 
         offset_ += read_length;
@@ -1939,7 +1959,7 @@ const char* Cdr::read_string(
 
 const std::wstring Cdr::read_wstring(
         uint32_t& length,
-        CdrTypeConsistencyFlag consistency_flag)
+        CdrTryConstructFlag consistency_flag)
 {
     std::wstring ret_value = L"";
     uint32_t read_length {0};
@@ -1960,13 +1980,13 @@ const std::wstring Cdr::read_wstring(
         {
             switch (consistency_flag)
             {
-                case CdrTypeConsistencyFlag::FAIL:
+                case CdrTryConstructFlag::FAIL:
                     throw BadParamException(
                               "Deserialized wstring length exceeds the maximum length allowed by the destination type");
-                case CdrTypeConsistencyFlag::DEFAULT_VALUE:
+                case CdrTryConstructFlag::DEFAULT_VALUE:
                     length_to_read = 0;
                     break;
-                case CdrTypeConsistencyFlag::TRIM:
+                case CdrTryConstructFlag::TRIM:
                     length_to_read = length;
                     break;
             }
@@ -1975,7 +1995,9 @@ const std::wstring Cdr::read_wstring(
         // Save last datasize.
         last_data_size_ = sizeof(uint16_t);
 
-        length = length_to_read;
+        // In fake mode the stream is only consumed, so the returned string is left empty and the
+        // reported length must be zero to stay consistent with it.
+        length = fake_mode ? 0 : length_to_read;
 
         if (!fake_mode)
         {
@@ -2451,12 +2473,9 @@ Cdr& Cdr::deserialize_array(
         }
         else
         {
-#if FASTCDR_SIZEOF_LONG_DOUBLE == 16
+            // Long doubles always occupy 16 bytes on the wire, regardless of the platform's
+            // sizeof(long double), so the whole array is skipped with a single jump.
             offset_ += total_size;
-#else
-            offset_ += 8 * num_elements;
-        }
-#endif // FASTCDR_SIZEOF_LONG_DOUBLE == 16
         }
 
         return *this;
@@ -2608,7 +2627,7 @@ Cdr& Cdr::deserialize_bool_array(
 
 Cdr& Cdr::deserialize_bool_sequence(
         std::vector<bool>& vector_t,
-        CdrTypeConsistencyFlag consistency_flag,
+        CdrTryConstructFlag consistency_flag,
         uint32_t max_length)
 {
     uint32_t sequence_length {0};
@@ -2628,13 +2647,13 @@ Cdr& Cdr::deserialize_bool_sequence(
         {
             switch (consistency_flag)
             {
-                case CdrTypeConsistencyFlag::FAIL:
+                case CdrTryConstructFlag::FAIL:
                     throw exception::BadParamException(
                               "Serialized vector contains more elements than the destination array can hold");
-                case CdrTypeConsistencyFlag::DEFAULT_VALUE:
+                case CdrTryConstructFlag::DEFAULT_VALUE:
                     length_to_read = 0;
                     break;
-                case CdrTypeConsistencyFlag::TRIM:
+                case CdrTryConstructFlag::TRIM:
                     length_to_read = max_length;
                     vector_t.resize(length_to_read);
                     break;

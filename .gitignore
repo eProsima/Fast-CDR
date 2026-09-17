@@ -4,6 +4,7 @@
 *.swp
 # Build directory
 build/
+install/
 # Visual Studio user configuration files.
 *.vcxproj.user
 *.sdf

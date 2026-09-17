@@ -57,7 +57,7 @@ typedef enum
     DEFAULT_VALUE = 1,
     //! @brief Cdr will trims the serialized data so it can be assigned to the type used for deserialization.
     TRIM = 2
-} CdrTypeConsistencyFlag;
+} CdrTryConstructFlag;
 
 } // namespace fastcdr
 } // namespace eprosima

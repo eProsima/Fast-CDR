@@ -1639,13 +1639,17 @@ Cdr& Cdr::deserialize(
     }
     else if ((end_ - offset_) >= length)
     {
+        if ((&offset_)[length - 1] != '\0')
+        {
+            set_state(state_before_error);
+            throw BadParamException("The deserialized string is not null-terminated");
+        }
+
         // Save last datasize.
         last_data_size_ = sizeof(uint8_t);
 
         // Allocate memory.
-        string_t =
-                reinterpret_cast<char*>(calloc(length + ((&offset_)[length - 1] == '\0' ? 0 : 1),
-                sizeof(char)));
+        string_t = reinterpret_cast<char*>(calloc(length, sizeof(char)));
         memcpy(string_t, &offset_, length);
         offset_ += length;
         return *this;
@@ -1702,11 +1706,14 @@ const char* Cdr::read_string(
         last_data_size_ = sizeof(uint8_t);
 
         ret_value = &offset_;
-        offset_ += length;
-        if (ret_value[length - 1] == '\0')
+        if (ret_value[length - 1] != '\0')
         {
-            --length;
+            set_state(state_before_error);
+            throw BadParamException("The deserialized string is not null-terminated");
         }
+
+        offset_ += length;
+        --length;
         return ret_value;
     }
 

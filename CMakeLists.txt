@@ -97,7 +97,7 @@ option(APPEND_PROJECT_NAME_TO_INCLUDEDIR
 
 include(GNUInstallDirs)
 set(BIN_INSTALL_DIR "${CMAKE_INSTALL_BINDIR}" CACHE PATH "Installation directory for binaries")
-set(_include_dir "${CMAKE_INSTALL_INCLUDEDIR}")
+set(_include_dir "${CMAKE_INSTALL_INCLUDEDIR}/")
 if(APPEND_PROJECT_NAME_TO_INCLUDEDIR)
   string(APPEND _include_dir "${PROJECT_NAME}/")
 endif()

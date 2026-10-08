@@ -19,7 +19,7 @@ Please, refer to the [master branch](https://github.com/eProsima/Fast-CDR/blob/m
 |Fast DDS Version|Fast CDR Version|Fast CDR Version branch|Fast CDR Latest Release|Release Date|EOL Date|
 |----------------|----------------|-----------------------|-----------------------|------------|--------|
 |3.5 |2.3|[2.3.x](https://github.com/eProsima/Fast-CDR/tree/2.3.x)|[v2.3.5](https://github.com/eProsima/Fast-CDR/releases/tag/v2.3.5)  |March 2025    |January 2026 [^*]|
-|3.4 |2.3|[2.3.x](https://github.com/eProsima/Fast-CDR/tree/2.3.x)|[v2.3.5](https://github.com/eProsima/Fast-CDR/releases/tag/v2.3.7)  |March 2025    |June 2026 [^*]|
+|3.4 |2.3|[2.3.x](https://github.com/eProsima/Fast-CDR/tree/2.3.x)|[v2.3.7](https://github.com/eProsima/Fast-CDR/releases/tag/v2.3.7)  |March 2025    |June 2026 [^*]|
 |3.3 |2.3|[2.3.x](https://github.com/eProsima/Fast-CDR/tree/2.3.x)|[v2.3.4](https://github.com/eProsima/Fast-CDR/releases/tag/v2.3.4)  |March 2025    |November 2025 [^*]|
 |3.1 |2.2|[2.2.x](https://github.com/eProsima/Fast-CDR/tree/2.2.x)|[v2.2.6](https://github.com/eProsima/Fast-CDR/releases/tag/v2.2.6)  |February 2023 |March 2025 [^*]|
 |2.13|2.1|[2.1.x](https://github.com/eProsima/Fast-CDR/tree/2.1.x)|[v2.1.3](https://github.com/eProsima/Fast-CDR/releases/tag/v2.1.3)  |December 2023 |July 2024|

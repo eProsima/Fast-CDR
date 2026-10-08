@@ -413,7 +413,7 @@ FastCdr& FastCdr::deserialize(
         string_t = NULL;
         return *this;
     }
-    else if ((last_position_ - current_position_) >= length)
+    else if (length <= (last_position_ - current_position_) / 4)
     {
         // Allocate memory.
         string_t = reinterpret_cast<wchar_t*>(calloc(length + 1, sizeof(wchar_t))); // WStrings never serialize terminating zero
@@ -473,13 +473,11 @@ std::wstring FastCdr::read_wstring(
     state state_(*this);
 
     *this >> length;
-    uint32_t bytes_length = length * 4;
-
-    if (bytes_length == 0)
+    if (length == 0)
     {
         return ret_value;
     }
-    else if ((last_position_ - current_position_) >= bytes_length)
+    else if (length <= (last_position_ - current_position_) / 4)
     {
 
         ret_value.resize(length);

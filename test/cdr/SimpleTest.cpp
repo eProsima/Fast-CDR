@@ -666,6 +666,88 @@ TEST(CDRTests, WString)
     check_bad_length_deserialization(wstring_t, true);
 }
 
+template<typename Stream>
+static void check_wstring_overflow_length(
+        Stream& stream,
+        uint32_t length)
+{
+    stream << length;
+    stream.reset();
+    std::wstring value = L"unchanged";
+    EXPECT_THROW(stream >> value, NotEnoughMemoryException);
+    EXPECT_EQ(value, L"unchanged");
+    EXPECT_EQ(stream.get_serialized_data_length(), 0u);
+}
+
+template<typename Stream>
+static void check_wstring_truncated_length(
+        Stream& stream)
+{
+    stream << uint32_t(2);
+    stream.reset();
+    std::wstring value = L"unchanged";
+    EXPECT_THROW(stream >> value, NotEnoughMemoryException);
+    EXPECT_EQ(value, L"unchanged");
+    EXPECT_EQ(stream.get_serialized_data_length(), 0u);
+
+    stream.reset();
+    wchar_t* pointer = nullptr;
+    EXPECT_THROW(stream.deserialize(pointer), NotEnoughMemoryException);
+    EXPECT_EQ(pointer, nullptr);
+    EXPECT_EQ(stream.get_serialized_data_length(), 0u);
+    free(pointer);
+}
+
+TEST(CDRTests, WStringOverflowLength)
+{
+    for (auto version : {CdrVersion::XCDRv1, CdrVersion::XCDRv2})
+    {
+        for (auto endian : {Cdr::LITTLE_ENDIANNESS, Cdr::BIG_ENDIANNESS})
+        {
+            for (uint32_t length : {0x40000000u, 0x80000000u, 0xffffffffu})
+            {
+                char buffer[4] = {};
+                FastBuffer fast_buffer(buffer, sizeof(buffer));
+                Cdr stream(fast_buffer, endian, version);
+                check_wstring_overflow_length(stream, length);
+            }
+        }
+    }
+}
+
+TEST(CDRTests, WStringTruncatedLength)
+{
+    for (auto version : {CdrVersion::XCDRv1, CdrVersion::XCDRv2})
+    {
+        for (auto endian : {Cdr::LITTLE_ENDIANNESS, Cdr::BIG_ENDIANNESS})
+        {
+            char buffer[6] = {};
+            FastBuffer fast_buffer(buffer, sizeof(buffer));
+            Cdr stream(fast_buffer, endian, version);
+            check_wstring_truncated_length(stream);
+        }
+    }
+}
+
+TEST(FastCDRTests, WStringOverflowLength)
+{
+    for (uint32_t length : {0x40000000u, 0x80000000u, 0xffffffffu})
+    {
+        char buffer[4] = {};
+        FastBuffer fast_buffer(buffer, sizeof(buffer));
+        FastCdr stream(fast_buffer);
+        check_wstring_overflow_length(stream, length);
+    }
+}
+
+TEST(FastCDRTests, WStringTruncatedLength)
+{
+    char buffer[6] = {};
+    FastBuffer fast_buffer(buffer, sizeof(buffer));
+    FastCdr stream(fast_buffer);
+    check_wstring_truncated_length(stream);
+}
+
 TEST(CDRTests, EmptyString)
 {
     check_good_case(emptystring_t);

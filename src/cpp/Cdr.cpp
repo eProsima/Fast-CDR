@@ -1668,7 +1668,7 @@ Cdr& Cdr::deserialize(
         string_t = nullptr;
         return *this;
     }
-    else if ((end_ - offset_) >= (length * 2))
+    else if (length <= (end_ - offset_) / 2)
     {
         // Save last datasize.
         last_data_size_ = sizeof(uint16_t);
@@ -1722,13 +1722,11 @@ const std::wstring Cdr::read_wstring(
     state state_(*this);
 
     *this >> length;
-    uint32_t bytes_length = length * 2;
-
-    if (bytes_length == 0)
+    if (length == 0)
     {
         return ret_value;
     }
-    else if ((end_ - offset_) >= bytes_length)
+    else if (length <= (end_ - offset_) / 2)
     {
         // Save last datasize.
         last_data_size_ = sizeof(uint16_t);

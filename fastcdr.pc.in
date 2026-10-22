@@ -1,0 +1,12 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+includedir=@includedir_for_pc_file@
+libdir=@libdir_for_pc_file@
+
+Name: fastcdr
+Description: C++ library for serialize using CDR serialization
+URL: https://github.com/eProsima/Fast-CDR
+Version: @PROJECT_VERSION@
+
+Cflags: -I${includedir} -DFASTCDR_DYN_LINK
+Cflags.private: -UFASTCDR_DYN_LINK -DFASTCDR_STATIC_LINK
+Libs: -L${libdir} -lfastcdr

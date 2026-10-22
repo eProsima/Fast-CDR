@@ -633,6 +633,7 @@ TEST(XCdrTest, mutable_string_with_extra_alignment)
 /*!
  * @test Test an exception is thrown when the member size provided by the member header of a mutable structure is lower
  * than the real decoded member size.
+ * Both ShortMemberHeader and LongMemberHeader are tested.
  * @code{.idl}
  * @mutable
  * struct MutableStringWithWrongMemberSize
@@ -664,6 +665,38 @@ TEST(XCdrTest, mutable_string_with_lower_member_size)
             {
                 0x00, 0x03, 0x00, 0x00, // Encapsulation
                 0x00, 0x00, 0x04, 0x00, // ShortMemberHeader
+                0x03, 0x00, 0x00, 0x00, // String length
+                0x41, 0x42, 0x00,       // String
+                0x00,                   // Alignment
+                0x01, 0x00, 0x02, 0x00, // ShortMemberHeader
+                0x30, 0x00,             // Short
+                0x00, 0x00,             // Alignment
+                0x02, 0x3F, 0x00, 0x00  // Sentinel
+            }
+        },
+        {
+            Cdr::Endianness::BIG_ENDIANNESS,
+            {
+                0x00, 0x02, 0x00, 0x00, // Encapsulation
+                0x3F, 0x01, 0x00, 0x08, // LongMemberHeader
+                0x00, 0x00, 0x00, 0x00, // Member ID and flags
+                0x00, 0x00, 0x00, 0x04, // Size
+                0x00, 0x00, 0x00, 0x03, // String length
+                0x41, 0x42, 0x00,       // String
+                0x00,                   // Alignment
+                0x00, 0x01, 0x00, 0x02, // ShortMemberHeader
+                0x00, 0x30,             // Short
+                0x00, 0x00,             // Alignment
+                0x3F, 0x02, 0x00, 0x00  // Sentinel
+            }
+        },
+        {
+            Cdr::Endianness::LITTLE_ENDIANNESS,
+            {
+                0x00, 0x03, 0x00, 0x00, // Encapsulation
+                0x01, 0x3F, 0x08, 0x00, // LongMemberHeader
+                0x00, 0x00, 0x00, 0x00, // Member ID and flags
+                0x04, 0x00, 0x00, 0x00, // Size
                 0x03, 0x00, 0x00, 0x00, // String length
                 0x41, 0x42, 0x00,       // String
                 0x00,                   // Alignment

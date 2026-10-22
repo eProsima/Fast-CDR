@@ -37,7 +37,7 @@ class XCdrv1Test : public ::testing::TestWithParam<std::tuple<EncodingAlgorithmF
 {
 };
 
-class XCdrv1PLTest : public ::testing::TestWithParam< Cdr::XCdrHeaderSelection>
+class XCdrv1PLTest : public ::testing::TestWithParam<Cdr::XCdrHeaderSelection>
 {
 };
 

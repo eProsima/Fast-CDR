@@ -540,6 +540,34 @@ TEST(CDRTests, DDSEncapsulation)
     }
 }
 
+TEST(CDRTests, DDSEncapsulationTruncatedOptionAlignment)
+{
+    // Regression test: an encapsulation header whose options request trailing
+    // alignment padding on a buffer that is too short to contain it used to
+    // move end_ before the read cursor. The remaining length then underflowed
+    // and later reads ran off the buffer (segfault). It must be refused.
+    {
+        // 4-byte header only: PLAIN_CDR_BE, options {0x00, 0x01} -> align 1,
+        // but no payload byte for the claimed padding.
+        char encapsulation[4]{ 0, 0, 0, 1 };
+        eprosima::fastcdr::FastBuffer buffer(encapsulation, sizeof(encapsulation));
+        eprosima::fastcdr::Cdr cdr(buffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN,
+                eprosima::fastcdr::CdrVersion::DDS_CDR);
+        EXPECT_THROW(cdr.read_encapsulation(),
+                eprosima::fastcdr::exception::NotEnoughMemoryException);
+    }
+
+    {
+        // Same option alignment, but the buffer is long enough to hold the
+        // padding: read_encapsulation must still succeed.
+        char encapsulation[8]{ 0, 0, 0, 1, 0, 0, 0, 0 };
+        eprosima::fastcdr::FastBuffer buffer(encapsulation, sizeof(encapsulation));
+        eprosima::fastcdr::Cdr cdr(buffer, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN,
+                eprosima::fastcdr::CdrVersion::DDS_CDR);
+        EXPECT_NO_THROW(cdr.read_encapsulation());
+    }
+}
+
 TEST(CDRTests, CorbaEncapsulation)
 {
     char encapsulation[1]{ 0 };

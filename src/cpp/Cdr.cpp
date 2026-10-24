@@ -297,6 +297,17 @@ Cdr& Cdr::read_encapsulation()
 
                 if (0 == alignment)
                 {
+                    // The option alignment counts padding bytes at the end of
+                    // the stream. A truncated buffer may not actually contain
+                    // them; moving end_ back past the read cursor would make
+                    // the remaining length underflow and later reads run off
+                    // the buffer. Refuse such input instead.
+                    if ((end_ - offset_) < option_align)
+                    {
+                        throw NotEnoughMemoryException(
+                                  NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+                    }
+
                     end_ -= option_align;
                 }
             }

@@ -14,6 +14,8 @@
 
 #include <fastcdr/exceptions/LockedExternalAccessException.hpp>
 
+#include <utility>
+
 using namespace eprosima::fastcdr::exception;
 
 const char* const LockedExternalAccessException::LOCKED_EXTERNAL_ACCESS_MESSAGE_DEFAULT =

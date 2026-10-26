@@ -21,11 +21,7 @@
 #include <string>
 #include <vector>
 
-#if !__APPLE__ && !__FreeBSD__ && !__VXWORKS__
-#include <malloc.h>
-#else
-#include <stdlib.h>
-#endif // if !__APPLE__ && !__FreeBSD__ && !__VXWORKS__
+#include <cstdlib>
 
 #include "fastcdr_dll.h"
 #include "FastBuffer.h"
@@ -87,7 +83,7 @@ public:
      * @return True is returned when the jump operation works successfully. Otherwise, false is returned.
      */
     bool jump(
-            size_t num_bytes);
+            std::size_t num_bytes);
 
     /*!
      * @brief This function resets the current position in the buffer to the begining.
@@ -104,7 +100,7 @@ public:
      * @brief This function returns the length of the serialized data inside the stream.
      * @return The length of the serialized data.
      */
-    inline size_t get_serialized_data_length() const
+    inline std::size_t get_serialized_data_length() const
     {
         return current_position_ - cdr_buffer_.begin();
     }
@@ -129,7 +125,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
      */
     inline FastCdr& operator <<(
-            const uint8_t octet_t)
+            const std::uint8_t octet_t)
     {
         return serialize(octet_t);
     }
@@ -153,7 +149,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
      */
     inline FastCdr& operator <<(
-            const int8_t int8)
+            const std::int8_t int8)
     {
         return serialize(int8);
     }
@@ -165,7 +161,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
      */
     inline FastCdr& operator <<(
-            const uint16_t ushort_t)
+            const std::uint16_t ushort_t)
     {
         return serialize(ushort_t);
     }
@@ -177,7 +173,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
      */
     inline FastCdr& operator <<(
-            const int16_t short_t)
+            const std::int16_t short_t)
     {
         return serialize(short_t);
     }
@@ -189,7 +185,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
      */
     inline FastCdr& operator <<(
-            const uint32_t ulong_t)
+            const std::uint32_t ulong_t)
     {
         return serialize(ulong_t);
     }
@@ -201,7 +197,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
      */
     inline FastCdr& operator <<(
-            const int32_t long_t)
+            const std::int32_t long_t)
     {
         return serialize(long_t);
     }
@@ -225,7 +221,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
      */
     inline FastCdr& operator <<(
-            const uint64_t ulonglong_t)
+            const std::uint64_t ulonglong_t)
     {
         return serialize(ulonglong_t);
     }
@@ -237,7 +233,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
      */
     inline FastCdr& operator <<(
-            const int64_t longlong_t)
+            const std::int64_t longlong_t)
     {
         return serialize(longlong_t);
     }
@@ -344,7 +340,7 @@ public:
      * @return Reference to the eprosima::fastcdr::FastCdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
      */
-    template<class _T, size_t _Size>
+    template<class _T, std::size_t _Size>
     inline FastCdr& operator <<(
             const std::array<_T, _Size>& array_t)
     {
@@ -385,7 +381,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
      */
     inline FastCdr& operator >>(
-            uint8_t& octet_t)
+            std::uint8_t& octet_t)
     {
         return deserialize(octet_t);
     }
@@ -409,7 +405,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
      */
     inline FastCdr& operator >>(
-            int8_t& int8)
+            std::int8_t& int8)
     {
         return deserialize(int8);
     }
@@ -421,7 +417,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
      */
     inline FastCdr& operator >>(
-            uint16_t& ushort_t)
+            std::uint16_t& ushort_t)
     {
         return deserialize(ushort_t);
     }
@@ -433,7 +429,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
      */
     inline FastCdr& operator >>(
-            int16_t& short_t)
+            std::int16_t& short_t)
     {
         return deserialize(short_t);
     }
@@ -445,7 +441,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
      */
     inline FastCdr& operator >>(
-            uint32_t& ulong_t)
+            std::uint32_t& ulong_t)
     {
         return deserialize(ulong_t);
     }
@@ -457,7 +453,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
      */
     inline FastCdr& operator >>(
-            int32_t& long_t)
+            std::int32_t& long_t)
     {
         return deserialize(long_t);
     }
@@ -481,7 +477,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
      */
     inline FastCdr& operator >>(
-            uint64_t& ulonglong_t)
+            std::uint64_t& ulonglong_t)
     {
         return deserialize(ulonglong_t);
     }
@@ -493,7 +489,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
      */
     inline FastCdr& operator >>(
-            int64_t& longlong_t)
+            std::int64_t& longlong_t)
     {
         return deserialize(longlong_t);
     }
@@ -592,7 +588,7 @@ public:
      * @return Reference to the eprosima::fastcdr::FastCdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
      */
-    template<class _T, size_t _Size>
+    template<class _T, std::size_t _Size>
     inline FastCdr& operator >>(
             std::array<_T, _Size>& array_t)
     {
@@ -634,7 +630,7 @@ public:
      */
     inline
     FastCdr& serialize(
-            const uint8_t octet_t)
+            const std::uint8_t octet_t)
     {
         return serialize(static_cast<char>(octet_t));
     }
@@ -667,7 +663,7 @@ public:
      */
     inline
     FastCdr& serialize(
-            const int8_t int8)
+            const std::int8_t int8)
     {
         return serialize(static_cast<char>(int8));
     }
@@ -680,9 +676,9 @@ public:
      */
     inline
     FastCdr& serialize(
-            const uint16_t ushort_t)
+            const std::uint16_t ushort_t)
     {
-        return serialize(static_cast<int16_t>(ushort_t));
+        return serialize(static_cast<std::int16_t>(ushort_t));
     }
 
     /*!
@@ -693,7 +689,7 @@ public:
      */
     inline
     FastCdr& serialize(
-            const int16_t short_t)
+            const std::int16_t short_t)
     {
         if (((last_position_ - current_position_) >= sizeof(short_t)) || resize(sizeof(short_t)))
         {
@@ -715,9 +711,9 @@ public:
      */
     inline
     FastCdr& serialize(
-            const uint32_t ulong_t)
+            const std::uint32_t ulong_t)
     {
-        return serialize(static_cast<int32_t>(ulong_t));
+        return serialize(static_cast<std::int32_t>(ulong_t));
     }
 
     /*!
@@ -728,7 +724,7 @@ public:
      */
     inline
     FastCdr& serialize(
-            const int32_t long_t)
+            const std::int32_t long_t)
     {
         if (((last_position_ - current_position_) >= sizeof(long_t)) || resize(sizeof(long_t)))
         {
@@ -752,7 +748,7 @@ public:
     FastCdr& serialize(
             const wchar_t wchar)
     {
-        return serialize(static_cast<uint32_t>(wchar));
+        return serialize(static_cast<std::uint32_t>(wchar));
     }
 
     /*!
@@ -763,9 +759,9 @@ public:
      */
     inline
     FastCdr& serialize(
-            const uint64_t ulonglong_t)
+            const std::uint64_t ulonglong_t)
     {
-        return serialize(static_cast<int64_t>(ulonglong_t));
+        return serialize(static_cast<std::int64_t>(ulonglong_t));
     }
 
     /*!
@@ -776,7 +772,7 @@ public:
      */
     inline
     FastCdr& serialize(
-            const int64_t longlong_t)
+            const std::int64_t longlong_t)
     {
         if (((last_position_ - current_position_) >= sizeof(longlong_t)) || resize(sizeof(longlong_t)))
         {
@@ -900,7 +896,7 @@ public:
     {
         // Check there are no null characters in the string.
         const char* c_str = string_t.c_str();
-        const auto str_len = strlen(c_str);
+        const auto str_len = std::strlen(c_str);
         if (string_t.size() > str_len)
         {
             throw exception::BadParamException("The string contains null characters");
@@ -928,7 +924,7 @@ public:
      * @return Reference to the eprosima::fastcdr::FastCdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
      */
-    template<class _T, size_t _Size>
+    template<class _T, std::size_t _Size>
     inline FastCdr& serialize(
             const std::array<_T, _Size>& array_t)
     {
@@ -960,7 +956,7 @@ public:
     {
         state state_before_error(*this);
 
-        *this << static_cast<int32_t>(vector_t.size());
+        *this << static_cast<std::int32_t>(vector_t.size());
 
         try
         {
@@ -1014,8 +1010,8 @@ public:
      */
     inline
     FastCdr& serialize_array(
-            const uint8_t* octet_t,
-            size_t num_elements)
+            const std::uint8_t* octet_t,
+            std::size_t num_elements)
     {
         return serialize_array(reinterpret_cast<const char*>(octet_t), num_elements);
     }
@@ -1029,7 +1025,7 @@ public:
      */
     FastCdr& serialize_array(
             const char* char_t,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function serializes an array of int8_t.
@@ -1040,8 +1036,8 @@ public:
      */
     inline
     FastCdr& serialize_array(
-            const int8_t* int8,
-            size_t num_elements)
+            const std::int8_t* int8,
+            std::size_t num_elements)
     {
         return serialize_array(reinterpret_cast<const char*>(int8), num_elements);
     }
@@ -1055,10 +1051,10 @@ public:
      */
     inline
     FastCdr& serialize_array(
-            const uint16_t* ushort_t,
-            size_t num_elements)
+            const std::uint16_t* ushort_t,
+            std::size_t num_elements)
     {
-        return serialize_array(reinterpret_cast<const int16_t*>(ushort_t), num_elements);
+        return serialize_array(reinterpret_cast<const std::int16_t*>(ushort_t), num_elements);
     }
 
     /*!
@@ -1069,8 +1065,8 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
      */
     FastCdr& serialize_array(
-            const int16_t* short_t,
-            size_t num_elements);
+            const std::int16_t* short_t,
+            std::size_t num_elements);
 
     /*!
      * @brief This function serializes an array of unsigned longs.
@@ -1081,10 +1077,10 @@ public:
      */
     inline
     FastCdr& serialize_array(
-            const uint32_t* ulong_t,
-            size_t num_elements)
+            const std::uint32_t* ulong_t,
+            std::size_t num_elements)
     {
-        return serialize_array(reinterpret_cast<const int32_t*>(ulong_t), num_elements);
+        return serialize_array(reinterpret_cast<const std::int32_t*>(ulong_t), num_elements);
     }
 
     /*!
@@ -1095,8 +1091,8 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
      */
     FastCdr& serialize_array(
-            const int32_t* long_t,
-            size_t num_elements);
+            const std::int32_t* long_t,
+            std::size_t num_elements);
 
     /*!
      * @brief This function serializes an array of wide-chars.
@@ -1107,7 +1103,7 @@ public:
      */
     FastCdr& serialize_array(
             const wchar_t* wchar,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function serializes an array of unsigned long longs.
@@ -1118,10 +1114,10 @@ public:
      */
     inline
     FastCdr& serialize_array(
-            const uint64_t* ulonglong_t,
-            size_t num_elements)
+            const std::uint64_t* ulonglong_t,
+            std::size_t num_elements)
     {
-        return serialize_array(reinterpret_cast<const int64_t*>(ulonglong_t), num_elements);
+        return serialize_array(reinterpret_cast<const std::int64_t*>(ulonglong_t), num_elements);
     }
 
     /*!
@@ -1132,8 +1128,8 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
      */
     FastCdr& serialize_array(
-            const int64_t* longlong_t,
-            size_t num_elements);
+            const std::int64_t* longlong_t,
+            std::size_t num_elements);
 
     /*!
      * @brief This function serializes an array of floats.
@@ -1144,7 +1140,7 @@ public:
      */
     FastCdr& serialize_array(
             const float* float_t,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function serializes an array of doubles.
@@ -1155,7 +1151,7 @@ public:
      */
     FastCdr& serialize_array(
             const double* double_t,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function serializes an array of long doubles.
@@ -1166,7 +1162,7 @@ public:
      */
     FastCdr& serialize_array(
             const long double* ldouble_t,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function serializes an array of booleans.
@@ -1177,7 +1173,7 @@ public:
      */
     FastCdr& serialize_array(
             const bool* bool_t,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function serializes an array of strings.
@@ -1189,9 +1185,9 @@ public:
     inline
     FastCdr& serialize_array(
             const std::string* string_t,
-            size_t num_elements)
+            std::size_t num_elements)
     {
-        for (size_t count = 0; count < num_elements; ++count)
+        for (std::size_t count = 0; count < num_elements; ++count)
         {
             serialize(string_t[count].c_str());
         }
@@ -1208,9 +1204,9 @@ public:
     inline
     FastCdr& serialize_array(
             const std::wstring* string_t,
-            size_t num_elements)
+            std::size_t num_elements)
     {
-        for (size_t count = 0; count < num_elements; ++count)
+        for (std::size_t count = 0; count < num_elements; ++count)
         {
             serialize(string_t[count].c_str());
         }
@@ -1227,9 +1223,9 @@ public:
     template<class _T>
     FastCdr& serialize_array(
             const std::vector<_T>* vector_t,
-            size_t num_elements)
+            std::size_t num_elements)
     {
-        for (size_t count = 0; count < num_elements; ++count)
+        for (std::size_t count = 0; count < num_elements; ++count)
         {
             serialize(vector_t[count]);
         }
@@ -1246,9 +1242,9 @@ public:
     template<class _T>
     FastCdr& serialize_array(
             const _T* type_t,
-            size_t num_elements)
+            std::size_t num_elements)
     {
-        for (size_t count = 0; count < num_elements; ++count)
+        for (std::size_t count = 0; count < num_elements; ++count)
         {
             type_t[count].serialize(*this);
         }
@@ -1265,11 +1261,11 @@ public:
     template<class _T>
     FastCdr& serialize_sequence(
             const _T* sequence_t,
-            size_t num_elements)
+            std::size_t num_elements)
     {
         state state_before_error(*this);
 
-        serialize(static_cast<int32_t>(num_elements));
+        serialize(static_cast<std::int32_t>(num_elements));
 
         try
         {
@@ -1292,7 +1288,7 @@ public:
      */
     inline
     FastCdr& deserialize(
-            uint8_t& octet_t)
+            std::uint8_t& octet_t)
     {
         return deserialize(reinterpret_cast<char&>(octet_t));
     }
@@ -1325,7 +1321,7 @@ public:
      */
     inline
     FastCdr& deserialize(
-            int8_t& int8)
+            std::int8_t& int8)
     {
         return deserialize(reinterpret_cast<char&>(int8));
     }
@@ -1338,9 +1334,9 @@ public:
      */
     inline
     FastCdr& deserialize(
-            uint16_t& ushort_t)
+            std::uint16_t& ushort_t)
     {
-        return deserialize(reinterpret_cast<int16_t&>(ushort_t));
+        return deserialize(reinterpret_cast<std::int16_t&>(ushort_t));
     }
 
     /*!
@@ -1351,7 +1347,7 @@ public:
      */
     inline
     FastCdr& deserialize(
-            int16_t& short_t)
+            std::int16_t& short_t)
     {
         if ((last_position_ - current_position_) >= sizeof(short_t))
         {
@@ -1373,9 +1369,9 @@ public:
      */
     inline
     FastCdr& deserialize(
-            uint32_t& ulong_t)
+            std::uint32_t& ulong_t)
     {
-        return deserialize(reinterpret_cast<int32_t&>(ulong_t));
+        return deserialize(reinterpret_cast<std::int32_t&>(ulong_t));
     }
 
     /*!
@@ -1386,7 +1382,7 @@ public:
      */
     inline
     FastCdr& deserialize(
-            int32_t& long_t)
+            std::int32_t& long_t)
     {
         if ((last_position_ - current_position_) >= sizeof(long_t))
         {
@@ -1410,7 +1406,7 @@ public:
     FastCdr& deserialize(
             wchar_t& wchar)
     {
-        uint32_t ret;
+        std::uint32_t ret;
         deserialize(ret);
         wchar = static_cast<wchar_t>(ret);
         return *this;
@@ -1424,9 +1420,9 @@ public:
      */
     inline
     FastCdr& deserialize(
-            uint64_t& ulonglong_t)
+            std::uint64_t& ulonglong_t)
     {
-        return deserialize(reinterpret_cast<int64_t&>(ulonglong_t));
+        return deserialize(reinterpret_cast<std::int64_t&>(ulonglong_t));
     }
 
     /*!
@@ -1437,7 +1433,7 @@ public:
      */
     inline
     FastCdr& deserialize(
-            int64_t& longlong_t)
+            std::int64_t& longlong_t)
     {
         if ((last_position_ - current_position_) >= sizeof(longlong_t))
         {
@@ -1564,7 +1560,7 @@ public:
     FastCdr& deserialize(
             std::string& string_t)
     {
-        uint32_t length = 0;
+        std::uint32_t length = 0;
         const char* str = read_string(length);
         string_t.assign(str, length);
         return *this;
@@ -1580,7 +1576,7 @@ public:
     FastCdr& deserialize(
             std::wstring& string_t)
     {
-        uint32_t length = 0;
+        std::uint32_t length = 0;
         string_t = read_wstring(length);
         return *this;
     }
@@ -1591,7 +1587,7 @@ public:
      * @return Reference to the eprosima::fastcdr::FastCdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
      */
-    template<class _T, size_t _Size>
+    template<class _T, std::size_t _Size>
     inline FastCdr& deserialize(
             std::array<_T, _Size>& array_t)
     {
@@ -1621,7 +1617,7 @@ public:
     FastCdr& deserialize(
             std::vector<_T>& vector_t)
     {
-        uint32_t sequence_length = 0;
+        std::uint32_t sequence_length = 0;
         state state_before_error(*this);
 
         *this >> sequence_length;
@@ -1679,8 +1675,8 @@ public:
      */
     inline
     FastCdr& deserialize_array(
-            uint8_t* octet_t,
-            size_t num_elements)
+            std::uint8_t* octet_t,
+            std::size_t num_elements)
     {
         return deserialize_array(reinterpret_cast<char*>(octet_t), num_elements);
     }
@@ -1694,7 +1690,7 @@ public:
      */
     FastCdr& deserialize_array(
             char* char_t,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function deserializes an array of int8_t.
@@ -1705,8 +1701,8 @@ public:
      */
     inline
     FastCdr& deserialize_array(
-            int8_t* int8,
-            size_t num_elements)
+            std::int8_t* int8,
+            std::size_t num_elements)
     {
         return deserialize_array(reinterpret_cast<char*>(int8), num_elements);
     }
@@ -1720,10 +1716,10 @@ public:
      */
     inline
     FastCdr& deserialize_array(
-            uint16_t* ushort_t,
-            size_t num_elements)
+            std::uint16_t* ushort_t,
+            std::size_t num_elements)
     {
-        return deserialize_array(reinterpret_cast<int16_t*>(ushort_t), num_elements);
+        return deserialize_array(reinterpret_cast<std::int16_t*>(ushort_t), num_elements);
     }
 
     /*!
@@ -1734,8 +1730,8 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
      */
     FastCdr& deserialize_array(
-            int16_t* short_t,
-            size_t num_elements);
+            std::int16_t* short_t,
+            std::size_t num_elements);
 
     /*!
      * @brief This function deserializes an array of unsigned longs.
@@ -1746,10 +1742,10 @@ public:
      */
     inline
     FastCdr& deserialize_array(
-            uint32_t* ulong_t,
-            size_t num_elements)
+            std::uint32_t* ulong_t,
+            std::size_t num_elements)
     {
-        return deserialize_array(reinterpret_cast<int32_t*>(ulong_t), num_elements);
+        return deserialize_array(reinterpret_cast<std::int32_t*>(ulong_t), num_elements);
     }
 
     /*!
@@ -1760,8 +1756,8 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
      */
     FastCdr& deserialize_array(
-            int32_t* long_t,
-            size_t num_elements);
+            std::int32_t* long_t,
+            std::size_t num_elements);
 
     /*!
      * @brief This function deserializes an array of wide-chars.
@@ -1772,7 +1768,7 @@ public:
      */
     FastCdr& deserialize_array(
             wchar_t* wchar,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function deserializes an array of unsigned long longs.
@@ -1783,10 +1779,10 @@ public:
      */
     inline
     FastCdr& deserialize_array(
-            uint64_t* ulonglong_t,
-            size_t num_elements)
+            std::uint64_t* ulonglong_t,
+            std::size_t num_elements)
     {
-        return deserialize_array(reinterpret_cast<int64_t*>(ulonglong_t), num_elements);
+        return deserialize_array(reinterpret_cast<std::int64_t*>(ulonglong_t), num_elements);
     }
 
     /*!
@@ -1797,8 +1793,8 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
      */
     FastCdr& deserialize_array(
-            int64_t* longlong_t,
-            size_t num_elements);
+            std::int64_t* longlong_t,
+            std::size_t num_elements);
 
     /*!
      * @brief This function deserializes an array of floats.
@@ -1809,7 +1805,7 @@ public:
      */
     FastCdr& deserialize_array(
             float* float_t,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function deserializes an array of doubles.
@@ -1820,7 +1816,7 @@ public:
      */
     FastCdr& deserialize_array(
             double* double_t,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function deserializes an array of long doubles.
@@ -1831,7 +1827,7 @@ public:
      */
     FastCdr& deserialize_array(
             long double* ldouble_t,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function deserializes an array of booleans.
@@ -1842,7 +1838,7 @@ public:
      */
     FastCdr& deserialize_array(
             bool* bool_t,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function deserializes an array of strings.
@@ -1854,9 +1850,9 @@ public:
     inline
     FastCdr& deserialize_array(
             std::string* string_t,
-            size_t num_elements)
+            std::size_t num_elements)
     {
-        for (size_t count = 0; count < num_elements; ++count)
+        for (std::size_t count = 0; count < num_elements; ++count)
         {
             deserialize(string_t[count]);
         }
@@ -1873,9 +1869,9 @@ public:
     inline
     FastCdr& deserialize_array(
             std::wstring* string_t,
-            size_t num_elements)
+            std::size_t num_elements)
     {
-        for (size_t count = 0; count < num_elements; ++count)
+        for (std::size_t count = 0; count < num_elements; ++count)
         {
             deserialize(string_t[count]);
         }
@@ -1892,9 +1888,9 @@ public:
     template<class _T>
     FastCdr& deserialize_array(
             std::vector<_T>* vector_t,
-            size_t num_elements)
+            std::size_t num_elements)
     {
-        for (size_t count = 0; count < num_elements; ++count)
+        for (std::size_t count = 0; count < num_elements; ++count)
         {
             deserialize(vector_t[count]);
         }
@@ -1911,9 +1907,9 @@ public:
     template<class _T>
     FastCdr& deserialize_array(
             _T* type_t,
-            size_t num_elements)
+            std::size_t num_elements)
     {
-        for (size_t count = 0; count < num_elements; ++count)
+        for (std::size_t count = 0; count < num_elements; ++count)
         {
             type_t[count].deserialize(*this);
         }
@@ -1932,7 +1928,7 @@ public:
     template<class _T = std::string>
     FastCdr& deserialize_sequence(
             std::string*& sequence_t,
-            size_t& num_elements)
+            std::size_t& num_elements)
     {
         return deserialize_string_sequence(sequence_t, num_elements);
     }
@@ -1949,7 +1945,7 @@ public:
     template<class _T = std::wstring>
     FastCdr& deserialize_sequence(
             std::wstring*& sequence_t,
-            size_t& num_elements)
+            std::size_t& num_elements)
     {
         return deserialize_wstring_sequence(sequence_t, num_elements);
     }
@@ -1966,21 +1962,21 @@ public:
     template<class _T>
     FastCdr& deserialize_sequence(
             _T*& sequence_t,
-            size_t& num_elements)
+            std::size_t& num_elements)
     {
-        uint32_t sequence_length = 0;
+        std::uint32_t sequence_length = 0;
         state state_before_error(*this);
 
         deserialize(sequence_length);
 
         try
         {
-            sequence_t = reinterpret_cast<_T*>(calloc(sequence_length, sizeof(_T)));
+            sequence_t = reinterpret_cast<_T*>(std::calloc(sequence_length, sizeof(_T)));
             deserialize_array(sequence_t, sequence_length);
         }
         catch (eprosima::fastcdr::exception::Exception& ex)
         {
-            free(sequence_t);
+            std::free(sequence_t);
             sequence_t = NULL;
             set_state(state_before_error);
             ex.raise();
@@ -2003,7 +1999,7 @@ public:
     template<>
     FastCdr& deserialize_sequence<std::string>(
             std::string*& sequence_t,
-            size_t& num_elements)
+            std::size_t& num_elements)
     {
         return deserialize_string_sequence(sequence_t, num_elements);
     }
@@ -2020,7 +2016,7 @@ public:
     template<>
     FastCdr& deserialize_sequence<std::wstring>(
             std::wstring*& sequence_t,
-            size_t& num_elements)
+            std::size_t& num_elements)
     {
         return deserialize_wstring_sequence(sequence_t, num_elements);
     }
@@ -2053,11 +2049,11 @@ private:
 
     FastCdr& deserialize_string_sequence(
             std::string*& sequence_t,
-            size_t& num_elements);
+            std::size_t& num_elements);
 
     FastCdr& deserialize_wstring_sequence(
             std::wstring*& sequence_t,
-            size_t& num_elements);
+            std::size_t& num_elements);
 
     /*!
      * @brief This function template detects the content type of the STD container array and serializes the array.
@@ -2066,10 +2062,10 @@ private:
      * @return Reference to the eprosima::fastcdr::FastCdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize in a position that exceeds the internal memory size.
      */
-    template<class _T, size_t _Size>
+    template<class _T, std::size_t _Size>
     FastCdr& serialize_array(
             const std::array<_T, _Size>* array_t,
-            size_t num_elements)
+            std::size_t num_elements)
     {
         if (num_elements == 0 || array_t == nullptr)
         {
@@ -2085,10 +2081,10 @@ private:
      * @return Reference to the eprosima::fastcdr::FastCdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize in a position that exceeds the internal memory size.
      */
-    template<class _T, size_t _Size>
+    template<class _T, std::size_t _Size>
     FastCdr& deserialize_array(
             std::array<_T, _Size>* array_t,
-            size_t num_elements)
+            std::size_t num_elements)
     {
         if (num_elements == 0 || array_t == nullptr)
         {
@@ -2098,13 +2094,13 @@ private:
     }
 
     bool resize(
-            size_t min_size_inc);
+            std::size_t min_size_inc);
 
     const char* read_string(
-            uint32_t& length);
+            std::uint32_t& length);
 
     std::wstring read_wstring(
-            uint32_t& length);
+            std::uint32_t& length);
 
     //! @brief Reference to the buffer that will be serialized/deserialized.
     FastBuffer& cdr_buffer_;

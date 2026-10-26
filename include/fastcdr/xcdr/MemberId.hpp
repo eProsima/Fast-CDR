@@ -31,13 +31,13 @@ public:
     MemberId() = default;
 
     MemberId(
-            uint32_t id_value)
+            std::uint32_t id_value)
         : id(id_value)
     {
     }
 
     bool operator ==(
-            uint32_t id_value) const
+            std::uint32_t id_value) const
     {
         return id == id_value;
     }
@@ -54,13 +54,13 @@ public:
         return !(member_id == *this);
     }
 
-    uint32_t id { member_id_invalid_value_ };
+    std::uint32_t id { member_id_invalid_value_ };
 
     bool must_understand { false };
 
 private:
 
-    static constexpr uint32_t member_id_invalid_value_ = 0xFFFFFFFF;
+    static constexpr std::uint32_t member_id_invalid_value_ = 0xFFFFFFFF;
 
 };
 

@@ -40,18 +40,18 @@ namespace fastcdr {
  * @tparam MAX_CHARS Maximum number of characters is specified as the template parameter.
  *                   Space for an additional null terminator will be reserved.
  */
-template <size_t MAX_CHARS>
+template <std::size_t MAX_CHARS>
 struct fixed_string
 {
 public:
 
     //! @brief Maximum number of characters.
-    static constexpr size_t max_size = MAX_CHARS;
+    static constexpr std::size_t max_size = MAX_CHARS;
 
     //! @brief Default constructor.
     fixed_string() noexcept
     {
-        memset(string_data, 0, sizeof(string_data));
+        std::memset(string_data, 0, sizeof(string_data));
         string_len = 0;
     }
 
@@ -64,7 +64,7 @@ public:
      */
     fixed_string(
             const char* c_array,
-            size_t n_chars) noexcept
+            std::size_t n_chars) noexcept
     {
         assign(c_array, n_chars);
     }
@@ -77,13 +77,13 @@ public:
      */
     fixed_string& assign(
             const char* c_array,
-            size_t n_chars) noexcept
+            std::size_t n_chars) noexcept
     {
         string_len = (nullptr == c_array) ? 0 :
                 (MAX_CHARS < n_chars) ? MAX_CHARS : n_chars;
         if (0 < string_len)
         {
-            memcpy(string_data, c_array, string_len);
+            std::memcpy(string_data, c_array, string_len);
         }
         string_data[string_len] = '\0';
         return *this;
@@ -140,7 +140,7 @@ public:
      * @param[in] rhs Reference to the fixed_string.
      * return Reference of this instance.
      */
-    template<size_t N> fixed_string& operator = (
+    template<std::size_t N> fixed_string& operator = (
             const fixed_string<N>& rhs) noexcept
     {
         set(rhs.c_str());
@@ -173,7 +173,7 @@ public:
     bool operator == (
             const char* rhs) const noexcept
     {
-        return strncmp(string_data, rhs, MAX_CHARS) == 0;
+        return std::strncmp(string_data, rhs, MAX_CHARS) == 0;
     }
 
     /*!
@@ -184,7 +184,7 @@ public:
     bool operator == (
             const std::string& rhs) const noexcept
     {
-        return strncmp(string_data, rhs.c_str(), MAX_CHARS) == 0;
+        return std::strncmp(string_data, rhs.c_str(), MAX_CHARS) == 0;
     }
 
     /*!
@@ -192,10 +192,10 @@ public:
      * @param[in] rhs fixed_string to be compared with.
      * @return `true` if strings are equal. `false` otherwise.
      */
-    template<size_t N>  bool operator == (
+    template<std::size_t N>  bool operator == (
             const fixed_string<N>& rhs) const noexcept
     {
-        return strncmp(string_data, rhs.c_str(), MAX_CHARS) == 0;
+        return std::strncmp(string_data, rhs.c_str(), MAX_CHARS) == 0;
     }
 
     /*!
@@ -225,7 +225,7 @@ public:
      * @param[in] rhs fixed_string to be compared with.
      * @return `true` if strings are not equal. `false` otherwise.
      */
-    template<size_t N>  bool operator != (
+    template<std::size_t N>  bool operator != (
             const fixed_string<N>& rhs) const noexcept
     {
         return !(*this == rhs);
@@ -236,7 +236,7 @@ public:
      * @param[in] rhs fixed_string to be compared with.
      * @return `true` if this string is less than the provided one. `false` otherwise.
      */
-    template<size_t N>  bool operator < (
+    template<std::size_t N>  bool operator < (
             const fixed_string<N>& rhs) const noexcept
     {
         return 0 > compare(rhs);
@@ -247,7 +247,7 @@ public:
      * @param[in] rhs fixed_string to be compared with.
      * @return `true` if this string is greater than the provided one. `false` otherwise.
      */
-    template<size_t N>  bool operator > (
+    template<std::size_t N>  bool operator > (
             const fixed_string<N>& rhs) const noexcept
     {
         return 0 < compare(rhs);
@@ -286,7 +286,7 @@ public:
      * @brief Returns the size of the string.
      * @return Length of the string.
      */
-    size_t size() const noexcept
+    std::size_t size() const noexcept
     {
         return string_len;
     }
@@ -299,7 +299,7 @@ public:
     int compare(
             const char* str) const noexcept
     {
-        return strncmp(string_data, str, MAX_CHARS);
+        return std::strncmp(string_data, str, MAX_CHARS);
     }
 
     /*!
@@ -310,7 +310,7 @@ public:
     int compare(
             const std::string& str) const noexcept
     {
-        return strncmp(string_data, str.c_str(), MAX_CHARS);
+        return std::strncmp(string_data, str.c_str(), MAX_CHARS);
     }
 
     /*!
@@ -318,10 +318,10 @@ public:
      * @param[in] str fixed_string to be compared with.
      * @return Integer value with the result of the comparison as described in `std::string::compare()`.
      */
-    template<size_t N>  int compare(
+    template<std::size_t N>  int compare(
             const fixed_string<N>& str) const noexcept
     {
-        return strncmp(string_data, str.c_str(), MAX_CHARS);
+        return std::strncmp(string_data, str.c_str(), MAX_CHARS);
     }
 
 private:
@@ -330,11 +330,11 @@ private:
             const char* c_string) noexcept
     {
         char* result = static_cast<char*>(MEMCCPY(string_data, c_string, '\0', MAX_CHARS));
-        string_len = (result == nullptr) ? MAX_CHARS : static_cast<size_t>(result - string_data) - 1u;
+        string_len = (result == nullptr) ? MAX_CHARS : static_cast<std::size_t>(result - string_data) - 1u;
     }
 
     char string_data[MAX_CHARS + 1];      ///< Holds string data, including ending null character.
-    size_t string_len;                    ///< Holds current string length.
+    std::size_t string_len;                    ///< Holds current string length.
 };
 
 using string_255 = fixed_string<255>;

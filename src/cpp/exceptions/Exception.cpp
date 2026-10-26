@@ -14,6 +14,8 @@
 
 #include <fastcdr/exceptions/Exception.h>
 
+#include <utility>
+
 using namespace eprosima::fastcdr::exception;
 
 Exception::Exception(

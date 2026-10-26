@@ -14,6 +14,8 @@
 
 #include <fastcdr/exceptions/BadOptionalAccessException.hpp>
 
+#include <utility>
+
 using namespace eprosima::fastcdr::exception;
 
 const char* const BadOptionalAccessException::BAD_OPTIONAL_ACCESS_MESSAGE_DEFAULT =

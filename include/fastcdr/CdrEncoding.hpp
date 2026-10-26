@@ -34,7 +34,7 @@ typedef enum
 } CdrVersion;
 
 //! @brief This enumeration represents the supported XCDR encoding algorithms.
-typedef enum : uint8_t
+typedef enum : std::uint8_t
 {
     //! @brief Specifies that the content is PLAIN_CDR.
     PLAIN_CDR = 0x0,
@@ -49,7 +49,7 @@ typedef enum : uint8_t
 } EncodingAlgorithmFlag;
 
 //! @brief This enumeration represents Cdr's behavior when there is type inconsistency between the serialized data and the type used to deserialize the data.
-enum class CdrTryConstructFlag : uint32_t
+enum class CdrTryConstructFlag : std::uint32_t
 {
     //! @brief Cdr will fail deserialization if there is type inconsistency.
     FAIL = 0,

@@ -14,11 +14,7 @@
 
 #include <fastcdr/FastBuffer.h>
 
-#if !__APPLE__ && !__FreeBSD__ && !__VXWORKS__
-#include <malloc.h>
-#else
-#include <stdlib.h>
-#endif // if !__APPLE__ && !__FreeBSD__ && !__VXWORKS__
+#include <cstdlib>
 
 #define BUFFER_START_LENGTH 200
 
@@ -26,7 +22,7 @@ using namespace eprosima::fastcdr;
 
 FastBuffer::FastBuffer(
         char* const buffer,
-        const size_t bufferSize)
+        const std::size_t bufferSize)
     : buffer_(buffer)
     , size_(bufferSize)
     , m_internalBuffer(false)
@@ -37,16 +33,16 @@ FastBuffer::~FastBuffer()
 {
     if (m_internalBuffer && buffer_ != nullptr)
     {
-        free(buffer_);
+        std::free(buffer_);
     }
 }
 
 bool FastBuffer::reserve(
-        size_t size)
+        std::size_t size)
 {
     if (m_internalBuffer && buffer_ == NULL)
     {
-        buffer_ = reinterpret_cast<char*>(malloc(size));
+        buffer_ = reinterpret_cast<char*>(std::malloc(size));
         if (buffer_)
         {
             size_ = size;
@@ -57,9 +53,9 @@ bool FastBuffer::reserve(
 }
 
 bool FastBuffer::resize(
-        size_t min_size_inc)
+        std::size_t min_size_inc)
 {
-    size_t incBufferSize = BUFFER_START_LENGTH;
+    std::size_t incBufferSize = BUFFER_START_LENGTH;
 
     if (m_internalBuffer)
     {
@@ -72,7 +68,7 @@ bool FastBuffer::resize(
         {
             size_ = incBufferSize;
 
-            buffer_ = reinterpret_cast<char*>(malloc(size_));
+            buffer_ = reinterpret_cast<char*>(std::malloc(size_));
 
             if (buffer_ != NULL)
             {
@@ -83,7 +79,7 @@ bool FastBuffer::resize(
         {
             size_ += incBufferSize;
 
-            buffer_ = reinterpret_cast<char*>(realloc(buffer_, size_));
+            buffer_ = reinterpret_cast<char*>(std::realloc(buffer_, size_));
 
             if (buffer_ != NULL)
             {

@@ -32,29 +32,29 @@ const Cdr::Endianness Cdr::DEFAULT_ENDIAN = BIG_ENDIANNESS;
 const Cdr::Endianness Cdr::DEFAULT_ENDIAN = LITTLE_ENDIANNESS;
 #endif // if FASTCDR_IS_BIG_ENDIAN_TARGET
 
-constexpr uint16_t PID_EXTENDED = 0x3F01;
-constexpr uint16_t PID_EXTENDED_LENGTH = 0x8;
-constexpr uint16_t PID_SENTINEL = 0x3F02;
-constexpr uint16_t PID_SENTINEL_LENGTH = 0x0;
+constexpr std::uint16_t PID_EXTENDED = 0x3F01;
+constexpr std::uint16_t PID_EXTENDED_LENGTH = 0x8;
+constexpr std::uint16_t PID_SENTINEL = 0x3F02;
+constexpr std::uint16_t PID_SENTINEL_LENGTH = 0x0;
 
-constexpr uint8_t operator ""_8u(
+constexpr std::uint8_t operator ""_8u(
         unsigned long long int value)
 {
-    return static_cast<uint8_t>(value);
+    return static_cast<std::uint8_t>(value);
 }
 
-inline size_t alignment_on_state(
+inline std::size_t alignment_on_state(
         const FastBuffer::iterator& origin,
         const FastBuffer::iterator& offset,
-        size_t data_size)
+        std::size_t data_size)
 {
     return (data_size - ((offset - origin) % data_size)) & (data_size - 1);
 }
 
-inline uint32_t Cdr::get_long_lc(
+inline std::uint32_t Cdr::get_long_lc(
         SerializedMemberSizeForNextInt serialized_member_size)
 {
-    uint32_t lc {0x40000000};
+    std::uint32_t lc {0x40000000};
 
     switch (serialized_member_size)
     {
@@ -74,10 +74,10 @@ inline uint32_t Cdr::get_long_lc(
     return lc;
 }
 
-inline uint32_t Cdr::get_short_lc(
-        size_t member_serialized_size)
+inline std::uint32_t Cdr::get_short_lc(
+        std::size_t member_serialized_size)
 {
-    uint32_t lc {0xFFFFFFFFu};
+    std::uint32_t lc {0xFFFFFFFFu};
     switch (member_serialized_size)
     {
         case 1:
@@ -211,8 +211,8 @@ void Cdr::reset_callbacks()
 
 Cdr& Cdr::read_encapsulation()
 {
-    uint8_t dummy {0};
-    uint8_t encapsulation {0};
+    std::uint8_t dummy {0};
+    std::uint8_t encapsulation {0};
     state state_before_error(*this);
 
     try
@@ -232,7 +232,7 @@ Cdr& Cdr::read_encapsulation()
 
 
         // If it is a different endianness, make changes.
-        const uint8_t endianness = encapsulation & 0x1_8u;
+        const std::uint8_t endianness = encapsulation & 0x1_8u;
         if (endianness_ != endianness)
         {
             swap_bytes_ = !swap_bytes_;
@@ -240,7 +240,7 @@ Cdr& Cdr::read_encapsulation()
         }
 
         // Check encapsulationKind correctness
-        const uint8_t encoding_flag = encapsulation & static_cast<uint8_t>(~0x1);
+        const std::uint8_t encoding_flag = encapsulation & static_cast<std::uint8_t>(~0x1);
         switch (encoding_flag)
         {
             case EncodingAlgorithmFlag::PLAIN_CDR2:
@@ -289,7 +289,7 @@ Cdr& Cdr::read_encapsulation()
         {
             deserialize(options_);
 
-            uint8_t option_align {static_cast<uint8_t>(options_[1] & 0x3u)};
+            std::uint8_t option_align {static_cast<std::uint8_t>(options_[1] & 0x3u)};
 
             if (0 < option_align)
             {
@@ -316,8 +316,8 @@ Cdr& Cdr::read_encapsulation()
 
 Cdr& Cdr::serialize_encapsulation()
 {
-    uint8_t dummy = 0;
-    uint8_t encapsulation = 0;
+    std::uint8_t dummy = 0;
+    std::uint8_t encapsulation = 0;
     state state_before_error(*this);
 
     try
@@ -387,13 +387,13 @@ bool Cdr::set_encoding_flag(
     return ret_value;
 }
 
-std::array<uint8_t, 2> Cdr::get_dds_cdr_options() const
+std::array<std::uint8_t, 2> Cdr::get_dds_cdr_options() const
 {
     return options_;
 }
 
 void Cdr::set_dds_cdr_options(
-        const std::array<uint8_t, 2>& options)
+        const std::array<std::uint8_t, 2>& options)
 {
     options_ = options;
 
@@ -402,7 +402,7 @@ void Cdr::set_dds_cdr_options(
     {
         auto length {offset_ - cdr_buffer_.begin()};
         auto alignment = ((length + 3u) & ~3u) - length;
-        options_[1] = static_cast<uint8_t>(options_[1] & 0xC) + static_cast<uint8_t>(alignment & 0x3);
+        options_[1] = static_cast<std::uint8_t>(options_[1] & 0xC) + static_cast<std::uint8_t>(alignment & 0x3);
     }
 
     if (encapsulation_serialized_ && CdrVersion::CORBA_CDR < cdr_version_)
@@ -438,7 +438,7 @@ std::shared_ptr<CdrContext> Cdr::get_context() const
 }
 
 bool Cdr::jump(
-        size_t num_bytes)
+        std::size_t num_bytes)
 {
     bool ret_value = false;
 
@@ -462,7 +462,7 @@ char* Cdr::get_current_position()
     return &offset_;
 }
 
-size_t Cdr::get_serialized_data_length() const
+std::size_t Cdr::get_serialized_data_length() const
 {
     return offset_ - cdr_buffer_.begin();
 }
@@ -496,7 +496,7 @@ void Cdr::reset()
 }
 
 bool Cdr::move_alignment_forward(
-        size_t num_bytes)
+        std::size_t num_bytes)
 {
     bool ret_value = false;
 
@@ -511,7 +511,7 @@ bool Cdr::move_alignment_forward(
 }
 
 bool Cdr::resize(
-        size_t min_size_inc)
+        std::size_t min_size_inc)
 {
     if (cdr_buffer_.resize(min_size_inc))
     {
@@ -525,7 +525,7 @@ bool Cdr::resize(
 }
 
 Cdr& Cdr::serialize(
-        const uint8_t& octet_t)
+        const std::uint8_t& octet_t)
 {
     return serialize(static_cast<char>(octet_t));
 }
@@ -546,22 +546,22 @@ Cdr& Cdr::serialize(
 }
 
 Cdr& Cdr::serialize(
-        const int8_t int8)
+        const std::int8_t int8)
 {
     return serialize(static_cast<char>(int8));
 }
 
 Cdr& Cdr::serialize(
-        const uint16_t ushort_t)
+        const std::uint16_t ushort_t)
 {
-    return serialize(static_cast<int16_t>(ushort_t));
+    return serialize(static_cast<std::int16_t>(ushort_t));
 }
 
 Cdr& Cdr::serialize(
-        const int16_t short_t)
+        const std::int16_t short_t)
 {
-    size_t align = alignment(sizeof(short_t));
-    size_t size_aligned = sizeof(short_t) + align;
+    std::size_t align = alignment(sizeof(short_t));
+    std::size_t size_aligned = sizeof(short_t) + align;
 
     if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
@@ -589,16 +589,16 @@ Cdr& Cdr::serialize(
 }
 
 Cdr& Cdr::serialize(
-        const uint32_t ulong_t)
+        const std::uint32_t ulong_t)
 {
-    return serialize(static_cast<int32_t>(ulong_t));
+    return serialize(static_cast<std::int32_t>(ulong_t));
 }
 
 Cdr& Cdr::serialize(
-        const int32_t long_t)
+        const std::int32_t long_t)
 {
-    size_t align = alignment(sizeof(long_t));
-    size_t size_aligned = sizeof(long_t) + align;
+    std::size_t align = alignment(sizeof(long_t));
+    std::size_t size_aligned = sizeof(long_t) + align;
 
     if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
@@ -630,20 +630,20 @@ Cdr& Cdr::serialize(
 Cdr& Cdr::serialize(
         const wchar_t wchar)
 {
-    return serialize(static_cast<uint16_t>(wchar));
+    return serialize(static_cast<std::uint16_t>(wchar));
 }
 
 Cdr& Cdr::serialize(
-        const uint64_t ulonglong_t)
+        const std::uint64_t ulonglong_t)
 {
-    return serialize(static_cast<int64_t>(ulonglong_t));
+    return serialize(static_cast<std::int64_t>(ulonglong_t));
 }
 
 Cdr& Cdr::serialize(
-        const int64_t longlong_t)
+        const std::int64_t longlong_t)
 {
-    size_t align = alignment(align64_);
-    size_t size_aligned = sizeof(longlong_t) + align;
+    std::size_t align = alignment(align64_);
+    std::size_t size_aligned = sizeof(longlong_t) + align;
 
     if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
@@ -679,8 +679,8 @@ Cdr& Cdr::serialize(
 Cdr& Cdr::serialize(
         const float float_t)
 {
-    size_t align = alignment(sizeof(float_t));
-    size_t size_aligned = sizeof(float_t) + align;
+    std::size_t align = alignment(sizeof(float_t));
+    std::size_t size_aligned = sizeof(float_t) + align;
 
     if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
@@ -712,8 +712,8 @@ Cdr& Cdr::serialize(
 Cdr& Cdr::serialize(
         const double double_t)
 {
-    size_t align = alignment(align64_);
-    size_t size_aligned = sizeof(double_t) + align;
+    std::size_t align = alignment(align64_);
+    std::size_t size_aligned = sizeof(double_t) + align;
 
     if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
@@ -749,8 +749,8 @@ Cdr& Cdr::serialize(
 Cdr& Cdr::serialize(
         const long double ldouble_t)
 {
-    size_t align = alignment(align64_);
-    size_t size_aligned = sizeof(ldouble_t) + align;
+    std::size_t align = alignment(align64_);
+    std::size_t size_aligned = sizeof(ldouble_t) + align;
 
     if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
@@ -836,10 +836,10 @@ Cdr& Cdr::serialize(
 Cdr& Cdr::serialize(
         const bool bool_t)
 {
-    if (((end_ - offset_) >= sizeof(uint8_t)) || resize(sizeof(uint8_t)))
+    if (((end_ - offset_) >= sizeof(std::uint8_t)) || resize(sizeof(std::uint8_t)))
     {
         // Save last datasize.
-        last_data_size_ = sizeof(uint8_t);
+        last_data_size_ = sizeof(std::uint8_t);
 
         serialize_bool(bool_t);
 
@@ -858,11 +858,11 @@ Cdr& Cdr::serialize(
 Cdr& Cdr::serialize(
         const char* string_t)
 {
-    uint32_t length = 0;
+    std::uint32_t length = 0;
 
     if (string_t != nullptr)
     {
-        length = size_to_uint32(strlen(string_t)) + 1;
+        length = size_to_uint32(std::strlen(string_t)) + 1;
     }
 
     if (length > 0)
@@ -873,7 +873,7 @@ Cdr& Cdr::serialize(
         if (((end_ - offset_) >= length) || resize(length))
         {
             // Save last datasize.
-            last_data_size_ = sizeof(uint8_t);
+            last_data_size_ = sizeof(std::uint8_t);
 
             offset_.memcopy(string_t, length);
             offset_ += length;
@@ -897,12 +897,12 @@ Cdr& Cdr::serialize(
 Cdr& Cdr::serialize(
         const wchar_t* string_t)
 {
-    uint32_t bytes_length = 0;
-    size_t wstrlen = 0;
+    std::uint32_t bytes_length = 0;
+    std::size_t wstrlen = 0;
 
     if (string_t != nullptr)
     {
-        wstrlen = wcslen(string_t);
+        wstrlen = std::wcslen(string_t);
         bytes_length = size_to_uint32(wstrlen * 2);
     }
 
@@ -931,16 +931,16 @@ Cdr& Cdr::serialize(
 
 Cdr& Cdr::serialize_array(
         const bool* bool_t,
-        size_t num_elements)
+        std::size_t num_elements)
 {
-    size_t total_size = sizeof(*bool_t) * num_elements;
+    std::size_t total_size = sizeof(*bool_t) * num_elements;
 
     if (((end_ - offset_) >= total_size) || resize(total_size))
     {
         // Save last datasize.
         last_data_size_ = sizeof(*bool_t);
 
-        for (size_t count = 0; count < num_elements; ++count)
+        for (std::size_t count = 0; count < num_elements; ++count)
         {
             serialize_bool(bool_t[count]);
         }
@@ -953,9 +953,9 @@ Cdr& Cdr::serialize_array(
 
 Cdr& Cdr::serialize_array(
         const char* char_t,
-        size_t num_elements)
+        std::size_t num_elements)
 {
-    size_t total_size = sizeof(*char_t) * num_elements;
+    std::size_t total_size = sizeof(*char_t) * num_elements;
 
     if (((end_ - offset_) >= total_size) || resize(total_size))
     {
@@ -971,17 +971,17 @@ Cdr& Cdr::serialize_array(
 }
 
 Cdr& Cdr::serialize_array(
-        const int16_t* short_t,
-        size_t num_elements)
+        const std::int16_t* short_t,
+        std::size_t num_elements)
 {
     if (num_elements == 0)
     {
         return *this;
     }
 
-    size_t align = alignment(sizeof(*short_t));
-    size_t total_size = sizeof(*short_t) * num_elements;
-    size_t size_aligned = total_size + align;
+    std::size_t align = alignment(sizeof(*short_t));
+    std::size_t total_size = sizeof(*short_t) * num_elements;
+    std::size_t size_aligned = total_size + align;
 
     if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
@@ -1013,17 +1013,17 @@ Cdr& Cdr::serialize_array(
 }
 
 Cdr& Cdr::serialize_array(
-        const int32_t* long_t,
-        size_t num_elements)
+        const std::int32_t* long_t,
+        std::size_t num_elements)
 {
     if (num_elements == 0)
     {
         return *this;
     }
 
-    size_t align = alignment(sizeof(*long_t));
-    size_t total_size = sizeof(*long_t) * num_elements;
-    size_t size_aligned = total_size + align;
+    std::size_t align = alignment(sizeof(*long_t));
+    std::size_t total_size = sizeof(*long_t) * num_elements;
+    std::size_t size_aligned = total_size + align;
 
     if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
@@ -1058,14 +1058,14 @@ Cdr& Cdr::serialize_array(
 
 Cdr& Cdr::serialize_array(
         const wchar_t* wchar,
-        size_t num_elements)
+        std::size_t num_elements)
 {
     if (num_elements == 0)
     {
         return *this;
     }
 
-    for (size_t count = 0; count < num_elements; ++count)
+    for (std::size_t count = 0; count < num_elements; ++count)
     {
         serialize(wchar[count]);
     }
@@ -1073,17 +1073,17 @@ Cdr& Cdr::serialize_array(
 }
 
 Cdr& Cdr::serialize_array(
-        const int64_t* longlong_t,
-        size_t num_elements)
+        const std::int64_t* longlong_t,
+        std::size_t num_elements)
 {
     if (num_elements == 0)
     {
         return *this;
     }
 
-    size_t align = alignment(align64_);
-    size_t total_size = sizeof(*longlong_t) * num_elements;
-    size_t size_aligned = total_size + align;
+    std::size_t align = alignment(align64_);
+    std::size_t total_size = sizeof(*longlong_t) * num_elements;
+    std::size_t size_aligned = total_size + align;
 
     if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
@@ -1122,16 +1122,16 @@ Cdr& Cdr::serialize_array(
 
 Cdr& Cdr::serialize_array(
         const float* float_t,
-        size_t num_elements)
+        std::size_t num_elements)
 {
     if (num_elements == 0)
     {
         return *this;
     }
 
-    size_t align = alignment(sizeof(*float_t));
-    size_t total_size = sizeof(*float_t) * num_elements;
-    size_t size_aligned = total_size + align;
+    std::size_t align = alignment(sizeof(*float_t));
+    std::size_t total_size = sizeof(*float_t) * num_elements;
+    std::size_t size_aligned = total_size + align;
 
     if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
@@ -1166,16 +1166,16 @@ Cdr& Cdr::serialize_array(
 
 Cdr& Cdr::serialize_array(
         const double* double_t,
-        size_t num_elements)
+        std::size_t num_elements)
 {
     if (num_elements == 0)
     {
         return *this;
     }
 
-    size_t align = alignment(align64_);
-    size_t total_size = sizeof(*double_t) * num_elements;
-    size_t size_aligned = total_size + align;
+    std::size_t align = alignment(align64_);
+    std::size_t total_size = sizeof(*double_t) * num_elements;
+    std::size_t size_aligned = total_size + align;
 
     if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
@@ -1214,17 +1214,17 @@ Cdr& Cdr::serialize_array(
 
 Cdr& Cdr::serialize_array(
         const long double* ldouble_t,
-        size_t num_elements)
+        std::size_t num_elements)
 {
     if (num_elements == 0)
     {
         return *this;
     }
 
-    size_t align = alignment(align64_);
+    std::size_t align = alignment(align64_);
     // Fix for Windows ( long doubles only store 8 bytes )
-    size_t total_size = 16 * num_elements; // sizeof(*ldouble_t)
-    size_t size_aligned = total_size + align;
+    std::size_t total_size = 16 * num_elements; // sizeof(*ldouble_t)
+    std::size_t size_aligned = total_size + align;
 
     if (((end_ - offset_) >= size_aligned) || resize(size_aligned))
     {
@@ -1235,7 +1235,7 @@ Cdr& Cdr::serialize_array(
 #if FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
         if (swap_bytes_)
         {
-            for (size_t i = 0; i < num_elements; ++i, ++ldouble_t)
+            for (std::size_t i = 0; i < num_elements; ++i, ++ldouble_t)
             {
                 __float128 tmp = *ldouble_t;
                 const char* dst = reinterpret_cast<const char*>(&tmp);
@@ -1259,7 +1259,7 @@ Cdr& Cdr::serialize_array(
         }
         else
         {
-            for (size_t i = 0; i < num_elements; ++i, ++ldouble_t)
+            for (std::size_t i = 0; i < num_elements; ++i, ++ldouble_t)
             {
                 __float128 tmp = *ldouble_t;
                 offset_ << tmp;
@@ -1310,7 +1310,7 @@ Cdr& Cdr::serialize_array(
             offset_.memcopy(ldouble_t, total_size);
             offset_ += total_size;
 #else
-            for (size_t i = 0; i < num_elements; ++i)
+            for (std::size_t i = 0; i < num_elements; ++i)
             {
                 offset_ << static_cast<long double>(0);
                 offset_ += 8;
@@ -1353,10 +1353,10 @@ Cdr& Cdr::deserialize(
 }
 
 Cdr& Cdr::deserialize(
-        int16_t& short_t)
+        std::int16_t& short_t)
 {
-    size_t align = alignment(sizeof(short_t));
-    size_t size_aligned = sizeof(short_t) + align;
+    std::size_t align = alignment(sizeof(short_t));
+    std::size_t size_aligned = sizeof(short_t) + align;
 
     if ((end_ - offset_) >= size_aligned)
     {
@@ -1391,10 +1391,10 @@ Cdr& Cdr::deserialize(
 }
 
 Cdr& Cdr::deserialize(
-        int32_t& long_t)
+        std::int32_t& long_t)
 {
-    size_t align = alignment(sizeof(long_t));
-    size_t size_aligned = sizeof(long_t) + align;
+    std::size_t align = alignment(sizeof(long_t));
+    std::size_t size_aligned = sizeof(long_t) + align;
 
     if ((end_ - offset_) >= size_aligned)
     {
@@ -1431,10 +1431,10 @@ Cdr& Cdr::deserialize(
 }
 
 Cdr& Cdr::deserialize(
-        int64_t& longlong_t)
+        std::int64_t& longlong_t)
 {
-    size_t align = alignment(align64_);
-    size_t size_aligned = sizeof(longlong_t) + align;
+    std::size_t align = alignment(align64_);
+    std::size_t size_aligned = sizeof(longlong_t) + align;
 
     if ((end_ - offset_) >= size_aligned)
     {
@@ -1477,8 +1477,8 @@ Cdr& Cdr::deserialize(
 Cdr& Cdr::deserialize(
         float& float_t)
 {
-    size_t align = alignment(sizeof(float_t));
-    size_t size_aligned = sizeof(float_t) + align;
+    std::size_t align = alignment(sizeof(float_t));
+    std::size_t size_aligned = sizeof(float_t) + align;
 
     if ((end_ - offset_) >= size_aligned)
     {
@@ -1517,8 +1517,8 @@ Cdr& Cdr::deserialize(
 Cdr& Cdr::deserialize(
         double& double_t)
 {
-    size_t align = alignment(align64_);
-    size_t size_aligned = sizeof(double_t) + align;
+    std::size_t align = alignment(align64_);
+    std::size_t size_aligned = sizeof(double_t) + align;
 
     if ((end_ - offset_) >= size_aligned)
     {
@@ -1561,8 +1561,8 @@ Cdr& Cdr::deserialize(
 Cdr& Cdr::deserialize(
         long double& ldouble_t)
 {
-    size_t align = alignment(align64_);
-    size_t size_aligned = sizeof(ldouble_t) + align;
+    std::size_t align = alignment(align64_);
+    std::size_t size_aligned = sizeof(ldouble_t) + align;
 
     if ((end_ - offset_) >= size_aligned)
     {
@@ -1657,12 +1657,12 @@ Cdr& Cdr::deserialize(
 Cdr& Cdr::deserialize(
         bool& bool_t)
 {
-    uint8_t value = 0;
+    std::uint8_t value = 0;
 
-    if ((end_ - offset_) >= sizeof(uint8_t))
+    if ((end_ - offset_) >= sizeof(std::uint8_t))
     {
         // Save last datasize.
-        last_data_size_ = sizeof(uint8_t);
+        last_data_size_ = sizeof(std::uint8_t);
 
         if (!fake_mode_)
         {
@@ -1694,7 +1694,7 @@ Cdr& Cdr::deserialize(
 Cdr& Cdr::deserialize(
         char*& string_t)
 {
-    uint32_t length = 0;
+    std::uint32_t length = 0;
     Cdr::state state_before_error(*this);
 
     deserialize_framing(length);
@@ -1707,15 +1707,15 @@ Cdr& Cdr::deserialize(
     else if ((end_ - offset_) >= length)
     {
         // Save last datasize.
-        last_data_size_ = sizeof(uint8_t);
+        last_data_size_ = sizeof(std::uint8_t);
 
         // Allocate memory.
         if (!fake_mode_)
         {
             string_t =
-                    reinterpret_cast<char*>(calloc(length + ((&offset_)[length - 1] == '\0' ? 0 : 1),
+                    reinterpret_cast<char*>(std::calloc(length + ((&offset_)[length - 1] == '\0' ? 0 : 1),
                     sizeof(char)));
-            memcpy(string_t, &offset_, length);
+            std::memcpy(string_t, &offset_, length);
         }
         offset_ += length;
         return *this;
@@ -1728,7 +1728,7 @@ Cdr& Cdr::deserialize(
 Cdr& Cdr::deserialize(
         wchar_t*& string_t)
 {
-    uint32_t length = 0;
+    std::uint32_t length = 0;
     Cdr::state state_before_error(*this);
 
     deserialize_framing(length);
@@ -1741,12 +1741,12 @@ Cdr& Cdr::deserialize(
     else if ((end_ - offset_) >= (length * 2))
     {
         // Save last datasize.
-        last_data_size_ = sizeof(uint16_t);
+        last_data_size_ = sizeof(std::uint16_t);
 
         if (!fake_mode_)
         {
             // Allocate memory.
-            string_t = reinterpret_cast<wchar_t*>(calloc(length + 1, sizeof(wchar_t))); // WStrings never serialize terminating zero
+            string_t = reinterpret_cast<wchar_t*>(std::calloc(length + 1, sizeof(wchar_t))); // WStrings never serialize terminating zero
 
             deserialize_array(string_t, length);
         }
@@ -1765,9 +1765,9 @@ Cdr& Cdr::deserialize(
 Cdr& Cdr::deserialize(
         char*& string_t,
         CdrTryConstructFlag consistency_flag,
-        uint32_t max_length)
+        std::uint32_t max_length)
 {
-    uint32_t length {0};
+    std::uint32_t length {0};
     Cdr::state state_before_error(*this);
 
     deserialize_framing(length);
@@ -1782,14 +1782,14 @@ Cdr& Cdr::deserialize(
         // Number of visible characters, i.e. excluding the terminating null character when the
         // encoder serialized one. The consistency policy is applied to this value because
         // `max_length` bounds the characters the destination type can hold.
-        uint32_t visible_length {length};
+        std::uint32_t visible_length {length};
 
         if ((&offset_)[length - 1] == '\0')
         {
             --visible_length;
         }
 
-        uint32_t length_to_read {visible_length};
+        std::uint32_t length_to_read {visible_length};
 
         if (visible_length > max_length)
         {
@@ -1809,7 +1809,7 @@ Cdr& Cdr::deserialize(
         }
 
         // Save last datasize.
-        last_data_size_ = sizeof(uint8_t);
+        last_data_size_ = sizeof(std::uint8_t);
 
         if (!fake_mode_)
         {
@@ -1817,8 +1817,8 @@ Cdr& Cdr::deserialize(
             // is zeroed by calloc, so the result is null-terminated whether or not the stream
             // carried a terminator and whether or not the string was trimmed. A string with no
             // characters to keep becomes an empty string, as with the std::string overload.
-            string_t = reinterpret_cast<char*>(calloc(length_to_read + 1, sizeof(char)));
-            memcpy(string_t, &offset_, length_to_read);
+            string_t = reinterpret_cast<char*>(std::calloc(length_to_read + 1, sizeof(char)));
+            std::memcpy(string_t, &offset_, length_to_read);
         }
         offset_ += length;
         return *this;
@@ -1831,10 +1831,10 @@ Cdr& Cdr::deserialize(
 Cdr& Cdr::deserialize(
         wchar_t*& string_t,
         CdrTryConstructFlag consistency_flag,
-        uint32_t max_length)
+        std::uint32_t max_length)
 {
 
-    uint32_t length = 0;
+    std::uint32_t length = 0;
     Cdr::state state_before_error(*this);
 
     deserialize_framing(length);
@@ -1846,7 +1846,7 @@ Cdr& Cdr::deserialize(
     }
     else if ((end_ - offset_) >= (length * 2))
     {
-        uint32_t length_to_read {length};
+        std::uint32_t length_to_read {length};
 
         if (length > max_length)
         {
@@ -1866,14 +1866,14 @@ Cdr& Cdr::deserialize(
         }
 
         // Save last datasize.
-        last_data_size_ = sizeof(uint16_t);
+        last_data_size_ = sizeof(std::uint16_t);
 
         if (!fake_mode_)
         {
             // Allocate memory. WStrings never serialize the terminating zero, so the extra
             // character zeroed by calloc terminates the result. A string with no characters to
             // keep becomes an empty string, as with the std::wstring overload.
-            string_t = reinterpret_cast<wchar_t*>(calloc(length_to_read + 1, sizeof(wchar_t)));
+            string_t = reinterpret_cast<wchar_t*>(std::calloc(length_to_read + 1, sizeof(wchar_t)));
 
             deserialize_array(string_t, length_to_read);
 
@@ -1892,25 +1892,25 @@ Cdr& Cdr::deserialize(
 }
 
 const char* Cdr::read_string(
-        uint32_t& length)
+        std::uint32_t& length)
 {
-    length = (std::numeric_limits<uint32_t>::max)();
+    length = (std::numeric_limits<std::uint32_t>::max)();
     return read_string(length, CdrTryConstructFlag::FAIL);
 }
 
 const std::wstring Cdr::read_wstring(
-        uint32_t& length)
+        std::uint32_t& length)
 {
-    length = (std::numeric_limits<uint32_t>::max)();
+    length = (std::numeric_limits<std::uint32_t>::max)();
     return read_wstring(length, CdrTryConstructFlag::FAIL);
 }
 
 const char* Cdr::read_string(
-        uint32_t& length,
+        std::uint32_t& length,
         CdrTryConstructFlag consistency_flag)
 {
     const char* ret_value = "";
-    uint32_t read_length {0};
+    std::uint32_t read_length {0};
     state state_before_error(*this);
 
     deserialize_framing(read_length);
@@ -1925,14 +1925,14 @@ const char* Cdr::read_string(
         // Number of visible characters, i.e. excluding the terminating null character when the
         // encoder serialized one. The consistency policy is applied to this value because
         // `length` bounds the characters the destination type can hold.
-        uint32_t visible_length {read_length};
+        std::uint32_t visible_length {read_length};
 
         if ((&offset_)[read_length - 1] == '\0')
         {
             --visible_length;
         }
 
-        uint32_t length_to_read {visible_length};
+        std::uint32_t length_to_read {visible_length};
 
         if (visible_length > length)
         {
@@ -1952,7 +1952,7 @@ const char* Cdr::read_string(
         }
 
         // Save last datasize.
-        last_data_size_ = sizeof(uint8_t);
+        last_data_size_ = sizeof(std::uint8_t);
 
         // In fake mode the stream is only consumed, so the returned pointer is left empty and the
         // reported length must be zero to stay consistent with it.
@@ -1973,15 +1973,15 @@ const char* Cdr::read_string(
 }
 
 const std::wstring Cdr::read_wstring(
-        uint32_t& length,
+        std::uint32_t& length,
         CdrTryConstructFlag consistency_flag)
 {
     std::wstring ret_value = L"";
-    uint32_t read_length {0};
+    std::uint32_t read_length {0};
     state state_(*this);
 
     deserialize_framing(read_length);
-    uint32_t bytes_length = read_length * 2;
+    std::uint32_t bytes_length = read_length * 2;
 
     if (bytes_length == 0)
     {
@@ -1989,7 +1989,7 @@ const std::wstring Cdr::read_wstring(
     }
     else if ((end_ - offset_) >= bytes_length)
     {
-        uint32_t length_to_read {read_length};
+        std::uint32_t length_to_read {read_length};
 
         if (read_length > length)
         {
@@ -2009,7 +2009,7 @@ const std::wstring Cdr::read_wstring(
         }
 
         // Save last datasize.
-        last_data_size_ = sizeof(uint16_t);
+        last_data_size_ = sizeof(std::uint16_t);
 
         // In fake mode the stream is only consumed, so the returned string is left empty and the
         // reported length must be zero to stay consistent with it.
@@ -2043,9 +2043,9 @@ const std::wstring Cdr::read_wstring(
 
 Cdr& Cdr::deserialize_array(
         bool* bool_t,
-        size_t num_elements)
+        std::size_t num_elements)
 {
-    size_t total_size = sizeof(*bool_t) * num_elements;
+    std::size_t total_size = sizeof(*bool_t) * num_elements;
 
     if ((end_ - offset_) >= total_size)
     {
@@ -2054,9 +2054,9 @@ Cdr& Cdr::deserialize_array(
 
         if (!fake_mode_)
         {
-            for (size_t count = 0; count < num_elements; ++count)
+            for (std::size_t count = 0; count < num_elements; ++count)
             {
-                uint8_t value = 0;
+                std::uint8_t value = 0;
                 offset_++ >> value;
 
                 if (value == 1)
@@ -2082,9 +2082,9 @@ Cdr& Cdr::deserialize_array(
 
 Cdr& Cdr::deserialize_array(
         char* char_t,
-        size_t num_elements)
+        std::size_t num_elements)
 {
-    size_t total_size = sizeof(*char_t) * num_elements;
+    std::size_t total_size = sizeof(*char_t) * num_elements;
 
     if ((end_ - offset_) >= total_size)
     {
@@ -2103,17 +2103,17 @@ Cdr& Cdr::deserialize_array(
 }
 
 Cdr& Cdr::deserialize_array(
-        int16_t* short_t,
-        size_t num_elements)
+        std::int16_t* short_t,
+        std::size_t num_elements)
 {
     if (num_elements == 0)
     {
         return *this;
     }
 
-    size_t align = alignment(sizeof(*short_t));
-    size_t total_size = sizeof(*short_t) * num_elements;
-    size_t size_aligned = total_size + align;
+    std::size_t align = alignment(sizeof(*short_t));
+    std::size_t total_size = sizeof(*short_t) * num_elements;
+    std::size_t size_aligned = total_size + align;
 
     if ((end_ - offset_) >= size_aligned)
     {
@@ -2152,17 +2152,17 @@ Cdr& Cdr::deserialize_array(
 }
 
 Cdr& Cdr::deserialize_array(
-        int32_t* long_t,
-        size_t num_elements)
+        std::int32_t* long_t,
+        std::size_t num_elements)
 {
     if (num_elements == 0)
     {
         return *this;
     }
 
-    size_t align = alignment(sizeof(*long_t));
-    size_t total_size = sizeof(*long_t) * num_elements;
-    size_t size_aligned = total_size + align;
+    std::size_t align = alignment(sizeof(*long_t));
+    std::size_t total_size = sizeof(*long_t) * num_elements;
+    std::size_t size_aligned = total_size + align;
 
     if ((end_ - offset_) >= size_aligned)
     {
@@ -2204,15 +2204,15 @@ Cdr& Cdr::deserialize_array(
 
 Cdr& Cdr::deserialize_array(
         wchar_t* wchar,
-        size_t num_elements)
+        std::size_t num_elements)
 {
     if (num_elements == 0)
     {
         return *this;
     }
 
-    uint16_t value;
-    for (size_t count = 0; count < num_elements; ++count)
+    std::uint16_t value;
+    for (std::size_t count = 0; count < num_elements; ++count)
     {
         deserialize(value);
         wchar[count] = static_cast<wchar_t>(value);
@@ -2221,17 +2221,17 @@ Cdr& Cdr::deserialize_array(
 }
 
 Cdr& Cdr::deserialize_array(
-        int64_t* longlong_t,
-        size_t num_elements)
+        std::int64_t* longlong_t,
+        std::size_t num_elements)
 {
     if (num_elements == 0)
     {
         return *this;
     }
 
-    size_t align = alignment(align64_);
-    size_t total_size = sizeof(*longlong_t) * num_elements;
-    size_t size_aligned = total_size + align;
+    std::size_t align = alignment(align64_);
+    std::size_t total_size = sizeof(*longlong_t) * num_elements;
+    std::size_t size_aligned = total_size + align;
 
     if ((end_ - offset_) >= size_aligned)
     {
@@ -2277,16 +2277,16 @@ Cdr& Cdr::deserialize_array(
 
 Cdr& Cdr::deserialize_array(
         float* float_t,
-        size_t num_elements)
+        std::size_t num_elements)
 {
     if (num_elements == 0)
     {
         return *this;
     }
 
-    size_t align = alignment(sizeof(*float_t));
-    size_t total_size = sizeof(*float_t) * num_elements;
-    size_t size_aligned = total_size + align;
+    std::size_t align = alignment(sizeof(*float_t));
+    std::size_t total_size = sizeof(*float_t) * num_elements;
+    std::size_t size_aligned = total_size + align;
 
     if ((end_ - offset_) >= size_aligned)
     {
@@ -2328,16 +2328,16 @@ Cdr& Cdr::deserialize_array(
 
 Cdr& Cdr::deserialize_array(
         double* double_t,
-        size_t num_elements)
+        std::size_t num_elements)
 {
     if (num_elements == 0)
     {
         return *this;
     }
 
-    size_t align = alignment(align64_);
-    size_t total_size = sizeof(*double_t) * num_elements;
-    size_t size_aligned = total_size + align;
+    std::size_t align = alignment(align64_);
+    std::size_t total_size = sizeof(*double_t) * num_elements;
+    std::size_t size_aligned = total_size + align;
 
     if ((end_ - offset_) >= size_aligned)
     {
@@ -2383,17 +2383,17 @@ Cdr& Cdr::deserialize_array(
 
 Cdr& Cdr::deserialize_array(
         long double* ldouble_t,
-        size_t num_elements)
+        std::size_t num_elements)
 {
     if (num_elements == 0)
     {
         return *this;
     }
 
-    size_t align = alignment(align64_);
+    std::size_t align = alignment(align64_);
     // Fix for Windows ( long doubles only store 8 bytes )
-    size_t total_size = 16 * num_elements;
-    size_t size_aligned = total_size + align;
+    std::size_t total_size = 16 * num_elements;
+    std::size_t size_aligned = total_size + align;
 
     if ((end_ - offset_) >= size_aligned)
     {
@@ -2406,7 +2406,7 @@ Cdr& Cdr::deserialize_array(
 #if FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
             if (swap_bytes_)
             {
-                for (size_t i = 0; i < num_elements; ++i)
+                for (std::size_t i = 0; i < num_elements; ++i)
                 {
                     __float128 tmp;
                     char* dst = reinterpret_cast<char*>(&tmp);
@@ -2431,7 +2431,7 @@ Cdr& Cdr::deserialize_array(
             }
             else
             {
-                for (size_t i = 0; i < num_elements; ++i)
+                for (std::size_t i = 0; i < num_elements; ++i)
                 {
                     __float128 tmp;
                     offset_ >> tmp;
@@ -2476,7 +2476,7 @@ Cdr& Cdr::deserialize_array(
                 offset_.rmemcopy(ldouble_t, total_size);
                 offset_ += total_size;
 #else
-                for (size_t i = 0; i < num_elements; ++i)
+                for (std::size_t i = 0; i < num_elements; ++i)
                 {
                     offset_ += 8; // ignore first 8 bytes
                     offset_ >> ldouble_t[i];
@@ -2536,9 +2536,9 @@ inline void Cdr::serialize_bool(
         bool bool_t)
 {
 #if FASTCDR_STRICT_BOOL
-    offset_++ <<  static_cast<uint8_t>(normalize_bool(bool_t));
+    offset_++ <<  static_cast<std::uint8_t>(normalize_bool(bool_t));
 #else
-    offset_++ << (bool_t ? static_cast<uint8_t>(1) : static_cast<uint8_t>(0));
+    offset_++ << (bool_t ? static_cast<std::uint8_t>(1) : static_cast<std::uint8_t>(0));
 #endif // if FASTCDR_STRICT_BOOL
 }
 
@@ -2547,14 +2547,14 @@ Cdr& Cdr::serialize_bool_array(
 {
     state state_before_error(*this);
 
-    size_t total_size = vector_t.size() * sizeof(bool);
+    std::size_t total_size = vector_t.size() * sizeof(bool);
 
     if (((end_ - offset_) >= total_size) || resize(total_size))
     {
         // Save last datasize.
         last_data_size_ = sizeof(bool);
 
-        for (size_t count = 0; count < vector_t.size(); ++count)
+        for (std::size_t count = 0; count < vector_t.size(); ++count)
         {
             serialize_bool(vector_t[count]);
         }
@@ -2573,16 +2573,16 @@ Cdr& Cdr::serialize_bool_sequence(
 {
     state state_before_error(*this);
 
-    *this << static_cast<int32_t>(vector_t.size());
+    *this << static_cast<std::int32_t>(vector_t.size());
 
-    size_t total_size = vector_t.size() * sizeof(bool);
+    std::size_t total_size = vector_t.size() * sizeof(bool);
 
     if (((end_ - offset_) >= total_size) || resize(total_size))
     {
         // Save last datasize.
         last_data_size_ = sizeof(bool);
 
-        for (size_t count = 0; count < vector_t.size(); ++count)
+        for (std::size_t count = 0; count < vector_t.size(); ++count)
         {
             serialize_bool(vector_t[count]);
         }
@@ -2606,16 +2606,16 @@ Cdr& Cdr::deserialize_bool_array(
 {
     state state_before_error(*this);
 
-    size_t total_size = vector_t.size() * sizeof(bool);
+    std::size_t total_size = vector_t.size() * sizeof(bool);
 
     if ((end_ - offset_) >= total_size)
     {
         // Save last datasize.
         last_data_size_ = sizeof(bool);
 
-        for (uint32_t count = 0; count < vector_t.size(); ++count)
+        for (std::uint32_t count = 0; count < vector_t.size(); ++count)
         {
-            uint8_t value = 0;
+            std::uint8_t value = 0;
             offset_++ >> value;
 
             if (value == 1)
@@ -2644,20 +2644,20 @@ Cdr& Cdr::deserialize_bool_array(
 Cdr& Cdr::deserialize_bool_sequence(
         std::vector<bool>& vector_t,
         CdrTryConstructFlag consistency_flag,
-        uint32_t max_length)
+        std::uint32_t max_length)
 {
-    uint32_t sequence_length {0};
+    std::uint32_t sequence_length {0};
     state state_before_error(*this);
 
     deserialize_framing(sequence_length);
 
     vector_t.clear();
 
-    size_t total_size = sequence_length * sizeof(bool);
+    std::size_t total_size = sequence_length * sizeof(bool);
 
     if ((end_ - offset_) >= total_size)
     {
-        uint32_t length_to_read {sequence_length};
+        std::uint32_t length_to_read {sequence_length};
 
         if (sequence_length > max_length)
         {
@@ -2684,9 +2684,9 @@ Cdr& Cdr::deserialize_bool_sequence(
         // Save last datasize.
         last_data_size_ = sizeof(bool);
 
-        for (uint32_t count = 0; count < length_to_read; ++count)
+        for (std::uint32_t count = 0; count < length_to_read; ++count)
         {
-            uint8_t value = 0;
+            std::uint8_t value = 0;
             offset_++ >> value;
 
             if (value == 1)
@@ -2717,13 +2717,13 @@ Cdr& Cdr::deserialize_bool_sequence(
 
 Cdr& Cdr::deserialize_string_sequence(
         std::string*& sequence_t,
-        size_t& num_elements)
+        std::size_t& num_elements)
 {
-    uint32_t sequence_length {0};
+    std::uint32_t sequence_length {0};
 
     if (CdrVersion::XCDRv2 == cdr_version_)
     {
-        uint32_t dheader {0};
+        std::uint32_t dheader {0};
         deserialize_framing(dheader);
 
         auto offset = offset_;
@@ -2734,7 +2734,7 @@ Cdr& Cdr::deserialize_string_sequence(
         {
             sequence_t = new std::string[sequence_length];
 
-            uint32_t count {0};
+            std::uint32_t count {0};
             while (offset_ - offset < dheader && count < sequence_length)
             {
                 deserialize(sequence_t[count]);
@@ -2779,13 +2779,13 @@ Cdr& Cdr::deserialize_string_sequence(
 
 Cdr& Cdr::deserialize_wstring_sequence(
         std::wstring*& sequence_t,
-        size_t& num_elements)
+        std::size_t& num_elements)
 {
-    uint32_t sequence_length {0};
+    std::uint32_t sequence_length {0};
 
     if (CdrVersion::XCDRv2 == cdr_version_)
     {
-        uint32_t dheader {0};
+        std::uint32_t dheader {0};
         deserialize_framing(dheader);
 
         auto offset = offset_;
@@ -2796,7 +2796,7 @@ Cdr& Cdr::deserialize_wstring_sequence(
         {
             sequence_t = new std::wstring[sequence_length];
 
-            uint32_t count {0};
+            std::uint32_t count {0};
             while (offset_ - offset < dheader && count < sequence_length)
             {
                 deserialize(sequence_t[count]);
@@ -2849,24 +2849,24 @@ void Cdr::xcdr1_serialize_short_member_header(
 
     make_alignment(alignment(4));
 
-    uint16_t flags_and_member_id = static_cast<uint16_t>(member_id.must_understand ? 0x4000 : 0x0) |
-            static_cast<uint16_t>(member_id.id);
+    std::uint16_t flags_and_member_id = static_cast<std::uint16_t>(member_id.must_understand ? 0x4000 : 0x0) |
+            static_cast<std::uint16_t>(member_id.id);
     serialize(flags_and_member_id);
-    uint16_t size = 0;
+    std::uint16_t size = 0;
     serialize(size);
     reset_alignment();
 }
 
 void Cdr::xcdr1_end_short_member_header(
         const MemberId& member_id,
-        size_t member_serialized_size)
+        std::size_t member_serialized_size)
 {
     static_cast<void>(member_id);
     assert(0x3F00 >= member_id.id);
-    assert(std::numeric_limits<uint16_t>::max() >= member_serialized_size );
+    assert(std::numeric_limits<std::uint16_t>::max() >= member_serialized_size );
     make_alignment(alignment(4));
-    jump(sizeof(uint16_t));
-    uint16_t size = static_cast<uint16_t>(member_serialized_size);
+    jump(sizeof(std::uint16_t));
+    std::uint16_t size = static_cast<std::uint16_t>(member_serialized_size);
     serialize(size);
 }
 
@@ -2875,62 +2875,62 @@ void Cdr::xcdr1_serialize_long_member_header(
 {
     make_alignment(alignment(4));
 
-    uint16_t flags_and_extended_pid = static_cast<uint16_t>(member_id.must_understand ? 0x4000 : 0x0) |
-            static_cast<uint16_t>(PID_EXTENDED);
+    std::uint16_t flags_and_extended_pid = static_cast<std::uint16_t>(member_id.must_understand ? 0x4000 : 0x0) |
+            static_cast<std::uint16_t>(PID_EXTENDED);
     serialize(flags_and_extended_pid);
-    uint16_t size = PID_EXTENDED_LENGTH;
+    std::uint16_t size = PID_EXTENDED_LENGTH;
     serialize(size);
-    uint32_t id = member_id.id;
+    std::uint32_t id = member_id.id;
     serialize(id);
-    uint32_t msize = 0;
+    std::uint32_t msize = 0;
     serialize(msize);
     reset_alignment();
 }
 
 void Cdr::xcdr1_end_long_member_header(
         const MemberId&,
-        size_t member_serialized_size)
+        std::size_t member_serialized_size)
 {
-    jump(sizeof(uint16_t) + sizeof(uint16_t) + sizeof(uint32_t));
-    uint32_t msize = static_cast<uint32_t>(member_serialized_size);
+    jump(sizeof(std::uint16_t) + sizeof(std::uint16_t) + sizeof(std::uint32_t));
+    std::uint32_t msize = static_cast<std::uint32_t>(member_serialized_size);
     serialize(msize);
 }
 
 void Cdr::xcdr1_change_to_short_member_header(
         const MemberId& member_id,
-        size_t member_serialized_size)
+        std::size_t member_serialized_size)
 {
     assert(0x3F00 >= member_id.id);
-    assert(std::numeric_limits<uint16_t>::max() >= member_serialized_size );
+    assert(std::numeric_limits<std::uint16_t>::max() >= member_serialized_size );
 
-    uint16_t flags_and_member_id = static_cast<uint16_t>(member_id.must_understand ? 0x4000 : 0x0) |
-            static_cast<uint16_t>(member_id.id);
+    std::uint16_t flags_and_member_id = static_cast<std::uint16_t>(member_id.must_understand ? 0x4000 : 0x0) |
+            static_cast<std::uint16_t>(member_id.id);
     serialize(flags_and_member_id);
-    uint16_t size = static_cast<uint16_t>(member_serialized_size);
+    std::uint16_t size = static_cast<std::uint16_t>(member_serialized_size);
     serialize(size);
-    memmove(&offset_, &offset_ + 8, member_serialized_size);
+    std::memmove(&offset_, &offset_ + 8, member_serialized_size);
 }
 
 void Cdr::xcdr1_change_to_long_member_header(
         const MemberId& member_id,
-        size_t member_serialized_size)
+        std::size_t member_serialized_size)
 {
     if (0 < (end_ - offset_ - member_serialized_size - 11))
     {
-        memmove(&offset_ + 12, &offset_ + 4, member_serialized_size);
+        std::memmove(&offset_ + 12, &offset_ + 4, member_serialized_size);
     }
     else
     {
         throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
-    uint16_t flags_and_extended_pid = static_cast<uint16_t>(member_id.must_understand ? 0x4000 : 0x0) |
-            static_cast<uint16_t>(PID_EXTENDED);
+    std::uint16_t flags_and_extended_pid = static_cast<std::uint16_t>(member_id.must_understand ? 0x4000 : 0x0) |
+            static_cast<std::uint16_t>(PID_EXTENDED);
     serialize(flags_and_extended_pid);
-    uint16_t size = PID_EXTENDED_LENGTH;
+    std::uint16_t size = PID_EXTENDED_LENGTH;
     serialize(size);
-    uint32_t id = member_id.id;
+    std::uint32_t id = member_id.id;
     serialize(id);
-    uint32_t msize = static_cast<uint32_t>(member_serialized_size);
+    std::uint32_t msize = static_cast<std::uint32_t>(member_serialized_size);
     serialize(msize);
 }
 
@@ -2940,16 +2940,16 @@ bool Cdr::xcdr1_deserialize_member_header(
 {
     bool ret_value = true;
     make_alignment(alignment(4));
-    uint16_t flags_and_member_id = 0;
+    std::uint16_t flags_and_member_id = 0;
     deserialize_framing(flags_and_member_id);
     member_id.must_understand = (flags_and_member_id & 0x4000);
-    uint16_t id = (flags_and_member_id & 0x3FFF);
+    std::uint16_t id = (flags_and_member_id & 0x3FFF);
 
 
     if (PID_EXTENDED > id)
     {
         member_id.id = id;
-        uint16_t size = 0;
+        std::uint16_t size = 0;
         deserialize_framing(size);
         current_state.member_size_ = size;
         current_state.header_serialized_ = XCdrHeaderSelection::SHORT_HEADER;
@@ -2957,13 +2957,13 @@ bool Cdr::xcdr1_deserialize_member_header(
     }
     else if (PID_EXTENDED == id) // PID_EXTENDED
     {
-        uint16_t size = 0;
+        std::uint16_t size = 0;
         deserialize_framing(size);
         if (PID_EXTENDED_LENGTH != size)
         {
             throw BadParamException("PID_EXTENDED comes with a size different than 8");
         }
-        uint32_t mid = 0;
+        std::uint32_t mid = 0;
         deserialize_framing(mid);
         member_id.id = mid;
         deserialize_framing(current_state.member_size_);
@@ -2972,7 +2972,7 @@ bool Cdr::xcdr1_deserialize_member_header(
     }
     else if (PID_SENTINEL == id) // PID_SENTINEL
     {
-        uint16_t size = 0;
+        std::uint16_t size = 0;
         deserialize_framing(size);
         if (0 != size)
         {
@@ -2990,19 +2990,19 @@ void Cdr::xcdr2_serialize_short_member_header(
 {
     assert(0x10000000 > member_id.id);
 
-    uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | member_id.id;
+    std::uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | member_id.id;
     serialize(flags_and_member_id);
 }
 
 void Cdr::xcdr2_end_short_member_header(
         const MemberId& member_id,
-        size_t member_serialized_size)
+        std::size_t member_serialized_size)
 {
     assert(0x10000000 > member_id.id);
     assert(8 >= member_serialized_size);
 
-    uint32_t lc = get_short_lc(member_serialized_size);
-    uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | lc | member_id.id;
+    std::uint32_t lc = get_short_lc(member_serialized_size);
+    std::uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | lc | member_id.id;
     serialize(flags_and_member_id);
 }
 
@@ -3011,59 +3011,59 @@ void Cdr::xcdr2_serialize_long_member_header(
 {
     assert(0x10000000 > member_id.id);
 
-    uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | member_id.id;
+    std::uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | member_id.id;
     serialize(flags_and_member_id);
-    uint32_t size = 0;
+    std::uint32_t size = 0;
     serialize(size);
 }
 
 void Cdr::xcdr2_end_long_member_header(
         const MemberId& member_id,
-        size_t member_serialized_size)
+        std::size_t member_serialized_size)
 {
     assert(0x10000000 > member_id.id);
 
-    uint32_t lc = 0 == member_serialized_size ? get_long_lc(serialized_member_size_) : 0x40000000;
-    uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | lc | member_id.id;
+    std::uint32_t lc = 0 == member_serialized_size ? get_long_lc(serialized_member_size_) : 0x40000000;
+    std::uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | lc | member_id.id;
     serialize(flags_and_member_id);
     if (0 < member_serialized_size)
     {
-        uint32_t size = static_cast<uint32_t>(member_serialized_size);
+        std::uint32_t size = static_cast<std::uint32_t>(member_serialized_size);
         serialize(size);
     }
 }
 
 void Cdr::xcdr2_change_to_short_member_header(
         const MemberId& member_id,
-        size_t member_serialized_size)
+        std::size_t member_serialized_size)
 {
     assert(0x10000000 > member_id.id);
     assert(8 >= member_serialized_size);
 
-    uint32_t lc = get_short_lc(member_serialized_size);
-    uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | lc | member_id.id;
+    std::uint32_t lc = get_short_lc(member_serialized_size);
+    std::uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | lc | member_id.id;
     serialize(flags_and_member_id);
-    memmove(&offset_, &offset_ + 4, member_serialized_size);
+    std::memmove(&offset_, &offset_ + 4, member_serialized_size);
 }
 
 void Cdr::xcdr2_change_to_long_member_header(
         const MemberId& member_id,
-        size_t member_serialized_size)
+        std::size_t member_serialized_size)
 {
     assert(0x10000000 > member_id.id);
 
     if (0 < (end_ - offset_ - member_serialized_size - 7))
     {
-        memmove(&offset_ + 8, &offset_ + 4, member_serialized_size);
+        std::memmove(&offset_ + 8, &offset_ + 4, member_serialized_size);
     }
     else
     {
         throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
-    uint32_t lc = get_long_lc(serialized_member_size_);
-    uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | lc | member_id.id;
+    std::uint32_t lc = get_long_lc(serialized_member_size_);
+    std::uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | lc | member_id.id;
     serialize(flags_and_member_id);
-    uint32_t size = static_cast<uint32_t>(member_serialized_size);
+    std::uint32_t size = static_cast<std::uint32_t>(member_serialized_size);
     serialize(size);
 }
 
@@ -3073,9 +3073,9 @@ void Cdr::xcdr2_shrink_to_long_member_header(
 {
     assert(0x10000000 > member_id.id);
 
-    memmove(&offset_ + 4, &offset_ + 8, offset - offset_ - 8);
-    uint32_t lc = get_long_lc(serialized_member_size_);
-    uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | lc | member_id.id;
+    std::memmove(&offset_ + 4, &offset_ + 8, offset - offset_ - 8);
+    std::uint32_t lc = get_long_lc(serialized_member_size_);
+    std::uint32_t flags_and_member_id = (member_id.must_understand ? 0x80000000 : 0x0) | lc | member_id.id;
     serialize(flags_and_member_id);
 }
 
@@ -3147,9 +3147,9 @@ Cdr& Cdr::xcdr1_end_serialize_member(
         auto member_origin = origin_;
         set_state(current_state);
         make_alignment(alignment(4));
-        const size_t member_serialized_size = last_offset - offset_ -
+        const std::size_t member_serialized_size = last_offset - offset_ -
                 (current_state.header_serialized_ == XCdrHeaderSelection::SHORT_HEADER ? 4 : 12);
-        if (member_serialized_size > std::numeric_limits<uint16_t>::max())
+        if (member_serialized_size > std::numeric_limits<std::uint16_t>::max())
         {
             switch (current_state.header_serialized_)
             {
@@ -3271,9 +3271,9 @@ Cdr& Cdr::xcdr1_end_serialize_opt_member(
         auto member_origin = origin_;
         set_state(current_state);
         make_alignment(alignment(4));
-        const size_t member_serialized_size = last_offset - offset_ -
+        const std::size_t member_serialized_size = last_offset - offset_ -
                 (current_state.header_serialized_ == XCdrHeaderSelection::SHORT_HEADER ? 4 : 12);
-        if (member_serialized_size > std::numeric_limits<uint16_t>::max())
+        if (member_serialized_size > std::numeric_limits<std::uint16_t>::max())
         {
             switch (current_state.header_serialized_)
             {
@@ -3383,10 +3383,10 @@ Cdr& Cdr::xcdr2_end_serialize_member(
     {
         auto last_offset = offset_;
         set_state(current_state);
-        make_alignment(alignment(sizeof(uint32_t)));
+        make_alignment(alignment(sizeof(std::uint32_t)));
         if (NO_SERIALIZED_MEMBER_SIZE == serialized_member_size_)
         {
-            const size_t member_serialized_size = last_offset - offset_ -
+            const std::size_t member_serialized_size = last_offset - offset_ -
                     (current_state.header_serialized_ == XCdrHeaderSelection::SHORT_HEADER ? 4 : 8);
             if (8 < member_serialized_size || 0xFFFFFFFFu == get_short_lc(member_serialized_size))
             {
@@ -3452,7 +3452,7 @@ Cdr& Cdr::xcdr2_end_serialize_member(
                 case XCdrHeaderSelection::LONG_HEADER:
                     xcdr2_shrink_to_long_member_header(current_state.next_member_id_, last_offset);
                     offset_ = last_offset;
-                    offset_ -= sizeof(uint32_t);
+                    offset_ -= sizeof(std::uint32_t);
                     break;
                 default:
                     assert(false); // header_serialized_ must have only SHORT_HEADER or LONG_HEADER
@@ -3472,11 +3472,11 @@ void Cdr::xcdr2_deserialize_member_header(
         MemberId& member_id,
         Cdr::state& current_state)
 {
-    uint32_t flags_and_member_id = 0;
+    std::uint32_t flags_and_member_id = 0;
     deserialize_framing(flags_and_member_id);
     member_id.must_understand = (flags_and_member_id & 0x80000000);
-    uint32_t mid = (flags_and_member_id & 0x0FFFFFFF);
-    uint32_t lc = (flags_and_member_id & 0x70000000) >> 28;
+    std::uint32_t mid = (flags_and_member_id & 0x0FFFFFFF);
+    std::uint32_t lc = (flags_and_member_id & 0x70000000) >> 28;
 
     member_id.id = mid;
 
@@ -3503,18 +3503,18 @@ void Cdr::xcdr2_deserialize_member_header(
     }
     else if (4 == lc)
     {
-        uint32_t size = 0;
+        std::uint32_t size = 0;
         deserialize_framing(size);
         current_state.member_size_ = size;
         current_state.header_serialized_ = XCdrHeaderSelection::LONG_HEADER;
     }
     else
     {
-        uint32_t size = 0;
+        std::uint32_t size = 0;
         deserialize_framing(size);
         current_state.member_size_ = 4 + (size * (5 == lc ? 1 : (6 == lc ? 4 : 8)));
         current_state.header_serialized_ = XCdrHeaderSelection::SHORT_HEADER; // Avoid take into account DHEADER after.
-        offset_ -= sizeof(uint32_t);
+        offset_ -= sizeof(std::uint32_t);
     }
 }
 
@@ -3563,7 +3563,7 @@ Cdr& Cdr::xcdr2_begin_serialize_type(
             EncodingAlgorithmFlag::PL_CDR2 == type_encoding);
     if (EncodingAlgorithmFlag::PLAIN_CDR2 != type_encoding)
     {
-        uint32_t dheader {0};
+        std::uint32_t dheader {0};
         serialize(dheader);
     }
     serialized_member_size_ = NO_SERIALIZED_MEMBER_SIZE; // Avoid error when serializing arrays, sequences, etc..
@@ -3582,8 +3582,8 @@ Cdr& Cdr::xcdr2_end_serialize_type(
     {
         auto last_offset = offset_;
         set_state(current_state);
-        const size_t member_serialized_size = last_offset - offset_ /*DHEADER ->*/ - 4 - alignment(4);
-        serialize(static_cast<uint32_t>(member_serialized_size));
+        const std::size_t member_serialized_size = last_offset - offset_ /*DHEADER ->*/ - 4 - alignment(4);
+        serialize(static_cast<std::uint32_t>(member_serialized_size));
         jump(member_serialized_size);
         serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
     }
@@ -3619,8 +3619,8 @@ Cdr& Cdr::xcdr1_deserialize_type(
                 }
             }
 
-            size_t member_size {current_state.member_size_};
-            size_t diff {offset_ - prev_offset};
+            std::size_t member_size {current_state.member_size_};
+            std::size_t diff {offset_ - prev_offset};
             if (member_size < diff)
             {
                 throw exception::BadParamException(
@@ -3658,7 +3658,7 @@ Cdr& Cdr::xcdr2_deserialize_type(
 
     if (EncodingAlgorithmFlag::PLAIN_CDR2 != type_encoding)
     {
-        uint32_t dheader {0};
+        std::uint32_t dheader {0};
         deserialize_framing(dheader);
 
         Cdr::state current_state(*this);
@@ -3693,7 +3693,7 @@ Cdr& Cdr::xcdr2_deserialize_type(
                         0 == offset_ - offset) &&
                         !(0 < current_state.member_size_ &&
                         current_state.member_size_ == offset_ - offset -
-                        alignment_on_state(current_state.origin_, offset, sizeof(uint32_t)) -
+                        alignment_on_state(current_state.origin_, offset, sizeof(std::uint32_t)) -
                         (XCdrHeaderSelection::SHORT_HEADER == current_state.header_serialized_ ? 4 : 8)))
                 {
                     throw BadParamException(
@@ -3711,7 +3711,7 @@ Cdr& Cdr::xcdr2_deserialize_type(
             {
                 ++next_member_id_.id;
             }
-            size_t jump_size = dheader - (offset_ - current_state.offset_);
+            std::size_t jump_size = dheader - (offset_ - current_state.offset_);
             jump(jump_size);
 
             next_member_id_ = current_state.next_member_id_;
@@ -3798,7 +3798,7 @@ Cdr::state Cdr::allocate_xcdrv2_dheader()
     if (CdrVersion::XCDRv2 == cdr_version_)
     {
         // Serialize DHEADER
-        uint32_t dheader {0};
+        std::uint32_t dheader {0};
         serialize(dheader);
     }
 
@@ -3813,8 +3813,8 @@ void Cdr::set_xcdrv2_dheader(
         auto offset = offset_;
         Cdr::state state_after(*this);
         set_state(dheader_state);
-        size_t dheader = offset - offset_ - (4 + alignment(sizeof(uint32_t)));    /* DHEADER */
-        serialize(static_cast<uint32_t>(dheader));
+        std::size_t dheader = offset - offset_ - (4 + alignment(sizeof(std::uint32_t)));    /* DHEADER */
+        serialize(static_cast<std::uint32_t>(dheader));
         set_state(state_after);
         serialized_member_size_ = SERIALIZED_MEMBER_SIZE;
     }

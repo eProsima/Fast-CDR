@@ -40,7 +40,7 @@ constexpr bool is_multi_array_primitive(
     return true;
 }
 
-template <typename _T, size_t _N>
+template <typename _T, std::size_t _N>
 constexpr bool is_multi_array_primitive(
         std::array<_T, _N> const*)
 {

@@ -15,6 +15,8 @@
 #ifndef _SRC_CPP_HELPERS_MEMORYHELPERS_HPP_
 #define _SRC_CPP_HELPERS_MEMORYHELPERS_HPP_
 
+#include <cstdint>
+
 #include <atomic>
 #include <type_traits>
 #include <utility>
@@ -148,7 +150,7 @@ inline void do_not_optimize(
 inline bool normalize_bool(
         bool b) noexcept
 {
-    uint8_t raw;
+    std::uint8_t raw;
     std::memcpy(&raw, &b, 1);
     do_not_optimize(raw);
     return static_cast<bool>(raw);

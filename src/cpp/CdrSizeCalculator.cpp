@@ -72,11 +72,11 @@ std::shared_ptr<CdrContext> CdrSizeCalculator::get_context() const
     return context_;
 }
 
-size_t CdrSizeCalculator::begin_calculate_type_serialized_size(
+std::size_t CdrSizeCalculator::begin_calculate_type_serialized_size(
         EncodingAlgorithmFlag new_encoding,
-        size_t& current_alignment)
+        std::size_t& current_alignment)
 {
-    size_t calculated_size {0};
+    std::size_t calculated_size {0};
     current_encoding_ = new_encoding;
 
     if (CdrVersion::XCDRv2 == cdr_version_ && EncodingAlgorithmFlag::PLAIN_CDR2 != current_encoding_)
@@ -91,11 +91,11 @@ size_t CdrSizeCalculator::begin_calculate_type_serialized_size(
     return calculated_size;
 }
 
-size_t CdrSizeCalculator::end_calculate_type_serialized_size(
+std::size_t CdrSizeCalculator::end_calculate_type_serialized_size(
         EncodingAlgorithmFlag new_encoding,
-        size_t& current_alignment)
+        std::size_t& current_alignment)
 {
-    size_t calculated_size {0};
+    std::size_t calculated_size {0};
 
     if (CdrVersion::XCDRv1 == cdr_version_ && EncodingAlgorithmFlag::PL_CDR == current_encoding_)
     {

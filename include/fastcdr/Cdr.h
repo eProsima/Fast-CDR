@@ -392,6 +392,33 @@ public:
     }
 
     /*!
+     * @brief Decodes a value that determines how the rest of the stream is read, such as a length, a DHEADER, a
+     * member header, a presence flag or a union discriminator.
+     *
+     * The elements of a sequence or map that do not fit in the destination, when a
+     * @ref CdrTryConstructFlag::DEFAULT_VALUE or @ref CdrTryConstructFlag::TRIM policy is applied, are consumed
+     * from the stream without storing their decoded values. Values like the ones above are needed to know how many
+     * bytes those elements occupy, so they must be stored anyway. The regular @c deserialize overloads do not store
+     * them in that situation; this function always does.
+     *
+     * Fast CDR uses it for the values it decodes itself. Code decoding a type whose layout depends on a value it
+     * reads, like the discriminator of a union, must decode that value with this function instead of
+     * @c deserialize or @c operator>> , so the type is consumed correctly when it is discarded.
+     *
+     * @param[out] value Reference to the variable where the decoded value will be stored.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
+     * position that exceeds the internal memory size.
+     */
+    template<class _T>
+    Cdr& deserialize_framing(
+            _T& value)
+    {
+        fake_mode_scope storing {*this, false};
+        return deserialize(value);
+    }
+
+    /*!
      * @brief Encodes the value of a type into the buffer.
      *
      * To do that, the encoder expects a function `serialize` to be provided by the type.
@@ -3969,25 +3996,6 @@ private:
 
         bool previous_;
     };
-
-    /*!
-     * @brief Decodes a value that determines how the rest of the stream is read, such as a length, a DHEADER, a
-     * member header or a presence flag.
-     *
-     * Unlike the regular @c deserialize overloads, the value is always stored, also in @c fake_mode . Discarded
-     * elements are decoded in fake mode, and they still need these values to consume exactly the bytes they occupy.
-     * @param[out] value Reference to the variable where the decoded value will be stored.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
-     * position that exceeds the internal memory size.
-     */
-    template<class _T>
-    Cdr& deserialize_framing(
-            _T& value)
-    {
-        fake_mode_scope storing {*this, false};
-        return deserialize(value);
-    }
 
     Cdr_DllAPI const char* read_string(
             uint32_t& length);

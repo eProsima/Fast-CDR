@@ -1766,10 +1766,16 @@ public:
      * @brief This function deserializes a string applying a type consistency policy when the
      * string read does not fit in the supplied @p max_length .
      *
+     * This function allocates memory to store the string, which the user has to free using free(). An empty
+     * serialized string sets @p string_t to @c nullptr without allocating, as the overload without a policy does.
+     *
+     * Except when an exception is thrown, the whole string is consumed from the stream. If an exception is thrown,
+     * the stream is left where it was before the call.
+     *
      * If the string is longer than @p max_length characters (the terminating null character, when
      * the encoder serialized one, is not counted):
-     *   - @ref CdrTryConstructFlag::FAIL resets @p string_t to @c nullptr , and throws @ref exception::BadParamException .
-     *   - @ref CdrTryConstructFlag::DEFAULT_VALUE resets @p string_t to @c nullptr .
+     *   - @ref CdrTryConstructFlag::FAIL throws @ref exception::BadParamException , leaving @p string_t unchanged.
+     *   - @ref CdrTryConstructFlag::DEFAULT_VALUE allocates an empty string.
      *   - @ref CdrTryConstructFlag::TRIM reads until position @p max_length so the string is truncated to @p max_length characters.
      *
      * @param[out] string_t The pointer that will point to the string read from the buffer.
@@ -1800,10 +1806,16 @@ public:
      * @brief This function deserializes a wide-string applying a type consistency policy when the
      * wide string read does not fit in the supplied @p max_length .
      *
+     * This function allocates memory to store the wide string, which the user has to free using free(). An empty
+     * serialized string sets @p string_t to @c nullptr without allocating, as the overload without a policy does.
+     *
+     * Except when an exception is thrown, the whole string is consumed from the stream. If an exception is thrown,
+     * the stream is left where it was before the call.
+     *
      * If the number of wide characters read is larger than @p max_length (unlike narrow strings, no
      * terminating null character is serialized, so every character read is counted):
-     *   - @ref CdrTryConstructFlag::FAIL resets @p string_t to @c nullptr , and throws @ref exception::BadParamException .
-     *   - @ref CdrTryConstructFlag::DEFAULT_VALUE resets @p string_t to @c nullptr .
+     *   - @ref CdrTryConstructFlag::FAIL throws @ref exception::BadParamException , leaving @p string_t unchanged.
+     *   - @ref CdrTryConstructFlag::DEFAULT_VALUE allocates an empty string.
      *   - @ref CdrTryConstructFlag::TRIM reads at position @p max_length so the visible string is truncated to @p max_length characters.
      *
      * @param[out] string_t The pointer that will point to the wide string read from the buffer.
@@ -1839,8 +1851,11 @@ public:
      * @brief This function deserializes a std::string applying a type consistency policy when
      * the string read does not fit in the supplied @p max_length .
      *
-     * The stream is always fully consumed first. If the string read is longer than @p max_length
-     * characters, not counting the terminating null character when the encoder serialized one:
+     * Except when an exception is thrown, the whole string is consumed from the stream. If an exception is thrown,
+     * the stream is left where it was before the call.
+     *
+     * If the string read is longer than @p max_length characters, not counting the terminating null character
+     * when the encoder serialized one:
      *   - @ref CdrTryConstructFlag::FAIL throws @ref exception::BadParamException .
      *   - @ref CdrTryConstructFlag::DEFAULT_VALUE clears @p string_t .
      *   - @ref CdrTryConstructFlag::TRIM resizes @p string_t to @p max_length .
@@ -1883,8 +1898,11 @@ public:
      * @brief This function deserializes a std::wstring applying a type consistency policy when
      * the wide string read does not fit in the supplied @p max_length .
      *
-     * The stream is always fully consumed first. If the number of wide characters read is larger
-     * than @p max_length (no terminating null character is serialized, so every character counts):
+     * Except when an exception is thrown, the whole string is consumed from the stream. If an exception is thrown,
+     * the stream is left where it was before the call.
+     *
+     * If the number of wide characters read is larger than @p max_length (no terminating null character is
+     * serialized, so every character counts):
      *   - @ref CdrTryConstructFlag::FAIL throws @ref exception::BadParamException .
      *   - @ref CdrTryConstructFlag::DEFAULT_VALUE clears @p string_t .
      *   - @ref CdrTryConstructFlag::TRIM resizes @p string_t to @p max_length .
@@ -1928,8 +1946,11 @@ public:
      * @brief Decodes a fixed string applying a type consistency policy when the deserialized
      * string does not fit in @c MAX_CHARS .
      *
-     * The stream is always fully consumed first. When the number of characters read, excluding
-     * the terminating null character, is larger than @c MAX_CHARS :
+     * Except when an exception is thrown, the whole string is consumed from the stream. If an exception is thrown,
+     * the stream is left where it was before the call.
+     *
+     * When the number of characters read, excluding the terminating null character, is larger than
+     * @c MAX_CHARS :
      *   - @ref CdrTryConstructFlag::FAIL throws @ref exception::BadParamException .
      *   - @ref CdrTryConstructFlag::DEFAULT_VALUE resets @p value to an empty fixed_string.
      *   - @ref CdrTryConstructFlag::TRIM keeps the first @c MAX_CHARS characters. This is the
@@ -1951,20 +1972,6 @@ public:
     {
         uint32_t length {MAX_CHARS};
         const char* str = read_string(length, consistency_flag);
-        if (length > MAX_CHARS)
-        {
-            switch (consistency_flag)
-            {
-                case CdrTryConstructFlag::FAIL:
-                    throw exception::BadParamException(
-                              "Deserialized string length exceeds the fixed_string maximum size");
-                case CdrTryConstructFlag::DEFAULT_VALUE:
-                    value = fixed_string<MAX_CHARS>{};
-                    return *this;
-                case CdrTryConstructFlag::TRIM:
-                    break;
-            }
-        }
         value.assign(str, length);
         return *this;
     }
@@ -2183,18 +2190,16 @@ public:
     }
 
     /*!
-     * @brief This function template deserializes a sequence applying a type consistency policy
+     * @brief This function template deserializes a sequence of primitives or enumerations applying a type consistency policy
      * when the serialized length exceeds the supplied @p max_length .
      *
-     * The stream is always fully consumed first. After deserialization, if the resulting
-     * sequence is longer than @p max_length :
+     * If the serialized sequence has more than @p max_length elements:
      *   - @ref CdrTryConstructFlag::FAIL throws @ref exception::BadParamException .
-     *   - @ref CdrTryConstructFlag::DEFAULT_VALUE clears @p vector_t .
-     *   - @ref CdrTryConstructFlag::TRIM resizes @p vector_t to @p max_length .
+     *   - @ref CdrTryConstructFlag::DEFAULT_VALUE leaves @p vector_t empty.
+     *   - @ref CdrTryConstructFlag::TRIM keeps the first @p max_length elements.
      *
-     * The overload covers all element types, including @c bool , primitives, enumerations and
-     * user-defined types, dispatching through the regular @c deserialize overload to read the
-     * sequence before applying the policy.
+     * Except when an exception is thrown, the whole sequence is consumed from the stream, including the elements
+     * that are discarded. If an exception is thrown, the stream is left where it was before the call.
      *
      * @param[out] vector_t The variable that will store the sequence read from the buffer.
      * @param[in] consistency_flag Policy applied when the serialized length exceeds @p max_length .
@@ -2237,6 +2242,7 @@ public:
             switch (consistency_flag)
             {
                 case CdrTryConstructFlag::FAIL:
+                    set_state(state_before_error);
                     throw exception::BadParamException(
                               "Serialized vector contains more elements than the destination array can hold");
                 case CdrTryConstructFlag::DEFAULT_VALUE:
@@ -2276,6 +2282,27 @@ public:
         return *this;
     }
 
+    /*!
+     * @brief This function template deserializes a sequence of non-primitive elements applying a type consistency policy
+     * when the serialized length exceeds the supplied @p max_length .
+     *
+     * If the serialized sequence has more than @p max_length elements:
+     *   - @ref CdrTryConstructFlag::FAIL throws @ref exception::BadParamException .
+     *   - @ref CdrTryConstructFlag::DEFAULT_VALUE leaves @p vector_t empty.
+     *   - @ref CdrTryConstructFlag::TRIM keeps the first @p max_length elements.
+     *
+     * Except when an exception is thrown, the whole sequence is consumed from the stream, including the elements
+     * that are discarded. If an exception is thrown, the stream is left where it was before the call.
+     *
+     * @param[out] vector_t The variable that will store the sequence read from the buffer.
+     * @param[in] consistency_flag Policy applied when the serialized length exceeds @p max_length .
+     * @param[in] max_length Maximum length accepted for the destination sequence.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+     * @exception exception::BadParamException This exception is thrown when @p consistency_flag is
+     *            @ref CdrTryConstructFlag::FAIL and the serialized length exceeds @p max_length , or when
+     *            the elements read do not match the size given by the DHEADER.
+     */
     template<class _T, typename std::enable_if<!std::is_enum<_T>::value &&
             !std::is_arithmetic<_T>::value>::type* = nullptr>
     Cdr& deserialize(
@@ -2316,6 +2343,7 @@ public:
                 switch (consistency_flag)
                 {
                     case CdrTryConstructFlag::FAIL:
+                        set_state(state_before_error);
                         throw exception::BadParamException(
                                   "Serialized vector contains more elements than the destination array can hold");
                     case CdrTryConstructFlag::DEFAULT_VALUE:
@@ -2323,31 +2351,38 @@ public:
                         break;
                     case CdrTryConstructFlag::TRIM:
                         length_to_read = max_length;
-                        vector_t.resize(length_to_read);
                         break;
                 }
             }
-            else
-            {
-                vector_t.resize(length_to_read);
-            }
+
+            vector_t.resize(length_to_read);
 
             uint32_t count {0};
-            while (offset_ - offset < dheader && count < length_to_read)
-            {
-                deserialize(vector_t.data()[count]);
-                ++count;
-            }
 
-            if (sequence_length == length_to_read)
+            try
             {
-                if (offset_ - offset != dheader)
+                while (offset_ - offset < dheader && count < length_to_read)
                 {
-                    set_state(state_before_error);
-                    throw exception::BadParamException("Member size differs from the size specified by DHEADER");
+                    deserialize(vector_t.data()[count]);
+                    ++count;
                 }
             }
-            else if (offset_ - offset < dheader)
+            catch (exception::Exception& ex)
+            {
+                set_state(state_before_error);
+                ex.raise();
+            }
+
+            // The elements kept must fit in the DHEADER, and must fill it exactly when none is discarded. Discarded
+            // elements are skipped using the DHEADER.
+            if (count < length_to_read || offset_ - offset > dheader ||
+                    (sequence_length == length_to_read && offset_ - offset != dheader))
+            {
+                set_state(state_before_error);
+                throw exception::BadParamException("Member size differs from the size specified by DHEADER");
+            }
+
+            if (offset_ - offset < dheader)
             {
                 uint32_t remaining_bytes = dheader - static_cast<uint32_t>(offset_ - offset);
                 if (!jump(remaining_bytes))
@@ -2383,6 +2418,7 @@ public:
                 switch (consistency_flag)
                 {
                     case CdrTryConstructFlag::FAIL:
+                        set_state(state_before_error);
                         throw exception::BadParamException(
                                   "Serialized vector contains more elements than the destination array can hold");
                     case CdrTryConstructFlag::DEFAULT_VALUE:
@@ -2559,6 +2595,29 @@ public:
         return *this;
     }
 
+    /*!
+     * @brief This function template deserializes a map of non-primitive values applying a type consistency policy
+     * when the serialized map has more entries than the supplied @p max_length .
+     *
+     * The whole map is consumed from the stream. If the serialized map has more than @p max_length entries:
+     *   - @ref CdrTryConstructFlag::FAIL throws @ref exception::BadParamException .
+     *   - @ref CdrTryConstructFlag::DEFAULT_VALUE leaves @p map_t empty.
+     *   - @ref CdrTryConstructFlag::TRIM keeps the first @p max_length entries in the order they were
+     *     serialized and discards the rest. If the stream repeats a key, the repeated entry does not replace the
+     *     first one, so @p map_t may end up with fewer than @p max_length entries.
+     *
+     * The content of @p map_t is only replaced when the whole deserialization succeeds. If an exception is thrown,
+     * @p map_t keeps its previous content and the stream is left where it was before the call.
+     *
+     * @param[out] map_t The variable that will store the map read from the buffer.
+     * @param[in] consistency_flag Policy applied when the serialized map has more than @p max_length entries.
+     * @param[in] max_length Maximum number of entries accepted for the destination map.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+     * @exception exception::BadParamException This exception is thrown when @p consistency_flag is
+     *            @ref CdrTryConstructFlag::FAIL and the serialized map has more than @p max_length entries, or when
+     *            the entries read do not match the size given by the DHEADER.
+     */
     template<class _K, class _T, typename std::enable_if<!std::is_enum<_T>::value &&
             !std::is_arithmetic<_T>::value>::type* = nullptr>
     Cdr& deserialize(
@@ -2567,6 +2626,7 @@ public:
             uint32_t max_length)
     {
         state state_before_error(*this);
+        std::map<_K, _T> map;
 
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
@@ -2585,13 +2645,6 @@ public:
             uint32_t map_length {0};
             deserialize_framing(map_length);
 
-            map_t.clear();
-
-            if (0 == map_length)
-            {
-                return *this;
-            }
-
             uint32_t length_to_read {map_length};
 
             if (map_length > max_length)
@@ -2599,8 +2652,9 @@ public:
                 switch (consistency_flag)
                 {
                     case CdrTryConstructFlag::FAIL:
+                        set_state(state_before_error);
                         throw exception::BadParamException(
-                                  "Serialized vector contains more elements than the destination array can hold");
+                                  "Serialized map contains more entries than the destination map can hold");
                     case CdrTryConstructFlag::DEFAULT_VALUE:
                         length_to_read = 0;
                         break;
@@ -2611,25 +2665,35 @@ public:
             }
 
             uint32_t count {0};
-            while (offset_ - offset < dheader && count < length_to_read)
-            {
-                _K key;
-                _T val;
-                deserialize(key);
-                deserialize(val);
-                map_t.emplace(std::pair<_K, _T>(std::move(key), std::move(val)));
-                ++count;
-            }
 
-            if (map_length == length_to_read)
+            try
             {
-                if (offset_ - offset != dheader)
+                while (offset_ - offset < dheader && count < length_to_read)
                 {
-                    set_state(state_before_error);
-                    throw exception::BadParamException("Member size greater than size specified by DHEADER");
+                    _K key;
+                    _T value;
+                    deserialize(key);
+                    deserialize(value);
+                    map.emplace(std::pair<_K, _T>(std::move(key), std::move(value)));
+                    ++count;
                 }
             }
-            else if (offset_ - offset < dheader)
+            catch (exception::Exception& ex)
+            {
+                set_state(state_before_error);
+                ex.raise();
+            }
+
+            // The entries kept must fit in the DHEADER, and must fill it exactly when none is discarded. Discarded
+            // entries are skipped using the DHEADER.
+            if (count < length_to_read || offset_ - offset > dheader ||
+                    (map_length == length_to_read && offset_ - offset != dheader))
+            {
+                set_state(state_before_error);
+                throw exception::BadParamException("Member size differs from the size specified by DHEADER");
+            }
+
+            if (offset_ - offset < dheader)
             {
                 uint32_t remaining_bytes = dheader - static_cast<uint32_t>(offset_ - offset);
                 if (!jump(remaining_bytes))
@@ -2642,16 +2706,8 @@ public:
         }
         else
         {
-            uint32_t map_length = 0;
-
+            uint32_t map_length {0};
             deserialize_framing(map_length);
-
-            map_t.clear();
-
-            if (map_length == 0)
-            {
-                return *this;
-            }
 
             uint32_t length_to_read {map_length};
 
@@ -2660,8 +2716,9 @@ public:
                 switch (consistency_flag)
                 {
                     case CdrTryConstructFlag::FAIL:
+                        set_state(state_before_error);
                         throw exception::BadParamException(
-                                  "Serialized vector contains more elements than the destination array can hold");
+                                  "Serialized map contains more entries than the destination map can hold");
                     case CdrTryConstructFlag::DEFAULT_VALUE:
                         length_to_read = 0;
                         break;
@@ -2673,13 +2730,13 @@ public:
 
             try
             {
-                for (uint32_t i = 0; i < length_to_read; ++i)
+                for (uint32_t i {0}; i < length_to_read; ++i)
                 {
                     _K key;
                     _T value;
                     deserialize(key);
                     deserialize(value);
-                    map_t.emplace(std::pair<_K, _T>(std::move(key), std::move(value)));
+                    map.emplace(std::pair<_K, _T>(std::move(key), std::move(value)));
                 }
 
                 // Consume the entries that do not fit in the destination. They are read into discarded
@@ -2704,30 +2761,33 @@ public:
             }
         }
 
+        map_t = std::move(map);
+
         return *this;
     }
 
     /*!
-     * @brief This function template deserializes a map applying a type consistency policy when
-     * the serialized length exceeds the supplied @p max_length .
+     * @brief This function template deserializes a map of primitive values applying a type consistency policy when
+     * the serialized map has more entries than the supplied @p max_length .
      *
-     * The stream is always fully consumed first. After deserialization, if the resulting map
-     * has more than @p max_length entries:
+     * The whole map is consumed from the stream. If the serialized map has more than @p max_length entries:
      *   - @ref CdrTryConstructFlag::FAIL throws @ref exception::BadParamException .
-     *   - @ref CdrTryConstructFlag::DEFAULT_VALUE clears @p map_t .
-     *   - @ref CdrTryConstructFlag::TRIM erases the highest-keyed entries until @p map_t
-     *     holds exactly @p max_length entries.
+     *   - @ref CdrTryConstructFlag::DEFAULT_VALUE leaves @p map_t empty.
+     *   - @ref CdrTryConstructFlag::TRIM keeps the first @p max_length entries in the order they were
+     *     serialized and discards the rest. If the stream repeats a key, the repeated entry does not replace the
+     *     first one, so @p map_t may end up with fewer than @p max_length entries.
      *
-     * The overload covers both primitive and non-primitive value types, dispatching through the
-     * regular @c deserialize overload to read the map before applying the policy.
+     * The content of @p map_t is only replaced when the whole deserialization succeeds. If an exception is thrown,
+     * @p map_t keeps its previous content and the stream is left where it was before the call.
      *
      * @param[out] map_t The variable that will store the map read from the buffer.
-     * @param[in] consistency_flag Policy applied when the serialized length exceeds @p max_length .
+     * @param[in] consistency_flag Policy applied when the serialized map has more than @p max_length entries.
      * @param[in] max_length Maximum number of entries accepted for the destination map.
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      * @exception exception::BadParamException This exception is thrown when @p consistency_flag is
-     *            @ref CdrTryConstructFlag::FAIL and the serialized length exceeds @p max_length .
+     *            @ref CdrTryConstructFlag::FAIL and the serialized map has more than @p max_length entries, or when
+     *            the entries read do not match the size given by the DHEADER.
      */
     template<class _K, class _T, typename std::enable_if<std::is_enum<_T>::value ||
             std::is_arithmetic<_T>::value>::type* = nullptr>
@@ -2736,17 +2796,11 @@ public:
             CdrTryConstructFlag consistency_flag,
             uint32_t max_length)
     {
-        uint32_t map_length = 0;
-        state state_(*this);
+        state state_before_error(*this);
+        std::map<_K, _T> map;
 
+        uint32_t map_length {0};
         deserialize_framing(map_length);
-
-        map_t.clear();
-
-        if (map_length == 0)
-        {
-            return *this;
-        }
 
         uint32_t length_to_read {map_length};
 
@@ -2755,8 +2809,9 @@ public:
             switch (consistency_flag)
             {
                 case CdrTryConstructFlag::FAIL:
+                    set_state(state_before_error);
                     throw exception::BadParamException(
-                              "Serialized vector contains more elements than the destination array can hold");
+                              "Serialized map contains more entries than the destination map can hold");
                 case CdrTryConstructFlag::DEFAULT_VALUE:
                     length_to_read = 0;
                     break;
@@ -2774,7 +2829,7 @@ public:
                 _T value;
                 deserialize(key);
                 deserialize(value);
-                map_t.emplace(std::pair<_K, _T>(std::move(key), std::move(value)));
+                map.emplace(std::pair<_K, _T>(std::move(key), std::move(value)));
             }
 
             // Consume the entries that do not fit in the destination. They are read into discarded
@@ -2794,9 +2849,11 @@ public:
         }
         catch (exception::Exception& ex)
         {
-            set_state(state_);
+            set_state(state_before_error);
             ex.raise();
         }
+
+        map_t = std::move(map);
 
         return *this;
     }

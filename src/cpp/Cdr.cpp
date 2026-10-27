@@ -1549,7 +1549,6 @@ Cdr& Cdr::deserialize(
         }
         else
         {
-
             offset_ += sizeof(double_t);
         }
 
@@ -1751,6 +1750,10 @@ Cdr& Cdr::deserialize(
 
             deserialize_array(string_t, length);
         }
+        else
+        {
+            offset_ += length * 2;
+        }
 
         return *this;
     }
@@ -1793,11 +1796,10 @@ Cdr& Cdr::deserialize(
             switch (consistency_flag)
             {
                 case CdrTryConstructFlag::FAIL:
-                    string_t = nullptr;
+                    set_state(state_before_error);
                     throw BadParamException(
                               "Deserialized string length exceeds the maximum length allowed by the destination type");
                 case CdrTryConstructFlag::DEFAULT_VALUE:
-                    string_t = nullptr;
                     length_to_read = 0;
                     break;
                 case CdrTryConstructFlag::TRIM:
@@ -1809,17 +1811,17 @@ Cdr& Cdr::deserialize(
         // Save last datasize.
         last_data_size_ = sizeof(uint8_t);
 
-        if (0 < length_to_read && !fake_mode)
+        if (!fake_mode)
         {
             // Allocate memory. The extra byte always reserved for the terminating null character
             // is zeroed by calloc, so the result is null-terminated whether or not the stream
-            // carried a terminator and whether or not the string was trimmed.
+            // carried a terminator and whether or not the string was trimmed. A string with no
+            // characters to keep becomes an empty string, as with the std::string overload.
             string_t = reinterpret_cast<char*>(calloc(length_to_read + 1, sizeof(char)));
             memcpy(string_t, &offset_, length_to_read);
         }
         offset_ += length;
         return *this;
-
     }
 
     set_state(state_before_error);
@@ -1851,11 +1853,10 @@ Cdr& Cdr::deserialize(
             switch (consistency_flag)
             {
                 case CdrTryConstructFlag::FAIL:
-                    string_t = nullptr;
+                    set_state(state_before_error);
                     throw BadParamException(
                               "Deserialized wide string length exceeds the maximum length allowed by the destination type");
                 case CdrTryConstructFlag::DEFAULT_VALUE:
-                    string_t = nullptr;
                     length_to_read = 0;
                     break;
                 case CdrTryConstructFlag::TRIM:
@@ -1869,13 +1870,12 @@ Cdr& Cdr::deserialize(
 
         if (!fake_mode)
         {
-            if (0 < length_to_read)
-            {
-                // Allocate memory.
-                string_t = reinterpret_cast<wchar_t*>(calloc(length_to_read + 1, sizeof(wchar_t))); // WStrings never serialize terminating zero
+            // Allocate memory. WStrings never serialize the terminating zero, so the extra
+            // character zeroed by calloc terminates the result. A string with no characters to
+            // keep becomes an empty string, as with the std::wstring overload.
+            string_t = reinterpret_cast<wchar_t*>(calloc(length_to_read + 1, sizeof(wchar_t)));
 
-                deserialize_array(string_t, length_to_read);
-            }
+            deserialize_array(string_t, length_to_read);
 
             offset_ += (length - length_to_read) * 2;
         }
@@ -1939,6 +1939,7 @@ const char* Cdr::read_string(
             switch (consistency_flag)
             {
                 case CdrTryConstructFlag::FAIL:
+                    set_state(state_before_error);
                     throw BadParamException(
                               "Deserialized string length exceeds the maximum length allowed by the destination type");
                 case CdrTryConstructFlag::DEFAULT_VALUE:
@@ -1995,6 +1996,7 @@ const std::wstring Cdr::read_wstring(
             switch (consistency_flag)
             {
                 case CdrTryConstructFlag::FAIL:
+                    set_state(state_);
                     throw BadParamException(
                               "Deserialized wstring length exceeds the maximum length allowed by the destination type");
                 case CdrTryConstructFlag::DEFAULT_VALUE:
@@ -2662,6 +2664,7 @@ Cdr& Cdr::deserialize_bool_sequence(
             switch (consistency_flag)
             {
                 case CdrTryConstructFlag::FAIL:
+                    set_state(state_before_error);
                     throw exception::BadParamException(
                               "Serialized vector contains more elements than the destination array can hold");
                 case CdrTryConstructFlag::DEFAULT_VALUE:
@@ -2696,6 +2699,7 @@ Cdr& Cdr::deserialize_bool_sequence(
             }
             else
             {
+                set_state(state_before_error);
                 throw BadParamException("Unexpected byte value in Cdr::deserialize_bool_sequence, expected 0 or 1");
             }
         }

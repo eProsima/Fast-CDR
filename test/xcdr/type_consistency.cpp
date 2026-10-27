@@ -27,6 +27,7 @@
 #include <fastcdr/FastBuffer.h>
 #include <fastcdr/cdr/fixed_size_string.hpp>
 #include <fastcdr/exceptions/BadParamException.h>
+#include <fastcdr/exceptions/NotEnoughMemoryException.h>
 #include "utility.hpp"
 
 using namespace eprosima::fastcdr;
@@ -714,13 +715,13 @@ TEST_P(XCdrTypeConsistencyTest, CharPtr_Fail)
 /*!
  * @brief Checks that @c DEFAULT_VALUE discards a C string longer than the bound.
  *
- * For a raw pointer the discarded value is represented by a null pointer, so nothing needs to be released. The
- * case is repeated for XCDRv1 and XCDRv2, in big and little endian.
+ * The discarded value is an allocated empty string, as with the std::string overload, so the caller can use the
+ * result without checking for a null pointer. The case is repeated for XCDRv1 and XCDRv2, in big and little
+ * endian.
  *
  * @test XCdrTypeConsistencyTest.CharPtr_DefaultValue
  * @pre An 11 character string is serialized and the destination pointer is null.
- * @post Deserializing with @c DEFAULT_VALUE and a bound of 5 does not throw and leaves the destination pointer
- * null.
+ * @post Deserializing with @c DEFAULT_VALUE and a bound of 5 does not throw and yields an allocated empty string.
  */
 TEST_P(XCdrTypeConsistencyTest, CharPtr_DefaultValue)
 {
@@ -737,7 +738,9 @@ TEST_P(XCdrTypeConsistencyTest, CharPtr_DefaultValue)
 
     char* output {nullptr};
     ASSERT_NO_THROW(cdr_des.deserialize(output, CdrTryConstructFlag::DEFAULT_VALUE, 5));
-    EXPECT_EQ(output, nullptr);
+    ASSERT_NE(output, nullptr);
+    EXPECT_STREQ(output, "");
+    free(output);
 }
 
 /*!
@@ -876,13 +879,14 @@ TEST_P(XCdrTypeConsistencyTest, WcharPtr_Fail)
 /*!
  * @brief Checks that @c DEFAULT_VALUE discards a C wide string longer than the bound.
  *
- * For a raw pointer the discarded value is represented by a null pointer, so nothing needs to be released. The
- * case is repeated for XCDRv1 and XCDRv2, in big and little endian.
+ * The discarded value is an allocated empty wide string, as with the std::wstring overload, so the caller can use
+ * the result without checking for a null pointer. The case is repeated for XCDRv1 and XCDRv2, in big and little
+ * endian.
  *
  * @test XCdrTypeConsistencyTest.WcharPtr_DefaultValue
  * @pre An 11 character wide string is serialized and the destination pointer is null.
- * @post Deserializing with @c DEFAULT_VALUE and a bound of 5 does not throw and leaves the destination pointer
- * null.
+ * @post Deserializing with @c DEFAULT_VALUE and a bound of 5 does not throw and yields an allocated empty wide
+ * string.
  */
 TEST_P(XCdrTypeConsistencyTest, WcharPtr_DefaultValue)
 {
@@ -899,7 +903,9 @@ TEST_P(XCdrTypeConsistencyTest, WcharPtr_DefaultValue)
 
     wchar_t* output {nullptr};
     ASSERT_NO_THROW(cdr_des.deserialize(output, CdrTryConstructFlag::DEFAULT_VALUE, 5));
-    EXPECT_EQ(output, nullptr);
+    ASSERT_NE(output, nullptr);
+    EXPECT_EQ(std::wcscmp(output, L""), 0);
+    free(output);
 }
 
 /*!
@@ -2247,6 +2253,139 @@ TEST_P(XCdrTypeConsistencyTest, StdVectorOptionalStruct_TrimConsumesWholeSequenc
     EXPECT_EQ(read_trailer, trailer);
 }
 
+// =====================================================================================
+// FAIL leaves the stream and the destination unchanged
+// =====================================================================================
+
+/*!
+ * @brief Checks that @c FAIL leaves the stream where it was before the call for a std::string.
+ *
+ * Reading the same value again with a policy that accepts it proves the stream was not advanced. The case is
+ * repeated for XCDRv1 and XCDRv2, in big and little endian.
+ *
+ * @test XCdrTypeConsistencyTest.StdString_FailLeavesStreamUnchanged
+ * @pre An 11 character string ("hello world") is serialized.
+ * @post Deserializing with @c FAIL and a bound of 5 throws @c BadParamException , and deserializing again with
+ * @c TRIM and a bound of 5 yields "hello".
+ */
+TEST_P(XCdrTypeConsistencyTest, StdString_FailLeavesStreamUnchanged)
+{
+    const EncodingAlgorithmFlag encoding {std::get<0>(GetParam())};
+    const Cdr::Endianness endianness {std::get<1>(GetParam())};
+
+    char buffer[TEST_BUFFER_LENGTH];
+    const std::string input {"hello world"};
+    serialize_into(buffer, sizeof(buffer), input, encoding, endianness);
+
+    FastBuffer fast_buffer(buffer, sizeof(buffer));
+    Cdr cdr_des(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    cdr_des.set_encoding_flag(encoding);
+
+    std::string output;
+    EXPECT_THROW(cdr_des.deserialize(output, CdrTryConstructFlag::FAIL, 5), BadParamException);
+    ASSERT_NO_THROW(cdr_des.deserialize(output, CdrTryConstructFlag::TRIM, 5));
+    EXPECT_EQ(output, "hello");
+}
+
+/*!
+ * @brief Checks that @c FAIL leaves the stream where it was before the call for a sequence of non-primitives.
+ *
+ * Reading the same value again with a policy that accepts it proves the stream was not advanced. The case is
+ * repeated for XCDRv1 and XCDRv2, in big and little endian.
+ *
+ * @test XCdrTypeConsistencyTest.StdVectorNonPrimitive_FailLeavesStreamUnchanged
+ * @pre A 4 element std::vector<std::string> ({"alpha", "beta", "gamma", "delta"}) is serialized.
+ * @post Deserializing with @c FAIL and a bound of 2 throws @c BadParamException , and deserializing again with
+ * @c TRIM and a bound of 2 yields {"alpha", "beta"}.
+ */
+TEST_P(XCdrTypeConsistencyTest, StdVectorNonPrimitive_FailLeavesStreamUnchanged)
+{
+    const EncodingAlgorithmFlag encoding {std::get<0>(GetParam())};
+    const Cdr::Endianness endianness {std::get<1>(GetParam())};
+
+    char buffer[TEST_BUFFER_LENGTH];
+    const std::vector<std::string> input {"alpha", "beta", "gamma", "delta"};
+    serialize_into(buffer, sizeof(buffer), input, encoding, endianness);
+
+    FastBuffer fast_buffer(buffer, sizeof(buffer));
+    Cdr cdr_des(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    cdr_des.set_encoding_flag(encoding);
+
+    std::vector<std::string> output;
+    EXPECT_THROW(cdr_des.deserialize(output, CdrTryConstructFlag::FAIL, 2), BadParamException);
+    ASSERT_NO_THROW(cdr_des.deserialize(output, CdrTryConstructFlag::TRIM, 2));
+    const std::vector<std::string> expected {"alpha", "beta"};
+    EXPECT_EQ(output, expected);
+}
+
+/*!
+ * @brief Checks that @c FAIL leaves both the stream and the destination unchanged for a map.
+ *
+ * The destination map is only replaced when the whole deserialization succeeds, and reading the same value again
+ * with a policy that accepts it proves the stream was not advanced. The case is repeated for XCDRv1 and XCDRv2,
+ * in big and little endian.
+ *
+ * @test XCdrTypeConsistencyTest.StdMapNonPrimitive_FailLeavesStreamAndDestinationUnchanged
+ * @pre A 4 entry std::map<int32_t, std::string> is serialized and the destination holds one entry.
+ * @post Deserializing with @c FAIL and a bound of 2 throws @c BadParamException and keeps the destination entry,
+ * and deserializing again with @c TRIM and a bound of 2 yields {{1, "one"}, {2, "two"}}.
+ */
+TEST_P(XCdrTypeConsistencyTest, StdMapNonPrimitive_FailLeavesStreamAndDestinationUnchanged)
+{
+    const EncodingAlgorithmFlag encoding {std::get<0>(GetParam())};
+    const Cdr::Endianness endianness {std::get<1>(GetParam())};
+
+    char buffer[TEST_BUFFER_LENGTH];
+    const std::map<int32_t, std::string> input {{1, "one"}, {2, "two"}, {3, "three"}, {4, "four"}};
+    serialize_into(buffer, sizeof(buffer), input, encoding, endianness);
+
+    FastBuffer fast_buffer(buffer, sizeof(buffer));
+    Cdr cdr_des(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    cdr_des.set_encoding_flag(encoding);
+
+    const std::map<int32_t, std::string> previous {{0, "x"}};
+    std::map<int32_t, std::string> output {previous};
+    EXPECT_THROW(cdr_des.deserialize(output, CdrTryConstructFlag::FAIL, 2), BadParamException);
+    EXPECT_EQ(output, previous);
+
+    ASSERT_NO_THROW(cdr_des.deserialize(output, CdrTryConstructFlag::TRIM, 2));
+    const std::map<int32_t, std::string> expected {{1, "one"}, {2, "two"}};
+    EXPECT_EQ(output, expected);
+}
+
+/*!
+ * @brief Checks that a map with primitive values is left unchanged when the deserialization fails midway.
+ *
+ * The buffer is cut inside the second entry, so the first entry is read before the failure. The destination
+ * must not receive it. The case is repeated for XCDRv1 and XCDRv2, in big and little endian.
+ *
+ * @test XCdrTypeConsistencyTest.StdMapPrimitive_ErrorKeepsDestination
+ * @pre A 2 entry std::map<int32_t, int32_t> is serialized, the buffer is cut inside the second entry, and the
+ * destination holds one entry.
+ * @post Deserializing with @c TRIM and a bound of 2 throws @c NotEnoughMemoryException and keeps the destination
+ * entry.
+ */
+TEST_P(XCdrTypeConsistencyTest, StdMapPrimitive_ErrorKeepsDestination)
+{
+    const EncodingAlgorithmFlag encoding {std::get<0>(GetParam())};
+    const Cdr::Endianness endianness {std::get<1>(GetParam())};
+
+    char buffer[TEST_BUFFER_LENGTH];
+    const std::map<int32_t, int32_t> input {{1, 10}, {2, 20}};
+    serialize_into(buffer, sizeof(buffer), input, encoding, endianness);
+
+    // Length (4 bytes), first entry (8 bytes) and the key of the second entry (4 bytes).
+    FastBuffer fast_buffer(buffer, 16);
+    Cdr cdr_des(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    cdr_des.set_encoding_flag(encoding);
+
+    const std::map<int32_t, int32_t> previous {{0, 0}};
+    std::map<int32_t, int32_t> output {previous};
+    EXPECT_THROW(cdr_des.deserialize(output, CdrTryConstructFlag::TRIM, 2),
+            eprosima::fastcdr::exception::NotEnoughMemoryException);
+    EXPECT_EQ(output, previous);
+}
+
 
 INSTANTIATE_TEST_SUITE_P(
     XCdrTest,
@@ -2257,3 +2396,131 @@ INSTANTIATE_TEST_SUITE_P(
         std::make_tuple(EncodingAlgorithmFlag::PLAIN_CDR2, Cdr::Endianness::BIG_ENDIANNESS),
         std::make_tuple(EncodingAlgorithmFlag::PLAIN_CDR2, Cdr::Endianness::LITTLE_ENDIANNESS)
         ));
+
+
+// =====================================================================================
+// XCDRv2 DHEADER consistency
+// =====================================================================================
+
+namespace {
+
+//! Overwrites the little endian DHEADER at the start of @p buffer .
+void patch_dheader(
+        char* buffer,
+        uint32_t dheader)
+{
+    buffer[0] = static_cast<char>(dheader & 0xFF);
+    buffer[1] = static_cast<char>((dheader >> 8) & 0xFF);
+    buffer[2] = static_cast<char>((dheader >> 16) & 0xFF);
+    buffer[3] = static_cast<char>((dheader >> 24) & 0xFF);
+}
+
+//! Deserializes @p buffer as XCDRv2 little endian into @p output with @p flag and @p max_length .
+template<typename T>
+void deserialize_xcdrv2(
+        char* buffer,
+        size_t buffer_size,
+        T& output,
+        CdrTryConstructFlag flag,
+        uint32_t max_length)
+{
+    FastBuffer fast_buffer(buffer, buffer_size);
+    Cdr cdr_des(fast_buffer, Cdr::Endianness::LITTLE_ENDIANNESS, CdrVersion::XCDRv2);
+    cdr_des.set_encoding_flag(EncodingAlgorithmFlag::PLAIN_CDR2);
+    cdr_des.deserialize(output, flag, max_length);
+}
+
+} // namespace
+
+/*!
+ * @brief Checks that a sequence whose DHEADER is too small for the elements it announces is rejected.
+ *
+ * Layout of {"a", "b"}: DHEADER at 0, length at 4, "a" at 8 (length) and 12 (characters), "b" at 16 and 20. A
+ * DHEADER of 10 covers the length and the first string only, so the second element cannot be read from it. It
+ * must not be silently left default-constructed.
+ *
+ * @test XCdrTypeConsistencyDheaderTest.StdVectorNonPrimitive_DheaderTooSmall
+ * @pre A 2 element std::vector<std::string> is serialized with XCDRv2 and its DHEADER is patched to 10.
+ * @post Deserializing with @c TRIM and a bound of 2 throws @c BadParamException .
+ */
+TEST(XCdrTypeConsistencyDheaderTest, StdVectorNonPrimitive_DheaderTooSmall)
+{
+    char buffer[TEST_BUFFER_LENGTH];
+    const std::vector<std::string> input {"a", "b"};
+    serialize_into(buffer, sizeof(buffer), input, EncodingAlgorithmFlag::PLAIN_CDR2,
+            Cdr::Endianness::LITTLE_ENDIANNESS);
+    patch_dheader(buffer, 10);
+
+    std::vector<std::string> output;
+    EXPECT_THROW(deserialize_xcdrv2(buffer, sizeof(buffer), output, CdrTryConstructFlag::TRIM, 2),
+            BadParamException);
+}
+
+/*!
+ * @brief Checks that a truncated sequence whose kept elements overrun the DHEADER is rejected.
+ *
+ * With the layout of {"a", "b"} (see StdVectorNonPrimitive_DheaderTooSmall), a DHEADER of 6 ends inside the first
+ * string, which is the element kept when trimming to one.
+ *
+ * @test XCdrTypeConsistencyDheaderTest.StdVectorNonPrimitive_TrimOverrunsDheader
+ * @pre A 2 element std::vector<std::string> is serialized with XCDRv2 and its DHEADER is patched to 6.
+ * @post Deserializing with @c TRIM and a bound of 1 throws @c BadParamException .
+ */
+TEST(XCdrTypeConsistencyDheaderTest, StdVectorNonPrimitive_TrimOverrunsDheader)
+{
+    char buffer[TEST_BUFFER_LENGTH];
+    const std::vector<std::string> input {"a", "b"};
+    serialize_into(buffer, sizeof(buffer), input, EncodingAlgorithmFlag::PLAIN_CDR2,
+            Cdr::Endianness::LITTLE_ENDIANNESS);
+    patch_dheader(buffer, 6);
+
+    std::vector<std::string> output;
+    EXPECT_THROW(deserialize_xcdrv2(buffer, sizeof(buffer), output, CdrTryConstructFlag::TRIM, 1),
+            BadParamException);
+}
+
+/*!
+ * @brief Checks that a map whose DHEADER is too small for the entries it announces is rejected.
+ *
+ * Layout of {{1, "a"}, {2, "b"}}: DHEADER at 0, length at 4, first key at 8 and value at 12 (length) and 16
+ * (characters), second key at 20. A DHEADER of 14 covers the length and the first entry only.
+ *
+ * @test XCdrTypeConsistencyDheaderTest.StdMapNonPrimitive_DheaderTooSmall
+ * @pre A 2 entry std::map<int32_t, std::string> is serialized with XCDRv2 and its DHEADER is patched to 14.
+ * @post Deserializing with @c TRIM and a bound of 2 throws @c BadParamException .
+ */
+TEST(XCdrTypeConsistencyDheaderTest, StdMapNonPrimitive_DheaderTooSmall)
+{
+    char buffer[TEST_BUFFER_LENGTH];
+    const std::map<int32_t, std::string> input {{1, "a"}, {2, "b"}};
+    serialize_into(buffer, sizeof(buffer), input, EncodingAlgorithmFlag::PLAIN_CDR2,
+            Cdr::Endianness::LITTLE_ENDIANNESS);
+    patch_dheader(buffer, 14);
+
+    std::map<int32_t, std::string> output;
+    EXPECT_THROW(deserialize_xcdrv2(buffer, sizeof(buffer), output, CdrTryConstructFlag::TRIM, 2),
+            BadParamException);
+}
+
+/*!
+ * @brief Checks that a truncated map whose kept entries overrun the DHEADER is rejected.
+ *
+ * With the layout of {{1, "a"}, {2, "b"}} (see StdMapNonPrimitive_DheaderTooSmall), a DHEADER of 6 ends inside
+ * the first entry, which is the entry kept when trimming to one.
+ *
+ * @test XCdrTypeConsistencyDheaderTest.StdMapNonPrimitive_TrimOverrunsDheader
+ * @pre A 2 entry std::map<int32_t, std::string> is serialized with XCDRv2 and its DHEADER is patched to 6.
+ * @post Deserializing with @c TRIM and a bound of 1 throws @c BadParamException .
+ */
+TEST(XCdrTypeConsistencyDheaderTest, StdMapNonPrimitive_TrimOverrunsDheader)
+{
+    char buffer[TEST_BUFFER_LENGTH];
+    const std::map<int32_t, std::string> input {{1, "a"}, {2, "b"}};
+    serialize_into(buffer, sizeof(buffer), input, EncodingAlgorithmFlag::PLAIN_CDR2,
+            Cdr::Endianness::LITTLE_ENDIANNESS);
+    patch_dheader(buffer, 6);
+
+    std::map<int32_t, std::string> output;
+    EXPECT_THROW(deserialize_xcdrv2(buffer, sizeof(buffer), output, CdrTryConstructFlag::TRIM, 1),
+            BadParamException);
+}

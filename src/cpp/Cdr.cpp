@@ -1698,7 +1698,7 @@ Cdr& Cdr::deserialize(
     uint32_t length = 0;
     Cdr::state state_before_error(*this);
 
-    deserialize(length);
+    deserialize_framing(length);
 
     if (length == 0)
     {
@@ -1732,7 +1732,7 @@ Cdr& Cdr::deserialize(
     uint32_t length = 0;
     Cdr::state state_before_error(*this);
 
-    deserialize(length);
+    deserialize_framing(length);
 
     if (length == 0)
     {
@@ -1767,7 +1767,7 @@ Cdr& Cdr::deserialize(
     uint32_t length {0};
     Cdr::state state_before_error(*this);
 
-    deserialize(length);
+    deserialize_framing(length);
 
     if (length == 0)
     {
@@ -1835,7 +1835,7 @@ Cdr& Cdr::deserialize(
     uint32_t length = 0;
     Cdr::state state_before_error(*this);
 
-    deserialize(length);
+    deserialize_framing(length);
 
     if (length == 0)
     {
@@ -1892,6 +1892,20 @@ Cdr& Cdr::deserialize(
 }
 
 const char* Cdr::read_string(
+        uint32_t& length)
+{
+    length = (std::numeric_limits<uint32_t>::max)();
+    return read_string(length, CdrTryConstructFlag::FAIL);
+}
+
+const std::wstring Cdr::read_wstring(
+        uint32_t& length)
+{
+    length = (std::numeric_limits<uint32_t>::max)();
+    return read_wstring(length, CdrTryConstructFlag::FAIL);
+}
+
+const char* Cdr::read_string(
         uint32_t& length,
         CdrTryConstructFlag consistency_flag)
 {
@@ -1899,7 +1913,7 @@ const char* Cdr::read_string(
     uint32_t read_length {0};
     state state_before_error(*this);
 
-    *this >> read_length;
+    deserialize_framing(read_length);
 
     if (read_length == 0)
     {
@@ -1965,7 +1979,7 @@ const std::wstring Cdr::read_wstring(
     uint32_t read_length {0};
     state state_(*this);
 
-    *this >> read_length;
+    deserialize_framing(read_length);
     uint32_t bytes_length = read_length * 2;
 
     if (bytes_length == 0)
@@ -2633,7 +2647,7 @@ Cdr& Cdr::deserialize_bool_sequence(
     uint32_t sequence_length {0};
     state state_before_error(*this);
 
-    *this >> sequence_length;
+    deserialize_framing(sequence_length);
 
     vector_t.clear();
 
@@ -2706,11 +2720,11 @@ Cdr& Cdr::deserialize_string_sequence(
     if (CdrVersion::XCDRv2 == cdr_version_)
     {
         uint32_t dheader {0};
-        deserialize(dheader);
+        deserialize_framing(dheader);
 
         auto offset = offset_;
 
-        deserialize(sequence_length);
+        deserialize_framing(sequence_length);
 
         try
         {
@@ -2739,7 +2753,7 @@ Cdr& Cdr::deserialize_string_sequence(
     {
         state state_before_error(*this);
 
-        deserialize(sequence_length);
+        deserialize_framing(sequence_length);
 
         try
         {
@@ -2768,11 +2782,11 @@ Cdr& Cdr::deserialize_wstring_sequence(
     if (CdrVersion::XCDRv2 == cdr_version_)
     {
         uint32_t dheader {0};
-        deserialize(dheader);
+        deserialize_framing(dheader);
 
         auto offset = offset_;
 
-        deserialize(sequence_length);
+        deserialize_framing(sequence_length);
 
         try
         {
@@ -2801,7 +2815,7 @@ Cdr& Cdr::deserialize_wstring_sequence(
     {
         state state_before_error(*this);
 
-        deserialize(sequence_length);
+        deserialize_framing(sequence_length);
 
         try
         {
@@ -2923,7 +2937,7 @@ bool Cdr::xcdr1_deserialize_member_header(
     bool ret_value = true;
     make_alignment(alignment(4));
     uint16_t flags_and_member_id = 0;
-    deserialize(flags_and_member_id);
+    deserialize_framing(flags_and_member_id);
     member_id.must_understand = (flags_and_member_id & 0x4000);
     uint16_t id = (flags_and_member_id & 0x3FFF);
 
@@ -2932,7 +2946,7 @@ bool Cdr::xcdr1_deserialize_member_header(
     {
         member_id.id = id;
         uint16_t size = 0;
-        deserialize(size);
+        deserialize_framing(size);
         current_state.member_size_ = size;
         current_state.header_serialized_ = XCdrHeaderSelection::SHORT_HEADER;
         reset_alignment();
@@ -2940,22 +2954,22 @@ bool Cdr::xcdr1_deserialize_member_header(
     else if (PID_EXTENDED == id) // PID_EXTENDED
     {
         uint16_t size = 0;
-        deserialize(size);
+        deserialize_framing(size);
         if (PID_EXTENDED_LENGTH != size)
         {
             throw BadParamException("PID_EXTENDED comes with a size different than 8");
         }
         uint32_t mid = 0;
-        deserialize(mid);
+        deserialize_framing(mid);
         member_id.id = mid;
-        deserialize(current_state.member_size_);
+        deserialize_framing(current_state.member_size_);
         current_state.header_serialized_ = XCdrHeaderSelection::LONG_HEADER;
         reset_alignment();
     }
     else if (PID_SENTINEL == id) // PID_SENTINEL
     {
         uint16_t size = 0;
-        deserialize(size);
+        deserialize_framing(size);
         if (0 != size)
         {
             throw BadParamException("PID_SENTINEL comes with a size different than 0");
@@ -3455,7 +3469,7 @@ void Cdr::xcdr2_deserialize_member_header(
         Cdr::state& current_state)
 {
     uint32_t flags_and_member_id = 0;
-    deserialize(flags_and_member_id);
+    deserialize_framing(flags_and_member_id);
     member_id.must_understand = (flags_and_member_id & 0x80000000);
     uint32_t mid = (flags_and_member_id & 0x0FFFFFFF);
     uint32_t lc = (flags_and_member_id & 0x70000000) >> 28;
@@ -3486,14 +3500,14 @@ void Cdr::xcdr2_deserialize_member_header(
     else if (4 == lc)
     {
         uint32_t size = 0;
-        deserialize(size);
+        deserialize_framing(size);
         current_state.member_size_ = size;
         current_state.header_serialized_ = XCdrHeaderSelection::LONG_HEADER;
     }
     else
     {
         uint32_t size = 0;
-        deserialize(size);
+        deserialize_framing(size);
         current_state.member_size_ = 4 + (size * (5 == lc ? 1 : (6 == lc ? 4 : 8)));
         current_state.header_serialized_ = XCdrHeaderSelection::SHORT_HEADER; // Avoid take into account DHEADER after.
         offset_ -= sizeof(uint32_t);
@@ -3636,7 +3650,7 @@ Cdr& Cdr::xcdr2_deserialize_type(
     if (EncodingAlgorithmFlag::PLAIN_CDR2 != type_encoding)
     {
         uint32_t dheader {0};
-        deserialize(dheader);
+        deserialize_framing(dheader);
 
         Cdr::state current_state(*this);
         current_encoding_ = type_encoding;

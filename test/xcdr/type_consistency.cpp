@@ -154,6 +154,156 @@ void deserialize(
 } // namespace fastcdr
 } // namespace eprosima
 
+/*!
+ * Element type used to check that discarding a mutable structure consumes exactly its bytes. Skipping it requires
+ * the member headers (member id and size) and the length of the string member, which are only known by decoding
+ * them, so it fails if any of those values is not stored while the element is discarded.
+ */
+struct InnerMutableStruct
+{
+    InnerMutableStruct() = default;
+
+    InnerMutableStruct(
+            const std::string& t,
+            int32_t n)
+        : text(t)
+        , number(n)
+    {
+    }
+
+    bool operator ==(
+            const InnerMutableStruct& other) const
+    {
+        return text == other.text && number == other.number;
+    }
+
+    std::string text;
+
+    int32_t number {0};
+};
+
+namespace eprosima {
+namespace fastcdr {
+
+template<>
+void serialize(
+        Cdr& cdr,
+        const InnerMutableStruct& data)
+{
+    Cdr::state current_status(cdr);
+    cdr.begin_serialize_type(current_status, cdr.get_cdr_version() == CdrVersion::XCDRv1
+                             ? EncodingAlgorithmFlag::PL_CDR
+                             : EncodingAlgorithmFlag::PL_CDR2);
+    cdr << MemberId(0) << data.text;
+    cdr << MemberId(1) << data.number;
+    cdr.end_serialize_type(current_status);
+}
+
+template<>
+void deserialize(
+        Cdr& cdr,
+        InnerMutableStruct& data)
+{
+    cdr.deserialize_type(cdr.get_cdr_version() == CdrVersion::XCDRv1
+                         ? EncodingAlgorithmFlag::PL_CDR
+                         : EncodingAlgorithmFlag::PL_CDR2,
+            [&data](Cdr& cdr_inner, const MemberId& mid) -> bool
+            {
+                bool ret_value = true;
+
+                switch (mid.id)
+                {
+                    case 0:
+                        cdr_inner >> data.text;
+                        break;
+                    case 1:
+                        cdr_inner >> data.number;
+                        break;
+                    default:
+                        ret_value = false;
+                        break;
+                }
+
+                return ret_value;
+            });
+}
+
+} // namespace fastcdr
+} // namespace eprosima
+
+/*!
+ * Element type used to check that discarding a structure with an optional member consumes exactly its bytes.
+ * Whether the optional value follows is only known by decoding the presence flag (XCDRv2) or the member header size
+ * (XCDRv1), so skipping fails if that value is not stored while the element is discarded. Elements with and without
+ * the optional value are both needed: each one fails under a different wrong default.
+ */
+struct InnerOptionalStruct
+{
+    InnerOptionalStruct() = default;
+
+    InnerOptionalStruct(
+            const optional<int32_t>& o,
+            uint16_t v)
+        : value1(o)
+        , value2(v)
+    {
+    }
+
+    bool operator ==(
+            const InnerOptionalStruct& other) const
+    {
+        return value1 == other.value1 && value2 == other.value2;
+    }
+
+    optional<int32_t> value1;
+
+    uint16_t value2 {0};
+};
+
+namespace eprosima {
+namespace fastcdr {
+
+template<>
+void serialize(
+        Cdr& cdr,
+        const InnerOptionalStruct& data)
+{
+    Cdr::state current_status(cdr);
+    cdr.begin_serialize_type(current_status, cdr.get_encoding_flag());
+    cdr << MemberId(0) << data.value1;
+    cdr << MemberId(1) << data.value2;
+    cdr.end_serialize_type(current_status);
+}
+
+template<>
+void deserialize(
+        Cdr& cdr,
+        InnerOptionalStruct& data)
+{
+    cdr.deserialize_type(cdr.get_encoding_flag(), [&data](Cdr& cdr_inner, const MemberId& mid) -> bool
+            {
+                bool ret_value = true;
+
+                switch (mid.id)
+                {
+                    case 0:
+                        cdr_inner >> data.value1;
+                        break;
+                    case 1:
+                        cdr_inner >> data.value2;
+                        break;
+                    default:
+                        ret_value = false;
+                        break;
+                }
+
+                return ret_value;
+            });
+}
+
+} // namespace fastcdr
+} // namespace eprosima
+
 // =====================================================================================
 // std::string
 // =====================================================================================
@@ -1194,6 +1344,76 @@ TEST_P(XCdrTypeConsistencyTest, StdVectorNonPrimitive_Trim)
     EXPECT_EQ(output, expected);
 }
 
+/*!
+ * @brief Checks that discarding a whole sequence of strings leaves the stream just past it.
+ *
+ * Skipping a string requires its length prefix, so the discarded elements must be read rather than only stepped
+ * over. A trailer serialized after the sequence makes a wrong stream position visible. The case is repeated for
+ * XCDRv1 and XCDRv2, in big and little endian.
+ *
+ * @test XCdrTypeConsistencyTest.StdVectorNonPrimitive_DefaultValueConsumesWholeSequence
+ * @pre A 4 element std::vector<std::string> followed by a uint32_t trailer are serialized.
+ * @post Deserializing with @c DEFAULT_VALUE and a bound of 2 does not throw, leaves the destination empty, and the
+ * trailer is read back unchanged.
+ */
+TEST_P(XCdrTypeConsistencyTest, StdVectorNonPrimitive_DefaultValueConsumesWholeSequence)
+{
+    const EncodingAlgorithmFlag encoding {std::get<0>(GetParam())};
+    const Cdr::Endianness endianness {std::get<1>(GetParam())};
+
+    char buffer[TEST_BUFFER_LENGTH];
+    const std::vector<std::string> input {"alpha", "beta", "gamma", "delta"};
+    const uint32_t trailer {0xCAFEBABEu};
+    serialize_into_with_trailer(buffer, sizeof(buffer), input, trailer, encoding, endianness);
+
+    FastBuffer fast_buffer(buffer, sizeof(buffer));
+    Cdr cdr_des(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    cdr_des.set_encoding_flag(encoding);
+
+    std::vector<std::string> output {"x"};
+    ASSERT_NO_THROW(cdr_des.deserialize(output, CdrTryConstructFlag::DEFAULT_VALUE, 2));
+    EXPECT_TRUE(output.empty());
+
+    uint32_t read_trailer {0};
+    ASSERT_NO_THROW(cdr_des.deserialize(read_trailer));
+    EXPECT_EQ(read_trailer, trailer);
+}
+
+/*!
+ * @brief Checks that truncating a sequence of strings leaves the stream just past it.
+ *
+ * The strings dropped must be consumed by exactly the bytes they occupy, which is observable only by reading what
+ * was serialized next. The case is repeated for XCDRv1 and XCDRv2, in big and little endian.
+ *
+ * @test XCdrTypeConsistencyTest.StdVectorNonPrimitive_TrimConsumesWholeSequence
+ * @pre A 4 element std::vector<std::string> followed by a uint32_t trailer are serialized.
+ * @post Deserializing with @c TRIM and a bound of 2 does not throw, yields {"alpha", "beta"}, and the trailer is
+ * read back unchanged.
+ */
+TEST_P(XCdrTypeConsistencyTest, StdVectorNonPrimitive_TrimConsumesWholeSequence)
+{
+    const EncodingAlgorithmFlag encoding {std::get<0>(GetParam())};
+    const Cdr::Endianness endianness {std::get<1>(GetParam())};
+
+    char buffer[TEST_BUFFER_LENGTH];
+    const std::vector<std::string> input {"alpha", "beta", "gamma", "delta"};
+    const uint32_t trailer {0xCAFEBABEu};
+    serialize_into_with_trailer(buffer, sizeof(buffer), input, trailer, encoding, endianness);
+
+    FastBuffer fast_buffer(buffer, sizeof(buffer));
+    Cdr cdr_des(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    cdr_des.set_encoding_flag(encoding);
+
+    std::vector<std::string> output;
+    ASSERT_NO_THROW(cdr_des.deserialize(output, CdrTryConstructFlag::TRIM, 2));
+    const std::vector<std::string> expected {"alpha", "beta"};
+    EXPECT_EQ(output, expected);
+
+    uint32_t read_trailer {0};
+    ASSERT_NO_THROW(cdr_des.deserialize(read_trailer));
+    EXPECT_EQ(read_trailer, trailer);
+}
+
 
 // =====================================================================================
 // std::vector<bool>
@@ -1547,6 +1767,76 @@ TEST_P(XCdrTypeConsistencyTest, StdMapNonPrimitive_Trim)
     EXPECT_EQ(output, expected);
 }
 
+/*!
+ * @brief Checks that discarding a whole map with string values leaves the stream just past it.
+ *
+ * Skipping a string value requires its length prefix, so the discarded entries must be read rather than only
+ * stepped over. A trailer serialized after the map makes a wrong stream position visible. The case is repeated
+ * for XCDRv1 and XCDRv2, in big and little endian.
+ *
+ * @test XCdrTypeConsistencyTest.StdMapNonPrimitive_DefaultValueConsumesWholeMap
+ * @pre A 4 entry std::map<int32_t, std::string> followed by a uint32_t trailer are serialized.
+ * @post Deserializing with @c DEFAULT_VALUE and a bound of 2 does not throw, leaves the destination empty, and the
+ * trailer is read back unchanged.
+ */
+TEST_P(XCdrTypeConsistencyTest, StdMapNonPrimitive_DefaultValueConsumesWholeMap)
+{
+    const EncodingAlgorithmFlag encoding {std::get<0>(GetParam())};
+    const Cdr::Endianness endianness {std::get<1>(GetParam())};
+
+    char buffer[TEST_BUFFER_LENGTH];
+    const std::map<int32_t, std::string> input {{1, "one"}, {2, "two"}, {3, "three"}, {4, "four"}};
+    const uint32_t trailer {0xCAFEBABEu};
+    serialize_into_with_trailer(buffer, sizeof(buffer), input, trailer, encoding, endianness);
+
+    FastBuffer fast_buffer(buffer, sizeof(buffer));
+    Cdr cdr_des(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    cdr_des.set_encoding_flag(encoding);
+
+    std::map<int32_t, std::string> output {{0, "x"}};
+    ASSERT_NO_THROW(cdr_des.deserialize(output, CdrTryConstructFlag::DEFAULT_VALUE, 2));
+    EXPECT_TRUE(output.empty());
+
+    uint32_t read_trailer {0};
+    ASSERT_NO_THROW(cdr_des.deserialize(read_trailer));
+    EXPECT_EQ(read_trailer, trailer);
+}
+
+/*!
+ * @brief Checks that truncating a map with string values leaves the stream just past it.
+ *
+ * The entries dropped must be consumed by exactly the bytes they occupy, which is observable only by reading what
+ * was serialized next. The case is repeated for XCDRv1 and XCDRv2, in big and little endian.
+ *
+ * @test XCdrTypeConsistencyTest.StdMapNonPrimitive_TrimConsumesWholeMap
+ * @pre A 4 entry std::map<int32_t, std::string> followed by a uint32_t trailer are serialized.
+ * @post Deserializing with @c TRIM and a bound of 2 does not throw, yields {{1, "one"}, {2, "two"}}, and the
+ * trailer is read back unchanged.
+ */
+TEST_P(XCdrTypeConsistencyTest, StdMapNonPrimitive_TrimConsumesWholeMap)
+{
+    const EncodingAlgorithmFlag encoding {std::get<0>(GetParam())};
+    const Cdr::Endianness endianness {std::get<1>(GetParam())};
+
+    char buffer[TEST_BUFFER_LENGTH];
+    const std::map<int32_t, std::string> input {{1, "one"}, {2, "two"}, {3, "three"}, {4, "four"}};
+    const uint32_t trailer {0xCAFEBABEu};
+    serialize_into_with_trailer(buffer, sizeof(buffer), input, trailer, encoding, endianness);
+
+    FastBuffer fast_buffer(buffer, sizeof(buffer));
+    Cdr cdr_des(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    cdr_des.set_encoding_flag(encoding);
+
+    std::map<int32_t, std::string> output;
+    ASSERT_NO_THROW(cdr_des.deserialize(output, CdrTryConstructFlag::TRIM, 2));
+    const std::map<int32_t, std::string> expected {{1, "one"}, {2, "two"}};
+    EXPECT_EQ(output, expected);
+
+    uint32_t read_trailer {0};
+    ASSERT_NO_THROW(cdr_des.deserialize(read_trailer));
+    EXPECT_EQ(read_trailer, trailer);
+}
+
 
 // =====================================================================================
 // std::vector<struct with a bool member>
@@ -1730,6 +2020,226 @@ TEST_P(XCdrTypeConsistencyTest, StdVectorBoolStruct_TrimConsumesWholeSequence)
     std::vector<InnerBoolStruct> output;
     ASSERT_NO_THROW(cdr_des.deserialize(output, CdrTryConstructFlag::TRIM, 2));
     const std::vector<InnerBoolStruct> expected {{true, 11}, {false, 22}};
+    EXPECT_EQ(output, expected);
+
+    uint32_t read_trailer {0};
+    ASSERT_NO_THROW(cdr_des.deserialize(read_trailer));
+    EXPECT_EQ(read_trailer, trailer);
+}
+
+// =====================================================================================
+// Discarded elements whose size is only known by decoding them
+// =====================================================================================
+
+/*!
+ * @brief Checks that discarding a whole sequence of sequences leaves the stream just past it.
+ *
+ * Each discarded element starts with its own length, which must be decoded to know how many bytes it occupies.
+ * A trailer serialized after the sequence makes a wrong stream position visible.
+ * The case is repeated for XCDRv1 and XCDRv2, in big and little endian.
+ *
+ * @test XCdrTypeConsistencyTest.StdVectorNestedSequence_DefaultValueConsumesWholeSequence
+ * @pre A 4 element std::vector<std::vector<int32_t>> followed by a uint32_t trailer are serialized.
+ * @post Deserializing with @c DEFAULT_VALUE and a bound of 2 does not throw, leaves the destination empty, and the
+ * trailer is read back unchanged.
+ */
+TEST_P(XCdrTypeConsistencyTest, StdVectorNestedSequence_DefaultValueConsumesWholeSequence)
+{
+    const EncodingAlgorithmFlag encoding {std::get<0>(GetParam())};
+    const Cdr::Endianness endianness {std::get<1>(GetParam())};
+
+    char buffer[TEST_BUFFER_LENGTH];
+    const std::vector<std::vector<int32_t>> input {{1, 2}, {3}, {4, 5, 6}, {7, 8, 9, 10}};
+    const uint32_t trailer {0xCAFEBABEu};
+    serialize_into_with_trailer(buffer, sizeof(buffer), input, trailer, encoding, endianness);
+
+    FastBuffer fast_buffer(buffer, sizeof(buffer));
+    Cdr cdr_des(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    cdr_des.set_encoding_flag(encoding);
+
+    std::vector<std::vector<int32_t>> output {{0}};
+    ASSERT_NO_THROW(cdr_des.deserialize(output, CdrTryConstructFlag::DEFAULT_VALUE, 2));
+    EXPECT_TRUE(output.empty());
+
+    uint32_t read_trailer {0};
+    ASSERT_NO_THROW(cdr_des.deserialize(read_trailer));
+    EXPECT_EQ(read_trailer, trailer);
+}
+
+/*!
+ * @brief Checks that truncating a sequence of sequences leaves the stream just past it.
+ *
+ * Each discarded element starts with its own length, which must be decoded to know how many bytes it occupies.
+ * A trailer serialized after the sequence makes a wrong stream position visible.
+ * The case is repeated for XCDRv1 and XCDRv2, in big and little endian.
+ *
+ * @test XCdrTypeConsistencyTest.StdVectorNestedSequence_TrimConsumesWholeSequence
+ * @pre A 4 element std::vector<std::vector<int32_t>> followed by a uint32_t trailer are serialized.
+ * @post Deserializing with @c TRIM and a bound of 2 does not throw, yields the first two elements, and the trailer
+ * is read back unchanged.
+ */
+TEST_P(XCdrTypeConsistencyTest, StdVectorNestedSequence_TrimConsumesWholeSequence)
+{
+    const EncodingAlgorithmFlag encoding {std::get<0>(GetParam())};
+    const Cdr::Endianness endianness {std::get<1>(GetParam())};
+
+    char buffer[TEST_BUFFER_LENGTH];
+    const std::vector<std::vector<int32_t>> input {{1, 2}, {3}, {4, 5, 6}, {7, 8, 9, 10}};
+    const uint32_t trailer {0xCAFEBABEu};
+    serialize_into_with_trailer(buffer, sizeof(buffer), input, trailer, encoding, endianness);
+
+    FastBuffer fast_buffer(buffer, sizeof(buffer));
+    Cdr cdr_des(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    cdr_des.set_encoding_flag(encoding);
+
+    std::vector<std::vector<int32_t>> output;
+    ASSERT_NO_THROW(cdr_des.deserialize(output, CdrTryConstructFlag::TRIM, 2));
+    const std::vector<std::vector<int32_t>> expected {{1, 2}, {3}};
+    EXPECT_EQ(output, expected);
+
+    uint32_t read_trailer {0};
+    ASSERT_NO_THROW(cdr_des.deserialize(read_trailer));
+    EXPECT_EQ(read_trailer, trailer);
+}
+
+/*!
+ * @brief Checks that discarding a whole sequence of mutable structures leaves the stream just past it.
+ *
+ * Discarded elements are mutable structures holding a string, so skipping them requires decoding their member
+ * headers and the string length. A trailer serialized after the sequence makes a wrong stream position visible.
+ * The case is repeated for XCDRv1 and XCDRv2, in big and little endian.
+ *
+ * @test XCdrTypeConsistencyTest.StdVectorMutableStruct_DefaultValueConsumesWholeSequence
+ * @pre A 4 element std::vector<InnerMutableStruct> followed by a uint32_t trailer are serialized.
+ * @post Deserializing with @c DEFAULT_VALUE and a bound of 2 does not throw, leaves the destination empty, and the
+ * trailer is read back unchanged.
+ */
+TEST_P(XCdrTypeConsistencyTest, StdVectorMutableStruct_DefaultValueConsumesWholeSequence)
+{
+    const EncodingAlgorithmFlag encoding {std::get<0>(GetParam())};
+    const Cdr::Endianness endianness {std::get<1>(GetParam())};
+
+    char buffer[TEST_BUFFER_LENGTH];
+    const std::vector<InnerMutableStruct> input {{"alpha", 1}, {"beta", 2}, {"gamma", 3}, {"delta", 4}};
+    const uint32_t trailer {0xCAFEBABEu};
+    serialize_into_with_trailer(buffer, sizeof(buffer), input, trailer, encoding, endianness);
+
+    FastBuffer fast_buffer(buffer, sizeof(buffer));
+    Cdr cdr_des(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    cdr_des.set_encoding_flag(encoding);
+
+    std::vector<InnerMutableStruct> output {{"x", 0}};
+    ASSERT_NO_THROW(cdr_des.deserialize(output, CdrTryConstructFlag::DEFAULT_VALUE, 2));
+    EXPECT_TRUE(output.empty());
+
+    uint32_t read_trailer {0};
+    ASSERT_NO_THROW(cdr_des.deserialize(read_trailer));
+    EXPECT_EQ(read_trailer, trailer);
+}
+
+/*!
+ * @brief Checks that truncating a sequence of mutable structures leaves the stream just past it.
+ *
+ * Discarded elements are mutable structures holding a string, so skipping them requires decoding their member
+ * headers and the string length. A trailer serialized after the sequence makes a wrong stream position visible.
+ * The case is repeated for XCDRv1 and XCDRv2, in big and little endian.
+ *
+ * @test XCdrTypeConsistencyTest.StdVectorMutableStruct_TrimConsumesWholeSequence
+ * @pre A 4 element std::vector<InnerMutableStruct> followed by a uint32_t trailer are serialized.
+ * @post Deserializing with @c TRIM and a bound of 2 does not throw, yields {{"alpha", 1}, {"beta", 2}}, and the
+ * trailer is read back unchanged.
+ */
+TEST_P(XCdrTypeConsistencyTest, StdVectorMutableStruct_TrimConsumesWholeSequence)
+{
+    const EncodingAlgorithmFlag encoding {std::get<0>(GetParam())};
+    const Cdr::Endianness endianness {std::get<1>(GetParam())};
+
+    char buffer[TEST_BUFFER_LENGTH];
+    const std::vector<InnerMutableStruct> input {{"alpha", 1}, {"beta", 2}, {"gamma", 3}, {"delta", 4}};
+    const uint32_t trailer {0xCAFEBABEu};
+    serialize_into_with_trailer(buffer, sizeof(buffer), input, trailer, encoding, endianness);
+
+    FastBuffer fast_buffer(buffer, sizeof(buffer));
+    Cdr cdr_des(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    cdr_des.set_encoding_flag(encoding);
+
+    std::vector<InnerMutableStruct> output;
+    ASSERT_NO_THROW(cdr_des.deserialize(output, CdrTryConstructFlag::TRIM, 2));
+    const std::vector<InnerMutableStruct> expected {{"alpha", 1}, {"beta", 2}};
+    EXPECT_EQ(output, expected);
+
+    uint32_t read_trailer {0};
+    ASSERT_NO_THROW(cdr_des.deserialize(read_trailer));
+    EXPECT_EQ(read_trailer, trailer);
+}
+
+/*!
+ * @brief Checks that discarding a whole sequence of structures with an optional member leaves the stream just past
+ * it.
+ *
+ * The discarded elements alternate between having and not having the optional value, which is only known by
+ * decoding the presence flag (XCDRv2) or the member header size (XCDRv1). A trailer serialized after the sequence
+ * makes a wrong stream position visible. The case is repeated for XCDRv1 and XCDRv2, in big and little endian.
+ *
+ * @test XCdrTypeConsistencyTest.StdVectorOptionalStruct_DefaultValueConsumesWholeSequence
+ * @pre A 4 element std::vector<InnerOptionalStruct>, two of them without the optional value, followed by a uint32_t
+ * trailer are serialized.
+ * @post Deserializing with @c DEFAULT_VALUE and a bound of 2 does not throw, leaves the destination empty, and the
+ * trailer is read back unchanged.
+ */
+TEST_P(XCdrTypeConsistencyTest, StdVectorOptionalStruct_DefaultValueConsumesWholeSequence)
+{
+    const EncodingAlgorithmFlag encoding {std::get<0>(GetParam())};
+    const Cdr::Endianness endianness {std::get<1>(GetParam())};
+
+    char buffer[TEST_BUFFER_LENGTH];
+    const std::vector<InnerOptionalStruct> input {{optional<int32_t>{}, 1}, {7, 2}, {optional<int32_t>{}, 3}, {9, 4}};
+    const uint32_t trailer {0xCAFEBABEu};
+    serialize_into_with_trailer(buffer, sizeof(buffer), input, trailer, encoding, endianness);
+
+    FastBuffer fast_buffer(buffer, sizeof(buffer));
+    Cdr cdr_des(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    cdr_des.set_encoding_flag(encoding);
+
+    std::vector<InnerOptionalStruct> output {{5, 0}};
+    ASSERT_NO_THROW(cdr_des.deserialize(output, CdrTryConstructFlag::DEFAULT_VALUE, 2));
+    EXPECT_TRUE(output.empty());
+
+    uint32_t read_trailer {0};
+    ASSERT_NO_THROW(cdr_des.deserialize(read_trailer));
+    EXPECT_EQ(read_trailer, trailer);
+}
+
+/*!
+ * @brief Checks that truncating a sequence of structures with an optional member leaves the stream just past it.
+ *
+ * The discarded elements are one without and one with the optional value, which is only known by decoding the
+ * presence flag (XCDRv2) or the member header size (XCDRv1). A trailer serialized after the sequence makes a wrong
+ * stream position visible. The case is repeated for XCDRv1 and XCDRv2, in big and little endian.
+ *
+ * @test XCdrTypeConsistencyTest.StdVectorOptionalStruct_TrimConsumesWholeSequence
+ * @pre A 4 element std::vector<InnerOptionalStruct>, two of them without the optional value, followed by a uint32_t
+ * trailer are serialized.
+ * @post Deserializing with @c TRIM and a bound of 2 does not throw, yields the first two elements, and the trailer
+ * is read back unchanged.
+ */
+TEST_P(XCdrTypeConsistencyTest, StdVectorOptionalStruct_TrimConsumesWholeSequence)
+{
+    const EncodingAlgorithmFlag encoding {std::get<0>(GetParam())};
+    const Cdr::Endianness endianness {std::get<1>(GetParam())};
+
+    char buffer[TEST_BUFFER_LENGTH];
+    const std::vector<InnerOptionalStruct> input {{optional<int32_t>{}, 1}, {7, 2}, {optional<int32_t>{}, 3}, {9, 4}};
+    const uint32_t trailer {0xCAFEBABEu};
+    serialize_into_with_trailer(buffer, sizeof(buffer), input, trailer, encoding, endianness);
+
+    FastBuffer fast_buffer(buffer, sizeof(buffer));
+    Cdr cdr_des(fast_buffer, endianness, get_version_from_algorithm(encoding));
+    cdr_des.set_encoding_flag(encoding);
+
+    std::vector<InnerOptionalStruct> output;
+    ASSERT_NO_THROW(cdr_des.deserialize(output, CdrTryConstructFlag::TRIM, 2));
+    const std::vector<InnerOptionalStruct> expected {{optional<int32_t>{}, 1}, {7, 2}};
     EXPECT_EQ(output, expected);
 
     uint32_t read_trailer {0};

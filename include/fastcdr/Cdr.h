@@ -1984,7 +1984,7 @@ public:
         if (CdrVersion::XCDRv2 == cdr_version_ && !is_multi_array_primitive(&array_t))
         {
             uint32_t dheader {0};
-            deserialize(dheader);
+            deserialize_framing(dheader);
 
             if ((end_ - offset_) < dheader)
             {
@@ -2042,7 +2042,7 @@ public:
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
             uint32_t dheader {0};
-            deserialize(dheader);
+            deserialize_framing(dheader);
 
             if (((end_ - offset_) < dheader) || (dheader < 4))
             {
@@ -2054,7 +2054,7 @@ public:
             auto last_offset = offset_;
             last_offset += dheader;
 
-            deserialize(sequence_length);
+            deserialize_framing(sequence_length);
 
             if (0 == sequence_length)
             {
@@ -2095,7 +2095,7 @@ public:
         }
         else
         {
-            deserialize(sequence_length);
+            deserialize_framing(sequence_length);
 
             if (sequence_length == 0)
             {
@@ -2139,7 +2139,7 @@ public:
         uint32_t sequence_length = 0;
         state state_before_error(*this);
 
-        deserialize(sequence_length);
+        deserialize_framing(sequence_length);
 
         if (sequence_length == 0)
         {
@@ -2214,7 +2214,7 @@ public:
         uint32_t sequence_length = 0;
         state state_before_error(*this);
 
-        deserialize(sequence_length);
+        deserialize_framing(sequence_length);
 
         vector_t.clear();
 
@@ -2231,7 +2231,6 @@ public:
         }
 
         uint32_t length_to_read {sequence_length};
-        bool i_set_fake {false};
 
         if (sequence_length > max_length)
         {
@@ -2259,11 +2258,7 @@ public:
             // discarded object instead of the destination, which may be shorter or empty.
             if (sequence_length > length_to_read)
             {
-                if (!fake_mode)
-                {
-                    fake_mode = true;
-                    i_set_fake = true;
-                }
+                fake_mode_scope discarding {*this, true};
 
                 for (uint32_t count {length_to_read}; count < sequence_length; ++count)
                 {
@@ -2274,17 +2269,8 @@ public:
         }
         catch (exception::Exception& ex)
         {
-            if (i_set_fake)
-            {
-                fake_mode = false;
-            }
             set_state(state_before_error);
             ex.raise();
-        }
-
-        if (i_set_fake)
-        {
-            fake_mode = false;
         }
 
         return *this;
@@ -2298,15 +2284,23 @@ public:
             uint32_t max_length)
     {
         uint32_t sequence_length {0};
+        state state_before_error(*this);
 
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
             uint32_t dheader {0};
-            deserialize(dheader);
+            deserialize_framing(dheader);
+
+            if (((end_ - offset_) < dheader) || (dheader < 4))
+            {
+                set_state(state_before_error);
+                throw exception::NotEnoughMemoryException(
+                          exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            }
 
             auto offset = offset_;
 
-            deserialize(sequence_length);
+            deserialize_framing(sequence_length);
 
             vector_t.clear();
 
@@ -2349,6 +2343,7 @@ public:
             {
                 if (offset_ - offset != dheader)
                 {
+                    set_state(state_before_error);
                     throw exception::BadParamException("Member size differs from the size specified by DHEADER");
                 }
             }
@@ -2357,6 +2352,7 @@ public:
                 uint32_t remaining_bytes = dheader - static_cast<uint32_t>(offset_ - offset);
                 if (!jump(remaining_bytes))
                 {
+                    set_state(state_before_error);
                     throw exception::NotEnoughMemoryException(
                               exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
                 }
@@ -2364,9 +2360,7 @@ public:
         }
         else
         {
-            state state_before_error(*this);
-
-            deserialize(sequence_length);
+            deserialize_framing(sequence_length);
 
             vector_t.clear();
 
@@ -2383,7 +2377,6 @@ public:
             }
 
             uint32_t length_to_read {sequence_length};
-            bool i_set_fake {false};
 
             if (sequence_length > max_length)
             {
@@ -2411,11 +2404,7 @@ public:
                 // discarded object instead of the destination, which may be shorter or empty.
                 if (sequence_length > length_to_read)
                 {
-                    if (!fake_mode)
-                    {
-                        fake_mode = true;
-                        i_set_fake = true;
-                    }
+                    fake_mode_scope discarding {*this, true};
 
                     for (uint32_t count {length_to_read}; count < sequence_length; ++count)
                     {
@@ -2426,17 +2415,8 @@ public:
             }
             catch (exception::Exception& ex)
             {
-                if (i_set_fake)
-                {
-                    fake_mode = false;
-                }
                 set_state(state_before_error);
                 ex.raise();
-            }
-
-            if (i_set_fake)
-            {
-                fake_mode = false;
             }
         }
 
@@ -2470,7 +2450,7 @@ public:
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
             uint32_t dheader {0};
-            deserialize(dheader);
+            deserialize_framing(dheader);
 
             if (((end_ - offset_) < dheader) || (dheader < 4))
             {
@@ -2483,7 +2463,7 @@ public:
             last_offset += dheader;
 
             uint32_t map_length {0};
-            deserialize(map_length);
+            deserialize_framing(map_length);
 
             try
             {
@@ -2514,7 +2494,7 @@ public:
         {
             uint32_t sequence_length = 0;
 
-            deserialize(sequence_length);
+            deserialize_framing(sequence_length);
 
             try
             {
@@ -2555,7 +2535,7 @@ public:
         state state_(*this);
         std::map<_K, _T> map;
 
-        deserialize(sequence_length);
+        deserialize_framing(sequence_length);
 
         try
         {
@@ -2586,15 +2566,24 @@ public:
             CdrTryConstructFlag consistency_flag,
             uint32_t max_length)
     {
+        state state_before_error(*this);
+
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
             uint32_t dheader {0};
-            deserialize(dheader);
+            deserialize_framing(dheader);
+
+            if (((end_ - offset_) < dheader) || (dheader < 4))
+            {
+                set_state(state_before_error);
+                throw exception::NotEnoughMemoryException(
+                          exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            }
 
             auto offset = offset_;
 
             uint32_t map_length {0};
-            deserialize(map_length);
+            deserialize_framing(map_length);
 
             map_t.clear();
 
@@ -2636,6 +2625,7 @@ public:
             {
                 if (offset_ - offset != dheader)
                 {
+                    set_state(state_before_error);
                     throw exception::BadParamException("Member size greater than size specified by DHEADER");
                 }
             }
@@ -2644,6 +2634,7 @@ public:
                 uint32_t remaining_bytes = dheader - static_cast<uint32_t>(offset_ - offset);
                 if (!jump(remaining_bytes))
                 {
+                    set_state(state_before_error);
                     throw exception::NotEnoughMemoryException(
                               exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
                 }
@@ -2652,9 +2643,8 @@ public:
         else
         {
             uint32_t map_length = 0;
-            state state_(*this);
 
-            deserialize(map_length);
+            deserialize_framing(map_length);
 
             map_t.clear();
 
@@ -2664,7 +2654,6 @@ public:
             }
 
             uint32_t length_to_read {map_length};
-            bool i_set_fake {false};
 
             if (map_length > max_length)
             {
@@ -2693,33 +2682,25 @@ public:
                     map_t.emplace(std::pair<_K, _T>(std::move(key), std::move(value)));
                 }
 
-                if (!fake_mode)
+                // Consume the entries that do not fit in the destination. They are read into discarded
+                // objects instead of the destination, which may be smaller or empty.
+                if (map_length > length_to_read)
                 {
-                    fake_mode = true;
-                    i_set_fake = true;
-                }
+                    fake_mode_scope discarding {*this, true};
 
-                for (uint32_t i {length_to_read}; i < map_length; ++i)
-                {
-                    _K key;
-                    _T value;
-                    deserialize(key);
-                    deserialize(value);
+                    for (uint32_t i {length_to_read}; i < map_length; ++i)
+                    {
+                        _K key;
+                        _T value;
+                        deserialize(key);
+                        deserialize(value);
+                    }
                 }
             }
             catch (exception::Exception& ex)
             {
-                if (i_set_fake)
-                {
-                    fake_mode = false;
-                }
-                set_state(state_);
+                set_state(state_before_error);
                 ex.raise();
-            }
-
-            if (i_set_fake)
-            {
-                fake_mode = false;
             }
         }
 
@@ -2758,7 +2739,7 @@ public:
         uint32_t map_length = 0;
         state state_(*this);
 
-        deserialize(map_length);
+        deserialize_framing(map_length);
 
         map_t.clear();
 
@@ -2768,7 +2749,6 @@ public:
         }
 
         uint32_t length_to_read {map_length};
-        bool i_set_fake {false};
 
         if (map_length > max_length)
         {
@@ -2797,33 +2777,25 @@ public:
                 map_t.emplace(std::pair<_K, _T>(std::move(key), std::move(value)));
             }
 
-            if (!fake_mode)
+            // Consume the entries that do not fit in the destination. They are read into discarded
+            // objects instead of the destination, which may be smaller or empty.
+            if (map_length > length_to_read)
             {
-                fake_mode = true;
-                i_set_fake = true;
-            }
+                fake_mode_scope discarding {*this, true};
 
-            for (uint32_t i {length_to_read}; i < map_length; ++i)
-            {
-                _K key;
-                _T value;
-                deserialize(key);
-                deserialize(value);
+                for (uint32_t i {length_to_read}; i < map_length; ++i)
+                {
+                    _K key;
+                    _T value;
+                    deserialize(key);
+                    deserialize(value);
+                }
             }
         }
         catch (exception::Exception& ex)
         {
-            if (i_set_fake)
-            {
-                fake_mode = false;
-            }
             set_state(state_);
             ex.raise();
-        }
-
-        if (i_set_fake)
-        {
-            fake_mode = false;
         }
 
         return *this;
@@ -3146,7 +3118,7 @@ public:
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
             uint32_t dheader {0};
-            deserialize(dheader);
+            deserialize_framing(dheader);
 
             if ((end_ - offset_) < dheader)
             {
@@ -3260,7 +3232,7 @@ public:
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
             uint32_t dheader {0};
-            deserialize(dheader);
+            deserialize_framing(dheader);
 
             if (((end_ - offset_) < dheader) || (dheader < 4))
             {
@@ -3272,7 +3244,7 @@ public:
             auto last_offset = offset_;
             last_offset += dheader;
 
-            deserialize(sequence_length);
+            deserialize_framing(sequence_length);
             if (0 == sequence_length)
             {
                 sequence_t = NULL;
@@ -3313,7 +3285,7 @@ public:
         }
         else
         {
-            deserialize(sequence_length);
+            deserialize_framing(sequence_length);
 
             if ((end_ - offset_) < sequence_length)
             {
@@ -3358,7 +3330,7 @@ public:
         uint32_t sequence_length = 0;
         state state_before_error(*this);
 
-        deserialize(sequence_length);
+        deserialize_framing(sequence_length);
 
         try
         {
@@ -3694,7 +3666,7 @@ public:
         bool is_present = true;
         if (CdrVersion::XCDRv2 == cdr_version_ && EncodingAlgorithmFlag::PL_CDR2 != current_encoding_)
         {
-            deserialize(is_present);
+            deserialize_framing(is_present);
         }
         value.reset(is_present);
         if (is_present)
@@ -3750,7 +3722,7 @@ public:
         bool is_present = true;
         if (CdrVersion::XCDRv2 == cdr_version_ && EncodingAlgorithmFlag::PL_CDR2 != current_encoding_)
         {
-            deserialize(is_present);
+            deserialize_framing(is_present);
         }
         value.reset(is_present);
         if (is_present)
@@ -3905,6 +3877,65 @@ private:
      */
     bool resize(
             size_t min_size_inc);
+
+    /*!
+     * @brief Sets @c fake_mode for the lifetime of the object, restoring its previous value on destruction
+     * even when an exception is thrown.
+     */
+    class fake_mode_scope
+    {
+    public:
+
+        fake_mode_scope(
+                Cdr& cdr,
+                bool enabled)
+            : cdr_(cdr)
+            , previous_(cdr.fake_mode)
+        {
+            cdr_.fake_mode = enabled;
+        }
+
+        ~fake_mode_scope()
+        {
+            cdr_.fake_mode = previous_;
+        }
+
+        fake_mode_scope(
+                const fake_mode_scope&) = delete;
+
+        fake_mode_scope& operator =(
+                const fake_mode_scope&) = delete;
+
+    private:
+
+        Cdr& cdr_;
+
+        bool previous_;
+    };
+
+    /*!
+     * @brief Decodes a value that determines how the rest of the stream is read, such as a length, a DHEADER, a
+     * member header or a presence flag.
+     *
+     * Unlike the regular @c deserialize overloads, the value is always stored, also in @c fake_mode . Discarded
+     * elements are decoded in fake mode, and they still need these values to consume exactly the bytes they occupy.
+     * @param[out] value Reference to the variable where the decoded value will be stored.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
+     * position that exceeds the internal memory size.
+     */
+    template<class _T>
+    Cdr& deserialize_framing(
+            _T& value)
+    {
+        fake_mode_scope storing {*this, false};
+        return deserialize(value);
+    }
+
+    Cdr_DllAPI const char* read_string(
+            uint32_t& length);
+    Cdr_DllAPI const std::wstring read_wstring(
+            uint32_t& length);
 
     Cdr_DllAPI const char* read_string(
             uint32_t& length,

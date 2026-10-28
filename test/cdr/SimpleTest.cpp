@@ -33,7 +33,9 @@ using namespace ::exception;
 
 static const uint8_t octet_t = 32;
 static const char char_t =  'Z';
+#if !FASTCDR_DISABLE_WSTRINGS
 static const wchar_t wchar = 'Z';
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 static const int8_t int8 = 64;
 static const uint16_t ushort_t = 65500;
 static const int16_t short_t = -32700;
@@ -47,14 +49,20 @@ static const long double ldouble_tt = std::numeric_limits<long double>::min();
 static const bool bool_t = true;
 static const std::string string_t = "Hola a todos, esto es un test";
 static const std::string emptystring_t = "";
+#if !FASTCDR_DISABLE_WSTRINGS
 static const std::wstring wstring_t = L"Hola a todos, esto es un test con widestring";
 static const std::wstring emptywstring_t = L"";
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 static const std::array<uint8_t, N_ARR_ELEMENTS> octet_array_t = {{1, 2, 3, 4, 5}};
 static const uint8_t octet_array_2_t[N_ARR_ELEMENTS] = {5, 4, 3, 2, 1};
 static const std::array<char, N_ARR_ELEMENTS> char_array_t = {{'A', 'B', 'C', 'D', 'E'}};
+#if !FASTCDR_DISABLE_WSTRINGS
 static const std::array<wchar_t, N_ARR_ELEMENTS> wchar_array_t = {{'A', 'B', 'C', 'D', 'E'}};
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 static const char char_array_2_t[N_ARR_ELEMENTS] = {'E', 'D', 'C', 'B', 'A'};
+#if !FASTCDR_DISABLE_WSTRINGS
 static const wchar_t wchar_array_2_t[N_ARR_ELEMENTS] = {'E', 'D', 'C', 'B', 'A'};
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 static const std::array<int8_t, N_ARR_ELEMENTS> int8_array_t = {{6, 7, 8, 9, 10}};
 static const int8_t int8_array_2_t[N_ARR_ELEMENTS] = {10, 9, 8, 7, 6};
 static const std::array<uint16_t, N_ARR_ELEMENTS> ushort_array_t = {{65500, 65501, 65502, 65503, 65504}};
@@ -92,15 +100,21 @@ static const long double ldouble_array_2_t[N_ARR_ELEMENTS] =
 static const std::array<bool, N_ARR_ELEMENTS> bool_array_t = {{true, false, true, false, true}};
 static const bool bool_array_2_t[N_ARR_ELEMENTS] = {false, true, false, true, false};
 static const std::array<std::string, N_ARR_ELEMENTS> string_array_t = {{"HOLA", "ADIOS", "HELLO", "BYE", "GOODBYE"}};
+#if !FASTCDR_DISABLE_WSTRINGS
 static const std::array<std::wstring,
         N_ARR_ELEMENTS> wstring_array_t = {{L"HOLA", L"ADIOS", L"HELLO", L"BYE", L"GOODBYE"}};
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 static const std::string string_array_2_t[N_ARR_ELEMENTS] = {"HOLA", "ADIOS", "HELLO", "BYE", "GOODBYE"};
+#if !FASTCDR_DISABLE_WSTRINGS
 static const std::wstring wstring_array_2_t[N_ARR_ELEMENTS] = {L"HOLA", L"ADIOS", L"HELLO", L"BYE", L"GOODBYE"};
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 static const std::vector<uint8_t> octet_vector_t(octet_array_2_t,
         octet_array_2_t + sizeof(octet_array_2_t) / sizeof(uint8_t));
 static const std::vector<char> char_vector_t(char_array_2_t, char_array_2_t + sizeof(char_array_2_t) / sizeof(char));
+#if !FASTCDR_DISABLE_WSTRINGS
 static const std::vector<wchar_t> wchar_vector_t(wchar_array_2_t,
         wchar_array_2_t + sizeof(wchar_array_2_t) / sizeof(wchar_t));
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 static const std::vector<int8_t> int8_vector_t(int8_array_2_t,
         int8_array_2_t + sizeof(int8_array_2_t) / sizeof(int8_t));
 static const std::vector<uint16_t> ushort_vector_t(ushort_array_2_t,
@@ -127,15 +141,19 @@ static const std::vector<bool> bool_vector_t(bool_array_2_t, bool_array_2_t + si
 static const std::vector<std::string> string_vector_t(string_array_2_t,
         string_array_2_t + sizeof(string_array_2_t) /
         sizeof(std::string));
+#if !FASTCDR_DISABLE_WSTRINGS
 static const std::vector<std::wstring> wstring_vector_t(wstring_array_2_t,
         wstring_array_2_t + sizeof(wstring_array_2_t) /
         sizeof(std::wstring));
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 static const std::array<std::array<std::array<uint32_t, 3>, 2>,
         2> triple_ulong_array_t = {{ {{ {{1, 2, 3}}, {{4, 5, 6}} }}, {{ {{7, 8, 9}}, {{10, 11, 12}} }} }};
 // Added because error 336.
 static const uint8_t octet_seq_t[N_ARR_ELEMENTS] = {5, 4, 3, 2, 1};
 static const char char_seq_t[N_ARR_ELEMENTS] = {'E', 'D', 'C', 'B', 'A'};
+#if !FASTCDR_DISABLE_WSTRINGS
 static const wchar_t wchar_seq_t[N_ARR_ELEMENTS] = {'E', 'D', 'C', 'B', 'A'};
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 static const int8_t int8_seq_t[N_ARR_ELEMENTS] = {10, 9, 8, 7, 6};
 static const uint16_t ushort_seq_t[N_ARR_ELEMENTS] = {65504, 65503, 65502, 65501, 65500};
 static const int16_t short_seq_t[N_ARR_ELEMENTS] = {-32704, -32703, -32702, -32701, -32700};
@@ -153,10 +171,14 @@ static const long double ldouble_seq_t[N_ARR_ELEMENTS] =
 {ldouble_tt + 4, ldouble_tt + 3, ldouble_tt + 2, ldouble_tt + 1, ldouble_tt};
 static const bool bool_seq_t[N_ARR_ELEMENTS] = {true, true, false, false, true};
 static const std::string string_seq_t[N_ARR_ELEMENTS] = {"HELLO", "BYE", "GOODBYE", "HOLA", "ADIOS"};
+#if !FASTCDR_DISABLE_WSTRINGS
 static const std::wstring wstring_seq_t[N_ARR_ELEMENTS] = {L"HELLO", L"BYE", L"GOODBYE", L"HOLA", L"ADIOS"};
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 // Added because error 337
 static const char* c_string_t = "HOLA";
+#if !FASTCDR_DISABLE_WSTRINGS
 static const wchar_t* c_wstring_t = L"HOLA";
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 template<typename T>
 void EXPECT_ARRAY_EQ(
@@ -340,6 +362,7 @@ static void check_no_space(
     }
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 static void check_no_space(
         const wchar_t& input_value,
         size_t buf_size = 1)
@@ -364,6 +387,9 @@ static void check_no_space(
     }
 }
 
+#endif // if !FASTCDR_DISABLE_WSTRINGS
+
+#if !FASTCDR_DISABLE_WSTRINGS
 template<size_t _N>
 static void check_no_space(
         const std::array<wchar_t, _N>& input_value,
@@ -388,6 +414,8 @@ static void check_no_space(
         EXPECT_THROW(cdr_des >> output_value, NotEnoughMemoryException);
     }
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 template<typename T, size_t N = N_ARR_ELEMENTS>
 static void check_good_case_array(
@@ -580,11 +608,13 @@ TEST(CDRTests, Char)
     check_no_space(char_t);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRTests, WChar)
 {
     check_good_case(wchar);
     check_no_space(wchar);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(CDRTests, Int8)
 {
@@ -659,12 +689,14 @@ TEST(CDRTests, String)
     check_bad_length_deserialization(string_t, false);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRTests, WString)
 {
     check_good_case(wstring_t);
     check_no_space(wstring_t, 1);
     check_bad_length_deserialization(wstring_t, true);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(CDRTests, EmptyString)
 {
@@ -672,11 +704,13 @@ TEST(CDRTests, EmptyString)
     check_no_space(emptystring_t, 1);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRTests, EmptyWString)
 {
     check_good_case(emptywstring_t);
     check_no_space(emptywstring_t, 1);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(CDRTests, STDArrayOctet)
 {
@@ -690,11 +724,13 @@ TEST(CDRTests, STDArrayChar)
     check_no_space(char_array_t);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRTests, STDArrayWChar)
 {
     check_good_case(wchar_array_t);
     check_no_space(wchar_array_t);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(CDRTests, STDArrayInt8)
 {
@@ -768,11 +804,13 @@ TEST(CDRTests, STDArrayString)
     check_no_space(string_array_t, 1);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRTests, STDArrayWString)
 {
     check_good_case(wstring_array_t);
     check_no_space(wstring_array_t, 1);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(CDRTests, ArrayOctet)
 {
@@ -786,11 +824,13 @@ TEST(CDRTests, ArrayChar)
     check_no_space_array(char_array_2_t);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRTests, ArrayWChar)
 {
     check_good_case_array(wchar_array_2_t);
     check_no_space_array(wchar_array_2_t);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(CDRTests, ArrayInt8)
 {
@@ -864,11 +904,13 @@ TEST(CDRTests, ArrayString)
     check_no_space_array(string_array_2_t, 1);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRTests, ArrayWString)
 {
     check_good_case_array(wstring_array_2_t);
     check_no_space_array(wstring_array_2_t, 1);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(CDRTests, STDVectorOctet)
 {
@@ -884,12 +926,14 @@ TEST(CDRTests, STDVectorChar)
     check_bad_length_deserialization(char_vector_t, false);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRTests, STDVectorWChar)
 {
     check_good_case(wchar_vector_t);
     check_no_space(wchar_vector_t, 1);
     check_bad_length_deserialization(wchar_vector_t, false);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(CDRTests, STDVectorInt8)
 {
@@ -975,12 +1019,14 @@ TEST(CDRTests, STDVectorString)
     check_bad_length_deserialization(string_vector_t, true);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRTests, STDVectorWString)
 {
     check_good_case(wstring_vector_t);
     check_no_space(wstring_vector_t, 1);
     check_bad_length_deserialization(wstring_vector_t, true);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(CDRTests, STDTripleArrayUnsignedLong)
 {
@@ -1135,6 +1181,7 @@ TEST(CDRTests, SequenceChar)
         NotEnoughMemoryException);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRTests, SequenceWChar)
 {
     // Check good case.
@@ -1186,6 +1233,7 @@ TEST(CDRTests, SequenceWChar)
         },
         NotEnoughMemoryException);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(CDRTests, SequenceInt8)
 {
@@ -1811,6 +1859,7 @@ TEST(CDRTests, SequenceString)
         NotEnoughMemoryException);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRTests, SequenceWString)
 {
     // Check good case.
@@ -1862,6 +1911,7 @@ TEST(CDRTests, SequenceWString)
         },
         NotEnoughMemoryException);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(CDRTests, CString)
 {
@@ -1914,6 +1964,7 @@ TEST(CDRTests, CString)
         NotEnoughMemoryException);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRTests, CWString)
 {
     // Check good case.
@@ -1990,6 +2041,7 @@ TEST(CDRTests, CWString)
         },
         NotEnoughMemoryException);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(CDRTests, Complete)
 {
@@ -2036,6 +2088,11 @@ TEST(CDRTests, Complete)
             5).serialize_sequence(ldouble_seq_t,
             5);
             cdr_ser.serialize(c_string_t);
+            cdr_ser.serialize_sequence(string_seq_t, 5);
+        });
+#if !FASTCDR_DISABLE_WSTRINGS
+    EXPECT_NO_THROW(
+        {
             // Wstring and wchar
             cdr_ser << wchar << wstring_t;
             cdr_ser.serialize_array(wchar_array_2_t, 5).serialize_array(wstring_array_2_t, 5);
@@ -2043,16 +2100,18 @@ TEST(CDRTests, Complete)
             cdr_ser << wchar_vector_t << wstring_vector_t;
             cdr_ser.serialize_sequence(wchar_seq_t, 5);
             cdr_ser.serialize_sequence(wstring_seq_t, 5);
-            cdr_ser.serialize_sequence(string_seq_t, 5);
             cdr_ser.serialize(c_wstring_t);
         });
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     // Deserialization.
     Cdr cdr_des(cdrbuffer);
 
     uint8_t octet_value = 0;
     char char_value = 0;
+#if !FASTCDR_DISABLE_WSTRINGS
     wchar_t wchar_value = 0;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     int8_t int8_value = 0;
     uint16_t ushort_value = 0;
     int16_t short_value = 0;
@@ -2065,13 +2124,19 @@ TEST(CDRTests, Complete)
     long double ldouble_value = 0;
     bool bool_value = false;
     std::string string_value = "";
+#if !FASTCDR_DISABLE_WSTRINGS
     std::wstring wstring_value = L"";
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     std::array<uint8_t, N_ARR_ELEMENTS> octet_array_value;
     uint8_t octet_array_2_value[N_ARR_ELEMENTS];
     std::array<char, N_ARR_ELEMENTS> char_array_value;
+#if !FASTCDR_DISABLE_WSTRINGS
     std::array<wchar_t, N_ARR_ELEMENTS> wchar_array_value;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     char char_array_2_value[N_ARR_ELEMENTS];
+#if !FASTCDR_DISABLE_WSTRINGS
     wchar_t wchar_array_2_value[N_ARR_ELEMENTS];
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     std::array<int8_t, N_ARR_ELEMENTS> int8_array_value;
     int8_t int8_array_2_value[N_ARR_ELEMENTS];
     std::array<uint16_t, N_ARR_ELEMENTS> ushort_array_value;
@@ -2096,7 +2161,9 @@ TEST(CDRTests, Complete)
     bool bool_array_2_value[N_ARR_ELEMENTS];
     std::vector<uint8_t> octet_vector_value;
     std::vector<char> char_vector_value;
+#if !FASTCDR_DISABLE_WSTRINGS
     std::vector<wchar_t> wchar_vector_value;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     std::vector<int8_t> int8_vector_value;
     std::vector<uint16_t> ushort_vector_value;
     std::vector<int16_t> short_vector_value;
@@ -2111,7 +2178,9 @@ TEST(CDRTests, Complete)
     std::array<std::array<std::array<uint32_t, 3>, 2>, 2> triple_ulong_array_value;
     uint8_t* octet_seq_value = NULL; size_t octet_seq_len;
     char* char_seq_value = NULL; size_t char_seq_len;
+#if !FASTCDR_DISABLE_WSTRINGS
     wchar_t* wchar_seq_value = NULL; size_t wchar_seq_len;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     int8_t* int8_seq_value = NULL; size_t int8_seq_len;
     uint16_t* ushort_seq_value = NULL; size_t ushort_seq_len;
     int16_t* short_seq_value = NULL; size_t short_seq_len;
@@ -2123,11 +2192,13 @@ TEST(CDRTests, Complete)
     double* double_seq_value = NULL; size_t double_seq_len;
     long double* ldouble_seq_value = NULL; size_t ldouble_seq_len;
     char* c_string_value = NULL;
+#if !FASTCDR_DISABLE_WSTRINGS
     wchar_t* c_wstring_value = NULL;
     std::array<std::wstring, N_ARR_ELEMENTS> wstring_array_value;
     std::wstring wstring_array_2_value[N_ARR_ELEMENTS];
     std::vector<std::wstring> wstring_vector_value;
     std::wstring* wstring_seq_value = NULL; size_t wstring_seq_len;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     std::string* string_seq_value = NULL; size_t string_seq_len;
 
     EXPECT_NO_THROW(
@@ -2170,6 +2241,11 @@ TEST(CDRTests, Complete)
                     deserialize_sequence(double_seq_value, double_seq_len).deserialize_sequence(ldouble_seq_value,
             ldouble_seq_len);
             cdr_des.deserialize(c_string_value);
+            cdr_des.deserialize_sequence(string_seq_value, string_seq_len);
+        });
+#if !FASTCDR_DISABLE_WSTRINGS
+    EXPECT_NO_THROW(
+        {
             // WString and wchar_t
             cdr_des >> wchar_value >> wstring_value;
             cdr_des.deserialize_array(wchar_array_2_value, 5).deserialize_array(wstring_array_2_value, 5);
@@ -2177,13 +2253,15 @@ TEST(CDRTests, Complete)
             cdr_des >> wchar_vector_value >> wstring_vector_value;
             cdr_des.deserialize_sequence(wchar_seq_value, wchar_seq_len);
             cdr_des.deserialize_sequence(wstring_seq_value, wstring_seq_len);
-            cdr_des.deserialize_sequence(string_seq_value, string_seq_len);
             cdr_des.deserialize(c_wstring_value);
         });
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_EQ(octet_value, octet_t);
     EXPECT_EQ(char_value, char_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wchar_value, wchar);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(int8_value, int8);
     EXPECT_EQ(ushort_value, ushort_t);
     EXPECT_EQ(short_value, short_t);
@@ -2196,11 +2274,15 @@ TEST(CDRTests, Complete)
     EXPECT_LONG_DOUBLE_EQ(ldouble_value, ldouble_tt);
     EXPECT_EQ(bool_value, bool_t);
     EXPECT_EQ(string_value, string_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wstring_value, wstring_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_EQ(octet_array_value, octet_array_t);
     EXPECT_EQ(char_array_value, char_array_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wchar_array_value, wchar_array_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(int8_array_value, int8_array_t);
     EXPECT_EQ(ushort_array_value, ushort_array_t);
     EXPECT_EQ(short_array_value, short_array_t);
@@ -2212,11 +2294,15 @@ TEST(CDRTests, Complete)
     EXPECT_EQ(double_array_value, double_array_t);
     EXPECT_EQ(ldouble_array_value, ldouble_array_t);
     EXPECT_EQ(bool_array_value, bool_array_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wstring_array_value, wstring_array_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_ARRAY_EQ(octet_array_2_value, octet_array_2_t, 5);
     EXPECT_ARRAY_EQ(char_array_2_value, char_array_2_t, 5);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_ARRAY_EQ(wchar_array_2_value, wchar_array_2_t, 5);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_ARRAY_EQ(int8_array_2_value, int8_array_2_t, 5);
     EXPECT_ARRAY_EQ(ushort_array_2_value, ushort_array_2_t, 5);
     EXPECT_ARRAY_EQ(short_array_2_value, short_array_2_t, 5);
@@ -2228,11 +2314,15 @@ TEST(CDRTests, Complete)
     EXPECT_ARRAY_DOUBLE_EQ(double_array_2_value, double_array_2_t, 5);
     EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_array_2_value, ldouble_array_2_t, 5);
     EXPECT_ARRAY_EQ(bool_array_2_value, bool_array_2_t, 5);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_ARRAY_EQ(wstring_array_2_value, wstring_array_2_t, 5);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_EQ(octet_vector_value, octet_vector_t);
     EXPECT_EQ(char_vector_value, char_vector_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wchar_vector_value, wchar_vector_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(int8_vector_value, int8_vector_t);
     EXPECT_EQ(ushort_vector_value, ushort_vector_t);
     EXPECT_EQ(short_vector_value, short_vector_t);
@@ -2244,15 +2334,19 @@ TEST(CDRTests, Complete)
     EXPECT_EQ(double_vector_value, double_vector_t);
     EXPECT_EQ(ldouble_vector_value, ldouble_vector_t);
     EXPECT_EQ(bool_vector_value, bool_vector_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wstring_vector_value, wstring_vector_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_EQ(triple_ulong_array_t, triple_ulong_array_value);
     EXPECT_EQ(octet_seq_len, 5u);
     EXPECT_ARRAY_EQ(octet_seq_value, octet_seq_t, 5);
     EXPECT_EQ(char_seq_len, 5u);
     EXPECT_ARRAY_EQ(char_seq_value, char_seq_t, 5);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wchar_seq_len, 5u);
     EXPECT_ARRAY_EQ(wchar_seq_value, wchar_seq_t, 5);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(int8_seq_len, 5u);
     EXPECT_ARRAY_EQ(int8_seq_value, int8_seq_t, 5);
     EXPECT_EQ(ushort_seq_len, 5u);
@@ -2273,21 +2367,29 @@ TEST(CDRTests, Complete)
     EXPECT_ARRAY_DOUBLE_EQ(double_seq_value, double_seq_t, 5);
     EXPECT_EQ(ldouble_seq_len, 5u);
     EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_seq_value, ldouble_seq_t, 5);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wstring_seq_len, 5u);
     EXPECT_ARRAY_EQ(wstring_seq_value, wstring_seq_t, 5);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(string_seq_len, 5u);
     EXPECT_ARRAY_EQ(string_seq_value, string_seq_t, 5);
 
     EXPECT_EQ(strcmp(c_string_t, c_string_value), 0);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wcscmp(c_wstring_t, c_wstring_value), 0);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
+#if !FASTCDR_DISABLE_WSTRINGS
     delete[] wstring_seq_value;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     delete[] string_seq_value;
 
     free(octet_seq_value);
     free(char_seq_value);
+#if !FASTCDR_DISABLE_WSTRINGS
     free(wchar_seq_value);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     free(int8_seq_value);
     free(ushort_seq_value);
     free(short_seq_value);
@@ -2299,7 +2401,9 @@ TEST(CDRTests, Complete)
     free(double_seq_value);
     free(ldouble_seq_value);
     free(c_string_value);
+#if !FASTCDR_DISABLE_WSTRINGS
     free(c_wstring_value);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 }
 
 // Regression test for Fast DDS issue #5136
@@ -2553,6 +2657,7 @@ TEST(FastCDRTests, Char)
     EXPECT_EQ(char_value, char_t);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRTests, WChar)
 {
     // Check good case.
@@ -2579,6 +2684,7 @@ TEST(FastCDRTests, WChar)
 
     EXPECT_EQ(char_value, wchar);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(FastCDRTests, Int8)
 {
@@ -3124,6 +3230,7 @@ TEST(FastCDRTests, String)
         NotEnoughMemoryException);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRTests, WString)
 {
     // Check good case.
@@ -3172,6 +3279,7 @@ TEST(FastCDRTests, WString)
         },
         NotEnoughMemoryException);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(FastCDRTests, EmptyString)
 {
@@ -3222,6 +3330,7 @@ TEST(FastCDRTests, EmptyString)
         NotEnoughMemoryException);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRTests, EmptyWString)
 {
     // Check good case.
@@ -3270,6 +3379,7 @@ TEST(FastCDRTests, EmptyWString)
         },
         NotEnoughMemoryException);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(FastCDRTests, STDArrayOctet)
 {
@@ -3369,6 +3479,7 @@ TEST(FastCDRTests, STDArrayChar)
         NotEnoughMemoryException);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRTests, STDArrayWChar)
 {
     // Check good case.
@@ -3417,6 +3528,7 @@ TEST(FastCDRTests, STDArrayWChar)
         },
         NotEnoughMemoryException);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(FastCDRTests, STDArrayInt8)
 {
@@ -4006,6 +4118,7 @@ TEST(FastCDRTests, STDArrayString)
         NotEnoughMemoryException);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRTests, STDArrayWString)
 {
     // Check good case.
@@ -4054,6 +4167,7 @@ TEST(FastCDRTests, STDArrayWString)
         },
         NotEnoughMemoryException);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(FastCDRTests, ArrayOctet)
 {
@@ -4153,6 +4267,7 @@ TEST(FastCDRTests, ArrayChar)
         NotEnoughMemoryException);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRTests, ArrayWChar)
 {
     // Check good case.
@@ -4201,6 +4316,7 @@ TEST(FastCDRTests, ArrayWChar)
         },
         NotEnoughMemoryException);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(FastCDRTests, ArrayInt8)
 {
@@ -4790,6 +4906,7 @@ TEST(FastCDRTests, ArrayString)
         NotEnoughMemoryException);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRTests, ArrayWString)
 {
     // Check good case.
@@ -4838,6 +4955,7 @@ TEST(FastCDRTests, ArrayWString)
         },
         NotEnoughMemoryException);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(FastCDRTests, STDVectorOctet)
 {
@@ -4937,6 +5055,7 @@ TEST(FastCDRTests, STDVectorChar)
         NotEnoughMemoryException);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRTests, STDVectorWChar)
 {
     // Check good case.
@@ -4985,6 +5104,7 @@ TEST(FastCDRTests, STDVectorWChar)
         },
         NotEnoughMemoryException);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(FastCDRTests, STDVectorInt8)
 {
@@ -5574,6 +5694,7 @@ TEST(FastCDRTests, STDVectorString)
         NotEnoughMemoryException);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRTests, STDVectorWString)
 {
     // Check good case.
@@ -5622,6 +5743,7 @@ TEST(FastCDRTests, STDVectorWString)
         },
         NotEnoughMemoryException);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(FastCDRTests, STDTripleArrayUnsignedLong)
 {
@@ -5776,6 +5898,7 @@ TEST(FastCDRTests, SequenceChar)
         NotEnoughMemoryException);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRTests, SequenceWChar)
 {
     // Check good case.
@@ -5827,6 +5950,7 @@ TEST(FastCDRTests, SequenceWChar)
         },
         NotEnoughMemoryException);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(FastCDRTests, SequenceInt8)
 {
@@ -6452,6 +6576,7 @@ TEST(FastCDRTests, SequenceString)
         NotEnoughMemoryException);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRTests, SequenceWString)
 {
     // Check good case.
@@ -6503,6 +6628,7 @@ TEST(FastCDRTests, SequenceWString)
         },
         NotEnoughMemoryException);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(FastCDRTests, CString)
 {
@@ -6555,6 +6681,7 @@ TEST(FastCDRTests, CString)
         NotEnoughMemoryException);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRTests, CWString)
 {
     // Check good case.
@@ -6605,6 +6732,7 @@ TEST(FastCDRTests, CWString)
         },
         NotEnoughMemoryException);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 
 TEST(FastCDRTests, Complete)
@@ -6652,6 +6780,10 @@ TEST(FastCDRTests, Complete)
             5).serialize_sequence(ldouble_seq_t,
             5);
             cdr_ser.serialize(c_string_t);
+        });
+#if !FASTCDR_DISABLE_WSTRINGS
+    EXPECT_NO_THROW(
+        {
             // Wstring and wchar
             cdr_ser << wchar << wstring_t;
             cdr_ser.serialize_array(wchar_array_2_t, 5).serialize_array(wstring_array_2_t, 5);
@@ -6660,13 +6792,16 @@ TEST(FastCDRTests, Complete)
             cdr_ser.serialize_sequence(wchar_seq_t, 5).serialize_sequence(wstring_seq_t, 5);
             cdr_ser.serialize(c_wstring_t);
         });
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
 
     uint8_t octet_value = 0;
     char char_value = 0;
+#if !FASTCDR_DISABLE_WSTRINGS
     wchar_t wchar_value = 0;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     int8_t int8_value = 0;
     uint16_t ushort_value = 0;
     int16_t short_value = 0;
@@ -6679,13 +6814,19 @@ TEST(FastCDRTests, Complete)
     long double ldouble_value = 0;
     bool bool_value = false;
     std::string string_value = "";
+#if !FASTCDR_DISABLE_WSTRINGS
     std::wstring wstring_value = L"";
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     std::array<uint8_t, N_ARR_ELEMENTS> octet_array_value;
     uint8_t octet_array_2_value[N_ARR_ELEMENTS];
     std::array<char, N_ARR_ELEMENTS> char_array_value;
+#if !FASTCDR_DISABLE_WSTRINGS
     std::array<wchar_t, N_ARR_ELEMENTS> wchar_array_value;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     char char_array_2_value[N_ARR_ELEMENTS];
+#if !FASTCDR_DISABLE_WSTRINGS
     wchar_t wchar_array_2_value[N_ARR_ELEMENTS];
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     std::array<int8_t, N_ARR_ELEMENTS> int8_array_value;
     int8_t int8_array_2_value[N_ARR_ELEMENTS];
     std::array<uint16_t, N_ARR_ELEMENTS> ushort_array_value;
@@ -6710,7 +6851,9 @@ TEST(FastCDRTests, Complete)
     bool bool_array_2_value[N_ARR_ELEMENTS];
     std::vector<uint8_t> octet_vector_value;
     std::vector<char> char_vector_value;
+#if !FASTCDR_DISABLE_WSTRINGS
     std::vector<wchar_t> wchar_vector_value;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     std::vector<int8_t> int8_vector_value;
     std::vector<uint16_t> ushort_vector_value;
     std::vector<int16_t> short_vector_value;
@@ -6725,7 +6868,9 @@ TEST(FastCDRTests, Complete)
     std::array<std::array<std::array<uint32_t, 3>, 2>, 2> triple_ulong_array_value;
     uint8_t* octet_seq_value = NULL; size_t octet_seq_len;
     char* char_seq_value = NULL; size_t char_seq_len;
+#if !FASTCDR_DISABLE_WSTRINGS
     wchar_t* wchar_seq_value = NULL; size_t wchar_seq_len;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     int8_t* int8_seq_value = NULL; size_t int8_seq_len;
     uint16_t* ushort_seq_value = NULL; size_t ushort_seq_len;
     int16_t* short_seq_value = NULL; size_t short_seq_len;
@@ -6737,11 +6882,13 @@ TEST(FastCDRTests, Complete)
     double* double_seq_value = NULL; size_t double_seq_len;
     long double* ldouble_seq_value = NULL; size_t ldouble_seq_len;
     char* c_string_value = NULL;
+#if !FASTCDR_DISABLE_WSTRINGS
     wchar_t* c_wstring_value = NULL;
     std::array<std::wstring, N_ARR_ELEMENTS> wstring_array_value;
     std::wstring wstring_array_2_value[N_ARR_ELEMENTS];
     std::vector<std::wstring> wstring_vector_value;
     std::wstring* wstring_seq_value = NULL; size_t wstring_seq_len;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_NO_THROW(
         {
@@ -6782,6 +6929,10 @@ TEST(FastCDRTests, Complete)
                     deserialize_sequence(double_seq_value, double_seq_len).deserialize_sequence(ldouble_seq_value,
             ldouble_seq_len);
             cdr_des.deserialize(c_string_value);
+        });
+#if !FASTCDR_DISABLE_WSTRINGS
+    EXPECT_NO_THROW(
+        {
             // WString and wchar_t
             cdr_des >> wchar_value >> wstring_value;
             cdr_des.deserialize_array(wchar_array_2_value, 5).deserialize_array(wstring_array_2_value, 5);
@@ -6791,10 +6942,13 @@ TEST(FastCDRTests, Complete)
             wstring_seq_len);
             cdr_des.deserialize(c_wstring_value);
         });
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_EQ(octet_value, octet_t);
     EXPECT_EQ(char_value, char_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wchar_value, wchar);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(int8_value, int8);
     EXPECT_EQ(ushort_value, ushort_t);
     EXPECT_EQ(short_value, short_t);
@@ -6807,11 +6961,15 @@ TEST(FastCDRTests, Complete)
     EXPECT_LONG_DOUBLE_EQ(ldouble_value, ldouble_tt);
     EXPECT_EQ(bool_value, bool_t);
     EXPECT_EQ(string_value, string_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wstring_value, wstring_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_EQ(octet_array_value, octet_array_t);
     EXPECT_EQ(char_array_value, char_array_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wchar_array_value, wchar_array_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(int8_array_value, int8_array_t);
     EXPECT_EQ(ushort_array_value, ushort_array_t);
     EXPECT_EQ(short_array_value, short_array_t);
@@ -6823,11 +6981,15 @@ TEST(FastCDRTests, Complete)
     EXPECT_EQ(double_array_value, double_array_t);
     EXPECT_EQ(ldouble_array_value, ldouble_array_t);
     EXPECT_EQ(bool_array_value, bool_array_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wstring_array_value, wstring_array_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_ARRAY_EQ(octet_array_2_value, octet_array_2_t, 5);
     EXPECT_ARRAY_EQ(char_array_2_value, char_array_2_t, 5);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_ARRAY_EQ(wchar_array_2_value, wchar_array_2_t, 5);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_ARRAY_EQ(int8_array_2_value, int8_array_2_t, 5);
     EXPECT_ARRAY_EQ(ushort_array_2_value, ushort_array_2_t, 5);
     EXPECT_ARRAY_EQ(short_array_2_value, short_array_2_t, 5);
@@ -6839,11 +7001,15 @@ TEST(FastCDRTests, Complete)
     EXPECT_ARRAY_DOUBLE_EQ(double_array_2_value, double_array_2_t, 5);
     EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_array_2_value, ldouble_array_2_t, 5);
     EXPECT_ARRAY_EQ(bool_array_2_value, bool_array_2_t, 5);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_ARRAY_EQ(wstring_array_2_value, wstring_array_2_t, 5);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_EQ(octet_vector_value, octet_vector_t);
     EXPECT_EQ(char_vector_value, char_vector_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wchar_vector_value, wchar_vector_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(int8_vector_value, int8_vector_t);
     EXPECT_EQ(ushort_vector_value, ushort_vector_t);
     EXPECT_EQ(short_vector_value, short_vector_t);
@@ -6855,15 +7021,19 @@ TEST(FastCDRTests, Complete)
     EXPECT_EQ(double_vector_value, double_vector_t);
     EXPECT_EQ(ldouble_vector_value, ldouble_vector_t);
     EXPECT_EQ(bool_vector_value, bool_vector_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wstring_vector_value, wstring_vector_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_EQ(triple_ulong_array_t, triple_ulong_array_value);
     EXPECT_EQ(octet_seq_len, 5u);
     EXPECT_ARRAY_EQ(octet_seq_value, octet_seq_t, 5);
     EXPECT_EQ(char_seq_len, 5u);
     EXPECT_ARRAY_EQ(char_seq_value, char_seq_t, 5);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wchar_seq_len, 5u);
     EXPECT_ARRAY_EQ(wchar_seq_value, wchar_seq_t, 5);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(int8_seq_len, 5u);
     EXPECT_ARRAY_EQ(int8_seq_value, int8_seq_t, 5);
     EXPECT_EQ(ushort_seq_len, 5u);
@@ -6884,17 +7054,25 @@ TEST(FastCDRTests, Complete)
     EXPECT_ARRAY_DOUBLE_EQ(double_seq_value, double_seq_t, 5);
     EXPECT_EQ(ldouble_seq_len, 5u);
     EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_seq_value, ldouble_seq_t, 5);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wstring_seq_len, 5u);
     EXPECT_ARRAY_EQ(wstring_seq_value, wstring_seq_t, 5);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_EQ(strcmp(c_string_t, c_string_value), 0);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wcscmp(c_wstring_t, c_wstring_value), 0);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
+#if !FASTCDR_DISABLE_WSTRINGS
     delete[] wstring_seq_value;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     free(octet_seq_value);
     free(char_seq_value);
+#if !FASTCDR_DISABLE_WSTRINGS
     free(wchar_seq_value);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     free(int8_seq_value);
     free(ushort_seq_value);
     free(short_seq_value);
@@ -6906,7 +7084,9 @@ TEST(FastCDRTests, Complete)
     free(double_seq_value);
     free(ldouble_seq_value);
     free(c_string_value);
+#if !FASTCDR_DISABLE_WSTRINGS
     free(c_wstring_value);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 }
 
 // Regression test

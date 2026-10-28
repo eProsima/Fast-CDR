@@ -43,6 +43,9 @@
 #define FASTCDR_SIZEOF_LONG_DOUBLE @FASTCDR_SIZEOF_LONG_DOUBLE@
 #endif // ifndef FASTCDR_SIZEOF_LONG_DOUBLE
 
+// Wide characters and strings (wchar_t, std::wstring) left out of the API
+#cmakedefine01 FASTCDR_DISABLE_WSTRINGS
+
 #if defined(__ARM_ARCH) && __ARM_ARCH <= 7
 #define FASTCDR_ARM32
 #endif // if defined(__ARM_ARCH) && __ARM_ARCH <= 7

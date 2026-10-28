@@ -299,6 +299,7 @@ public:
         return 1;
     }
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief Specific template which calculates the encoded size of an instance of a wchar.
      * @param[in] data Reference to the instance.
@@ -315,6 +316,8 @@ public:
         current_alignment += calculated_size;
         return calculated_size;
     }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief Specific template which calculates the encoded size of an instance of a int16_t.
@@ -487,6 +490,7 @@ public:
         return calculated_size;
     }
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief Specific template which calculates the encoded size of an instance of a std::wstring.
      * @param[in] data Reference to the instance.
@@ -503,6 +507,8 @@ public:
 
         return calculated_size;
     }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief Specific template which calculates the encoded size of an instance of a fixed_string.
@@ -892,6 +898,7 @@ public:
         return num_elements;
     }
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief Specific template which calculates the encoded size of an instance of an array of wchar.
      * @param[in] data Reference to the array's instance.
@@ -910,6 +917,8 @@ public:
         current_alignment += calculated_size;
         return calculated_size;
     }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief Specific template which calculates the encoded size of an instance of an array of int16_t.

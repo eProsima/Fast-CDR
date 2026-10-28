@@ -606,6 +606,7 @@ public:
     Cdr_DllAPI Cdr& serialize(
             const std::int32_t long_t);
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This function serializes a wide-char.
      * @param wchar The value of the wide-char that will be serialized in the buffer.
@@ -614,6 +615,7 @@ public:
      */
     Cdr_DllAPI Cdr& serialize(
             const wchar_t wchar);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This function serializes an unsigned long long.
@@ -688,6 +690,7 @@ public:
     Cdr_DllAPI Cdr& serialize(
             const char* string_t);
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This function serializes a wstring.
      * @param string_t The pointer to the wstring that will be serialized in the buffer.
@@ -696,6 +699,7 @@ public:
      */
     Cdr_DllAPI Cdr& serialize(
             const wchar_t* string_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This function serializes a std::string.
@@ -719,6 +723,7 @@ public:
         return serialize_sequence(c_str, str_len + 1);
     }
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This function serializes a std::wstring.
      * @param string_t The wstring that will be serialized in the buffer.
@@ -731,6 +736,8 @@ public:
     {
         return serialize(string_t.c_str());
     }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief Encodes a eprosima::fastcdr::fixed_string in the buffer.
@@ -1098,6 +1105,7 @@ public:
             const std::int32_t* long_t,
             std::size_t num_elements);
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This function serializes an array of wide-chars.
      * @param wchar The array of wide-chars that will be serialized in the buffer.
@@ -1108,6 +1116,7 @@ public:
     Cdr_DllAPI Cdr& serialize_array(
             const wchar_t* wchar,
             std::size_t num_elements);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This function serializes an array of unsigned long longs.
@@ -1199,6 +1208,7 @@ public:
         return *this;
     }
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This function serializes an array of wide-strings.
      * @param string_t The array of wide-strings that will be serialized in the buffer.
@@ -1217,6 +1227,8 @@ public:
         }
         return *this;
     }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief Encodes an array of fixed strings.
@@ -1670,6 +1682,7 @@ public:
     Cdr_DllAPI Cdr& deserialize(
             std::int32_t& long_t);
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This function deserializes a wide-char.
      * @param wchar The variable that will store the wide-char read from the buffer.
@@ -1685,6 +1698,8 @@ public:
         wchar = static_cast<wchar_t>(ret);
         return *this;
     }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This function deserializes an unsigned long long.
@@ -1757,6 +1772,7 @@ public:
     Cdr_DllAPI Cdr& deserialize(
             char*& string_t);
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This function deserializes a wide-string.
      * This function allocates memory to store the wide string. The user pointer will be set to point this allocated memory.
@@ -1767,6 +1783,7 @@ public:
      */
     Cdr_DllAPI Cdr& deserialize(
             wchar_t*& string_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This function deserializes a std::string.
@@ -1784,6 +1801,7 @@ public:
         return *this;
     }
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This function deserializes a std::wstring.
      * @param string_t The variable that will store the string read from the buffer.
@@ -1798,6 +1816,8 @@ public:
         string_t = read_wstring(length);
         return *this;
     }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief Decodes a fixed string.
@@ -2350,6 +2370,7 @@ public:
             std::int32_t* long_t,
             std::size_t num_elements);
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This function deserializes an array of wide-chars.
      * @param wchar The variable that will store the array of wide-chars read from the buffer.
@@ -2360,6 +2381,7 @@ public:
     Cdr_DllAPI Cdr& deserialize_array(
             wchar_t* wchar,
             std::size_t num_elements);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This function deserializes an array of unsigned long longs.
@@ -2754,6 +2776,7 @@ public:
         return deserialize_string_sequence(sequence_t, num_elements);
     }
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This function template deserializes a wide-string sequence.
      * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
@@ -2770,6 +2793,8 @@ public:
     {
         return deserialize_wstring_sequence(sequence_t, num_elements);
     }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// XCDR extensions
@@ -3126,9 +3151,11 @@ private:
             std::string*& sequence_t,
             std::size_t& num_elements);
 
+#if !FASTCDR_DISABLE_WSTRINGS
     Cdr_DllAPI Cdr& deserialize_wstring_sequence(
             std::wstring*& sequence_t,
             std::size_t& num_elements);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief Serializes the canonical @c uint8_t representation of @p bool_t.
@@ -3232,8 +3259,10 @@ private:
 
     Cdr_DllAPI const char* read_string(
             std::uint32_t& length);
+#if !FASTCDR_DISABLE_WSTRINGS
     Cdr_DllAPI const std::wstring read_wstring(
             std::uint32_t& length);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// XCDR extensions

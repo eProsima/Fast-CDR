@@ -69,6 +69,11 @@ option(BUILD_SHARED_LIBS "Create shared libraries by default" ON)
 option(STRICT_BOOL "Enforce bool values to 0/1 during serialization" OFF)
 
 ###############################################################################
+# Wide characters and strings
+###############################################################################
+option(FASTCDR_DISABLE_WSTRINGS "Leave out the API for wide characters and strings (wchar_t, std::wstring)" OFF)
+
+###############################################################################
 # Test system configuration
 ###############################################################################
 include(${PROJECT_SOURCE_DIR}/cmake/common/check_configuration.cmake)

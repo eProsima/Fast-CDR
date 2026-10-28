@@ -27,7 +27,9 @@ using namespace ::exception;
 
 static const uint8_t octet_t = 32;
 static const char char_t =  'Z';
+#if !FASTCDR_DISABLE_WSTRINGS
 static const wchar_t wchar =  'Z';
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 static const int8_t int8 = 64;
 static const uint16_t ushort_t = 65500;
 static const int16_t short_t = -32700;
@@ -40,13 +42,19 @@ static const double double_tt = std::numeric_limits<double>::min();
 static const long double ldouble_tt = std::numeric_limits<long double>::min();
 static const bool bool_t = true;
 static const std::string string_t = "Hola a todos, esto es un test";
+#if !FASTCDR_DISABLE_WSTRINGS
 static const std::wstring wstring_t = L"Hola a todos, esto es un test con wide string";
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 static const std::array<uint8_t, 5> octet_array_t = {{1, 2, 3, 4, 5}};
 static const uint8_t octet_array_2_t[5] = {5, 4, 3, 2, 1};
 static const std::array<char, 5> char_array_t = {{'A', 'B', 'C', 'D', 'E'}};
+#if !FASTCDR_DISABLE_WSTRINGS
 static const std::array<wchar_t, 5> wchar_array_t = {{'A', 'B', 'C', 'D', 'E'}};
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 static const char char_array_2_t[5] = {'E', 'D', 'C', 'B', 'A'};
+#if !FASTCDR_DISABLE_WSTRINGS
 static const wchar_t wchar_array_2_t[5] = {'E', 'D', 'C', 'B', 'A'};
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 static const std::array<int8_t, 5> int8_array_t = {{6, 7, 8, 9, 10}};
 static const int8_t int8_array_2_t[5] = {10, 9, 8, 7, 6};
 static const std::array<uint16_t, 5> ushort_array_t = {{65500, 65501, 65502, 65503, 65504}};
@@ -80,14 +88,20 @@ static const long double ldouble_array_2_t[5] =
 static const std::array<bool, 5> bool_array_t = {{true, false, true, false, true}};
 static const bool bool_array_2_t[5] = {false, true, false, true, false};
 static const std::array<std::string, 5> string_array_t = {{"HOLA", "ADIOS", "HELLO", "BYE", "GOODBYE"}};
+#if !FASTCDR_DISABLE_WSTRINGS
 static const std::array<std::wstring, 5> wstring_array_t = {{L"HOLA", L"ADIOS", L"HELLO", L"BYE", L"GOODBYE"}};
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 static const std::string string_array_2_t[5] = {"HOLA", "ADIOS", "HELLO", "BYE", "GOODBYE"};
+#if !FASTCDR_DISABLE_WSTRINGS
 static const std::wstring wstring_array_2_t[5] = {L"HOLA", L"ADIOS", L"HELLO", L"BYE", L"GOODBYE"};
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 static const std::vector<uint8_t> octet_vector_t(octet_array_2_t,
         octet_array_2_t + sizeof(octet_array_2_t) / sizeof(uint8_t));
 static const std::vector<char> char_vector_t(char_array_2_t, char_array_2_t + sizeof(char_array_2_t) / sizeof(char));
+#if !FASTCDR_DISABLE_WSTRINGS
 static const std::vector<wchar_t> wchar_vector_t(wchar_array_2_t,
         wchar_array_2_t + sizeof(wchar_array_2_t) / sizeof(wchar_t));
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 static const std::vector<int8_t> int8_vector_t(int8_array_2_t,
         int8_array_2_t + sizeof(int8_array_2_t) / sizeof(int8_t));
 static const std::vector<uint16_t> ushort_vector_t(ushort_array_2_t,
@@ -114,15 +128,19 @@ static const std::vector<bool> bool_vector_t(bool_array_2_t, bool_array_2_t + si
 static const std::vector<std::string> string_vector_t(string_array_2_t,
         string_array_2_t + sizeof(string_array_2_t) /
         sizeof(std::string));
+#if !FASTCDR_DISABLE_WSTRINGS
 static const std::vector<std::wstring> wstring_vector_t(wstring_array_2_t,
         wstring_array_2_t + sizeof(wstring_array_2_t) /
         sizeof(std::wstring));
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 static const std::array<std::array<std::array<uint32_t, 3>, 2>,
         2> triple_ulong_array_t = {{ {{ {{1, 2, 3}}, {{4, 5, 6}} }}, {{ {{7, 8, 9}}, {{10, 11, 12}} }} }};
 // Added because error 336.
 static const uint8_t octet_seq_t[5] = {5, 4, 3, 2, 1};
 static const char char_seq_t[5] = {'E', 'D', 'C', 'B', 'A'};
+#if !FASTCDR_DISABLE_WSTRINGS
 static const wchar_t wchar_seq_t[5] = {'E', 'D', 'C', 'B', 'A'};
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 static const int8_t int8_seq_t[5] = {10, 9, 8, 7, 6};
 static const uint16_t ushort_seq_t[5] = {65504, 65503, 65502, 65501, 65500};
 static const int16_t short_seq_t[5] = {-32704, -32703, -32702, -32701, -32700};
@@ -139,10 +157,14 @@ static const long double ldouble_seq_t[5] =
 {ldouble_tt + 4, ldouble_tt + 3, ldouble_tt + 2, ldouble_tt + 1, ldouble_tt};
 static const bool bool_seq_t[5] = {true, true, false, false, true};
 static const std::string string_seq_t[5] = {"HELLO", "BYE", "GOODBYE", "HOLA", "ADIOS"};
+#if !FASTCDR_DISABLE_WSTRINGS
 static const std::wstring wstring_seq_t[5] = {L"HELLO", L"BYE", L"GOODBYE", L"HOLA", L"ADIOS"};
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 // Added because error 337
 static const char* c_string_t = "HOLA";
+#if !FASTCDR_DISABLE_WSTRINGS
 static const wchar_t* c_wstring_t = L"HOLA";
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 template<typename T>
 void EXPECT_ARRAY_EQ(
@@ -277,6 +299,7 @@ TEST(CDRResizeTests, Char)
     EXPECT_EQ(char_value, char_t);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRResizeTests, WChar)
 {
     // Serialization.
@@ -300,6 +323,8 @@ TEST(CDRResizeTests, WChar)
 
     EXPECT_EQ(char_value, wchar);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(CDRResizeTests, Int8)
 {
@@ -589,6 +614,7 @@ TEST(CDRResizeTests, String)
     EXPECT_EQ(string_value, string_t);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRResizeTests, WString)
 {
     // Serialization.
@@ -612,6 +638,8 @@ TEST(CDRResizeTests, WString)
 
     EXPECT_EQ(string_value, wstring_t);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(CDRResizeTests, STDArrayOctet)
 {
@@ -661,6 +689,7 @@ TEST(CDRResizeTests, STDArrayChar)
     EXPECT_EQ(char_array_value, char_array_t);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRResizeTests, STDArrayWChar)
 {
     // Serialization.
@@ -684,6 +713,8 @@ TEST(CDRResizeTests, STDArrayWChar)
 
     EXPECT_EQ(char_array_value, wchar_array_t);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(CDRResizeTests, STDArrayInt8)
 {
@@ -973,6 +1004,7 @@ TEST(CDRResizeTests, STDArrayString)
     EXPECT_EQ(string_array_value, string_array_t);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRResizeTests, STDArrayWString)
 {
     // Serialization.
@@ -996,6 +1028,8 @@ TEST(CDRResizeTests, STDArrayWString)
 
     EXPECT_EQ(string_array_value, wstring_array_t);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(CDRResizeTests, ArrayOctet)
 {
@@ -1045,6 +1079,7 @@ TEST(CDRResizeTests, ArrayChar)
     EXPECT_ARRAY_EQ(char_array_2_value, char_array_2_t, 5);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRResizeTests, ArrayWChar)
 {
     // Serialization.
@@ -1068,6 +1103,8 @@ TEST(CDRResizeTests, ArrayWChar)
 
     EXPECT_ARRAY_EQ(char_array_2_value, wchar_array_2_t, 5);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(CDRResizeTests, ArrayInt8)
 {
@@ -1357,6 +1394,7 @@ TEST(CDRResizeTests, ArrayString)
     EXPECT_ARRAY_EQ(string_array_2_value, string_array_2_t, 5);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRResizeTests, ArrayWString)
 {
     // Serialization.
@@ -1380,6 +1418,8 @@ TEST(CDRResizeTests, ArrayWString)
 
     EXPECT_ARRAY_EQ(string_array_2_value, wstring_array_2_t, 5);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(CDRResizeTests, STDVectorOctet)
 {
@@ -1429,6 +1469,7 @@ TEST(CDRResizeTests, STDVectorChar)
     EXPECT_EQ(char_vector_value, char_vector_t);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRResizeTests, STDVectorWChar)
 {
     // Serialization.
@@ -1452,6 +1493,8 @@ TEST(CDRResizeTests, STDVectorWChar)
 
     EXPECT_EQ(char_vector_value, wchar_vector_t);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(CDRResizeTests, STDVectorInt8)
 {
@@ -1741,6 +1784,7 @@ TEST(CDRResizeTests, STDVectorString)
     EXPECT_EQ(string_vector_value, string_vector_t);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRResizeTests, STDVectorWString)
 {
     // Serialization.
@@ -1764,6 +1808,8 @@ TEST(CDRResizeTests, STDVectorWString)
 
     EXPECT_EQ(string_vector_value, wstring_vector_t);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(CDRResizeTests, STDTripleArrayUnsignedLong)
 {
@@ -1843,6 +1889,7 @@ TEST(CDRResizeTests, SequenceChar)
     free(char_seq_value);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRResizeTests, SequenceWChar)
 {
     // Serialization.
@@ -1869,6 +1916,8 @@ TEST(CDRResizeTests, SequenceWChar)
 
     free(char_seq_value);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(CDRResizeTests, SequenceInt8)
 {
@@ -2194,6 +2243,7 @@ TEST(CDRResizeTests, SequenceString)
     delete[] string_seq_value;
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRResizeTests, SequenceWString)
 {
     // Serialization.
@@ -2221,6 +2271,8 @@ TEST(CDRResizeTests, SequenceWString)
     delete[] string_seq_value;
 }
 
+#endif // if !FASTCDR_DISABLE_WSTRINGS
+
 TEST(CDRResizeTests, CString)
 {
     // Serialization.
@@ -2247,6 +2299,7 @@ TEST(CDRResizeTests, CString)
     free(c_string_value);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(CDRResizeTests, CWString)
 {
     // Serialization.
@@ -2272,6 +2325,8 @@ TEST(CDRResizeTests, CWString)
 
     free(c_string_value);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(CDRResizeTests, Complete)
 {
@@ -2308,6 +2363,10 @@ TEST(CDRResizeTests, Complete)
                 serialize_sequence(float_seq_t, 5).serialize_sequence(double_seq_t, 5).serialize_sequence(ldouble_seq_t,
         5);
         cdr_ser.serialize(c_string_t);
+    });
+#if !FASTCDR_DISABLE_WSTRINGS
+    EXPECT_NO_THROW(
+    {
         // Wstring and wchar
         cdr_ser << wchar << wstring_t;
         cdr_ser.serialize_array(wchar_array_2_t, 5).serialize_array(wstring_array_2_t, 5);
@@ -2316,13 +2375,16 @@ TEST(CDRResizeTests, Complete)
         cdr_ser.serialize_sequence(wchar_seq_t, 5).serialize_sequence(wstring_seq_t, 5);
         cdr_ser.serialize(c_wstring_t);
     });
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     // Deserialization.
     Cdr cdr_des(cdrbuffer);
 
     uint8_t octet_value = 0;
     char char_value = 0;
+#if !FASTCDR_DISABLE_WSTRINGS
     wchar_t wchar_value = 0;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     int8_t int8_value = 0;
     uint16_t ushort_value = 0;
     int16_t short_value = 0;
@@ -2335,13 +2397,19 @@ TEST(CDRResizeTests, Complete)
     long double ldouble_value = 0;
     bool bool_value = false;
     std::string string_value = "";
+#if !FASTCDR_DISABLE_WSTRINGS
     std::wstring wstring_value = L"";
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     std::array<uint8_t, 5> octet_array_value;
     uint8_t octet_array_2_value[5];
     std::array<char, 5> char_array_value;
+#if !FASTCDR_DISABLE_WSTRINGS
     std::array<wchar_t, 5> wchar_array_value;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     char char_array_2_value[5];
+#if !FASTCDR_DISABLE_WSTRINGS
     wchar_t wchar_array_2_value[5];
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     std::array<int8_t, 5> int8_array_value;
     int8_t int8_array_2_value[5];
     std::array<uint16_t, 5> ushort_array_value;
@@ -2366,7 +2434,9 @@ TEST(CDRResizeTests, Complete)
     bool bool_array_2_value[5];
     std::vector<uint8_t> octet_vector_value;
     std::vector<char> char_vector_value;
+#if !FASTCDR_DISABLE_WSTRINGS
     std::vector<wchar_t> wchar_vector_value;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     std::vector<int8_t> int8_vector_value;
     std::vector<uint16_t> ushort_vector_value;
     std::vector<int16_t> short_vector_value;
@@ -2381,7 +2451,9 @@ TEST(CDRResizeTests, Complete)
     std::array<std::array<std::array<uint32_t, 3>, 2>, 2> triple_ulong_array_value;
     uint8_t* octet_seq_value = NULL; size_t octet_seq_len;
     char* char_seq_value = NULL; size_t char_seq_len;
+#if !FASTCDR_DISABLE_WSTRINGS
     wchar_t* wchar_seq_value = NULL; size_t wchar_seq_len;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     int8_t* int8_seq_value = NULL; size_t int8_seq_len;
     uint16_t* ushort_seq_value = NULL; size_t ushort_seq_len;
     int16_t* short_seq_value = NULL; size_t short_seq_len;
@@ -2393,11 +2465,13 @@ TEST(CDRResizeTests, Complete)
     double* double_seq_value = NULL; size_t double_seq_len;
     long double* ldouble_seq_value = NULL; size_t ldouble_seq_len;
     char* c_string_value = NULL;
+#if !FASTCDR_DISABLE_WSTRINGS
     wchar_t* c_wstring_value = NULL;
     std::array<std::wstring, 5> wstring_array_value;
     std::wstring wstring_array_2_value[5];
     std::vector<std::wstring> wstring_vector_value;
     std::wstring* wstring_seq_value = NULL; size_t wstring_seq_len;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_NO_THROW(
     {
@@ -2432,6 +2506,10 @@ TEST(CDRResizeTests, Complete)
                 deserialize_sequence(double_seq_value, double_seq_len).deserialize_sequence(ldouble_seq_value,
         ldouble_seq_len);
         cdr_des.deserialize(c_string_value);
+    });
+#if !FASTCDR_DISABLE_WSTRINGS
+    EXPECT_NO_THROW(
+    {
         // WString and wchar_t
         cdr_des >> wchar_value >> wstring_value;
         cdr_des.deserialize_array(wchar_array_2_value, 5).deserialize_array(wstring_array_2_value, 5);
@@ -2441,10 +2519,13 @@ TEST(CDRResizeTests, Complete)
         wstring_seq_len);
         cdr_des.deserialize(c_wstring_value);
     });
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_EQ(octet_value, octet_t);
     EXPECT_EQ(char_value, char_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wchar_value, wchar);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(int8_value, int8);
     EXPECT_EQ(ushort_value, ushort_t);
     EXPECT_EQ(short_value, short_t);
@@ -2457,11 +2538,15 @@ TEST(CDRResizeTests, Complete)
     EXPECT_LONG_DOUBLE_EQ(ldouble_value, ldouble_tt);
     EXPECT_EQ(bool_value, bool_t);
     EXPECT_EQ(string_value, string_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wstring_value, wstring_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_EQ(octet_array_value, octet_array_t);
     EXPECT_EQ(char_array_value, char_array_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wchar_array_value, wchar_array_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(int8_array_value, int8_array_t);
     EXPECT_EQ(ushort_array_value, ushort_array_t);
     EXPECT_EQ(short_array_value, short_array_t);
@@ -2473,11 +2558,15 @@ TEST(CDRResizeTests, Complete)
     EXPECT_EQ(double_array_value, double_array_t);
     EXPECT_EQ(ldouble_array_value, ldouble_array_t);
     EXPECT_EQ(bool_array_value, bool_array_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wstring_array_value, wstring_array_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_ARRAY_EQ(octet_array_2_value, octet_array_2_t, 5);
     EXPECT_ARRAY_EQ(char_array_2_value, char_array_2_t, 5);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_ARRAY_EQ(wchar_array_2_value, wchar_array_2_t, 5);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_ARRAY_EQ(int8_array_2_value, int8_array_2_t, 5);
     EXPECT_ARRAY_EQ(ushort_array_2_value, ushort_array_2_t, 5);
     EXPECT_ARRAY_EQ(short_array_2_value, short_array_2_t, 5);
@@ -2489,11 +2578,15 @@ TEST(CDRResizeTests, Complete)
     EXPECT_ARRAY_DOUBLE_EQ(double_array_2_value, double_array_2_t, 5);
     EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_array_2_value, ldouble_array_2_t, 5);
     EXPECT_ARRAY_EQ(bool_array_2_value, bool_array_2_t, 5);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_ARRAY_EQ(wstring_array_2_value, wstring_array_2_t, 5);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_EQ(octet_vector_value, octet_vector_t);
     EXPECT_EQ(char_vector_value, char_vector_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wchar_vector_value, wchar_vector_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(int8_vector_value, int8_vector_t);
     EXPECT_EQ(ushort_vector_value, ushort_vector_t);
     EXPECT_EQ(short_vector_value, short_vector_t);
@@ -2505,15 +2598,19 @@ TEST(CDRResizeTests, Complete)
     EXPECT_EQ(double_vector_value, double_vector_t);
     EXPECT_EQ(ldouble_vector_value, ldouble_vector_t);
     EXPECT_EQ(bool_vector_value, bool_vector_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wstring_vector_value, wstring_vector_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_EQ(triple_ulong_array_t, triple_ulong_array_value);
     EXPECT_EQ(octet_seq_len, 5u);
     EXPECT_ARRAY_EQ(octet_seq_value, octet_seq_t, 5);
     EXPECT_EQ(char_seq_len, 5u);
     EXPECT_ARRAY_EQ(char_seq_value, char_seq_t, 5);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wchar_seq_len, 5u);
     EXPECT_ARRAY_EQ(wchar_seq_value, wchar_seq_t, 5);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(int8_seq_len, 5u);
     EXPECT_ARRAY_EQ(int8_seq_value, int8_seq_t, 5);
     EXPECT_EQ(ushort_seq_len, 5u);
@@ -2534,17 +2631,25 @@ TEST(CDRResizeTests, Complete)
     EXPECT_ARRAY_DOUBLE_EQ(double_seq_value, double_seq_t, 5);
     EXPECT_EQ(ldouble_seq_len, 5u);
     EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_seq_value, ldouble_seq_t, 5);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wstring_seq_len, 5u);
     EXPECT_ARRAY_EQ(wstring_seq_value, wstring_seq_t, 5);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_EQ(strcmp(c_string_t, c_string_value), 0);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wcscmp(c_wstring_t, c_wstring_value), 0);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
+#if !FASTCDR_DISABLE_WSTRINGS
     delete[] wstring_seq_value;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     free(octet_seq_value);
     free(char_seq_value);
+#if !FASTCDR_DISABLE_WSTRINGS
     free(wchar_seq_value);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     free(int8_seq_value);
     free(ushort_seq_value);
     free(short_seq_value);
@@ -2556,7 +2661,9 @@ TEST(CDRResizeTests, Complete)
     free(double_seq_value);
     free(ldouble_seq_value);
     free(c_string_value);
+#if !FASTCDR_DISABLE_WSTRINGS
     free(c_wstring_value);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 }
 
 TEST(FastCDRResizeTests, Octet)
@@ -2607,6 +2714,7 @@ TEST(FastCDRResizeTests, Char)
     EXPECT_EQ(char_value, char_t);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRResizeTests, WChar)
 {
     // Serialization.
@@ -2630,6 +2738,8 @@ TEST(FastCDRResizeTests, WChar)
 
     EXPECT_EQ(char_value, wchar);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(FastCDRResizeTests, Int8)
 {
@@ -2919,6 +3029,7 @@ TEST(FastCDRResizeTests, String)
     EXPECT_EQ(string_value, string_t);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRResizeTests, WString)
 {
     // Serialization.
@@ -2942,6 +3053,8 @@ TEST(FastCDRResizeTests, WString)
 
     EXPECT_EQ(string_value, wstring_t);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(FastCDRResizeTests, STDArrayOctet)
 {
@@ -2991,6 +3104,7 @@ TEST(FastCDRResizeTests, STDArrayChar)
     EXPECT_EQ(char_array_value, char_array_t);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRResizeTests, STDArrayWChar)
 {
     // Serialization.
@@ -3014,6 +3128,8 @@ TEST(FastCDRResizeTests, STDArrayWChar)
 
     EXPECT_EQ(char_array_value, wchar_array_t);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(FastCDRResizeTests, STDArrayInt8)
 {
@@ -3303,6 +3419,7 @@ TEST(FastCDRResizeTests, STDArrayString)
     EXPECT_EQ(string_array_value, string_array_t);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRResizeTests, STDArrayWString)
 {
     // Serialization.
@@ -3326,6 +3443,8 @@ TEST(FastCDRResizeTests, STDArrayWString)
 
     EXPECT_EQ(string_array_value, wstring_array_t);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(FastCDRResizeTests, ArrayOctet)
 {
@@ -3375,6 +3494,7 @@ TEST(FastCDRResizeTests, ArrayChar)
     EXPECT_ARRAY_EQ(char_array_2_value, char_array_2_t, 5);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRResizeTests, ArrayWChar)
 {
     // Serialization.
@@ -3398,6 +3518,8 @@ TEST(FastCDRResizeTests, ArrayWChar)
 
     EXPECT_ARRAY_EQ(char_array_2_value, wchar_array_2_t, 5);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(FastCDRResizeTests, ArrayInt8)
 {
@@ -3687,6 +3809,7 @@ TEST(FastCDRResizeTests, ArrayString)
     EXPECT_ARRAY_EQ(string_array_2_value, string_array_2_t, 5);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRResizeTests, ArrayWString)
 {
     // Serialization.
@@ -3710,6 +3833,8 @@ TEST(FastCDRResizeTests, ArrayWString)
 
     EXPECT_ARRAY_EQ(string_array_2_value, wstring_array_2_t, 5);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(FastCDRResizeTests, STDVectorOctet)
 {
@@ -3759,6 +3884,7 @@ TEST(FastCDRResizeTests, STDVectorChar)
     EXPECT_EQ(char_vector_value, char_vector_t);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRResizeTests, STDVectorWChar)
 {
     // Serialization.
@@ -3782,6 +3908,8 @@ TEST(FastCDRResizeTests, STDVectorWChar)
 
     EXPECT_EQ(char_vector_value, wchar_vector_t);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(FastCDRResizeTests, STDVectorInt8)
 {
@@ -4071,6 +4199,7 @@ TEST(FastCDRResizeTests, STDVectorString)
     EXPECT_EQ(string_vector_value, string_vector_t);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRResizeTests, STDVectorWString)
 {
     // Serialization.
@@ -4094,6 +4223,8 @@ TEST(FastCDRResizeTests, STDVectorWString)
 
     EXPECT_EQ(string_vector_value, wstring_vector_t);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(FastCDRResizeTests, STDTripleArrayUnsignedLong)
 {
@@ -4173,6 +4304,7 @@ TEST(FastCDRResizeTests, SequenceChar)
     free(char_seq_value);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRResizeTests, SequenceWChar)
 {
     // Serialization.
@@ -4199,6 +4331,8 @@ TEST(FastCDRResizeTests, SequenceWChar)
 
     free(char_seq_value);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 TEST(FastCDRResizeTests, SequenceInt8)
 {
@@ -4524,6 +4658,7 @@ TEST(FastCDRResizeTests, SequenceString)
     delete[] string_seq_value;
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRResizeTests, SequenceWString)
 {
     // Serialization.
@@ -4551,6 +4686,8 @@ TEST(FastCDRResizeTests, SequenceWString)
     delete[] string_seq_value;
 }
 
+#endif // if !FASTCDR_DISABLE_WSTRINGS
+
 TEST(FastCDRResizeTests, CString)
 {
     // Serialization.
@@ -4577,6 +4714,7 @@ TEST(FastCDRResizeTests, CString)
     free(c_string_value);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 TEST(FastCDRResizeTests, CWString)
 {
     // Serialization.
@@ -4602,6 +4740,8 @@ TEST(FastCDRResizeTests, CWString)
 
     free(c_string_value);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 
 TEST(FastCDRResizeTests, Complete)
@@ -4639,6 +4779,10 @@ TEST(FastCDRResizeTests, Complete)
                 serialize_sequence(float_seq_t, 5).serialize_sequence(double_seq_t, 5).serialize_sequence(ldouble_seq_t,
         5);
         cdr_ser.serialize(c_string_t);
+    });
+#if !FASTCDR_DISABLE_WSTRINGS
+    EXPECT_NO_THROW(
+    {
         // Wstring and wchar
         cdr_ser << wchar << wstring_t;
         cdr_ser.serialize_array(wchar_array_2_t, 5).serialize_array(wstring_array_2_t, 5);
@@ -4647,13 +4791,16 @@ TEST(FastCDRResizeTests, Complete)
         cdr_ser.serialize_sequence(wchar_seq_t, 5).serialize_sequence(wstring_seq_t, 5);
         cdr_ser.serialize(c_wstring_t);
     });
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
 
     uint8_t octet_value = 0;
     char char_value = 0;
+#if !FASTCDR_DISABLE_WSTRINGS
     wchar_t wchar_value = 0;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     int8_t int8_value = 0;
     uint16_t ushort_value = 0;
     int16_t short_value = 0;
@@ -4666,13 +4813,19 @@ TEST(FastCDRResizeTests, Complete)
     long double ldouble_value = 0;
     bool bool_value = false;
     std::string string_value = "";
+#if !FASTCDR_DISABLE_WSTRINGS
     std::wstring wstring_value = L"";
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     std::array<uint8_t, 5> octet_array_value;
     uint8_t octet_array_2_value[5];
     std::array<char, 5> char_array_value;
+#if !FASTCDR_DISABLE_WSTRINGS
     std::array<wchar_t, 5> wchar_array_value;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     char char_array_2_value[5];
+#if !FASTCDR_DISABLE_WSTRINGS
     wchar_t wchar_array_2_value[5];
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     std::array<int8_t, 5> int8_array_value;
     int8_t int8_array_2_value[5];
     std::array<uint16_t, 5> ushort_array_value;
@@ -4697,7 +4850,9 @@ TEST(FastCDRResizeTests, Complete)
     bool bool_array_2_value[5];
     std::vector<uint8_t> octet_vector_value;
     std::vector<char> char_vector_value;
+#if !FASTCDR_DISABLE_WSTRINGS
     std::vector<wchar_t> wchar_vector_value;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     std::vector<int8_t> int8_vector_value;
     std::vector<uint16_t> ushort_vector_value;
     std::vector<int16_t> short_vector_value;
@@ -4712,7 +4867,9 @@ TEST(FastCDRResizeTests, Complete)
     std::array<std::array<std::array<uint32_t, 3>, 2>, 2> triple_ulong_array_value;
     uint8_t* octet_seq_value = NULL; size_t octet_seq_len;
     char* char_seq_value = NULL; size_t char_seq_len;
+#if !FASTCDR_DISABLE_WSTRINGS
     wchar_t* wchar_seq_value = NULL; size_t wchar_seq_len;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     int8_t* int8_seq_value = NULL; size_t int8_seq_len;
     uint16_t* ushort_seq_value = NULL; size_t ushort_seq_len;
     int16_t* short_seq_value = NULL; size_t short_seq_len;
@@ -4724,11 +4881,13 @@ TEST(FastCDRResizeTests, Complete)
     double* double_seq_value = NULL; size_t double_seq_len;
     long double* ldouble_seq_value = NULL; size_t ldouble_seq_len;
     char* c_string_value = NULL;
+#if !FASTCDR_DISABLE_WSTRINGS
     wchar_t* c_wstring_value = NULL;
     std::array<std::wstring, 5> wstring_array_value;
     std::wstring wstring_array_2_value[5];
     std::vector<std::wstring> wstring_vector_value;
     std::wstring* wstring_seq_value = NULL; size_t wstring_seq_len;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_NO_THROW(
     {
@@ -4762,6 +4921,10 @@ TEST(FastCDRResizeTests, Complete)
                 deserialize_sequence(double_seq_value, double_seq_len).deserialize_sequence(ldouble_seq_value,
         ldouble_seq_len);
         cdr_des.deserialize(c_string_value);
+    });
+#if !FASTCDR_DISABLE_WSTRINGS
+    EXPECT_NO_THROW(
+    {
         // WString and wchar_t
         cdr_des >> wchar_value >> wstring_value;
         cdr_des.deserialize_array(wchar_array_2_value, 5).deserialize_array(wstring_array_2_value, 5);
@@ -4771,10 +4934,13 @@ TEST(FastCDRResizeTests, Complete)
         wstring_seq_len);
         cdr_des.deserialize(c_wstring_value);
     });
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_EQ(octet_value, octet_t);
     EXPECT_EQ(char_value, char_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wchar_value, wchar);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(int8_value, int8);
     EXPECT_EQ(ushort_value, ushort_t);
     EXPECT_EQ(short_value, short_t);
@@ -4787,11 +4953,15 @@ TEST(FastCDRResizeTests, Complete)
     EXPECT_LONG_DOUBLE_EQ(ldouble_value, ldouble_tt);
     EXPECT_EQ(bool_value, bool_t);
     EXPECT_EQ(string_value, string_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wstring_value, wstring_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_EQ(octet_array_value, octet_array_t);
     EXPECT_EQ(char_array_value, char_array_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wchar_array_value, wchar_array_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(int8_array_value, int8_array_t);
     EXPECT_EQ(ushort_array_value, ushort_array_t);
     EXPECT_EQ(short_array_value, short_array_t);
@@ -4803,11 +4973,15 @@ TEST(FastCDRResizeTests, Complete)
     EXPECT_EQ(double_array_value, double_array_t);
     EXPECT_EQ(ldouble_array_value, ldouble_array_t);
     EXPECT_EQ(bool_array_value, bool_array_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wstring_array_value, wstring_array_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_ARRAY_EQ(octet_array_2_value, octet_array_2_t, 5);
     EXPECT_ARRAY_EQ(char_array_2_value, char_array_2_t, 5);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_ARRAY_EQ(wchar_array_2_value, wchar_array_2_t, 5);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_ARRAY_EQ(int8_array_2_value, int8_array_2_t, 5);
     EXPECT_ARRAY_EQ(ushort_array_2_value, ushort_array_2_t, 5);
     EXPECT_ARRAY_EQ(short_array_2_value, short_array_2_t, 5);
@@ -4819,11 +4993,15 @@ TEST(FastCDRResizeTests, Complete)
     EXPECT_ARRAY_DOUBLE_EQ(double_array_2_value, double_array_2_t, 5);
     EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_array_2_value, ldouble_array_2_t, 5);
     EXPECT_ARRAY_EQ(bool_array_2_value, bool_array_2_t, 5);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_ARRAY_EQ(wstring_array_2_value, wstring_array_2_t, 5);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_EQ(octet_vector_value, octet_vector_t);
     EXPECT_EQ(char_vector_value, char_vector_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wchar_vector_value, wchar_vector_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(int8_vector_value, int8_vector_t);
     EXPECT_EQ(ushort_vector_value, ushort_vector_t);
     EXPECT_EQ(short_vector_value, short_vector_t);
@@ -4835,15 +5013,19 @@ TEST(FastCDRResizeTests, Complete)
     EXPECT_EQ(double_vector_value, double_vector_t);
     EXPECT_EQ(ldouble_vector_value, ldouble_vector_t);
     EXPECT_EQ(bool_vector_value, bool_vector_t);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wstring_vector_value, wstring_vector_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_EQ(triple_ulong_array_t, triple_ulong_array_value);
     EXPECT_EQ(octet_seq_len, 5u);
     EXPECT_ARRAY_EQ(octet_seq_value, octet_seq_t, 5);
     EXPECT_EQ(char_seq_len, 5u);
     EXPECT_ARRAY_EQ(char_seq_value, char_seq_t, 5);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wchar_seq_len, 5u);
     EXPECT_ARRAY_EQ(wchar_seq_value, wchar_seq_t, 5);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(int8_seq_len, 5u);
     EXPECT_ARRAY_EQ(int8_seq_value, int8_seq_t, 5);
     EXPECT_EQ(ushort_seq_len, 5u);
@@ -4864,17 +5046,25 @@ TEST(FastCDRResizeTests, Complete)
     EXPECT_ARRAY_DOUBLE_EQ(double_seq_value, double_seq_t, 5);
     EXPECT_EQ(ldouble_seq_len, 5u);
     EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_seq_value, ldouble_seq_t, 5);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wstring_seq_len, 5u);
     EXPECT_ARRAY_EQ(wstring_seq_value, wstring_seq_t, 5);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     EXPECT_EQ(strcmp(c_string_t, c_string_value), 0);
+#if !FASTCDR_DISABLE_WSTRINGS
     EXPECT_EQ(wcscmp(c_wstring_t, c_wstring_value), 0);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
+#if !FASTCDR_DISABLE_WSTRINGS
     delete[] wstring_seq_value;
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     free(octet_seq_value);
     free(char_seq_value);
+#if !FASTCDR_DISABLE_WSTRINGS
     free(wchar_seq_value);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
     free(int8_seq_value);
     free(ushort_seq_value);
     free(short_seq_value);
@@ -4886,7 +5076,9 @@ TEST(FastCDRResizeTests, Complete)
     free(double_seq_value);
     free(ldouble_seq_value);
     free(c_string_value);
+#if !FASTCDR_DISABLE_WSTRINGS
     free(c_wstring_value);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 }
 
 TEST(CDRResizeTests, ReserveBuffer)

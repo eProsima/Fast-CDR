@@ -23,12 +23,6 @@
 #include <string>
 #include <cstring>
 
-#ifdef _WIN32
-#define MEMCCPY _memccpy
-#else
-#define MEMCCPY memccpy
-#endif // ifdef _WIN32
-
 namespace eprosima {
 namespace fastcdr {
 
@@ -329,8 +323,15 @@ private:
     void set(
             const char* c_string) noexcept
     {
-        char* result = static_cast<char*>(MEMCCPY(string_data, c_string, '\0', MAX_CHARS));
-        string_len = (result == nullptr) ? MAX_CHARS : static_cast<std::size_t>(result - string_data) - 1u;
+        // As memccpy(string_data, c_string, '\0', MAX_CHARS), which is not standard C++: the terminator is copied
+        // when it fits.
+        std::size_t len = 0;
+        while (len < MAX_CHARS && '\0' != c_string[len])
+        {
+            ++len;
+        }
+        std::memcpy(string_data, c_string, len < MAX_CHARS ? len + 1u : len);
+        string_len = len;
     }
 
     char string_data[MAX_CHARS + 1];      ///< Holds string data, including ending null character.

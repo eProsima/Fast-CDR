@@ -17,10 +17,18 @@
 
 #include <cstdint>
 
-#include <atomic>
 #include <type_traits>
 #include <utility>
 #include <cstring>
+
+#if (!defined(__GNUC__) && !defined(__clang__)) || defined(__pnacl__) || \
+    defined(__EMSCRIPTEN__)
+#define HAS_NO_INLINE_ASSEMBLY
+#endif // if (!defined(__GNUC__) && !defined(__clang__)) || defined(__pnacl__) || defined(__EMSCRIPTEN__)
+
+#if defined(HAS_NO_INLINE_ASSEMBLY) && defined(_MSC_VER)
+#include <atomic>
+#endif // if defined(HAS_NO_INLINE_ASSEMBLY) && defined(_MSC_VER)
 
 namespace eprosima {
 namespace fastcdr {
@@ -29,16 +37,6 @@ namespace internal {
 void use_char_pointer(
         char const volatile *const v);
 } // namespace internal
-
-#if (!defined(__GNUC__) && !defined(__clang__)) || defined(__pnacl__) || \
-    defined(__EMSCRIPTEN__)
-#define HAS_NO_INLINE_ASSEMBLY
-#endif // if (!defined(__GNUC__) && !defined(__clang__)) || defined(__pnacl__) || defined(__EMSCRIPTEN__)
-
-inline void clobber_memory()
-{
-    std::atomic_signal_fence(std::memory_order_acq_rel);
-}
 
 #ifndef HAS_NO_INLINE_ASSEMBLY
 #if !defined(__GNUC__) || defined(__llvm__) || defined(__INTEL_COMPILER)
@@ -104,6 +102,11 @@ do_not_optimize(
 #endif // if !defined(__GNUC__) || defined(__llvm__) || defined(__INTEL_COMPILER)
 
 #elif defined(_MSC_VER)
+inline void clobber_memory()
+{
+    std::atomic_signal_fence(std::memory_order_acq_rel);
+}
+
 template<class Tp>
 inline void do_not_optimize(
         Tp& value)

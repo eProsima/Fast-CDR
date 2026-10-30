@@ -25,6 +25,42 @@
 
 namespace eprosima {
 namespace fastcdr {
+namespace detail {
+
+/**
+ * @brief Copies bytes from @c src to @c dest until @c c is copied or @c n bytes are copied, as POSIX's memccpy, which
+ * is not standard C++.
+ *
+ * @return A pointer to the byte after @c c in @c dest, or @c nullptr if @c c was not found in the first @c n bytes.
+ */
+inline void* memccpy(
+        void* dest,
+        const void* src,
+        int c,
+        std::size_t n) noexcept
+{
+    unsigned char* d = static_cast<unsigned char*>(dest);
+    const unsigned char* s = static_cast<const unsigned char*>(src);
+    const unsigned char uc = static_cast<unsigned char>(c);
+    for (std::size_t i = 0; i < n; ++i)
+    {
+        d[i] = s[i];
+        if (uc == s[i])
+        {
+            return d + i + 1;
+        }
+    }
+    return nullptr;
+}
+
+} // namespace detail
+} // namespace fastcdr
+} // namespace eprosima
+
+#define MEMCCPY eprosima::fastcdr::detail::memccpy
+
+namespace eprosima {
+namespace fastcdr {
 
 /**
  * @brief Template class for non-alloc strings.
@@ -323,15 +359,8 @@ private:
     void set(
             const char* c_string) noexcept
     {
-        // As memccpy(string_data, c_string, '\0', MAX_CHARS), which is not standard C++: the terminator is copied
-        // when it fits.
-        std::size_t len = 0;
-        while (len < MAX_CHARS && '\0' != c_string[len])
-        {
-            ++len;
-        }
-        std::memcpy(string_data, c_string, len < MAX_CHARS ? len + 1u : len);
-        string_len = len;
+        char* result = static_cast<char*>(MEMCCPY(string_data, c_string, '\0', MAX_CHARS));
+        string_len = (result == nullptr) ? MAX_CHARS : static_cast<std::size_t>(result - string_data) - 1u;
     }
 
     char string_data[MAX_CHARS + 1];      ///< Holds string data, including ending null character.

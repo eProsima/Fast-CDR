@@ -34,7 +34,7 @@ typedef enum
 } CdrVersion;
 
 //! @brief This enumeration represents the supported XCDR encoding algorithms.
-typedef enum : uint8_t
+typedef enum : std::uint8_t
 {
     //! @brief Specifies that the content is PLAIN_CDR.
     PLAIN_CDR = 0x0,

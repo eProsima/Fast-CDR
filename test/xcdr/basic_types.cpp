@@ -1771,6 +1771,7 @@ TEST_P(XCdrBasicTypesTest, char)
     serialize(expected_streams, encoding, endianness, char_value, false);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 /*!
  * @test Test a structure with a field of wchar type.
  * @code{.idl}
@@ -1859,6 +1860,7 @@ TEST_P(XCdrBasicTypesTest, wchar)
 
     serialize(expected_streams, encoding, endianness, wchar_value, false);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 /*!
  * @test Test a structure with a field of string type.
@@ -1959,6 +1961,7 @@ TEST_P(XCdrBasicTypesTest, string)
     serialize(expected_streams, encoding, endianness, string_value, false);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 /*!
  * @test Test a structure with a field of wstring type.
  * @code{.idl}
@@ -2065,6 +2068,7 @@ TEST_P(XCdrBasicTypesTest, wstring)
 
     serialize(expected_streams, encoding, endianness, string_value, false);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 /*!
  * @test Test a structure with a field of fixed string type.
@@ -8712,6 +8716,7 @@ TEST_P(XCdrBasicTypesTest, char_align_4)
     align_serialize(expected_streams, encoding, endianness, align_value, char_value, false);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 /*!
  * @test Test a structure with a field of octet type and another of wchar type.
  * @code{.idl}
@@ -8826,7 +8831,9 @@ TEST_P(XCdrBasicTypesTest, wchar_align_1)
 
     align_serialize(expected_streams, encoding, endianness, align_value, wchar_value, false);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
+#if !FASTCDR_DISABLE_WSTRINGS
 /*!
  * @test Test a structure with a field of unsigned short type and another of wchar type.
  * @code{.idl}
@@ -8937,7 +8944,9 @@ TEST_P(XCdrBasicTypesTest, wchar_align_2)
 
     align_serialize(expected_streams, encoding, endianness, align_value, wchar_value, false);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
+#if !FASTCDR_DISABLE_WSTRINGS
 /*!
  * @test Test a structure with a field of unsigned long type and another of wchar type.
  * @code{.idl}
@@ -9044,6 +9053,7 @@ TEST_P(XCdrBasicTypesTest, wchar_align_4)
 
     align_serialize(expected_streams, encoding, endianness, align_value, wchar_value, false);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 /*!
  * @test Test a structure with a field of octet type and another of string type.
@@ -9414,6 +9424,7 @@ TEST_P(XCdrBasicTypesTest, string_align_4)
     align_serialize(expected_streams, encoding, endianness, align_value, string_value, false);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 /*!
  * @test Test a structure with a field of octet type and another of wstring type.
  * @code{.idl}
@@ -9546,7 +9557,9 @@ TEST_P(XCdrBasicTypesTest, wstring_align_1)
 
     align_serialize(expected_streams, encoding, endianness, align_value, wstring_value, false);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
+#if !FASTCDR_DISABLE_WSTRINGS
 /*!
  * @test Test a structure with a field of unsigned short type and another of wstring type.
  * @code{.idl}
@@ -9681,7 +9694,9 @@ TEST_P(XCdrBasicTypesTest, wstring_align_2)
 
     align_serialize(expected_streams, encoding, endianness, align_value, wstring_value, false);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
+#if !FASTCDR_DISABLE_WSTRINGS
 /*!
  * @test Test a structure with a field of unsigned long type and another of wstring type.
  * @code{.idl}
@@ -9806,6 +9821,7 @@ TEST_P(XCdrBasicTypesTest, wstring_align_4)
 
     align_serialize(expected_streams, encoding, endianness, align_value, wstring_value, false);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 /*!
  * @test Test a structure with a field of octet type and another of enum 32bits type.
@@ -10836,6 +10852,7 @@ TEST_P(XCdrBasicTypesTest, enum8_align_4)
     align_serialize(expected_streams, encoding, endianness, align_value, enum_value, false);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 /*!
  * @test Test a structure with strings
  * @code{.idl}
@@ -11291,6 +11308,7 @@ TEST_P(XCdrBasicTypesTest, struct_with_strings)
         //}
     }
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 /*!
  * @test Test a structure with two fields of struct type.

@@ -2674,6 +2674,38 @@ TEST(XCdrTypeConsistencyDheaderTest, StdVectorNonPrimitive_LengthExceedsDheader)
 }
 
 /*!
+ * @brief Checks that an empty sequence whose DHEADER covers more than its length is rejected.
+ *
+ * The buffer holds a DHEADER of 8 and a length of 0, leaving four bytes inside the DHEADER that no element accounts
+ * for. Returning without consuming them would leave the stream misaligned, so the stream must be left where it was.
+ *
+ * @test XCdrTypeConsistencyDheaderTest.StdVectorNonPrimitive_EmptyDheaderMismatch
+ * @pre A buffer holds an XCDRv2 DHEADER of 8 followed by a sequence length of 0 and four padding bytes.
+ * @post Deserializing with every policy throws @c BadParamException , leaves the destination empty and the stream
+ *       at its start.
+ */
+TEST(XCdrTypeConsistencyDheaderTest, StdVectorNonPrimitive_EmptyDheaderMismatch)
+{
+    char buffer[12] {};
+    patch_dheader(buffer, 8);
+    patch_dheader(buffer + 4, 0);
+
+    for (CdrTryConstructFlag flag : {CdrTryConstructFlag::FAIL, CdrTryConstructFlag::DEFAULT_VALUE,
+                                     CdrTryConstructFlag::TRIM})
+    {
+        FastBuffer fast_buffer(buffer, sizeof(buffer));
+        Cdr cdr_des(fast_buffer, Cdr::Endianness::LITTLE_ENDIANNESS, CdrVersion::XCDRv2);
+        cdr_des.set_encoding_flag(EncodingAlgorithmFlag::PLAIN_CDR2);
+
+        std::vector<std::string> output;
+        EXPECT_THROW(cdr_des.deserialize(output, flag, 1),
+                eprosima::fastcdr::exception::BadParamException);
+        EXPECT_TRUE(output.empty());
+        EXPECT_EQ(0u, cdr_des.get_serialized_data_length());
+    }
+}
+
+/*!
  * @brief Checks that a truncated sequence whose kept elements overrun the DHEADER is rejected.
  *
  * With the layout of {"a", "b"} (see StdVectorNonPrimitive_DheaderTooSmall), a DHEADER of 6 ends inside the first

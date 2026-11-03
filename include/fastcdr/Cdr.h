@@ -2358,11 +2358,6 @@ public:
 
             vector_t.clear();
 
-            if (0 == sequence_length)
-            {
-                return *this;
-            }
-
             if ((dheader - static_cast<uint32_t>(offset_ - offset)) < sequence_length)
             {
                 set_state(state_before_error);

@@ -70,7 +70,7 @@ namespace fastcdr {
  * @tparam MAX_CHARS Maximum number of characters is specified as the template parameter.
  *                   Space for an additional null terminator will be reserved.
  */
-template <std::size_t MAX_CHARS>
+template<std::size_t MAX_CHARS>
 struct fixed_string
 {
 public:

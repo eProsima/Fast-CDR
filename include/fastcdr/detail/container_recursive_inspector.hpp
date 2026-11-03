@@ -31,7 +31,7 @@ constexpr bool is_multi_array_primitive(
 }
 
 /// Specializations
-template <typename _T,
+template<typename _T,
         typename std::enable_if<std::is_enum<_T>::value ||
         std::is_arithmetic<_T>::value>::type* = nullptr>
 constexpr bool is_multi_array_primitive(
@@ -40,7 +40,7 @@ constexpr bool is_multi_array_primitive(
     return true;
 }
 
-template <typename _T, std::size_t _N>
+template<typename _T, std::size_t _N>
 constexpr bool is_multi_array_primitive(
         std::array<_T, _N> const*)
 {

@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cwchar>
+#include <limits>
 #include <map>
 #include <string>
 #include <tuple>
@@ -2637,6 +2638,39 @@ TEST(XCdrTypeConsistencyDheaderTest, StdVectorNonPrimitive_DheaderTooSmall)
     std::vector<std::string> output;
     EXPECT_THROW(deserialize_xcdrv2(buffer, sizeof(buffer), output, CdrTryConstructFlag::TRIM, 2),
             BadParamException);
+}
+
+/*!
+ * @brief Checks that a sequence announcing more elements than its DHEADER can hold is rejected before allocating.
+ *
+ * The buffer holds a DHEADER of 4, covering only the length, and a length of 1000000. Every element takes at least
+ * one byte, so the sequence is malformed whatever the policy, and the stream must be left where it was.
+ *
+ * @test XCdrTypeConsistencyDheaderTest.StdVectorNonPrimitive_LengthExceedsDheader
+ * @pre A buffer holds an XCDRv2 DHEADER of 4 followed by a sequence length of 1000000.
+ * @post Deserializing with every policy throws @c NotEnoughMemoryException , leaves the destination empty and the
+ *       stream at its start.
+ */
+TEST(XCdrTypeConsistencyDheaderTest, StdVectorNonPrimitive_LengthExceedsDheader)
+{
+    char buffer[8] {};
+    patch_dheader(buffer, 4);
+    patch_dheader(buffer + 4, 1000000);
+
+    for (CdrTryConstructFlag flag : {CdrTryConstructFlag::FAIL, CdrTryConstructFlag::DEFAULT_VALUE,
+                                     CdrTryConstructFlag::TRIM})
+    {
+        FastBuffer fast_buffer(buffer, sizeof(buffer));
+        Cdr cdr_des(fast_buffer, Cdr::Endianness::LITTLE_ENDIANNESS, CdrVersion::XCDRv2);
+        cdr_des.set_encoding_flag(EncodingAlgorithmFlag::PLAIN_CDR2);
+
+        std::vector<std::string> output;
+        EXPECT_THROW(cdr_des.deserialize(output, flag, (std::numeric_limits<uint32_t>::max)()),
+                eprosima::fastcdr::exception::NotEnoughMemoryException);
+        EXPECT_TRUE(output.empty());
+        EXPECT_EQ(0u, output.capacity());
+        EXPECT_EQ(0u, cdr_des.get_serialized_data_length());
+    }
 }
 
 /*!

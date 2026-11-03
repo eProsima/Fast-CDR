@@ -2363,6 +2363,13 @@ public:
                 return *this;
             }
 
+            if ((dheader - static_cast<uint32_t>(offset_ - offset)) < sequence_length)
+            {
+                set_state(state_before_error);
+                throw exception::NotEnoughMemoryException(
+                          exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
+            }
+
             uint32_t length_to_read {sequence_length};
 
             if (sequence_length > max_length)
@@ -2382,12 +2389,12 @@ public:
                 }
             }
 
-            vector_t.resize(length_to_read);
-
             uint32_t count {0};
 
             try
             {
+                vector_t.resize(length_to_read);
+
                 while (offset_ - offset < dheader && count < length_to_read)
                 {
                     deserialize(vector_t.data()[count]);

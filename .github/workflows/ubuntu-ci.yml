@@ -89,7 +89,7 @@ jobs:
           ref: ${{ inputs.fastcdr-branch || github.ref }}
 
       - name: Configure Fast CDR
-        run: cmake -S src/fastcdr -B build/fastcdr
+        run: cmake -S src/fastcdr -B build/fastcdr -DFASTCDR_DISABLE_WSTRINGS=ON
 
       - name: FACE check (C++11 General Purpose capability set)
         run: |

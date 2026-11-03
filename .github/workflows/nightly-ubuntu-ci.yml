@@ -12,7 +12,6 @@ jobs:
       os-version: 'ubuntu-22.04'
       label: 'nightly-ubuntu-ci-master'
       fastcdr-branch: 'master'
-      cmake-args: '-DFASTCDR_FACE_TEST=ON'
       run-build: true
       run-tests: true
       use-ccache: false

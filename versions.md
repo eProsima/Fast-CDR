@@ -1,4 +1,7 @@
+# v2.5.0
+
 # v2.4.0
+
 * Add STRICT_BOOL CMake option to enforce canonical bool serialization
 
 * Add context to `Cdr` class to allow for customization of external (de)serialization methods.

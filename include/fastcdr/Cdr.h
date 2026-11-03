@@ -3965,7 +3965,7 @@ private:
             size_t min_size_inc);
 
     /*!
-     * @brief Sets @c fake_mode for the lifetime of the object, restoring its previous value on destruction
+     * @brief Sets @c fake_mode_ for the lifetime of the object, restoring its previous value on destruction
      * even when an exception is thrown.
      */
     class fake_mode_scope
@@ -3976,14 +3976,14 @@ private:
                 Cdr& cdr,
                 bool enabled)
             : cdr_(cdr)
-            , previous_(cdr.fake_mode)
+            , previous_(cdr.fake_mode_)
         {
-            cdr_.fake_mode = enabled;
+            cdr_.fake_mode_ = enabled;
         }
 
         ~fake_mode_scope()
         {
-            cdr_.fake_mode = previous_;
+            cdr_.fake_mode_ = previous_;
         }
 
         fake_mode_scope(
@@ -4497,11 +4497,11 @@ private:
     //! Whether the encapsulation was serialized.
     bool encapsulation_serialized_ {false};
 
+    //! Whether fake deserialization mode is enabled.
+    bool fake_mode_ {false};
+
     //! Custom serialization context.
     std::shared_ptr<CdrContext> context_;
-
-    //! Whether fake deserialization mode is enabled.
-    bool fake_mode {false};
 
     uint32_t get_long_lc(
             SerializedMemberSizeForNextInt serialized_member_size);

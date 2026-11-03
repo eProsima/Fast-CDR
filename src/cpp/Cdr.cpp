@@ -1338,7 +1338,7 @@ Cdr& Cdr::deserialize(
         // Save last datasize.
         last_data_size_ = sizeof(char_t);
 
-        if (!fake_mode)
+        if (!fake_mode_)
         {
             offset_++ >> char_t;
         }
@@ -1364,7 +1364,7 @@ Cdr& Cdr::deserialize(
         make_alignment(align);
         last_data_size_ = sizeof(short_t);
 
-        if (!fake_mode)
+        if (!fake_mode_)
         {
             if (swap_bytes_)
             {
@@ -1402,7 +1402,7 @@ Cdr& Cdr::deserialize(
         make_alignment(align);
         last_data_size_ = sizeof(long_t);
 
-        if (!fake_mode)
+        if (!fake_mode_)
         {
             if (swap_bytes_)
             {
@@ -1442,7 +1442,7 @@ Cdr& Cdr::deserialize(
         make_alignment(align);
         last_data_size_ = align64_;
 
-        if (!fake_mode)
+        if (!fake_mode_)
         {
             if (swap_bytes_)
             {
@@ -1486,7 +1486,7 @@ Cdr& Cdr::deserialize(
         make_alignment(align);
         last_data_size_ = sizeof(float_t);
 
-        if (!fake_mode)
+        if (!fake_mode_)
         {
             if (swap_bytes_)
             {
@@ -1526,7 +1526,7 @@ Cdr& Cdr::deserialize(
         make_alignment(align);
         last_data_size_ = align64_;
 
-        if (!fake_mode)
+        if (!fake_mode_)
         {
             if (swap_bytes_)
             {
@@ -1570,7 +1570,7 @@ Cdr& Cdr::deserialize(
         make_alignment(align);
         last_data_size_ = align64_;
 
-        if (!fake_mode)
+        if (!fake_mode_)
         {
             if (swap_bytes_)
             {
@@ -1664,7 +1664,7 @@ Cdr& Cdr::deserialize(
         // Save last datasize.
         last_data_size_ = sizeof(uint8_t);
 
-        if (!fake_mode)
+        if (!fake_mode_)
         {
             offset_++ >> value;
 
@@ -1710,7 +1710,7 @@ Cdr& Cdr::deserialize(
         last_data_size_ = sizeof(uint8_t);
 
         // Allocate memory.
-        if (!fake_mode)
+        if (!fake_mode_)
         {
             string_t =
                     reinterpret_cast<char*>(calloc(length + ((&offset_)[length - 1] == '\0' ? 0 : 1),
@@ -1743,7 +1743,7 @@ Cdr& Cdr::deserialize(
         // Save last datasize.
         last_data_size_ = sizeof(uint16_t);
 
-        if (!fake_mode)
+        if (!fake_mode_)
         {
             // Allocate memory.
             string_t = reinterpret_cast<wchar_t*>(calloc(length + 1, sizeof(wchar_t))); // WStrings never serialize terminating zero
@@ -1811,7 +1811,7 @@ Cdr& Cdr::deserialize(
         // Save last datasize.
         last_data_size_ = sizeof(uint8_t);
 
-        if (!fake_mode)
+        if (!fake_mode_)
         {
             // Allocate memory. The extra byte always reserved for the terminating null character
             // is zeroed by calloc, so the result is null-terminated whether or not the stream
@@ -1868,7 +1868,7 @@ Cdr& Cdr::deserialize(
         // Save last datasize.
         last_data_size_ = sizeof(uint16_t);
 
-        if (!fake_mode)
+        if (!fake_mode_)
         {
             // Allocate memory. WStrings never serialize the terminating zero, so the extra
             // character zeroed by calloc terminates the result. A string with no characters to
@@ -1956,7 +1956,7 @@ const char* Cdr::read_string(
 
         // In fake mode the stream is only consumed, so the returned pointer is left empty and the
         // reported length must be zero to stay consistent with it.
-        length = fake_mode ? 0 : length_to_read;
+        length = fake_mode_ ? 0 : length_to_read;
 
         if (length > 0)
         {
@@ -2013,9 +2013,9 @@ const std::wstring Cdr::read_wstring(
 
         // In fake mode the stream is only consumed, so the returned string is left empty and the
         // reported length must be zero to stay consistent with it.
-        length = fake_mode ? 0 : length_to_read;
+        length = fake_mode_ ? 0 : length_to_read;
 
-        if (!fake_mode)
+        if (!fake_mode_)
         {
             if (length_to_read > 0)
             {
@@ -2052,7 +2052,7 @@ Cdr& Cdr::deserialize_array(
         // Save last datasize.
         last_data_size_ = sizeof(*bool_t);
 
-        if (!fake_mode)
+        if (!fake_mode_)
         {
             for (size_t count = 0; count < num_elements; ++count)
             {
@@ -2091,7 +2091,7 @@ Cdr& Cdr::deserialize_array(
         // Save last datasize.
         last_data_size_ = sizeof(*char_t);
 
-        if (!fake_mode)
+        if (!fake_mode_)
         {
             offset_.rmemcopy(char_t, total_size);
         }
@@ -2121,7 +2121,7 @@ Cdr& Cdr::deserialize_array(
         make_alignment(align);
         last_data_size_ = sizeof(*short_t);
 
-        if (!fake_mode)
+        if (!fake_mode_)
         {
             if (swap_bytes_)
             {
@@ -2170,7 +2170,7 @@ Cdr& Cdr::deserialize_array(
         make_alignment(align);
         last_data_size_ = sizeof(*long_t);
 
-        if (!fake_mode)
+        if (!fake_mode_)
         {
             if (swap_bytes_)
             {
@@ -2239,7 +2239,7 @@ Cdr& Cdr::deserialize_array(
         make_alignment(align);
         last_data_size_ = align64_;
 
-        if (!fake_mode)
+        if (!fake_mode_)
         {
             if (swap_bytes_)
             {
@@ -2294,7 +2294,7 @@ Cdr& Cdr::deserialize_array(
         make_alignment(align);
         last_data_size_ = sizeof(*float_t);
 
-        if (!fake_mode)
+        if (!fake_mode_)
         {
             if (swap_bytes_)
             {
@@ -2345,7 +2345,7 @@ Cdr& Cdr::deserialize_array(
         make_alignment(align);
         last_data_size_ = align64_;
 
-        if (!fake_mode)
+        if (!fake_mode_)
         {
             if (swap_bytes_)
             {
@@ -2401,7 +2401,7 @@ Cdr& Cdr::deserialize_array(
         make_alignment(align);
         last_data_size_ = align64_;
 
-        if (!fake_mode)
+        if (!fake_mode_)
         {
 #if FASTCDR_HAVE_FLOAT128 && FASTCDR_SIZEOF_LONG_DOUBLE < 16
             if (swap_bytes_)

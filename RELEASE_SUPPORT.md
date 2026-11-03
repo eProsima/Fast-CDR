@@ -10,6 +10,7 @@ Please, refer to the [master branch](https://github.com/eProsima/Fast-CDR/blob/m
 
 |Fast DDS Version|Fast CDR Version|Fast CDR Version branch|Fast CDR Latest Release|
 |----------------|----------------|-----------------------|-----------------------|
+|3.8 (pro)|2.5|[2.5.x](https://github.com/eProsima/Fast-CDR/tree/2.5.x)||
 |3.7 (pro)|2.4|[2.4.x](https://github.com/eProsima/Fast-CDR/tree/2.4.x)|[v2.4.0](https://github.com/eProsima/Fast-CDR/releases/tag/v2.4.0)|
 |3.2, 3.6|2.3|[2.3.x](https://github.com/eProsima/Fast-CDR/tree/2.3.x)|[v2.3.6](https://github.com/eProsima/Fast-CDR/releases/tag/v2.3.6)|
 |2.14|2.2|[2.2.x](https://github.com/eProsima/Fast-CDR/tree/2.2.x)|[v2.2.6](https://github.com/eProsima/Fast-CDR/releases/tag/v2.2.6)|

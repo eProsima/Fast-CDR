@@ -119,9 +119,6 @@ add_subdirectory(src/cpp)
 enable_testing()
 include(CTest)
 
-# Needs GCC on Linux, Python 3 and network access: it fetches the gold standard files of the FACE CTS
-option(FASTCDR_FACE_TEST "Check Fast CDR against the FACE C++11 General Purpose capability set" OFF)
-
 if (BUILD_TESTING)
     if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.22)
         add_subdirectory(test)

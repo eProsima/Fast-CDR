@@ -57,7 +57,7 @@ jobs:
       os-version: ${{ inputs.os-version || 'ubuntu-22.04' }}
       label: ${{ format('ubuntu-ci-{0}', inputs.fastcdr-branch || github.ref) }}
       colcon-args: ${{ inputs.colcon-args }}
-      cmake-args: ${{ inputs.cmake-args }}
+      cmake-args: -DFASTCDR_FACE_TEST=ON ${{ inputs.cmake-args }}
       ctest-args: ${{ inputs.ctest-args }}
       fastcdr-branch: ${{ inputs.fastcdr-branch || github.ref }}
       run-build: ${{ !(github.event_name == 'pull_request') ||

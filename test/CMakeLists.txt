@@ -25,6 +25,9 @@ include(${PROJECT_SOURCE_DIR}/cmake/testing/GoogleTest.cmake)
 
 add_subdirectory(cdr)
 add_subdirectory(xcdr)
+if(FASTCDR_FACE_TEST)
+    add_subdirectory(face)
+endif()
 
 ###############################################################################
 # CMake modules tests

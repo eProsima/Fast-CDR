@@ -64,7 +64,7 @@ inline void do_not_optimize(
 
 #elif (__GNUC__ >= 5)
 template<class Tp>
-inline typename std::enable_if<std::is_trivially_copyable<Tp>::value&&
+inline typename std::enable_if<std::is_trivially_copyable<Tp>::value &&
         (sizeof(Tp) <= sizeof(Tp*))>::type
 do_not_optimize(
         Tp& value)
@@ -82,7 +82,7 @@ do_not_optimize(
 }
 
 template<class Tp>
-inline typename std::enable_if<std::is_trivially_copyable<Tp>::value&&
+inline typename std::enable_if<std::is_trivially_copyable<Tp>::value &&
         (sizeof(Tp) <= sizeof(Tp*))>::type
 do_not_optimize(
         Tp&& value)

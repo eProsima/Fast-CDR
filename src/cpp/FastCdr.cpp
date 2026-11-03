@@ -387,10 +387,14 @@ FastCdr& FastCdr::deserialize(
     }
     else if ((last_position_ - current_position_) >= length)
     {
+        if ((&current_position_)[length - 1] != '\0')
+        {
+            set_state(state_before_error);
+            throw BadParamException("The deserialized string is not null-terminated");
+        }
+
         // Allocate memory.
-        string_t =
-                reinterpret_cast<char*>(calloc(length + ((&current_position_)[length - 1] == '\0' ? 0 : 1),
-                sizeof(char)));
+        string_t = reinterpret_cast<char*>(calloc(length, sizeof(char)));
         memcpy(string_t, &current_position_, length);
         current_position_ += length;
         return *this;
@@ -453,11 +457,14 @@ const char* FastCdr::read_string(
     else if ((last_position_ - current_position_) >= length)
     {
         ret_value = &current_position_;
-        current_position_ += length;
-        if (ret_value[length - 1] == '\0')
+        if (ret_value[length - 1] != '\0')
         {
-            --length;
+            set_state(state_before_error);
+            throw BadParamException("The deserialized string is not null-terminated");
         }
+
+        current_position_ += length;
+        --length;
         return ret_value;
     }
 

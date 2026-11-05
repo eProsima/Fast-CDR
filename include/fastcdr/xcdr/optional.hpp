@@ -15,6 +15,7 @@
 #ifndef _FASTCDR_XCDR_OPTIONAL_HPP_
 #define _FASTCDR_XCDR_OPTIONAL_HPP_
 
+#include <memory>
 #include <new>
 #include <utility>
 

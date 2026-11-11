@@ -3654,99 +3654,80 @@ public:
      * @brief Decodes an optional member of a type according to the encoding algorithm used, applying the
      * try-construct policy to its value.
      * @param[out] member_value A reference of the variable where the optional member value will be stored.
-     * @param[in] consistency_flag Try-construct policy forwarded to the decoding of the optional's value.
-     * @param[in] args Extra arguments (e.g. maximum length) forwarded to the decoding of the optional's value.
+     * @param[in] consistency_flag Try-construct policy applied when the value does not fit.
      * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::BadParamException This exception is thrown when the policy applied to the value is
+     * @exception exception::BadParamException This exception is thrown when @p consistency_flag is
      * @ref CdrTryConstructFlag::FAIL and the value does not fit.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
      * position that exceeds the internal memory size.
      */
-    template<class _T, class ... _Args>
+    template<class _T>
     Cdr& deserialize_member(
             optional<_T>& member_value,
-            CdrTryConstructFlag consistency_flag,
-            _Args&&... args)
+            CdrTryConstructFlag consistency_flag)
     {
-        if (EncodingAlgorithmFlag::PLAIN_CDR == current_encoding_)
-        {
-            Cdr::state current_state(*this);
-            MemberId member_id;
-            xcdr1_deserialize_member_header(member_id, current_state);
-            auto prev_offset = offset_;
-            member_value.reset(0 < current_state.member_size_);
-            if (0 < current_state.member_size_)
-            {
-                deserialize(member_value, consistency_flag, std::forward<_Args>(args)...);
-            }
-            size_t member_size {current_state.member_size_};
-            size_t diff {offset_ - prev_offset};
-            if (member_size < diff)
-            {
-                throw exception::BadParamException(
-                          "Member size provided by member header is lower than real decoded member size");
-            }
-
-            // Skip unused bytes
-            offset_ += (member_size - diff);
-        }
-        else
-        {
-            deserialize(member_value, consistency_flag, std::forward<_Args>(args)...);
-        }
-        return *this;
+        return deserialize_member_try_construct(member_value, consistency_flag);
     }
 
     /*!
-     * @brief Decodes an optional member of an external according to the encoding algorithm used, applying the
+     * @brief Decodes an optional member of a type according to the encoding algorithm used, applying the
      * try-construct policy to its value.
      * @param[out] member_value A reference of the variable where the optional member value will be stored.
-     * @param[in] consistency_flag Try-construct policy forwarded to the decoding of the optional's value.
-     * @param[in] args Extra arguments (e.g. maximum length) forwarded to the decoding of the optional's value.
+     * @param[in] consistency_flag Try-construct policy applied when the value does not fit.
+     * @param[in] max_length Maximum number of characters or elements of the value.
      * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::BadParamException This exception is thrown when the external is locked or when the
-     * policy applied to the value is @ref CdrTryConstructFlag::FAIL and the value does not fit.
+     * @exception exception::BadParamException This exception is thrown when @p consistency_flag is
+     * @ref CdrTryConstructFlag::FAIL and the value does not fit.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
      * position that exceeds the internal memory size.
      */
-    template<class _T, class ... _Args>
+    template<class _T>
+    Cdr& deserialize_member(
+            optional<_T>& member_value,
+            CdrTryConstructFlag consistency_flag,
+            uint32_t max_length)
+    {
+        return deserialize_member_try_construct(member_value, consistency_flag, max_length);
+    }
+
+    /*!
+     * @brief Decodes an optional member of an external according to the encoding algorithm used, applying
+     * the try-construct policy to its value.
+     * @param[out] member_value A reference of the variable where the optional member value will be stored.
+     * @param[in] consistency_flag Try-construct policy applied when the value does not fit.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::BadParamException This exception is thrown when the external is locked or when
+     * @p consistency_flag is @ref CdrTryConstructFlag::FAIL and the value does not fit.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
+     * position that exceeds the internal memory size.
+     */
+    template<class _T>
+    Cdr& deserialize_member(
+            optional<external<_T>>& member_value,
+            CdrTryConstructFlag consistency_flag)
+    {
+        return deserialize_member_try_construct(member_value, consistency_flag);
+    }
+
+    /*!
+     * @brief Decodes an optional member of an external according to the encoding algorithm used, applying
+     * the try-construct policy to its value.
+     * @param[out] member_value A reference of the variable where the optional member value will be stored.
+     * @param[in] consistency_flag Try-construct policy applied when the value does not fit.
+     * @param[in] max_length Maximum number of characters or elements of the value.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::BadParamException This exception is thrown when the external is locked or when
+     * @p consistency_flag is @ref CdrTryConstructFlag::FAIL and the value does not fit.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
+     * position that exceeds the internal memory size.
+     */
+    template<class _T>
     Cdr& deserialize_member(
             optional<external<_T>>& member_value,
             CdrTryConstructFlag consistency_flag,
-            _Args&&... args)
+            uint32_t max_length)
     {
-        if (member_value.has_value() && member_value.value().is_locked())
-        {
-            throw exception::BadParamException("External member is locked");
-        }
-
-        if (EncodingAlgorithmFlag::PLAIN_CDR == current_encoding_)
-        {
-            Cdr::state current_state(*this);
-            MemberId member_id;
-            xcdr1_deserialize_member_header(member_id, current_state);
-            auto prev_offset = offset_;
-            member_value.reset(0 < current_state.member_size_);
-            if (0 < current_state.member_size_)
-            {
-                deserialize(member_value, consistency_flag, std::forward<_Args>(args)...);
-            }
-            size_t member_size {current_state.member_size_};
-            size_t diff {offset_ - prev_offset};
-            if (member_size < diff)
-            {
-                throw exception::BadParamException(
-                          "Member size provided by member header is lower than real decoded member size");
-            }
-
-            // Skip unused bytes
-            offset_ += (member_size - diff);
-        }
-        else
-        {
-            deserialize(member_value, consistency_flag, std::forward<_Args>(args)...);
-        }
-        return *this;
+        return deserialize_member_try_construct(member_value, consistency_flag, max_length);
     }
 
     /*!
@@ -3920,16 +3901,228 @@ public:
     /*!
      * @brief Decodes an optional from the buffer, applying the try-construct policy to its value.
      * @param[out] value A reference to the variable where the optional will be stored.
-     * @param[in] consistency_flag Try-construct policy forwarded to the decoding of the optional's value.
-     * @param[in] args Extra arguments (e.g. maximum length) forwarded to the decoding of the optional's value.
+     * @param[in] consistency_flag Try-construct policy applied when the value does not fit.
      * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::BadParamException This exception is thrown when the policy applied to the value is
+     * @exception exception::BadParamException This exception is thrown when @p consistency_flag is
      * @ref CdrTryConstructFlag::FAIL and the value does not fit.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
      * position that exceeds the internal memory size.
      */
-    template<class _T, class ... _Args>
+    template<class _T>
     Cdr& deserialize(
+            optional<_T>& value,
+            CdrTryConstructFlag consistency_flag)
+    {
+        return deserialize_try_construct(value, consistency_flag);
+    }
+
+    /*!
+     * @brief Decodes an optional from the buffer, applying the try-construct policy to its value.
+     * @param[out] value A reference to the variable where the optional will be stored.
+     * @param[in] consistency_flag Try-construct policy applied when the value does not fit.
+     * @param[in] max_length Maximum number of characters or elements of the value.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::BadParamException This exception is thrown when @p consistency_flag is
+     * @ref CdrTryConstructFlag::FAIL and the value does not fit.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
+     * position that exceeds the internal memory size.
+     */
+    template<class _T>
+    Cdr& deserialize(
+            optional<_T>& value,
+            CdrTryConstructFlag consistency_flag,
+            uint32_t max_length)
+    {
+        return deserialize_try_construct(value, consistency_flag, max_length);
+    }
+
+    /*!
+     * @brief Decodes an external from the buffer, applying the try-construct policy to its value.
+     * @param[out] value A reference to the variable where the external will be stored.
+     * @param[in] consistency_flag Try-construct policy applied when the value does not fit.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::BadParamException This exception is thrown when the external is locked or when
+     * @p consistency_flag is @ref CdrTryConstructFlag::FAIL and the value does not fit.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
+     * position that exceeds the internal memory size.
+     */
+    template<class _T>
+    Cdr& deserialize(
+            external<_T>& value,
+            CdrTryConstructFlag consistency_flag)
+    {
+        return deserialize_try_construct(value, consistency_flag);
+    }
+
+    /*!
+     * @brief Decodes an external from the buffer, applying the try-construct policy to its value.
+     * @param[out] value A reference to the variable where the external will be stored.
+     * @param[in] consistency_flag Try-construct policy applied when the value does not fit.
+     * @param[in] max_length Maximum number of characters or elements of the value.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::BadParamException This exception is thrown when the external is locked or when
+     * @p consistency_flag is @ref CdrTryConstructFlag::FAIL and the value does not fit.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
+     * position that exceeds the internal memory size.
+     */
+    template<class _T>
+    Cdr& deserialize(
+            external<_T>& value,
+            CdrTryConstructFlag consistency_flag,
+            uint32_t max_length)
+    {
+        return deserialize_try_construct(value, consistency_flag, max_length);
+    }
+
+    /*!
+     * @brief Decodes an optional of an external from the buffer, applying the try-construct policy to its
+     * value.
+     * @param[out] value A reference to the variable where the optional will be stored.
+     * @param[in] consistency_flag Try-construct policy applied when the value does not fit.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::BadParamException This exception is thrown when the external is locked or when
+     * @p consistency_flag is @ref CdrTryConstructFlag::FAIL and the value does not fit.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
+     * position that exceeds the internal memory size.
+     */
+    template<class _T>
+    Cdr& deserialize(
+            optional<external<_T>>& value,
+            CdrTryConstructFlag consistency_flag)
+    {
+        return deserialize_try_construct(value, consistency_flag);
+    }
+
+    /*!
+     * @brief Decodes an optional of an external from the buffer, applying the try-construct policy to its
+     * value.
+     * @param[out] value A reference to the variable where the optional will be stored.
+     * @param[in] consistency_flag Try-construct policy applied when the value does not fit.
+     * @param[in] max_length Maximum number of characters or elements of the value.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::BadParamException This exception is thrown when the external is locked or when
+     * @p consistency_flag is @ref CdrTryConstructFlag::FAIL and the value does not fit.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
+     * position that exceeds the internal memory size.
+     */
+    template<class _T>
+    Cdr& deserialize(
+            optional<external<_T>>& value,
+            CdrTryConstructFlag consistency_flag,
+            uint32_t max_length)
+    {
+        return deserialize_try_construct(value, consistency_flag, max_length);
+    }
+
+    /*!
+     * @brief Encodes an empty DHEADER if the encoding version is XCDRv2.
+     * After serializing the members's type, @ref set_xcdrv2_dheader must be called to set the correct DHEADER value
+     * using the @ref state returned by this function.
+     */
+    Cdr_DllAPI state allocate_xcdrv2_dheader();
+
+    /*!
+     * @brief Uses the @ref state to calculate the member's type size and serialize the value in the previous allocated
+     * DHEADER.
+     *
+     * @param[in] state @ref state used to calculate the member's type size.
+     */
+    Cdr_DllAPI void set_xcdrv2_dheader(
+            const state& state);
+
+private:
+
+    /*!
+     * @brief Decodes an optional member of a type according to the encoding algorithm used, applying the
+     * try-construct policy to its value.
+     * Implementation shared by the public overloads taking a @ref CdrTryConstructFlag .
+     */
+    template<class _T, class ... _Args>
+    Cdr& deserialize_member_try_construct(
+            optional<_T>& member_value,
+            CdrTryConstructFlag consistency_flag,
+            _Args&&... args)
+    {
+        if (EncodingAlgorithmFlag::PLAIN_CDR == current_encoding_)
+        {
+            Cdr::state current_state(*this);
+            MemberId member_id;
+            xcdr1_deserialize_member_header(member_id, current_state);
+            auto prev_offset = offset_;
+            member_value.reset(0 < current_state.member_size_);
+            if (0 < current_state.member_size_)
+            {
+                deserialize(member_value, consistency_flag, std::forward<_Args>(args)...);
+            }
+            size_t member_size {current_state.member_size_};
+            size_t diff {offset_ - prev_offset};
+            if (member_size < diff)
+            {
+                throw exception::BadParamException(
+                          "Member size provided by member header is lower than real decoded member size");
+            }
+
+            // Skip unused bytes
+            offset_ += (member_size - diff);
+        }
+        else
+        {
+            deserialize(member_value, consistency_flag, std::forward<_Args>(args)...);
+        }
+        return *this;
+    }
+
+    /*!
+     * @brief Decodes an optional member of an external according to the encoding algorithm used, applying the
+     * try-construct policy to its value.
+     * Implementation shared by the public overloads taking a @ref CdrTryConstructFlag .
+     */
+    template<class _T, class ... _Args>
+    Cdr& deserialize_member_try_construct(
+            optional<external<_T>>& member_value,
+            CdrTryConstructFlag consistency_flag,
+            _Args&&... args)
+    {
+        if (member_value.has_value() && member_value.value().is_locked())
+        {
+            throw exception::BadParamException("External member is locked");
+        }
+
+        if (EncodingAlgorithmFlag::PLAIN_CDR == current_encoding_)
+        {
+            Cdr::state current_state(*this);
+            MemberId member_id;
+            xcdr1_deserialize_member_header(member_id, current_state);
+            auto prev_offset = offset_;
+            member_value.reset(0 < current_state.member_size_);
+            if (0 < current_state.member_size_)
+            {
+                deserialize(member_value, consistency_flag, std::forward<_Args>(args)...);
+            }
+            size_t member_size {current_state.member_size_};
+            size_t diff {offset_ - prev_offset};
+            if (member_size < diff)
+            {
+                throw exception::BadParamException(
+                          "Member size provided by member header is lower than real decoded member size");
+            }
+
+            // Skip unused bytes
+            offset_ += (member_size - diff);
+        }
+        else
+        {
+            deserialize(member_value, consistency_flag, std::forward<_Args>(args)...);
+        }
+        return *this;
+    }
+
+    /*!
+     * @brief Decodes an optional from the buffer, applying the try-construct policy to its value.
+     * Implementation shared by the public overloads taking a @ref CdrTryConstructFlag .
+     */
+    template<class _T, class ... _Args>
+    Cdr& deserialize_try_construct(
             optional<_T>& value,
             CdrTryConstructFlag consistency_flag,
             _Args&&... args)
@@ -3949,17 +4142,10 @@ public:
 
     /*!
      * @brief Decodes an external from the buffer, applying the try-construct policy to its value.
-     * @param[out] value A reference to the variable where the external will be stored.
-     * @param[in] consistency_flag Try-construct policy forwarded to the decoding of the external's value.
-     * @param[in] args Extra arguments (e.g. maximum length) forwarded to the decoding of the external's value.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::BadParamException This exception is thrown when the external is locked or when the
-     * policy applied to the value is @ref CdrTryConstructFlag::FAIL and the value does not fit.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
-     * position that exceeds the internal memory size.
+     * Implementation shared by the public overloads taking a @ref CdrTryConstructFlag .
      */
     template<class _T, class ... _Args>
-    Cdr& deserialize(
+    Cdr& deserialize_try_construct(
             external<_T>& value,
             CdrTryConstructFlag consistency_flag,
             _Args&&... args)
@@ -3980,17 +4166,10 @@ public:
 
     /*!
      * @brief Decodes an optional of an external from the buffer, applying the try-construct policy to its value.
-     * @param[out] value A reference to the variable where the optional will be stored.
-     * @param[in] consistency_flag Try-construct policy forwarded to the decoding of the external's value.
-     * @param[in] args Extra arguments (e.g. maximum length) forwarded to the decoding of the external's value.
-     * @return Reference to the eprosima::fastcdr::Cdr object.
-     * @exception exception::BadParamException This exception is thrown when the external is locked or when the
-     * policy applied to the value is @ref CdrTryConstructFlag::FAIL and the value does not fit.
-     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
-     * position that exceeds the internal memory size.
+     * Implementation shared by the public overloads taking a @ref CdrTryConstructFlag .
      */
     template<class _T, class ... _Args>
-    Cdr& deserialize(
+    Cdr& deserialize_try_construct(
             optional<external<_T>>& value,
             CdrTryConstructFlag consistency_flag,
             _Args&&... args)
@@ -4012,24 +4191,6 @@ public:
         }
         return *this;
     }
-
-    /*!
-     * @brief Encodes an empty DHEADER if the encoding version is XCDRv2.
-     * After serializing the members's type, @ref set_xcdrv2_dheader must be called to set the correct DHEADER value
-     * using the @ref state returned by this function.
-     */
-    Cdr_DllAPI state allocate_xcdrv2_dheader();
-
-    /*!
-     * @brief Uses the @ref state to calculate the member's type size and serialize the value in the previous allocated
-     * DHEADER.
-     *
-     * @param[in] state @ref state used to calculate the member's type size.
-     */
-    Cdr_DllAPI void set_xcdrv2_dheader(
-            const state& state);
-
-private:
 
     Cdr(
             const Cdr&) = delete;

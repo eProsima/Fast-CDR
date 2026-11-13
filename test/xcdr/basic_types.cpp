@@ -48,7 +48,7 @@ enum Enum8 : uint8_t
     ENUM8_VAL_2 = 1
 };
 
-class XCdrBasicTypesTest : public ::testing::TestWithParam< std::tuple<EncodingAlgorithmFlag, Cdr::Endianness>>
+class XCdrBasicTypesTest : public ::testing::TestWithParam<std::tuple<EncodingAlgorithmFlag, Cdr::Endianness>>
 {
 };
 

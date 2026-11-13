@@ -13,13 +13,16 @@
 // limitations under the License.
 
 #include <cstring>
-#include <cwchar>
 #include <limits>
 #include <memory>
 
 #include <fastcdr/Cdr.h>
 #include <fastcdr/CdrContext.hpp>
 #include "helpers/memory_helpers.hpp"
+
+#if !FASTCDR_DISABLE_WSTRINGS
+#include <cwchar>
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 namespace eprosima {
 namespace fastcdr {
@@ -627,11 +630,14 @@ Cdr& Cdr::serialize(
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 Cdr& Cdr::serialize(
         const wchar_t wchar)
 {
     return serialize(static_cast<std::uint16_t>(wchar));
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 Cdr& Cdr::serialize(
         const std::uint64_t ulonglong_t)
@@ -894,6 +900,7 @@ Cdr& Cdr::serialize(
     return *this;
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 Cdr& Cdr::serialize(
         const wchar_t* string_t)
 {
@@ -928,6 +935,8 @@ Cdr& Cdr::serialize(
 
     return *this;
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 Cdr& Cdr::serialize_array(
         const bool* bool_t,
@@ -1056,6 +1065,7 @@ Cdr& Cdr::serialize_array(
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 Cdr& Cdr::serialize_array(
         const wchar_t* wchar,
         std::size_t num_elements)
@@ -1071,6 +1081,8 @@ Cdr& Cdr::serialize_array(
     }
     return *this;
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 Cdr& Cdr::serialize_array(
         const std::int64_t* longlong_t,
@@ -1725,6 +1737,7 @@ Cdr& Cdr::deserialize(
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 Cdr& Cdr::deserialize(
         wchar_t*& string_t)
 {
@@ -1761,6 +1774,8 @@ Cdr& Cdr::deserialize(
     set_state(state_before_error);
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 Cdr& Cdr::deserialize(
         char*& string_t,
@@ -1828,6 +1843,7 @@ Cdr& Cdr::deserialize(
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 Cdr& Cdr::deserialize(
         wchar_t*& string_t,
         CdrTryConstructFlag consistency_flag,
@@ -1891,6 +1907,8 @@ Cdr& Cdr::deserialize(
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
+#endif // if !FASTCDR_DISABLE_WSTRINGS
+
 const char* Cdr::read_string(
         std::uint32_t& length)
 {
@@ -1898,12 +1916,15 @@ const char* Cdr::read_string(
     return read_string(length, CdrTryConstructFlag::FAIL);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 const std::wstring Cdr::read_wstring(
         std::uint32_t& length)
 {
     length = (std::numeric_limits<std::uint32_t>::max)();
     return read_wstring(length, CdrTryConstructFlag::FAIL);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 const char* Cdr::read_string(
         std::uint32_t& length,
@@ -1972,6 +1993,7 @@ const char* Cdr::read_string(
               exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 const std::wstring Cdr::read_wstring(
         std::uint32_t& length,
         CdrTryConstructFlag consistency_flag)
@@ -2040,6 +2062,8 @@ const std::wstring Cdr::read_wstring(
     throw exception::NotEnoughMemoryException(
               exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 Cdr& Cdr::deserialize_array(
         bool* bool_t,
@@ -2202,6 +2226,7 @@ Cdr& Cdr::deserialize_array(
     throw NotEnoughMemoryException(NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 Cdr& Cdr::deserialize_array(
         wchar_t* wchar,
         std::size_t num_elements)
@@ -2219,6 +2244,8 @@ Cdr& Cdr::deserialize_array(
     }
     return *this;
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 Cdr& Cdr::deserialize_array(
         std::int64_t* longlong_t,
@@ -2777,6 +2804,7 @@ Cdr& Cdr::deserialize_string_sequence(
     return *this;
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 Cdr& Cdr::deserialize_wstring_sequence(
         std::wstring*& sequence_t,
         std::size_t& num_elements)
@@ -2838,6 +2866,8 @@ Cdr& Cdr::deserialize_wstring_sequence(
     num_elements = sequence_length;
     return *this;
 }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// XCDR extensions

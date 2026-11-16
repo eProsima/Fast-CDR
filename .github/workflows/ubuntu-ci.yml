@@ -60,7 +60,16 @@ jobs:
       cmake-args: ${{ inputs.cmake-args }}
       ctest-args: ${{ inputs.ctest-args }}
       fastcdr-branch: ${{ inputs.fastcdr-branch || github.ref }}
-      run-build: ${{ !(github.event_name == 'pull_request') || !contains(github.event.pull_request.labels.*.name, 'skip-ci') }}
-      run-tests: ${{ (inputs.run-tests == true) || ((github.event_name == 'pull_request') && (!contains(github.event.pull_request.labels.*.name, 'no-test'))) }}
+      run-build: ${{ !(github.event_name == 'pull_request') ||
+                     !contains(github.event.pull_request.labels.*.name, 'skip-ci') }}
+      run-tests: ${{ (inputs.run-tests == true) ||
+                     (
+                       (github.event_name == 'pull_request') &&
+                       (!contains(github.event.pull_request.labels.*.name, 'no-test')) &&
+                       (!contains(github.event.pull_request.labels.*.name, 'skip-ci'))
+                     ) }}
       use-ccache: ${{ inputs.use-ccache || false }}
-      add-label: ${{ (github.event_name == 'pull_request') && (github.event.pull_request.head.repo.full_name == github.repository) && true || false }}
+      add-label: ${{ (github.event_name == 'pull_request') &&
+                     (github.event.pull_request.head.repo.full_name == github.repository) &&
+                     (!contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
+                     true || false }}

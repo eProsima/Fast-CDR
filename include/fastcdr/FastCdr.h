@@ -2041,6 +2041,16 @@ private:
     FastCdr& deserialize_bool_sequence(
             std::vector<bool>& vector_t);
 
+    /*!
+     * @brief Serializes the canonical @c uint8_t representation of @p bool_t.
+     *
+     * When @c FASTCDR_STRICT_BOOL is defined the serialized value is guaranteed to be exactly @c 0 or @c 1.
+     *
+     * @param[in] bool_t The boolean value to serialize.
+     */
+    void serialize_bool(
+            bool bool_t);
+
     FastCdr& deserialize_string_sequence(
             std::string*& sequence_t,
             size_t& num_elements);

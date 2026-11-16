@@ -17,6 +17,7 @@
 #include <array>
 #include <memory>
 #include <tuple>
+#include <utility>
 #include <vector>
 
 #include <fastcdr/Cdr.h>
@@ -36,7 +37,7 @@ class XCdrv1Test : public ::testing::TestWithParam<std::tuple<EncodingAlgorithmF
 {
 };
 
-class XCdrv1PLTest : public ::testing::TestWithParam< Cdr::XCdrHeaderSelection>
+class XCdrv1PLTest : public ::testing::TestWithParam<Cdr::XCdrHeaderSelection>
 {
 };
 
@@ -513,4 +514,230 @@ TEST(XCdrTest, optional_string_with_extra_alignment)
     ASSERT_TRUE(dvalue.has_value());
     ASSERT_STREQ("AB", dvalue.value());
     ASSERT_EQ(0x30, short_dvalue);
+}
+
+/*!
+ * @test Regression test for a member of a mutable structure with extra alignment bytes included in its member size.
+ * Both ShortMemberHeader and LongMemberHeader are tested.
+ * @code{.idl}
+ * @mutable
+ * struct MutableStringWithExtraAlignment
+ * {
+ *     string<100> str;
+ *     unsigned short value;
+ * };
+ * @endcode
+ */
+TEST(XCdrTest, mutable_string_with_extra_alignment)
+{
+    std::vector<std::pair<Cdr::Endianness, std::vector<char>>> test_buffers {
+        {
+            Cdr::Endianness::BIG_ENDIANNESS,
+            {
+                0x00, 0x02, 0x00, 0x00, // Encapsulation
+                0x00, 0x00, 0x00, 0x08, // ShortMemberHeader
+                0x00, 0x00, 0x00, 0x03, // String length
+                0x41, 0x42, 0x00,       // String
+                0x00,                   // Extra alignment byte
+                0x00, 0x01, 0x00, 0x02, // ShortMemberHeader
+                0x00, 0x30,             // Short
+                0x00, 0x00,             // Alignment
+                0x3F, 0x02, 0x00, 0x00  // Sentinel
+            }
+        },
+        {
+            Cdr::Endianness::LITTLE_ENDIANNESS,
+            {
+                0x00, 0x03, 0x00, 0x00, // Encapsulation
+                0x00, 0x00, 0x08, 0x00, // ShortMemberHeader
+                0x03, 0x00, 0x00, 0x00, // String length
+                0x41, 0x42, 0x00,       // String
+                0x00,                   // Extra alignment byte
+                0x01, 0x00, 0x02, 0x00, // ShortMemberHeader
+                0x30, 0x00,             // Short
+                0x00, 0x00,             // Alignment
+                0x02, 0x3F, 0x00, 0x00  // Sentinel
+            }
+        },
+        {
+            Cdr::Endianness::BIG_ENDIANNESS,
+            {
+                0x00, 0x02, 0x00, 0x00, // Encapsulation
+                0x3F, 0x01, 0x00, 0x08, // LongMemberHeader
+                0x00, 0x00, 0x00, 0x00, // Member ID and flags
+                0x00, 0x00, 0x00, 0x08, // Size
+                0x00, 0x00, 0x00, 0x03, // String length
+                0x41, 0x42, 0x00,       // String
+                0x00,                   // Extra alignment byte
+                0x00, 0x01, 0x00, 0x02, // ShortMemberHeader
+                0x00, 0x30,             // Short
+                0x00, 0x00,             // Alignment
+                0x3F, 0x02, 0x00, 0x00  // Sentinel
+            }
+        },
+        {
+            Cdr::Endianness::LITTLE_ENDIANNESS,
+            {
+                0x00, 0x03, 0x00, 0x00, // Encapsulation
+                0x01, 0x3F, 0x08, 0x00, // LongMemberHeader
+                0x00, 0x00, 0x00, 0x00, // Member ID and flags
+                0x08, 0x00, 0x00, 0x00, // Size
+                0x03, 0x00, 0x00, 0x00, // String length
+                0x41, 0x42, 0x00,       // String
+                0x00,                   // Extra alignment byte
+                0x01, 0x00, 0x02, 0x00, // ShortMemberHeader
+                0x30, 0x00,             // Short
+                0x00, 0x00,             // Alignment
+                0x02, 0x3F, 0x00, 0x00  // Sentinel
+            }
+        }
+    };
+
+    for (auto& test_case : test_buffers)
+    {
+        EncodingAlgorithmFlag encoding = EncodingAlgorithmFlag::PL_CDR;
+        Cdr::Endianness endianness = test_case.first;
+        std::vector<char>& test_buffer = test_case.second;
+        FastBuffer fast_buffer(test_buffer.data(), test_buffer.size());
+        Cdr cdr(fast_buffer, endianness, CdrVersion::XCDRv1);
+        cdr.read_encapsulation();
+        ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+        ASSERT_EQ(cdr.endianness(), endianness);
+
+        fixed_string<100> dvalue;
+        uint16_t short_dvalue {0};
+        cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId& mid)->bool
+                {
+                    bool ret_value = true;
+
+                    switch (mid.id)
+                    {
+                        case 0:
+                            cdr_inner >> dvalue;
+                            break;
+                        case 1:
+                            cdr_inner >> short_dvalue;
+                            break;
+                        default:
+                            ret_value = false;
+                    }
+
+                    return ret_value;
+                });
+        ASSERT_STREQ("AB", dvalue);
+        ASSERT_EQ(0x30, short_dvalue);
+        ASSERT_EQ(test_buffer.size(), cdr.get_serialized_data_length());
+    }
+}
+
+/*!
+ * @test Test an exception is thrown when the member size provided by the member header of a mutable structure is lower
+ * than the real decoded member size.
+ * Both ShortMemberHeader and LongMemberHeader are tested.
+ * @code{.idl}
+ * @mutable
+ * struct MutableStringWithWrongMemberSize
+ * {
+ *     string<100> str;
+ *     unsigned short value;
+ * };
+ * @endcode
+ */
+TEST(XCdrTest, mutable_string_with_lower_member_size)
+{
+    std::vector<std::pair<Cdr::Endianness, std::vector<char>>> fail_case_buffers {
+        {
+            Cdr::Endianness::BIG_ENDIANNESS,
+            {
+                0x00, 0x02, 0x00, 0x00, // Encapsulation
+                0x00, 0x00, 0x00, 0x04, // ShortMemberHeader
+                0x00, 0x00, 0x00, 0x03, // String length
+                0x41, 0x42, 0x00,       // String
+                0x00,                   // Alignment
+                0x00, 0x01, 0x00, 0x02, // ShortMemberHeader
+                0x00, 0x30,             // Short
+                0x00, 0x00,             // Alignment
+                0x3F, 0x02, 0x00, 0x00  // Sentinel
+            }
+        },
+        {
+            Cdr::Endianness::LITTLE_ENDIANNESS,
+            {
+                0x00, 0x03, 0x00, 0x00, // Encapsulation
+                0x00, 0x00, 0x04, 0x00, // ShortMemberHeader
+                0x03, 0x00, 0x00, 0x00, // String length
+                0x41, 0x42, 0x00,       // String
+                0x00,                   // Alignment
+                0x01, 0x00, 0x02, 0x00, // ShortMemberHeader
+                0x30, 0x00,             // Short
+                0x00, 0x00,             // Alignment
+                0x02, 0x3F, 0x00, 0x00  // Sentinel
+            }
+        },
+        {
+            Cdr::Endianness::BIG_ENDIANNESS,
+            {
+                0x00, 0x02, 0x00, 0x00, // Encapsulation
+                0x3F, 0x01, 0x00, 0x08, // LongMemberHeader
+                0x00, 0x00, 0x00, 0x00, // Member ID and flags
+                0x00, 0x00, 0x00, 0x04, // Size
+                0x00, 0x00, 0x00, 0x03, // String length
+                0x41, 0x42, 0x00,       // String
+                0x00,                   // Alignment
+                0x00, 0x01, 0x00, 0x02, // ShortMemberHeader
+                0x00, 0x30,             // Short
+                0x00, 0x00,             // Alignment
+                0x3F, 0x02, 0x00, 0x00  // Sentinel
+            }
+        },
+        {
+            Cdr::Endianness::LITTLE_ENDIANNESS,
+            {
+                0x00, 0x03, 0x00, 0x00, // Encapsulation
+                0x01, 0x3F, 0x08, 0x00, // LongMemberHeader
+                0x00, 0x00, 0x00, 0x00, // Member ID and flags
+                0x04, 0x00, 0x00, 0x00, // Size
+                0x03, 0x00, 0x00, 0x00, // String length
+                0x41, 0x42, 0x00,       // String
+                0x00,                   // Alignment
+                0x01, 0x00, 0x02, 0x00, // ShortMemberHeader
+                0x30, 0x00,             // Short
+                0x00, 0x00,             // Alignment
+                0x02, 0x3F, 0x00, 0x00  // Sentinel
+            }
+        }
+    };
+
+    for (auto& test_case : fail_case_buffers)
+    {
+        EncodingAlgorithmFlag encoding = EncodingAlgorithmFlag::PL_CDR;
+        Cdr::Endianness endianness = test_case.first;
+        std::vector<char>& fail_case_buffer = test_case.second;
+        FastBuffer fast_buffer(fail_case_buffer.data(), fail_case_buffer.size());
+        Cdr cdr(fast_buffer, endianness, CdrVersion::XCDRv1);
+        cdr.read_encapsulation();
+        ASSERT_EQ(cdr.get_encoding_flag(), encoding);
+        ASSERT_EQ(cdr.endianness(), endianness);
+
+        fixed_string<100> dvalue;
+        uint16_t short_dvalue {0};
+        EXPECT_THROW(cdr.deserialize_type(encoding, [&](Cdr& cdr_inner, const MemberId& mid)->bool
+                {
+                    bool ret_value = true;
+
+                    switch (mid.id)
+                    {
+                        case 0:
+                            cdr_inner >> dvalue;
+                            break;
+                        case 1:
+                            cdr_inner >> short_dvalue;
+                            break;
+                        default:
+                            ret_value = false;
+                    }
+
+                    return ret_value;
+                }), exception::BadParamException);
+    }
 }

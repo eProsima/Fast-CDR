@@ -36,3 +36,14 @@ add_executable(UnitTests ${UNITTESTS_SOURCE})
 set_common_compile_options(UnitTests)
 target_link_libraries(UnitTests fastcdr GTest::gtest_main)
 gtest_discover_tests(UnitTests)
+
+###############################################################################
+# Bool strict serialization tests
+###############################################################################
+if(STRICT_BOOL)
+    add_executable(BoolStrictTests BoolStrictTest.cpp)
+    set_common_compile_options(BoolStrictTests)
+    target_compile_definitions(BoolStrictTests PRIVATE FASTCDR_STRICT_BOOL)
+    target_link_libraries(BoolStrictTests fastcdr GTest::gtest_main)
+    gtest_discover_tests(BoolStrictTests)
+endif()

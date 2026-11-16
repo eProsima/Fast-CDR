@@ -32,6 +32,7 @@ set(${PROJECT_NAME}_source_files
     exceptions/Exception.cpp
     exceptions/LockedExternalAccessException.cpp
     exceptions/NotEnoughMemoryException.cpp
+    helpers/memory_helpers.cpp
     FastCdr.rc
     )
 
@@ -57,6 +58,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
     ${PROJECT_NAME_UPPER}_SOURCE
+    $<$<BOOL:${STRICT_BOOL}>:${PROJECT_NAME_UPPER}_STRICT_BOOL>
     INTERFACE
     $<$<BOOL:${WIN32}>:${PROJECT_NAME_UPPER}_NO_LIB>
     PUBLIC

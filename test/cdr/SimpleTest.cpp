@@ -212,27 +212,64 @@ static void EXPECT_ARRAY_LONG_DOUBLE_EQ(
 
 template<typename T>
 static void check_bad_length_deserialization(
-        const T& const_value)
+        const T& const_value,
+        bool requires_dheader)
 {
-    char buffer[sizeof(uint32_t) + 1];
-
-    // Serialize wrong length (4GB)
+    // XCDRv1
     {
-        FastBuffer buf(buffer, sizeof(buffer));
-        Cdr cdr(buf);
-        uint32_t bad_length = 0xFFFFFFFF;
+        char buffer[sizeof(uint32_t) + 1];
 
-        EXPECT_NO_THROW(cdr << bad_length);
+        // Serialize wrong length (4GB)
+        {
+            FastBuffer buf(buffer, sizeof(buffer));
+            Cdr cdr(buf, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::CdrVersion::XCDRv1);
+            uint32_t bad_length = 0xFFFFFFFF;
+
+            EXPECT_NO_THROW(cdr << bad_length);
+        }
+
+        // Deserializing should throw
+        {
+            FastBuffer buf(buffer, sizeof(buffer));
+            Cdr cdr(buf, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::CdrVersion::XCDRv1);
+            T value;
+
+            EXPECT_THROW(cdr >> value, NotEnoughMemoryException);
+            EXPECT_NE(value, const_value);
+        }
     }
 
-    // Deserializing should throw
+    // XCDRv2
     {
-        FastBuffer buf(buffer, sizeof(buffer));
-        Cdr cdr(buf);
-        T value;
+        char buffer[sizeof(uint32_t) + sizeof(uint32_t) + 1];
 
-        EXPECT_THROW(cdr >> value, NotEnoughMemoryException);
-        EXPECT_NE(value, const_value);
+        // Serialize wrong length (4GB)
+        {
+            uint32_t bad_length = 0xFFFFFFFF;
+            FastBuffer buf(buffer, sizeof(buffer));
+            Cdr cdr(buf, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::CdrVersion::XCDRv2);
+
+            if (requires_dheader)
+            {
+                auto dheader = cdr.allocate_xcdrv2_dheader();
+                EXPECT_NO_THROW(cdr << bad_length);
+                EXPECT_NO_THROW(cdr.set_xcdrv2_dheader(dheader));
+            }
+            else
+            {
+                EXPECT_NO_THROW(cdr << bad_length);
+            }
+        }
+
+        // Deserializing should throw
+        {
+            FastBuffer buf(buffer, sizeof(buffer));
+            Cdr cdr(buf, eprosima::fastcdr::Cdr::DEFAULT_ENDIAN, eprosima::fastcdr::CdrVersion::XCDRv2);
+            T value;
+
+            EXPECT_THROW(cdr >> value, NotEnoughMemoryException);
+            EXPECT_NE(value, const_value);
+        }
     }
 }
 
@@ -619,14 +656,14 @@ TEST(CDRTests, String)
 {
     check_good_case(string_t);
     check_no_space(string_t, 1);
-    check_bad_length_deserialization(string_t);
+    check_bad_length_deserialization(string_t, false);
 }
 
 TEST(CDRTests, WString)
 {
     check_good_case(wstring_t);
     check_no_space(wstring_t, 1);
-    check_bad_length_deserialization(wstring_t);
+    check_bad_length_deserialization(wstring_t, true);
 }
 
 TEST(CDRTests, EmptyString)
@@ -837,112 +874,112 @@ TEST(CDRTests, STDVectorOctet)
 {
     check_good_case(octet_vector_t);
     check_no_space(octet_vector_t, 1);
-    check_bad_length_deserialization(octet_vector_t);
+    check_bad_length_deserialization(octet_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorChar)
 {
     check_good_case(char_vector_t);
     check_no_space(char_vector_t, 1);
-    check_bad_length_deserialization(char_vector_t);
+    check_bad_length_deserialization(char_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorWChar)
 {
     check_good_case(wchar_vector_t);
     check_no_space(wchar_vector_t, 1);
-    check_bad_length_deserialization(wchar_vector_t);
+    check_bad_length_deserialization(wchar_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorInt8)
 {
     check_good_case(int8_vector_t);
     check_no_space(int8_vector_t, 1);
-    check_bad_length_deserialization(int8_vector_t);
+    check_bad_length_deserialization(int8_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorUnsignedShort)
 {
     check_good_case(ushort_vector_t);
     check_no_space(ushort_vector_t, 1);
-    check_bad_length_deserialization(ushort_vector_t);
+    check_bad_length_deserialization(ushort_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorShort)
 {
     check_good_case(short_vector_t);
     check_no_space(short_vector_t, 1);
-    check_bad_length_deserialization(short_vector_t);
+    check_bad_length_deserialization(short_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorUnsignedLong)
 {
     check_good_case(ulong_vector_t);
     check_no_space(ulong_vector_t, 1);
-    check_bad_length_deserialization(ulong_vector_t);
+    check_bad_length_deserialization(ulong_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorLong)
 {
     check_good_case(long_vector_t);
     check_no_space(long_vector_t, 1);
-    check_bad_length_deserialization(long_vector_t);
+    check_bad_length_deserialization(long_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorUnsignedLongLong)
 {
     check_good_case(ulonglong_vector_t);
     check_no_space(ulonglong_vector_t, 1);
-    check_bad_length_deserialization(ulonglong_vector_t);
+    check_bad_length_deserialization(ulonglong_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorLongLong)
 {
     check_good_case(longlong_vector_t);
     check_no_space(longlong_vector_t, 1);
-    check_bad_length_deserialization(longlong_vector_t);
+    check_bad_length_deserialization(longlong_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorFloat)
 {
     check_good_case(float_vector_t);
     check_no_space(float_vector_t, 1);
-    check_bad_length_deserialization(float_vector_t);
+    check_bad_length_deserialization(float_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorDouble)
 {
     check_good_case(double_vector_t);
     check_no_space(double_vector_t, 1);
-    check_bad_length_deserialization(double_vector_t);
+    check_bad_length_deserialization(double_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorLongDouble)
 {
     check_good_case(ldouble_vector_t);
     check_no_space(ldouble_vector_t, 1);
-    check_bad_length_deserialization(ldouble_vector_t);
+    check_bad_length_deserialization(ldouble_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorBoolean)
 {
     check_good_case(bool_vector_t);
     check_no_space(bool_vector_t, 1);
-    check_bad_length_deserialization(bool_vector_t);
+    check_bad_length_deserialization(bool_vector_t, false);
 }
 
 TEST(CDRTests, STDVectorString)
 {
     check_good_case(string_vector_t);
     check_no_space(string_vector_t, 1);
-    check_bad_length_deserialization(string_vector_t);
+    check_bad_length_deserialization(string_vector_t, true);
 }
 
 TEST(CDRTests, STDVectorWString)
 {
     check_good_case(wstring_vector_t);
     check_no_space(wstring_vector_t, 1);
-    check_bad_length_deserialization(wstring_vector_t);
+    check_bad_length_deserialization(wstring_vector_t, true);
 }
 
 TEST(CDRTests, STDTripleArrayUnsignedLong)
@@ -955,9 +992,9 @@ TEST(CDRTests, STDTripleArrayUnsignedLong)
     Cdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << triple_ulong_array_t;
-    });
+        {
+            cdr_ser << triple_ulong_array_t;
+        });
 
     // Deserialization.
     Cdr cdr_des(cdrbuffer);
@@ -965,9 +1002,9 @@ TEST(CDRTests, STDTripleArrayUnsignedLong)
     std::array<std::array<std::array<uint32_t, 3>, 2>, 2> triple_ulong_array_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> triple_ulong_array_value;
-    });
+        {
+            cdr_des >> triple_ulong_array_value;
+        });
 
     EXPECT_EQ(triple_ulong_array_value, triple_ulong_array_t);
 
@@ -979,18 +1016,18 @@ TEST(CDRTests, STDTripleArrayUnsignedLong)
     Cdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << triple_ulong_array_t;
-    },
+        {
+            cdr_ser_bad << triple_ulong_array_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     Cdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> triple_ulong_array_value;
-    },
+        {
+            cdr_des_bad >> triple_ulong_array_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -1004,9 +1041,9 @@ TEST(CDRTests, SequenceOctet)
     Cdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(octet_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(octet_seq_t, 5);
+        });
 
     // Deserialization.
     Cdr cdr_des(cdrbuffer);
@@ -1014,9 +1051,9 @@ TEST(CDRTests, SequenceOctet)
     uint8_t* octet_seq_value = NULL; size_t octet_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(octet_seq_value, octet_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(octet_seq_value, octet_seq_len);
+        });
 
     EXPECT_EQ(octet_seq_len, 5u);
     EXPECT_ARRAY_EQ(octet_seq_value, octet_seq_t, octet_seq_len);
@@ -1031,18 +1068,18 @@ TEST(CDRTests, SequenceOctet)
     Cdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(octet_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(octet_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     Cdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(octet_seq_value, octet_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(octet_seq_value, octet_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -1056,9 +1093,9 @@ TEST(CDRTests, SequenceChar)
     Cdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(char_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(char_seq_t, 5);
+        });
 
     // Deserialization.
     Cdr cdr_des(cdrbuffer);
@@ -1066,9 +1103,9 @@ TEST(CDRTests, SequenceChar)
     char* char_seq_value = NULL; size_t char_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(char_seq_value, char_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(char_seq_value, char_seq_len);
+        });
 
     EXPECT_EQ(char_seq_len, 5u);
     EXPECT_ARRAY_EQ(char_seq_value, char_seq_t, char_seq_len);
@@ -1083,18 +1120,18 @@ TEST(CDRTests, SequenceChar)
     Cdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(char_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(char_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     Cdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(char_seq_value, char_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(char_seq_value, char_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -1108,9 +1145,9 @@ TEST(CDRTests, SequenceWChar)
     Cdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(wchar_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(wchar_seq_t, 5);
+        });
 
     // Deserialization.
     Cdr cdr_des(cdrbuffer);
@@ -1118,9 +1155,9 @@ TEST(CDRTests, SequenceWChar)
     wchar_t* char_seq_value = NULL; size_t char_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(char_seq_value, char_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(char_seq_value, char_seq_len);
+        });
 
     EXPECT_EQ(char_seq_len, 5u);
     EXPECT_ARRAY_EQ(char_seq_value, wchar_seq_t, char_seq_len);
@@ -1135,18 +1172,18 @@ TEST(CDRTests, SequenceWChar)
     Cdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(wchar_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(wchar_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     Cdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(char_seq_value, char_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(char_seq_value, char_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -1160,9 +1197,9 @@ TEST(CDRTests, SequenceInt8)
     Cdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(int8_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(int8_seq_t, 5);
+        });
 
     // Deserialization.
     Cdr cdr_des(cdrbuffer);
@@ -1170,9 +1207,9 @@ TEST(CDRTests, SequenceInt8)
     int8_t* int8_seq_value = NULL; size_t int8_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(int8_seq_value, int8_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(int8_seq_value, int8_seq_len);
+        });
 
     EXPECT_EQ(int8_seq_len, 5u);
     EXPECT_ARRAY_EQ(int8_seq_value, int8_seq_t, int8_seq_len);
@@ -1187,18 +1224,18 @@ TEST(CDRTests, SequenceInt8)
     Cdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(int8_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(int8_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     Cdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(int8_seq_value, int8_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(int8_seq_value, int8_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -1212,9 +1249,9 @@ TEST(CDRTests, SequenceUnsignedShort)
     Cdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(ushort_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(ushort_seq_t, 5);
+        });
 
     // Deserialization.
     Cdr cdr_des(cdrbuffer);
@@ -1222,9 +1259,9 @@ TEST(CDRTests, SequenceUnsignedShort)
     uint16_t* ushort_seq_value = NULL; size_t ushort_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(ushort_seq_value, ushort_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(ushort_seq_value, ushort_seq_len);
+        });
 
     EXPECT_EQ(ushort_seq_len, 5u);
     EXPECT_ARRAY_EQ(ushort_seq_value, ushort_seq_t, ushort_seq_len);
@@ -1239,18 +1276,18 @@ TEST(CDRTests, SequenceUnsignedShort)
     Cdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(ushort_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(ushort_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     Cdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(ushort_seq_value, ushort_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(ushort_seq_value, ushort_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -1264,9 +1301,9 @@ TEST(CDRTests, SequenceShort)
     Cdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(short_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(short_seq_t, 5);
+        });
 
     // Deserialization.
     Cdr cdr_des(cdrbuffer);
@@ -1274,9 +1311,9 @@ TEST(CDRTests, SequenceShort)
     int16_t* short_seq_value = NULL; size_t short_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(short_seq_value, short_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(short_seq_value, short_seq_len);
+        });
 
     EXPECT_EQ(short_seq_len, 5u);
     EXPECT_ARRAY_EQ(short_seq_value, short_seq_t, short_seq_len);
@@ -1291,18 +1328,18 @@ TEST(CDRTests, SequenceShort)
     Cdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(short_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(short_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     Cdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(short_seq_value, short_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(short_seq_value, short_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -1316,9 +1353,9 @@ TEST(CDRTests, SequenceUnsignedLong)
     Cdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(ulong_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(ulong_seq_t, 5);
+        });
 
     // Deserialization.
     Cdr cdr_des(cdrbuffer);
@@ -1326,9 +1363,9 @@ TEST(CDRTests, SequenceUnsignedLong)
     uint32_t* ulong_seq_value = NULL; size_t ulong_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(ulong_seq_value, ulong_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(ulong_seq_value, ulong_seq_len);
+        });
 
     EXPECT_EQ(ulong_seq_len, 5u);
     EXPECT_ARRAY_EQ(ulong_seq_value, ulong_seq_t, ulong_seq_len);
@@ -1343,18 +1380,18 @@ TEST(CDRTests, SequenceUnsignedLong)
     Cdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(ulong_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(ulong_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     Cdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(ulong_seq_value, ulong_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(ulong_seq_value, ulong_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -1368,9 +1405,9 @@ TEST(CDRTests, SequenceLong)
     Cdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(long_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(long_seq_t, 5);
+        });
 
     // Deserialization.
     Cdr cdr_des(cdrbuffer);
@@ -1378,9 +1415,9 @@ TEST(CDRTests, SequenceLong)
     int32_t* long_seq_value = NULL; size_t long_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(long_seq_value, long_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(long_seq_value, long_seq_len);
+        });
 
     EXPECT_EQ(long_seq_len, 5u);
     EXPECT_ARRAY_EQ(long_seq_value, long_seq_t, long_seq_len);
@@ -1395,18 +1432,18 @@ TEST(CDRTests, SequenceLong)
     Cdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(long_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(long_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     Cdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(long_seq_value, long_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(long_seq_value, long_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -1420,9 +1457,9 @@ TEST(CDRTests, SequenceUnsignedLongLong)
     Cdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(ulonglong_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(ulonglong_seq_t, 5);
+        });
 
     // Deserialization.
     Cdr cdr_des(cdrbuffer);
@@ -1430,9 +1467,9 @@ TEST(CDRTests, SequenceUnsignedLongLong)
     uint64_t* ulonglong_seq_value = NULL; size_t ulonglong_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(ulonglong_seq_value, ulonglong_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(ulonglong_seq_value, ulonglong_seq_len);
+        });
 
     EXPECT_EQ(ulonglong_seq_len, 5u);
     EXPECT_ARRAY_EQ(ulonglong_seq_value, ulonglong_seq_t, ulonglong_seq_len);
@@ -1447,18 +1484,18 @@ TEST(CDRTests, SequenceUnsignedLongLong)
     Cdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(ulonglong_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(ulonglong_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     Cdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(ulonglong_seq_value, ulonglong_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(ulonglong_seq_value, ulonglong_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -1472,9 +1509,9 @@ TEST(CDRTests, SequenceLongLong)
     Cdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(longlong_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(longlong_seq_t, 5);
+        });
 
     // Deserialization.
     Cdr cdr_des(cdrbuffer);
@@ -1482,9 +1519,9 @@ TEST(CDRTests, SequenceLongLong)
     int64_t* longlong_seq_value = NULL; size_t longlong_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(longlong_seq_value, longlong_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(longlong_seq_value, longlong_seq_len);
+        });
 
     EXPECT_EQ(longlong_seq_len, 5u);
     EXPECT_ARRAY_EQ(longlong_seq_value, longlong_seq_t, longlong_seq_len);
@@ -1499,18 +1536,18 @@ TEST(CDRTests, SequenceLongLong)
     Cdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(longlong_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(longlong_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     Cdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(longlong_seq_value, longlong_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(longlong_seq_value, longlong_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -1524,9 +1561,9 @@ TEST(CDRTests, SequenceFloat)
     Cdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(float_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(float_seq_t, 5);
+        });
 
     // Deserialization.
     Cdr cdr_des(cdrbuffer);
@@ -1534,9 +1571,9 @@ TEST(CDRTests, SequenceFloat)
     float* float_seq_value = NULL; size_t float_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(float_seq_value, float_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(float_seq_value, float_seq_len);
+        });
 
     EXPECT_EQ(float_seq_len, 5u);
     EXPECT_ARRAY_FLOAT_EQ(float_seq_value, float_seq_t, float_seq_len);
@@ -1551,18 +1588,18 @@ TEST(CDRTests, SequenceFloat)
     Cdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(float_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(float_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     Cdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(float_seq_value, float_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(float_seq_value, float_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -1576,9 +1613,9 @@ TEST(CDRTests, SequenceDouble)
     Cdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(double_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(double_seq_t, 5);
+        });
 
     // Deserialization.
     Cdr cdr_des(cdrbuffer);
@@ -1586,9 +1623,9 @@ TEST(CDRTests, SequenceDouble)
     double* double_seq_value = NULL; size_t double_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(double_seq_value, double_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(double_seq_value, double_seq_len);
+        });
 
     EXPECT_EQ(double_seq_len, 5u);
     EXPECT_ARRAY_DOUBLE_EQ(double_seq_value, double_seq_t, double_seq_len);
@@ -1603,18 +1640,18 @@ TEST(CDRTests, SequenceDouble)
     Cdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(double_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(double_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     Cdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(double_seq_value, double_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(double_seq_value, double_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -1628,9 +1665,9 @@ TEST(CDRTests, SequenceLongDouble)
     Cdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(ldouble_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(ldouble_seq_t, 5);
+        });
 
     // Deserialization.
     Cdr cdr_des(cdrbuffer);
@@ -1638,9 +1675,9 @@ TEST(CDRTests, SequenceLongDouble)
     long double* ldouble_seq_value = NULL; size_t ldouble_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(ldouble_seq_value, ldouble_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(ldouble_seq_value, ldouble_seq_len);
+        });
 
     EXPECT_EQ(ldouble_seq_len, 5u);
     EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_seq_value, ldouble_seq_t, ldouble_seq_len);
@@ -1655,18 +1692,18 @@ TEST(CDRTests, SequenceLongDouble)
     Cdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(ldouble_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(ldouble_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     Cdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(ldouble_seq_value, ldouble_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(ldouble_seq_value, ldouble_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -1680,9 +1717,9 @@ TEST(CDRTests, SequenceBoolean)
     Cdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(bool_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(bool_seq_t, 5);
+        });
 
     // Deserialization.
     Cdr cdr_des(cdrbuffer);
@@ -1690,9 +1727,9 @@ TEST(CDRTests, SequenceBoolean)
     bool* bool_seq_value = NULL; size_t bool_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(bool_seq_value, bool_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(bool_seq_value, bool_seq_len);
+        });
 
     EXPECT_EQ(bool_seq_len, 5u);
     EXPECT_ARRAY_EQ(bool_seq_value, bool_seq_t, bool_seq_len);
@@ -1707,18 +1744,18 @@ TEST(CDRTests, SequenceBoolean)
     Cdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(bool_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(bool_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     Cdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(bool_seq_value, bool_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(bool_seq_value, bool_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -1732,9 +1769,9 @@ TEST(CDRTests, SequenceString)
     Cdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(string_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(string_seq_t, 5);
+        });
 
     // Deserialization.
     Cdr cdr_des(cdrbuffer);
@@ -1742,9 +1779,9 @@ TEST(CDRTests, SequenceString)
     std::string* string_seq_value = NULL; size_t string_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(string_seq_value, string_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(string_seq_value, string_seq_len);
+        });
 
     EXPECT_EQ(string_seq_len, 5u);
     EXPECT_ARRAY_EQ(string_seq_value, string_seq_t, string_seq_len);
@@ -1759,18 +1796,18 @@ TEST(CDRTests, SequenceString)
     Cdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(string_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(string_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     Cdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(string_seq_value, string_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(string_seq_value, string_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -1784,9 +1821,9 @@ TEST(CDRTests, SequenceWString)
     Cdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(wstring_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(wstring_seq_t, 5);
+        });
 
     // Deserialization.
     Cdr cdr_des(cdrbuffer);
@@ -1794,9 +1831,9 @@ TEST(CDRTests, SequenceWString)
     std::wstring* string_seq_value = NULL; size_t string_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(string_seq_value, string_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(string_seq_value, string_seq_len);
+        });
 
     EXPECT_EQ(string_seq_len, 5u);
     EXPECT_ARRAY_EQ(string_seq_value, wstring_seq_t, string_seq_len);
@@ -1811,18 +1848,18 @@ TEST(CDRTests, SequenceWString)
     Cdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(wstring_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(wstring_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     Cdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(string_seq_value, string_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(string_seq_value, string_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -1836,9 +1873,9 @@ TEST(CDRTests, CString)
     Cdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize(c_string_t);
-    });
+        {
+            cdr_ser.serialize(c_string_t);
+        });
 
     // Deserialization.
     Cdr cdr_des(cdrbuffer);
@@ -1846,9 +1883,9 @@ TEST(CDRTests, CString)
     char* c_string_value = NULL;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize(c_string_value);
-    });
+        {
+            cdr_des.deserialize(c_string_value);
+        });
 
     EXPECT_EQ(strcmp(c_string_value, c_string_t), 0);
 
@@ -1862,18 +1899,18 @@ TEST(CDRTests, CString)
     Cdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize(c_string_t);
-    },
+        {
+            cdr_ser_bad.serialize(c_string_t);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     Cdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize(c_string_value);
-    },
+        {
+            cdr_des_bad.deserialize(c_string_value);
+        },
         NotEnoughMemoryException);
 }
 
@@ -1887,9 +1924,9 @@ TEST(CDRTests, CWString)
     Cdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize(c_wstring_t);
-    });
+        {
+            cdr_ser.serialize(c_wstring_t);
+        });
 
     // Deserialization.
     Cdr cdr_des(cdrbuffer);
@@ -1897,9 +1934,9 @@ TEST(CDRTests, CWString)
     wchar_t* c_string_value = NULL;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize(c_string_value);
-    });
+        {
+            cdr_des.deserialize(c_string_value);
+        });
 
     EXPECT_EQ(wcscmp(c_string_value, c_wstring_t), 0);
 
@@ -1913,9 +1950,9 @@ TEST(CDRTests, CWString)
     Cdr cdr_ser_bigendi(cdrbuffer_bigendi, eprosima::fastcdr::Cdr::Endianness::BIG_ENDIANNESS);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_bigendi.serialize(c_wstring_t);
-    });
+        {
+            cdr_ser_bigendi.serialize(c_wstring_t);
+        });
 
     // Deserialization.
     Cdr cdr_des_bigendi(cdrbuffer_bigendi, eprosima::fastcdr::Cdr::Endianness::BIG_ENDIANNESS);
@@ -1923,9 +1960,9 @@ TEST(CDRTests, CWString)
     wchar_t* c_wstring_bigendi {nullptr};
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_bigendi.deserialize(c_wstring_bigendi);
-    });
+        {
+            cdr_des_bigendi.deserialize(c_wstring_bigendi);
+        });
 
     EXPECT_EQ(wcscmp(c_wstring_bigendi, c_wstring_t), 0);
 
@@ -1939,18 +1976,18 @@ TEST(CDRTests, CWString)
     Cdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize(c_wstring_t);
-    },
+        {
+            cdr_ser_bad.serialize(c_wstring_t);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     Cdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize(c_string_value);
-    },
+        {
+            cdr_des_bad.deserialize(c_string_value);
+        },
         NotEnoughMemoryException);
 }
 
@@ -1963,45 +2000,52 @@ TEST(CDRTests, Complete)
     Cdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << octet_t << char_t << int8 << ushort_t << short_t << ulong_t << long_t << ulonglong_t << longlong_t <<
-            float_tt << double_tt << ldouble_tt << bool_t << string_t;
-        cdr_ser << octet_array_t << char_array_t << int8_array_t << ushort_array_t << short_array_t << ulong_array_t <<
-            long_array_t << ulonglong_array_t << longlong_array_t << float_array_t << double_array_t << ldouble_array_t << bool_array_t;
-        cdr_ser.serialize_array(octet_array_2_t,
-        5).serialize_array(char_array_2_t, 5).serialize_array(int8_array_2_t, 5).
-                serialize_array(ushort_array_2_t, 5).serialize_array(short_array_2_t,
-        5).serialize_array(ulong_array_2_t,
-        5).
-                serialize_array(long_array_2_t, 5).serialize_array(ulonglong_array_2_t,
-        5).serialize_array(longlong_array_2_t, 5).
-                serialize_array(float_array_2_t, 5).serialize_array(double_array_2_t,
-        5).serialize_array(ldouble_array_2_t,
-        5).serialize_array(
-            bool_array_2_t,
+        {
+            cdr_ser << octet_t << char_t << int8 << ushort_t << short_t << ulong_t << long_t << ulonglong_t
+                    << longlong_t
+                    << float_tt << double_tt << ldouble_tt << bool_t << string_t;
+            cdr_ser << octet_array_t << char_array_t << int8_array_t << ushort_array_t << short_array_t << ulong_array_t
+                    << long_array_t << ulonglong_array_t << longlong_array_t << float_array_t << double_array_t
+                    << ldouble_array_t << bool_array_t;
+            cdr_ser.serialize_array(octet_array_2_t,
+            5).serialize_array(char_array_2_t, 5).serialize_array(int8_array_2_t, 5).
+                    serialize_array(ushort_array_2_t, 5).serialize_array(short_array_2_t,
+            5).serialize_array(ulong_array_2_t,
+            5).
+                    serialize_array(long_array_2_t, 5).serialize_array(ulonglong_array_2_t,
+            5).serialize_array(longlong_array_2_t, 5).
+                    serialize_array(float_array_2_t, 5).serialize_array(double_array_2_t,
+            5).serialize_array(ldouble_array_2_t,
+            5).serialize_array(
+                bool_array_2_t,
+                5);
+            cdr_ser << octet_vector_t << char_vector_t << int8_vector_t << ushort_vector_t << short_vector_t
+                    << ulong_vector_t
+                    << long_vector_t << ulonglong_vector_t << longlong_vector_t << float_vector_t << double_vector_t
+                    << ldouble_vector_t << bool_vector_t;
+            cdr_ser << triple_ulong_array_t;
+            cdr_ser.serialize_sequence(octet_seq_t, 5).serialize_sequence(char_seq_t, 5).serialize_sequence(int8_seq_t,
+            5).
+                    serialize_sequence(ushort_seq_t, 5).serialize_sequence(short_seq_t,
+            5).serialize_sequence(ulong_seq_t,
+            5).
+                    serialize_sequence(long_seq_t, 5).serialize_sequence(ulonglong_seq_t,
+            5).serialize_sequence(longlong_seq_t,
+            5).
+                    serialize_sequence(float_seq_t, 5).serialize_sequence(double_seq_t,
+            5).serialize_sequence(ldouble_seq_t,
             5);
-        cdr_ser << octet_vector_t << char_vector_t << int8_vector_t << ushort_vector_t << short_vector_t << ulong_vector_t <<
-            long_vector_t << ulonglong_vector_t << longlong_vector_t << float_vector_t << double_vector_t << ldouble_vector_t << bool_vector_t;
-        cdr_ser << triple_ulong_array_t;
-        cdr_ser.serialize_sequence(octet_seq_t, 5).serialize_sequence(char_seq_t, 5).serialize_sequence(int8_seq_t, 5).
-                serialize_sequence(ushort_seq_t, 5).serialize_sequence(short_seq_t, 5).serialize_sequence(ulong_seq_t,
-        5).
-                serialize_sequence(long_seq_t, 5).serialize_sequence(ulonglong_seq_t,
-        5).serialize_sequence(longlong_seq_t,
-        5).
-                serialize_sequence(float_seq_t, 5).serialize_sequence(double_seq_t, 5).serialize_sequence(ldouble_seq_t,
-        5);
-        cdr_ser.serialize(c_string_t);
-        // Wstring and wchar
-        cdr_ser << wchar << wstring_t;
-        cdr_ser.serialize_array(wchar_array_2_t, 5).serialize_array(wstring_array_2_t, 5);
-        cdr_ser << wchar_array_t << wstring_array_t;
-        cdr_ser << wchar_vector_t << wstring_vector_t;
-        cdr_ser.serialize_sequence(wchar_seq_t, 5);
-        cdr_ser.serialize_sequence(wstring_seq_t, 5);
-        cdr_ser.serialize_sequence(string_seq_t, 5);
-        cdr_ser.serialize(c_wstring_t);
-    });
+            cdr_ser.serialize(c_string_t);
+            // Wstring and wchar
+            cdr_ser << wchar << wstring_t;
+            cdr_ser.serialize_array(wchar_array_2_t, 5).serialize_array(wstring_array_2_t, 5);
+            cdr_ser << wchar_array_t << wstring_array_t;
+            cdr_ser << wchar_vector_t << wstring_vector_t;
+            cdr_ser.serialize_sequence(wchar_seq_t, 5);
+            cdr_ser.serialize_sequence(wstring_seq_t, 5);
+            cdr_ser.serialize_sequence(string_seq_t, 5);
+            cdr_ser.serialize(c_wstring_t);
+        });
 
     // Deserialization.
     Cdr cdr_des(cdrbuffer);
@@ -2087,48 +2131,55 @@ TEST(CDRTests, Complete)
     std::string* string_seq_value = NULL; size_t string_seq_len;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> octet_value >> char_value >> int8_value >> ushort_value >> short_value >> ulong_value >> long_value >>
-        ulonglong_value >> longlong_value >> float_value >> double_value >> ldouble_value  >> bool_value >> string_value;
-        cdr_des >> octet_array_value >> char_array_value >> int8_array_value >> ushort_array_value >> short_array_value >>
-        ulong_array_value >> long_array_value >> ulonglong_array_value >> longlong_array_value >> float_array_value >>
-        double_array_value >> ldouble_array_value >> bool_array_value;
-        cdr_des.deserialize_array(octet_array_2_value,
-        5).deserialize_array(char_array_2_value, 5).deserialize_array(int8_array_2_value, 5).
-                deserialize_array(ushort_array_2_value, 5).deserialize_array(short_array_2_value,
-        5).deserialize_array(ulong_array_2_value, 5).
-                deserialize_array(long_array_2_value, 5).deserialize_array(ulonglong_array_2_value,
-        5).deserialize_array(longlong_array_2_value, 5).
-                deserialize_array(float_array_2_value, 5).deserialize_array(double_array_2_value,
-        5).deserialize_array(ldouble_array_2_value, 5).
-                deserialize_array(bool_array_2_value,
-        5);
-        cdr_des >> octet_vector_value >> char_vector_value >> int8_vector_value >> ushort_vector_value >> short_vector_value >>
-        ulong_vector_value >> long_vector_value >> ulonglong_vector_value >> longlong_vector_value >> float_vector_value >>
-        double_vector_value >> ldouble_vector_value >> bool_vector_value;
-        cdr_des >> triple_ulong_array_value;
-        cdr_des.deserialize_sequence(octet_seq_value, octet_seq_len).deserialize_sequence(char_seq_value, char_seq_len).
-                deserialize_sequence(int8_seq_value, int8_seq_len).deserialize_sequence(ushort_seq_value,
-        ushort_seq_len).
-                deserialize_sequence(short_seq_value, short_seq_len).deserialize_sequence(ulong_seq_value,
-        ulong_seq_len).
-                deserialize_sequence(long_seq_value, long_seq_len).deserialize_sequence(ulonglong_seq_value,
-        ulonglong_seq_len).
-                deserialize_sequence(longlong_seq_value, longlong_seq_len).deserialize_sequence(float_seq_value,
-        float_seq_len).
-                deserialize_sequence(double_seq_value, double_seq_len).deserialize_sequence(ldouble_seq_value,
-        ldouble_seq_len);
-        cdr_des.deserialize(c_string_value);
-        // WString and wchar_t
-        cdr_des >> wchar_value >> wstring_value;
-        cdr_des.deserialize_array(wchar_array_2_value, 5).deserialize_array(wstring_array_2_value, 5);
-        cdr_des >> wchar_array_value >> wstring_array_value;
-        cdr_des >> wchar_vector_value >> wstring_vector_value;
-        cdr_des.deserialize_sequence(wchar_seq_value, wchar_seq_len);
-        cdr_des.deserialize_sequence(wstring_seq_value, wstring_seq_len);
-        cdr_des.deserialize_sequence(string_seq_value, string_seq_len);
-        cdr_des.deserialize(c_wstring_value);
-    });
+        {
+            cdr_des >> octet_value >> char_value >> int8_value >> ushort_value >> short_value >> ulong_value
+            >> long_value
+            >> ulonglong_value >> longlong_value >> float_value >> double_value >> ldouble_value  >> bool_value
+            >> string_value;
+            cdr_des >> octet_array_value >> char_array_value >> int8_array_value >> ushort_array_value
+            >> short_array_value
+            >> ulong_array_value >> long_array_value >> ulonglong_array_value >> longlong_array_value
+            >> float_array_value
+            >> double_array_value >> ldouble_array_value >> bool_array_value;
+            cdr_des.deserialize_array(octet_array_2_value,
+            5).deserialize_array(char_array_2_value, 5).deserialize_array(int8_array_2_value, 5).
+                    deserialize_array(ushort_array_2_value, 5).deserialize_array(short_array_2_value,
+            5).deserialize_array(ulong_array_2_value, 5).
+                    deserialize_array(long_array_2_value, 5).deserialize_array(ulonglong_array_2_value,
+            5).deserialize_array(longlong_array_2_value, 5).
+                    deserialize_array(float_array_2_value, 5).deserialize_array(double_array_2_value,
+            5).deserialize_array(ldouble_array_2_value, 5).
+                    deserialize_array(bool_array_2_value,
+            5);
+            cdr_des >> octet_vector_value >> char_vector_value >> int8_vector_value >> ushort_vector_value
+            >> short_vector_value
+            >> ulong_vector_value >> long_vector_value >> ulonglong_vector_value >> longlong_vector_value
+            >> float_vector_value
+            >> double_vector_value >> ldouble_vector_value >> bool_vector_value;
+            cdr_des >> triple_ulong_array_value;
+            cdr_des.deserialize_sequence(octet_seq_value, octet_seq_len).deserialize_sequence(char_seq_value,
+            char_seq_len).
+                    deserialize_sequence(int8_seq_value, int8_seq_len).deserialize_sequence(ushort_seq_value,
+            ushort_seq_len).
+                    deserialize_sequence(short_seq_value, short_seq_len).deserialize_sequence(ulong_seq_value,
+            ulong_seq_len).
+                    deserialize_sequence(long_seq_value, long_seq_len).deserialize_sequence(ulonglong_seq_value,
+            ulonglong_seq_len).
+                    deserialize_sequence(longlong_seq_value, longlong_seq_len).deserialize_sequence(float_seq_value,
+            float_seq_len).
+                    deserialize_sequence(double_seq_value, double_seq_len).deserialize_sequence(ldouble_seq_value,
+            ldouble_seq_len);
+            cdr_des.deserialize(c_string_value);
+            // WString and wchar_t
+            cdr_des >> wchar_value >> wstring_value;
+            cdr_des.deserialize_array(wchar_array_2_value, 5).deserialize_array(wstring_array_2_value, 5);
+            cdr_des >> wchar_array_value >> wstring_array_value;
+            cdr_des >> wchar_vector_value >> wstring_vector_value;
+            cdr_des.deserialize_sequence(wchar_seq_value, wchar_seq_len);
+            cdr_des.deserialize_sequence(wstring_seq_value, wstring_seq_len);
+            cdr_des.deserialize_sequence(string_seq_value, string_seq_len);
+            cdr_des.deserialize(c_wstring_value);
+        });
 
     EXPECT_EQ(octet_value, octet_t);
     EXPECT_EQ(char_value, char_t);
@@ -2280,6 +2331,174 @@ TEST(CDRTests, DeserializeIntoANonEmptyMapInXCDRv1)
     ASSERT_EQ(initialized_map.at(2), "A");
 }
 
+// Regression tests for Fast CDR issue #339
+// Deserializing a map into a non-empty map should replace its content, both for
+// non-primitive and primitive mapped types. The content of the target map should
+// also be preserved when the deserialization fails.
+
+TEST(CDRTests, DeserializeIntoANonEmptyPrimitiveMapInXCDRv1)
+{
+    char buffer[BUFFER_LENGTH];
+
+    const std::map<std::string, double> input_map {{"value", 1.0}};
+
+    FastBuffer cdr_buffer(buffer, BUFFER_LENGTH);
+    Cdr cdr_ser_map(cdr_buffer, Cdr::DEFAULT_ENDIAN, XCDRv1);
+    cdr_ser_map << input_map;
+
+    std::map<std::string, double> initialized_map {{"other", 0.5}};
+
+    // Deserialization in a non-empty map
+    Cdr cdr_des_map(cdr_buffer, Cdr::DEFAULT_ENDIAN, XCDRv1);
+    ASSERT_NO_THROW(cdr_des_map >> initialized_map);
+    ASSERT_EQ(initialized_map.size(), 1u);
+    EXPECT_DOUBLE_EQ(initialized_map["value"], 1.0);
+}
+
+TEST(CDRTests, ReuseTargetMapInTwoDeserializations)
+{
+    char buffer[BUFFER_LENGTH];
+
+    // Case 1: map with non-primitive mapped type
+    {
+        using map_type = std::map<uint16_t, std::string>;
+
+        const map_type first_map {{static_cast<uint16_t>(1u), "first"}, {static_cast<uint16_t>(2u), "second"}};
+        const map_type second_map {{static_cast<uint16_t>(1u), "third"}};
+
+        for (CdrVersion version : {XCDRv1, XCDRv2})
+        {
+            map_type target_map;
+
+            // First deserialization
+            {
+                FastBuffer cdr_buffer(buffer, BUFFER_LENGTH);
+                Cdr cdr_ser(cdr_buffer, Cdr::DEFAULT_ENDIAN, version);
+                cdr_ser << first_map;
+                Cdr cdr_des(cdr_buffer, Cdr::DEFAULT_ENDIAN, version);
+                ASSERT_NO_THROW(cdr_des >> target_map);
+            }
+
+            ASSERT_EQ(target_map, first_map);
+
+            // Second deserialization reusing the same (non-empty) map
+            {
+                FastBuffer cdr_buffer(buffer, BUFFER_LENGTH);
+                Cdr cdr_ser(cdr_buffer, Cdr::DEFAULT_ENDIAN, version);
+                cdr_ser << second_map;
+                Cdr cdr_des(cdr_buffer, Cdr::DEFAULT_ENDIAN, version);
+                ASSERT_NO_THROW(cdr_des >> target_map);
+            }
+
+            ASSERT_EQ(target_map, second_map);
+        }
+    }
+
+    // Case 2: map with primitive mapped type
+    {
+        using map_type = std::map<std::string, double>;
+
+        const map_type first_map {{"first", 1.0}, {"second", 2.0}};
+        const map_type second_map {{"first", 0.0}};
+
+        for (CdrVersion version : {XCDRv1, XCDRv2})
+        {
+            map_type target_map;
+
+            // First deserialization
+            {
+                FastBuffer cdr_buffer(buffer, BUFFER_LENGTH);
+                Cdr cdr_ser(cdr_buffer, Cdr::DEFAULT_ENDIAN, version);
+                cdr_ser << first_map;
+                Cdr cdr_des(cdr_buffer, Cdr::DEFAULT_ENDIAN, version);
+                ASSERT_NO_THROW(cdr_des >> target_map);
+            }
+
+            ASSERT_EQ(target_map, first_map);
+
+            // Second deserialization reusing the same (non-empty) map
+            {
+                FastBuffer cdr_buffer(buffer, BUFFER_LENGTH);
+                Cdr cdr_ser(cdr_buffer, Cdr::DEFAULT_ENDIAN, version);
+                cdr_ser << second_map;
+                Cdr cdr_des(cdr_buffer, Cdr::DEFAULT_ENDIAN, version);
+                ASSERT_NO_THROW(cdr_des >> target_map);
+            }
+
+            ASSERT_EQ(target_map, second_map);
+        }
+    }
+}
+
+TEST(CDRTests, TargetMapPreservedWhenDeserializationFails)
+{
+    char buffer[BUFFER_LENGTH];
+
+    // Case 1: map with non-primitive mapped type
+    {
+        using map_type = std::map<uint16_t, std::string>;
+
+        const map_type input_map {{static_cast<uint16_t>(1u), "first"}, {static_cast<uint16_t>(2u), "second"}};
+        const map_type initial_content {{static_cast<uint16_t>(3u), "old"}};
+
+        // XCDRv1: the exception is thrown while deserializing an element
+        {
+            FastBuffer cdr_buffer(buffer, BUFFER_LENGTH);
+            Cdr cdr_ser(cdr_buffer, Cdr::DEFAULT_ENDIAN, XCDRv1);
+            cdr_ser << input_map;
+            size_t serialized_size = static_cast<size_t>(cdr_ser.get_current_position() - buffer);
+
+            // Simulate a truncated stream
+            FastBuffer truncated_buffer(buffer, serialized_size - 1);
+            Cdr cdr_des(truncated_buffer, Cdr::DEFAULT_ENDIAN, XCDRv1);
+
+            map_type target_map = initial_content;
+            EXPECT_THROW(cdr_des >> target_map, NotEnoughMemoryException);
+            EXPECT_EQ(target_map, initial_content);
+        }
+
+        // XCDRv2: DHEADER announces less bytes than the actual member size
+        {
+            FastBuffer cdr_buffer(buffer, BUFFER_LENGTH);
+            Cdr cdr_ser(cdr_buffer, Cdr::DEFAULT_ENDIAN, XCDRv2);
+            cdr_ser << input_map;
+
+            // Tamper with DHEADER to make it inconsistent with the member size
+            uint32_t dheader;
+            memcpy(&dheader, buffer, sizeof(dheader));
+            dheader -= 1;
+            memcpy(buffer, &dheader, sizeof(dheader));
+
+            Cdr cdr_des(cdr_buffer, Cdr::DEFAULT_ENDIAN, XCDRv2);
+
+            map_type target_map = initial_content;
+            EXPECT_THROW(cdr_des >> target_map, BadParamException);
+            EXPECT_EQ(target_map, initial_content);
+        }
+    }
+
+    // Case 2: map with primitive mapped type
+    {
+        using map_type = std::map<std::string, double>;
+
+        const map_type input_map {{"first", 1.0}, {"second", 2.0}};
+        const map_type initial_content {{"other", 0.5}};
+
+        FastBuffer cdr_buffer(buffer, BUFFER_LENGTH);
+        Cdr cdr_ser(cdr_buffer, Cdr::DEFAULT_ENDIAN, XCDRv1);
+        cdr_ser << input_map;
+        size_t serialized_size = static_cast<size_t>(cdr_ser.get_current_position() - buffer);
+
+        // The first element is deserialized before the exception is thrown
+        FastBuffer truncated_buffer(buffer, serialized_size - sizeof(double));
+        Cdr cdr_des(truncated_buffer, Cdr::DEFAULT_ENDIAN, XCDRv1);
+
+        map_type target_map = initial_content;
+        EXPECT_THROW(cdr_des >> target_map, NotEnoughMemoryException);
+        EXPECT_EQ(target_map, initial_content);
+    }
+}
+
 TEST(FastCDRTests, Octet)
 {
     // Check good case.
@@ -2290,9 +2509,9 @@ TEST(FastCDRTests, Octet)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << octet_t;
-    });
+        {
+            cdr_ser << octet_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -2300,9 +2519,9 @@ TEST(FastCDRTests, Octet)
     uint8_t octet_value = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> octet_value;
-    });
+        {
+            cdr_des >> octet_value;
+        });
 
     EXPECT_EQ(octet_value, octet_t);
 }
@@ -2317,9 +2536,9 @@ TEST(FastCDRTests, Char)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << char_t;
-    });
+        {
+            cdr_ser << char_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -2327,9 +2546,9 @@ TEST(FastCDRTests, Char)
     char char_value = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> char_value;
-    });
+        {
+            cdr_des >> char_value;
+        });
 
     EXPECT_EQ(char_value, char_t);
 }
@@ -2344,9 +2563,9 @@ TEST(FastCDRTests, WChar)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << wchar;
-    });
+        {
+            cdr_ser << wchar;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -2354,9 +2573,9 @@ TEST(FastCDRTests, WChar)
     wchar_t char_value = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> char_value;
-    });
+        {
+            cdr_des >> char_value;
+        });
 
     EXPECT_EQ(char_value, wchar);
 }
@@ -2371,9 +2590,9 @@ TEST(FastCDRTests, Int8)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << int8;
-    });
+        {
+            cdr_ser << int8;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -2381,9 +2600,9 @@ TEST(FastCDRTests, Int8)
     int8_t int8_value = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> int8_value;
-    });
+        {
+            cdr_des >> int8_value;
+        });
 
     EXPECT_EQ(int8_value, int8);
 }
@@ -2398,9 +2617,9 @@ TEST(FastCDRTests, UnsignedShort)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << ushort_t;
-    });
+        {
+            cdr_ser << ushort_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -2408,9 +2627,9 @@ TEST(FastCDRTests, UnsignedShort)
     uint16_t ushort_value = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> ushort_value;
-    });
+        {
+            cdr_des >> ushort_value;
+        });
 
     EXPECT_EQ(ushort_value, ushort_t);
 
@@ -2422,18 +2641,18 @@ TEST(FastCDRTests, UnsignedShort)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << ushort_t;
-    },
+        {
+            cdr_ser_bad << ushort_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> ushort_value;
-    },
+        {
+            cdr_des_bad >> ushort_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -2447,9 +2666,9 @@ TEST(FastCDRTests, Short)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << short_t;
-    });
+        {
+            cdr_ser << short_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -2457,9 +2676,9 @@ TEST(FastCDRTests, Short)
     int16_t short_value = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> short_value;
-    });
+        {
+            cdr_des >> short_value;
+        });
 
     EXPECT_EQ(short_value, short_t);
 
@@ -2471,18 +2690,18 @@ TEST(FastCDRTests, Short)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << short_t;
-    },
+        {
+            cdr_ser_bad << short_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> short_value;
-    },
+        {
+            cdr_des_bad >> short_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -2496,9 +2715,9 @@ TEST(FastCDRTests, UnsignedLong)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << ulong_t;
-    });
+        {
+            cdr_ser << ulong_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -2506,9 +2725,9 @@ TEST(FastCDRTests, UnsignedLong)
     uint32_t ulong_value = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> ulong_value;
-    });
+        {
+            cdr_des >> ulong_value;
+        });
 
     EXPECT_EQ(ulong_value, ulong_t);
 
@@ -2520,18 +2739,18 @@ TEST(FastCDRTests, UnsignedLong)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << ulong_t;
-    },
+        {
+            cdr_ser_bad << ulong_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> ulong_value;
-    },
+        {
+            cdr_des_bad >> ulong_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -2545,9 +2764,9 @@ TEST(FastCDRTests, Long)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << long_t;
-    });
+        {
+            cdr_ser << long_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -2555,9 +2774,9 @@ TEST(FastCDRTests, Long)
     int32_t long_value = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> long_value;
-    });
+        {
+            cdr_des >> long_value;
+        });
 
     EXPECT_EQ(long_value, long_t);
 
@@ -2569,18 +2788,18 @@ TEST(FastCDRTests, Long)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << long_t;
-    },
+        {
+            cdr_ser_bad << long_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> long_value;
-    },
+        {
+            cdr_des_bad >> long_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -2594,9 +2813,9 @@ TEST(FastCDRTests, UnsignedLongLong)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << ulonglong_t;
-    });
+        {
+            cdr_ser << ulonglong_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -2604,9 +2823,9 @@ TEST(FastCDRTests, UnsignedLongLong)
     uint64_t ulonglong_value = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> ulonglong_value;
-    });
+        {
+            cdr_des >> ulonglong_value;
+        });
 
     EXPECT_EQ(ulonglong_value, ulonglong_t);
 
@@ -2618,18 +2837,18 @@ TEST(FastCDRTests, UnsignedLongLong)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << ulonglong_t;
-    },
+        {
+            cdr_ser_bad << ulonglong_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> ulonglong_value;
-    },
+        {
+            cdr_des_bad >> ulonglong_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -2643,9 +2862,9 @@ TEST(FastCDRTests, LongLong)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << longlong_t;
-    });
+        {
+            cdr_ser << longlong_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -2653,9 +2872,9 @@ TEST(FastCDRTests, LongLong)
     int64_t longlong_value = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> longlong_value;
-    });
+        {
+            cdr_des >> longlong_value;
+        });
 
     EXPECT_EQ(longlong_value, longlong_t);
 
@@ -2667,18 +2886,18 @@ TEST(FastCDRTests, LongLong)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << longlong_t;
-    },
+        {
+            cdr_ser_bad << longlong_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> longlong_value;
-    },
+        {
+            cdr_des_bad >> longlong_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -2692,9 +2911,9 @@ TEST(FastCDRTests, Float)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << float_tt;
-    });
+        {
+            cdr_ser << float_tt;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -2702,9 +2921,9 @@ TEST(FastCDRTests, Float)
     float float_value = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> float_value;
-    });
+        {
+            cdr_des >> float_value;
+        });
 
     EXPECT_FLOAT_EQ(float_value, float_tt);
 
@@ -2716,18 +2935,18 @@ TEST(FastCDRTests, Float)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << float_tt;
-    },
+        {
+            cdr_ser_bad << float_tt;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> float_value;
-    },
+        {
+            cdr_des_bad >> float_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -2741,9 +2960,9 @@ TEST(FastCDRTests, Double)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << double_tt;
-    });
+        {
+            cdr_ser << double_tt;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -2751,9 +2970,9 @@ TEST(FastCDRTests, Double)
     double double_value = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> double_value;
-    });
+        {
+            cdr_des >> double_value;
+        });
 
     EXPECT_DOUBLE_EQ(double_value, double_tt);
 
@@ -2765,18 +2984,18 @@ TEST(FastCDRTests, Double)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << double_tt;
-    },
+        {
+            cdr_ser_bad << double_tt;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> double_value;
-    },
+        {
+            cdr_des_bad >> double_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -2790,9 +3009,9 @@ TEST(FastCDRTests, LongDouble)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << ldouble_tt;
-    });
+        {
+            cdr_ser << ldouble_tt;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -2800,9 +3019,9 @@ TEST(FastCDRTests, LongDouble)
     long double ldouble_value = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> ldouble_value;
-    });
+        {
+            cdr_des >> ldouble_value;
+        });
 
     EXPECT_LONG_DOUBLE_EQ(ldouble_value, ldouble_tt);
 
@@ -2814,18 +3033,18 @@ TEST(FastCDRTests, LongDouble)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << ldouble_tt;
-    },
+        {
+            cdr_ser_bad << ldouble_tt;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> ldouble_value;
-    },
+        {
+            cdr_des_bad >> ldouble_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -2839,9 +3058,9 @@ TEST(FastCDRTests, Boolean)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << bool_t;
-    });
+        {
+            cdr_ser << bool_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -2849,9 +3068,9 @@ TEST(FastCDRTests, Boolean)
     bool bool_value = false;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> bool_value;
-    });
+        {
+            cdr_des >> bool_value;
+        });
 
     EXPECT_EQ(bool_value, bool_t);
 }
@@ -2866,9 +3085,9 @@ TEST(FastCDRTests, String)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << string_t;
-    });
+        {
+            cdr_ser << string_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -2876,9 +3095,9 @@ TEST(FastCDRTests, String)
     std::string string_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> string_value;
-    });
+        {
+            cdr_des >> string_value;
+        });
 
     EXPECT_EQ(string_value, string_t);
 
@@ -2890,18 +3109,18 @@ TEST(FastCDRTests, String)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << string_t;
-    },
+        {
+            cdr_ser_bad << string_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> string_value;
-    },
+        {
+            cdr_des_bad >> string_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -2915,9 +3134,9 @@ TEST(FastCDRTests, WString)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << wstring_t;
-    });
+        {
+            cdr_ser << wstring_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -2925,9 +3144,9 @@ TEST(FastCDRTests, WString)
     std::wstring string_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> string_value;
-    });
+        {
+            cdr_des >> string_value;
+        });
 
     EXPECT_EQ(string_value, wstring_t);
 
@@ -2939,18 +3158,18 @@ TEST(FastCDRTests, WString)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << wstring_t;
-    },
+        {
+            cdr_ser_bad << wstring_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> string_value;
-    },
+        {
+            cdr_des_bad >> string_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -2964,9 +3183,9 @@ TEST(FastCDRTests, EmptyString)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << emptystring_t;
-    });
+        {
+            cdr_ser << emptystring_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -2974,9 +3193,9 @@ TEST(FastCDRTests, EmptyString)
     std::string string_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> string_value;
-    });
+        {
+            cdr_des >> string_value;
+        });
 
     EXPECT_EQ(string_value, emptystring_t);
 
@@ -2988,18 +3207,18 @@ TEST(FastCDRTests, EmptyString)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << emptystring_t;
-    },
+        {
+            cdr_ser_bad << emptystring_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> string_value;
-    },
+        {
+            cdr_des_bad >> string_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -3013,9 +3232,9 @@ TEST(FastCDRTests, EmptyWString)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << emptywstring_t;
-    });
+        {
+            cdr_ser << emptywstring_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -3023,9 +3242,9 @@ TEST(FastCDRTests, EmptyWString)
     std::wstring wstring_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> wstring_value;
-    });
+        {
+            cdr_des >> wstring_value;
+        });
 
     EXPECT_EQ(wstring_value, emptywstring_t);
 
@@ -3037,18 +3256,18 @@ TEST(FastCDRTests, EmptyWString)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << emptywstring_t;
-    },
+        {
+            cdr_ser_bad << emptywstring_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> wstring_value;
-    },
+        {
+            cdr_des_bad >> wstring_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -3062,9 +3281,9 @@ TEST(FastCDRTests, STDArrayOctet)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << octet_array_t;
-    });
+        {
+            cdr_ser << octet_array_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -3072,9 +3291,9 @@ TEST(FastCDRTests, STDArrayOctet)
     std::array<uint8_t, N_ARR_ELEMENTS> octet_array_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> octet_array_value;
-    });
+        {
+            cdr_des >> octet_array_value;
+        });
 
     EXPECT_EQ(octet_array_value, octet_array_t);
 
@@ -3086,18 +3305,18 @@ TEST(FastCDRTests, STDArrayOctet)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << octet_array_t;
-    },
+        {
+            cdr_ser_bad << octet_array_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> octet_array_value;
-    },
+        {
+            cdr_des_bad >> octet_array_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -3111,9 +3330,9 @@ TEST(FastCDRTests, STDArrayChar)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << char_array_t;
-    });
+        {
+            cdr_ser << char_array_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -3121,9 +3340,9 @@ TEST(FastCDRTests, STDArrayChar)
     std::array<char, N_ARR_ELEMENTS> char_array_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> char_array_value;
-    });
+        {
+            cdr_des >> char_array_value;
+        });
 
     EXPECT_EQ(char_array_value, char_array_t);
 
@@ -3135,18 +3354,18 @@ TEST(FastCDRTests, STDArrayChar)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << char_array_t;
-    },
+        {
+            cdr_ser_bad << char_array_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> char_array_value;
-    },
+        {
+            cdr_des_bad >> char_array_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -3160,9 +3379,9 @@ TEST(FastCDRTests, STDArrayWChar)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << wchar_array_t;
-    });
+        {
+            cdr_ser << wchar_array_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -3170,9 +3389,9 @@ TEST(FastCDRTests, STDArrayWChar)
     std::array<wchar_t, N_ARR_ELEMENTS> char_array_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> char_array_value;
-    });
+        {
+            cdr_des >> char_array_value;
+        });
 
     EXPECT_EQ(char_array_value, wchar_array_t);
 
@@ -3184,18 +3403,18 @@ TEST(FastCDRTests, STDArrayWChar)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << wchar_array_t;
-    },
+        {
+            cdr_ser_bad << wchar_array_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> char_array_value;
-    },
+        {
+            cdr_des_bad >> char_array_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -3209,9 +3428,9 @@ TEST(FastCDRTests, STDArrayInt8)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << int8_array_t;
-    });
+        {
+            cdr_ser << int8_array_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -3219,9 +3438,9 @@ TEST(FastCDRTests, STDArrayInt8)
     std::array<int8_t, N_ARR_ELEMENTS> int8_array_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> int8_array_value;
-    });
+        {
+            cdr_des >> int8_array_value;
+        });
 
     EXPECT_EQ(int8_array_value, int8_array_t);
 
@@ -3233,18 +3452,18 @@ TEST(FastCDRTests, STDArrayInt8)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << int8_array_t;
-    },
+        {
+            cdr_ser_bad << int8_array_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> int8_array_value;
-    },
+        {
+            cdr_des_bad >> int8_array_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -3258,9 +3477,9 @@ TEST(FastCDRTests, STDArrayUnsignedShort)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << ushort_array_t;
-    });
+        {
+            cdr_ser << ushort_array_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -3268,9 +3487,9 @@ TEST(FastCDRTests, STDArrayUnsignedShort)
     std::array<uint16_t, N_ARR_ELEMENTS> ushort_array_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> ushort_array_value;
-    });
+        {
+            cdr_des >> ushort_array_value;
+        });
 
     EXPECT_EQ(ushort_array_value, ushort_array_t);
 
@@ -3282,18 +3501,18 @@ TEST(FastCDRTests, STDArrayUnsignedShort)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << ushort_array_t;
-    },
+        {
+            cdr_ser_bad << ushort_array_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> ushort_array_value;
-    },
+        {
+            cdr_des_bad >> ushort_array_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -3307,9 +3526,9 @@ TEST(FastCDRTests, STDArrayShort)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << short_array_t;
-    });
+        {
+            cdr_ser << short_array_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -3317,9 +3536,9 @@ TEST(FastCDRTests, STDArrayShort)
     std::array<int16_t, N_ARR_ELEMENTS> short_array_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> short_array_value;
-    });
+        {
+            cdr_des >> short_array_value;
+        });
 
     EXPECT_EQ(short_array_value, short_array_t);
 
@@ -3331,18 +3550,18 @@ TEST(FastCDRTests, STDArrayShort)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << short_array_t;
-    },
+        {
+            cdr_ser_bad << short_array_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> short_array_value;
-    },
+        {
+            cdr_des_bad >> short_array_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -3356,9 +3575,9 @@ TEST(FastCDRTests, STDArrayUnsignedLong)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << ulong_array_t;
-    });
+        {
+            cdr_ser << ulong_array_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -3366,9 +3585,9 @@ TEST(FastCDRTests, STDArrayUnsignedLong)
     std::array<uint32_t, N_ARR_ELEMENTS> ulong_array_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> ulong_array_value;
-    });
+        {
+            cdr_des >> ulong_array_value;
+        });
 
     EXPECT_EQ(ulong_array_value, ulong_array_t);
 
@@ -3380,18 +3599,18 @@ TEST(FastCDRTests, STDArrayUnsignedLong)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << ulong_array_t;
-    },
+        {
+            cdr_ser_bad << ulong_array_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> ulong_array_value;
-    },
+        {
+            cdr_des_bad >> ulong_array_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -3405,9 +3624,9 @@ TEST(FastCDRTests, STDArrayLong)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << long_array_t;
-    });
+        {
+            cdr_ser << long_array_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -3415,9 +3634,9 @@ TEST(FastCDRTests, STDArrayLong)
     std::array<int32_t, N_ARR_ELEMENTS> long_array_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> long_array_value;
-    });
+        {
+            cdr_des >> long_array_value;
+        });
 
     EXPECT_EQ(long_array_value, long_array_t);
 
@@ -3429,18 +3648,18 @@ TEST(FastCDRTests, STDArrayLong)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << long_array_t;
-    },
+        {
+            cdr_ser_bad << long_array_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> long_array_value;
-    },
+        {
+            cdr_des_bad >> long_array_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -3454,9 +3673,9 @@ TEST(FastCDRTests, STDArrayUnsignedLongLong)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << ulonglong_array_t;
-    });
+        {
+            cdr_ser << ulonglong_array_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -3464,9 +3683,9 @@ TEST(FastCDRTests, STDArrayUnsignedLongLong)
     std::array<uint64_t, N_ARR_ELEMENTS> ulonglong_array_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> ulonglong_array_value;
-    });
+        {
+            cdr_des >> ulonglong_array_value;
+        });
 
     EXPECT_EQ(ulonglong_array_value, ulonglong_array_t);
 
@@ -3478,18 +3697,18 @@ TEST(FastCDRTests, STDArrayUnsignedLongLong)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << ulonglong_array_t;
-    },
+        {
+            cdr_ser_bad << ulonglong_array_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> ulonglong_array_value;
-    },
+        {
+            cdr_des_bad >> ulonglong_array_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -3503,9 +3722,9 @@ TEST(FastCDRTests, STDArrayLongLong)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << longlong_array_t;
-    });
+        {
+            cdr_ser << longlong_array_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -3513,9 +3732,9 @@ TEST(FastCDRTests, STDArrayLongLong)
     std::array<int64_t, N_ARR_ELEMENTS> longlong_array_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> longlong_array_value;
-    });
+        {
+            cdr_des >> longlong_array_value;
+        });
 
     EXPECT_EQ(longlong_array_value, longlong_array_t);
 
@@ -3527,18 +3746,18 @@ TEST(FastCDRTests, STDArrayLongLong)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << longlong_array_t;
-    },
+        {
+            cdr_ser_bad << longlong_array_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> longlong_array_value;
-    },
+        {
+            cdr_des_bad >> longlong_array_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -3552,9 +3771,9 @@ TEST(FastCDRTests, STDArrayFloat)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << float_array_t;
-    });
+        {
+            cdr_ser << float_array_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -3562,9 +3781,9 @@ TEST(FastCDRTests, STDArrayFloat)
     std::array<float, N_ARR_ELEMENTS> float_array_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> float_array_value;
-    });
+        {
+            cdr_des >> float_array_value;
+        });
 
     EXPECT_EQ(float_array_value, float_array_t);
 
@@ -3576,18 +3795,18 @@ TEST(FastCDRTests, STDArrayFloat)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << float_array_t;
-    },
+        {
+            cdr_ser_bad << float_array_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> float_array_value;
-    },
+        {
+            cdr_des_bad >> float_array_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -3601,9 +3820,9 @@ TEST(FastCDRTests, STDArrayDouble)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << double_array_t;
-    });
+        {
+            cdr_ser << double_array_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -3611,9 +3830,9 @@ TEST(FastCDRTests, STDArrayDouble)
     std::array<double, N_ARR_ELEMENTS> double_array_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> double_array_value;
-    });
+        {
+            cdr_des >> double_array_value;
+        });
 
     EXPECT_EQ(double_array_value, double_array_t);
 
@@ -3625,18 +3844,18 @@ TEST(FastCDRTests, STDArrayDouble)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << double_array_t;
-    },
+        {
+            cdr_ser_bad << double_array_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> double_array_value;
-    },
+        {
+            cdr_des_bad >> double_array_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -3650,9 +3869,9 @@ TEST(FastCDRTests, STDArrayLongDouble)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << ldouble_array_t;
-    });
+        {
+            cdr_ser << ldouble_array_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -3660,9 +3879,9 @@ TEST(FastCDRTests, STDArrayLongDouble)
     std::array<long double, N_ARR_ELEMENTS> ldouble_array_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> ldouble_array_value;
-    });
+        {
+            cdr_des >> ldouble_array_value;
+        });
 
     EXPECT_EQ(ldouble_array_value, ldouble_array_t);
 
@@ -3674,18 +3893,18 @@ TEST(FastCDRTests, STDArrayLongDouble)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << ldouble_array_t;
-    },
+        {
+            cdr_ser_bad << ldouble_array_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> ldouble_array_value;
-    },
+        {
+            cdr_des_bad >> ldouble_array_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -3699,9 +3918,9 @@ TEST(FastCDRTests, STDArrayBoolean)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << bool_array_t;
-    });
+        {
+            cdr_ser << bool_array_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -3709,9 +3928,9 @@ TEST(FastCDRTests, STDArrayBoolean)
     std::array<bool, N_ARR_ELEMENTS> bool_array_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> bool_array_value;
-    });
+        {
+            cdr_des >> bool_array_value;
+        });
 
     EXPECT_EQ(bool_array_value, bool_array_t);
 
@@ -3723,18 +3942,18 @@ TEST(FastCDRTests, STDArrayBoolean)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << bool_array_t;
-    },
+        {
+            cdr_ser_bad << bool_array_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> bool_array_value;
-    },
+        {
+            cdr_des_bad >> bool_array_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -3748,9 +3967,9 @@ TEST(FastCDRTests, STDArrayString)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << string_array_t;
-    });
+        {
+            cdr_ser << string_array_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -3758,9 +3977,9 @@ TEST(FastCDRTests, STDArrayString)
     std::array<std::string, N_ARR_ELEMENTS> string_array_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> string_array_value;
-    });
+        {
+            cdr_des >> string_array_value;
+        });
 
     EXPECT_EQ(string_array_value, string_array_t);
 
@@ -3772,18 +3991,18 @@ TEST(FastCDRTests, STDArrayString)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << string_array_t;
-    },
+        {
+            cdr_ser_bad << string_array_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> string_array_value;
-    },
+        {
+            cdr_des_bad >> string_array_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -3797,9 +4016,9 @@ TEST(FastCDRTests, STDArrayWString)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << wstring_array_t;
-    });
+        {
+            cdr_ser << wstring_array_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -3807,9 +4026,9 @@ TEST(FastCDRTests, STDArrayWString)
     std::array<std::wstring, N_ARR_ELEMENTS> string_array_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> string_array_value;
-    });
+        {
+            cdr_des >> string_array_value;
+        });
 
     EXPECT_EQ(string_array_value, wstring_array_t);
 
@@ -3821,18 +4040,18 @@ TEST(FastCDRTests, STDArrayWString)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << wstring_array_t;
-    },
+        {
+            cdr_ser_bad << wstring_array_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> string_array_value;
-    },
+        {
+            cdr_des_bad >> string_array_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -3846,9 +4065,9 @@ TEST(FastCDRTests, ArrayOctet)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_array(octet_array_2_t, 5);
-    });
+        {
+            cdr_ser.serialize_array(octet_array_2_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -3856,9 +4075,9 @@ TEST(FastCDRTests, ArrayOctet)
     uint8_t octet_array_2_value[N_ARR_ELEMENTS];
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_array(octet_array_2_value, 5);
-    });
+        {
+            cdr_des.deserialize_array(octet_array_2_value, 5);
+        });
 
     EXPECT_ARRAY_EQ(octet_array_2_value, octet_array_2_t, 5);
 
@@ -3870,18 +4089,18 @@ TEST(FastCDRTests, ArrayOctet)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_array(octet_array_2_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_array(octet_array_2_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_array(octet_array_2_value, 5);
-    },
+        {
+            cdr_des_bad.deserialize_array(octet_array_2_value, 5);
+        },
         NotEnoughMemoryException);
 }
 
@@ -3895,9 +4114,9 @@ TEST(FastCDRTests, ArrayChar)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_array(char_array_2_t, 5);
-    });
+        {
+            cdr_ser.serialize_array(char_array_2_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -3905,9 +4124,9 @@ TEST(FastCDRTests, ArrayChar)
     char char_array_2_value[N_ARR_ELEMENTS];
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_array(char_array_2_value, 5);
-    });
+        {
+            cdr_des.deserialize_array(char_array_2_value, 5);
+        });
 
     EXPECT_ARRAY_EQ(char_array_2_value, char_array_2_t, 5);
 
@@ -3919,18 +4138,18 @@ TEST(FastCDRTests, ArrayChar)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_array(char_array_2_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_array(char_array_2_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_array(char_array_2_value, 5);
-    },
+        {
+            cdr_des_bad.deserialize_array(char_array_2_value, 5);
+        },
         NotEnoughMemoryException);
 }
 
@@ -3944,9 +4163,9 @@ TEST(FastCDRTests, ArrayWChar)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_array(wchar_array_2_t, 5);
-    });
+        {
+            cdr_ser.serialize_array(wchar_array_2_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -3954,9 +4173,9 @@ TEST(FastCDRTests, ArrayWChar)
     wchar_t char_array_2_value[N_ARR_ELEMENTS];
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_array(char_array_2_value, 5);
-    });
+        {
+            cdr_des.deserialize_array(char_array_2_value, 5);
+        });
 
     EXPECT_ARRAY_EQ(char_array_2_value, wchar_array_2_t, 5);
 
@@ -3968,18 +4187,18 @@ TEST(FastCDRTests, ArrayWChar)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_array(wchar_array_2_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_array(wchar_array_2_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_array(char_array_2_value, 5);
-    },
+        {
+            cdr_des_bad.deserialize_array(char_array_2_value, 5);
+        },
         NotEnoughMemoryException);
 }
 
@@ -3993,9 +4212,9 @@ TEST(FastCDRTests, ArrayInt8)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_array(int8_array_2_t, 5);
-    });
+        {
+            cdr_ser.serialize_array(int8_array_2_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -4003,9 +4222,9 @@ TEST(FastCDRTests, ArrayInt8)
     int8_t int8_array_2_value[N_ARR_ELEMENTS];
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_array(int8_array_2_value, 5);
-    });
+        {
+            cdr_des.deserialize_array(int8_array_2_value, 5);
+        });
 
     EXPECT_ARRAY_EQ(int8_array_2_value, int8_array_2_t, 5);
 
@@ -4017,18 +4236,18 @@ TEST(FastCDRTests, ArrayInt8)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_array(int8_array_2_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_array(int8_array_2_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_array(int8_array_2_value, 5);
-    },
+        {
+            cdr_des_bad.deserialize_array(int8_array_2_value, 5);
+        },
         NotEnoughMemoryException);
 }
 
@@ -4042,9 +4261,9 @@ TEST(FastCDRTests, ArrayUnsignedShort)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_array(ushort_array_2_t, 5);
-    });
+        {
+            cdr_ser.serialize_array(ushort_array_2_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -4052,9 +4271,9 @@ TEST(FastCDRTests, ArrayUnsignedShort)
     uint16_t ushort_array_2_value[N_ARR_ELEMENTS];
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_array(ushort_array_2_value, 5);
-    });
+        {
+            cdr_des.deserialize_array(ushort_array_2_value, 5);
+        });
 
     EXPECT_ARRAY_EQ(ushort_array_2_value, ushort_array_2_t, 5);
 
@@ -4066,18 +4285,18 @@ TEST(FastCDRTests, ArrayUnsignedShort)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_array(ushort_array_2_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_array(ushort_array_2_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_array(ushort_array_2_value, 5);
-    },
+        {
+            cdr_des_bad.deserialize_array(ushort_array_2_value, 5);
+        },
         NotEnoughMemoryException);
 }
 
@@ -4091,9 +4310,9 @@ TEST(FastCDRTests, ArrayShort)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_array(short_array_2_t, 5);
-    });
+        {
+            cdr_ser.serialize_array(short_array_2_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -4101,9 +4320,9 @@ TEST(FastCDRTests, ArrayShort)
     int16_t short_array_2_value[N_ARR_ELEMENTS];
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_array(short_array_2_value, 5);
-    });
+        {
+            cdr_des.deserialize_array(short_array_2_value, 5);
+        });
 
     EXPECT_ARRAY_EQ(short_array_2_value, short_array_2_t, 5);
 
@@ -4115,18 +4334,18 @@ TEST(FastCDRTests, ArrayShort)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_array(short_array_2_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_array(short_array_2_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_array(short_array_2_value, 5);
-    },
+        {
+            cdr_des_bad.deserialize_array(short_array_2_value, 5);
+        },
         NotEnoughMemoryException);
 }
 
@@ -4140,9 +4359,9 @@ TEST(FastCDRTests, ArrayUnsignedLong)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_array(ulong_array_2_t, 5);
-    });
+        {
+            cdr_ser.serialize_array(ulong_array_2_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -4150,9 +4369,9 @@ TEST(FastCDRTests, ArrayUnsignedLong)
     uint32_t ulong_array_2_value[N_ARR_ELEMENTS];
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_array(ulong_array_2_value, 5);
-    });
+        {
+            cdr_des.deserialize_array(ulong_array_2_value, 5);
+        });
 
     EXPECT_ARRAY_EQ(ulong_array_2_value, ulong_array_2_t, 5);
 
@@ -4164,18 +4383,18 @@ TEST(FastCDRTests, ArrayUnsignedLong)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_array(ulong_array_2_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_array(ulong_array_2_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_array(ulong_array_2_value, 5);
-    },
+        {
+            cdr_des_bad.deserialize_array(ulong_array_2_value, 5);
+        },
         NotEnoughMemoryException);
 }
 
@@ -4189,9 +4408,9 @@ TEST(FastCDRTests, ArrayLong)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_array(long_array_2_t, 5);
-    });
+        {
+            cdr_ser.serialize_array(long_array_2_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -4199,9 +4418,9 @@ TEST(FastCDRTests, ArrayLong)
     int32_t long_array_2_value[N_ARR_ELEMENTS];
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_array(long_array_2_value, 5);
-    });
+        {
+            cdr_des.deserialize_array(long_array_2_value, 5);
+        });
 
     EXPECT_ARRAY_EQ(long_array_2_value, long_array_2_t, 5);
 
@@ -4213,18 +4432,18 @@ TEST(FastCDRTests, ArrayLong)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_array(long_array_2_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_array(long_array_2_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_array(long_array_2_value, 5);
-    },
+        {
+            cdr_des_bad.deserialize_array(long_array_2_value, 5);
+        },
         NotEnoughMemoryException);
 }
 
@@ -4238,9 +4457,9 @@ TEST(FastCDRTests, ArrayUnsignedLongLong)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_array(ulonglong_array_2_t, 5);
-    });
+        {
+            cdr_ser.serialize_array(ulonglong_array_2_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -4248,9 +4467,9 @@ TEST(FastCDRTests, ArrayUnsignedLongLong)
     uint64_t ulonglong_array_2_value[N_ARR_ELEMENTS];
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_array(ulonglong_array_2_value, 5);
-    });
+        {
+            cdr_des.deserialize_array(ulonglong_array_2_value, 5);
+        });
 
     EXPECT_ARRAY_EQ(ulonglong_array_2_value, ulonglong_array_2_t, 5);
 
@@ -4262,18 +4481,18 @@ TEST(FastCDRTests, ArrayUnsignedLongLong)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_array(ulonglong_array_2_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_array(ulonglong_array_2_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_array(ulonglong_array_2_value, 5);
-    },
+        {
+            cdr_des_bad.deserialize_array(ulonglong_array_2_value, 5);
+        },
         NotEnoughMemoryException);
 }
 
@@ -4287,9 +4506,9 @@ TEST(FastCDRTests, ArrayLongLong)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_array(longlong_array_2_t, 5);
-    });
+        {
+            cdr_ser.serialize_array(longlong_array_2_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -4297,9 +4516,9 @@ TEST(FastCDRTests, ArrayLongLong)
     int64_t longlong_array_2_value[N_ARR_ELEMENTS];
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_array(longlong_array_2_value, 5);
-    });
+        {
+            cdr_des.deserialize_array(longlong_array_2_value, 5);
+        });
 
     EXPECT_ARRAY_EQ(longlong_array_2_value, longlong_array_2_t, 5);
 
@@ -4311,18 +4530,18 @@ TEST(FastCDRTests, ArrayLongLong)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_array(longlong_array_2_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_array(longlong_array_2_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_array(longlong_array_2_value, 5);
-    },
+        {
+            cdr_des_bad.deserialize_array(longlong_array_2_value, 5);
+        },
         NotEnoughMemoryException);
 }
 
@@ -4336,9 +4555,9 @@ TEST(FastCDRTests, ArrayFloat)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_array(float_array_2_t, 5);
-    });
+        {
+            cdr_ser.serialize_array(float_array_2_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -4346,9 +4565,9 @@ TEST(FastCDRTests, ArrayFloat)
     float float_array_2_value[N_ARR_ELEMENTS];
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_array(float_array_2_value, 5);
-    });
+        {
+            cdr_des.deserialize_array(float_array_2_value, 5);
+        });
 
     EXPECT_ARRAY_FLOAT_EQ(float_array_2_value, float_array_2_t, 5);
 
@@ -4360,18 +4579,18 @@ TEST(FastCDRTests, ArrayFloat)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_array(float_array_2_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_array(float_array_2_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_array(float_array_2_value, 5);
-    },
+        {
+            cdr_des_bad.deserialize_array(float_array_2_value, 5);
+        },
         NotEnoughMemoryException);
 }
 
@@ -4385,9 +4604,9 @@ TEST(FastCDRTests, ArrayDouble)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_array(double_array_2_t, 5);
-    });
+        {
+            cdr_ser.serialize_array(double_array_2_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -4395,9 +4614,9 @@ TEST(FastCDRTests, ArrayDouble)
     double double_array_2_value[N_ARR_ELEMENTS];
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_array(double_array_2_value, 5);
-    });
+        {
+            cdr_des.deserialize_array(double_array_2_value, 5);
+        });
 
     EXPECT_ARRAY_DOUBLE_EQ(double_array_2_value, double_array_2_t, 5);
 
@@ -4409,18 +4628,18 @@ TEST(FastCDRTests, ArrayDouble)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_array(double_array_2_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_array(double_array_2_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_array(double_array_2_value, 5);
-    },
+        {
+            cdr_des_bad.deserialize_array(double_array_2_value, 5);
+        },
         NotEnoughMemoryException);
 }
 
@@ -4434,9 +4653,9 @@ TEST(FastCDRTests, ArrayLongDouble)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_array(ldouble_array_2_t, 5);
-    });
+        {
+            cdr_ser.serialize_array(ldouble_array_2_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -4444,9 +4663,9 @@ TEST(FastCDRTests, ArrayLongDouble)
     long double ldouble_array_2_value[N_ARR_ELEMENTS];
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_array(ldouble_array_2_value, 5);
-    });
+        {
+            cdr_des.deserialize_array(ldouble_array_2_value, 5);
+        });
 
     EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_array_2_value, ldouble_array_2_t, 5);
 
@@ -4458,18 +4677,18 @@ TEST(FastCDRTests, ArrayLongDouble)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_array(ldouble_array_2_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_array(ldouble_array_2_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_array(ldouble_array_2_value, 5);
-    },
+        {
+            cdr_des_bad.deserialize_array(ldouble_array_2_value, 5);
+        },
         NotEnoughMemoryException);
 }
 
@@ -4483,9 +4702,9 @@ TEST(FastCDRTests, ArrayBoolean)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_array(bool_array_2_t, 5);
-    });
+        {
+            cdr_ser.serialize_array(bool_array_2_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -4493,9 +4712,9 @@ TEST(FastCDRTests, ArrayBoolean)
     bool bool_array_2_value[N_ARR_ELEMENTS];
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_array(bool_array_2_value, 5);
-    });
+        {
+            cdr_des.deserialize_array(bool_array_2_value, 5);
+        });
 
     EXPECT_ARRAY_EQ(bool_array_2_value, bool_array_2_t, 5);
 
@@ -4507,18 +4726,18 @@ TEST(FastCDRTests, ArrayBoolean)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_array(bool_array_2_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_array(bool_array_2_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_array(bool_array_2_value, 5);
-    },
+        {
+            cdr_des_bad.deserialize_array(bool_array_2_value, 5);
+        },
         NotEnoughMemoryException);
 }
 
@@ -4532,9 +4751,9 @@ TEST(FastCDRTests, ArrayString)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_array(string_array_2_t, 5);
-    });
+        {
+            cdr_ser.serialize_array(string_array_2_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -4542,9 +4761,9 @@ TEST(FastCDRTests, ArrayString)
     std::string string_array_2_value[N_ARR_ELEMENTS];
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_array(string_array_2_value, 5);
-    });
+        {
+            cdr_des.deserialize_array(string_array_2_value, 5);
+        });
 
     EXPECT_ARRAY_EQ(string_array_2_value, string_array_2_t, 5);
 
@@ -4556,18 +4775,18 @@ TEST(FastCDRTests, ArrayString)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_array(string_array_2_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_array(string_array_2_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_array(string_array_2_value, 5);
-    },
+        {
+            cdr_des_bad.deserialize_array(string_array_2_value, 5);
+        },
         NotEnoughMemoryException);
 }
 
@@ -4581,9 +4800,9 @@ TEST(FastCDRTests, ArrayWString)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_array(wstring_array_2_t, 5);
-    });
+        {
+            cdr_ser.serialize_array(wstring_array_2_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -4591,9 +4810,9 @@ TEST(FastCDRTests, ArrayWString)
     std::wstring string_array_2_value[N_ARR_ELEMENTS];
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_array(string_array_2_value, 5);
-    });
+        {
+            cdr_des.deserialize_array(string_array_2_value, 5);
+        });
 
     EXPECT_ARRAY_EQ(string_array_2_value, wstring_array_2_t, 5);
 
@@ -4605,18 +4824,18 @@ TEST(FastCDRTests, ArrayWString)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_array(wstring_array_2_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_array(wstring_array_2_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_array(string_array_2_value, 5);
-    },
+        {
+            cdr_des_bad.deserialize_array(string_array_2_value, 5);
+        },
         NotEnoughMemoryException);
 }
 
@@ -4630,9 +4849,9 @@ TEST(FastCDRTests, STDVectorOctet)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << octet_vector_t;
-    });
+        {
+            cdr_ser << octet_vector_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -4640,9 +4859,9 @@ TEST(FastCDRTests, STDVectorOctet)
     std::vector<uint8_t> octet_vector_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> octet_vector_value;
-    });
+        {
+            cdr_des >> octet_vector_value;
+        });
 
     EXPECT_EQ(octet_vector_value, octet_vector_t);
 
@@ -4654,18 +4873,18 @@ TEST(FastCDRTests, STDVectorOctet)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << octet_vector_t;
-    },
+        {
+            cdr_ser_bad << octet_vector_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> octet_vector_value;
-    },
+        {
+            cdr_des_bad >> octet_vector_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -4679,9 +4898,9 @@ TEST(FastCDRTests, STDVectorChar)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << char_vector_t;
-    });
+        {
+            cdr_ser << char_vector_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -4689,9 +4908,9 @@ TEST(FastCDRTests, STDVectorChar)
     std::vector<char> char_vector_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> char_vector_value;
-    });
+        {
+            cdr_des >> char_vector_value;
+        });
 
     EXPECT_EQ(char_vector_value, char_vector_t);
 
@@ -4703,18 +4922,18 @@ TEST(FastCDRTests, STDVectorChar)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << char_vector_t;
-    },
+        {
+            cdr_ser_bad << char_vector_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> char_vector_value;
-    },
+        {
+            cdr_des_bad >> char_vector_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -4728,9 +4947,9 @@ TEST(FastCDRTests, STDVectorWChar)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << wchar_vector_t;
-    });
+        {
+            cdr_ser << wchar_vector_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -4738,9 +4957,9 @@ TEST(FastCDRTests, STDVectorWChar)
     std::vector<wchar_t> char_vector_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> char_vector_value;
-    });
+        {
+            cdr_des >> char_vector_value;
+        });
 
     EXPECT_EQ(char_vector_value, wchar_vector_t);
 
@@ -4752,18 +4971,18 @@ TEST(FastCDRTests, STDVectorWChar)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << wchar_vector_t;
-    },
+        {
+            cdr_ser_bad << wchar_vector_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> char_vector_value;
-    },
+        {
+            cdr_des_bad >> char_vector_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -4777,9 +4996,9 @@ TEST(FastCDRTests, STDVectorInt8)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << int8_vector_t;
-    });
+        {
+            cdr_ser << int8_vector_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -4787,9 +5006,9 @@ TEST(FastCDRTests, STDVectorInt8)
     std::vector<int8_t> int8_vector_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> int8_vector_value;
-    });
+        {
+            cdr_des >> int8_vector_value;
+        });
 
     EXPECT_EQ(int8_vector_value, int8_vector_t);
 
@@ -4801,18 +5020,18 @@ TEST(FastCDRTests, STDVectorInt8)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << int8_vector_t;
-    },
+        {
+            cdr_ser_bad << int8_vector_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> int8_vector_value;
-    },
+        {
+            cdr_des_bad >> int8_vector_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -4826,9 +5045,9 @@ TEST(FastCDRTests, STDVectorUnsignedShort)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << ushort_vector_t;
-    });
+        {
+            cdr_ser << ushort_vector_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -4836,9 +5055,9 @@ TEST(FastCDRTests, STDVectorUnsignedShort)
     std::vector<uint16_t> ushort_vector_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> ushort_vector_value;
-    });
+        {
+            cdr_des >> ushort_vector_value;
+        });
 
     EXPECT_EQ(ushort_vector_value, ushort_vector_t);
 
@@ -4850,18 +5069,18 @@ TEST(FastCDRTests, STDVectorUnsignedShort)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << ushort_vector_t;
-    },
+        {
+            cdr_ser_bad << ushort_vector_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> ushort_vector_value;
-    },
+        {
+            cdr_des_bad >> ushort_vector_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -4875,9 +5094,9 @@ TEST(FastCDRTests, STDVectorShort)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << short_vector_t;
-    });
+        {
+            cdr_ser << short_vector_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -4885,9 +5104,9 @@ TEST(FastCDRTests, STDVectorShort)
     std::vector<int16_t> short_vector_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> short_vector_value;
-    });
+        {
+            cdr_des >> short_vector_value;
+        });
 
     EXPECT_EQ(short_vector_value, short_vector_t);
 
@@ -4899,18 +5118,18 @@ TEST(FastCDRTests, STDVectorShort)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << short_vector_t;
-    },
+        {
+            cdr_ser_bad << short_vector_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> short_vector_value;
-    },
+        {
+            cdr_des_bad >> short_vector_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -4924,9 +5143,9 @@ TEST(FastCDRTests, STDVectorUnsignedLong)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << ulong_vector_t;
-    });
+        {
+            cdr_ser << ulong_vector_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -4934,9 +5153,9 @@ TEST(FastCDRTests, STDVectorUnsignedLong)
     std::vector<uint32_t> ulong_vector_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> ulong_vector_value;
-    });
+        {
+            cdr_des >> ulong_vector_value;
+        });
 
     EXPECT_EQ(ulong_vector_value, ulong_vector_t);
 
@@ -4948,18 +5167,18 @@ TEST(FastCDRTests, STDVectorUnsignedLong)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << ulong_vector_t;
-    },
+        {
+            cdr_ser_bad << ulong_vector_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> ulong_vector_value;
-    },
+        {
+            cdr_des_bad >> ulong_vector_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -4973,9 +5192,9 @@ TEST(FastCDRTests, STDVectorLong)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << long_vector_t;
-    });
+        {
+            cdr_ser << long_vector_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -4983,9 +5202,9 @@ TEST(FastCDRTests, STDVectorLong)
     std::vector<int32_t> long_vector_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> long_vector_value;
-    });
+        {
+            cdr_des >> long_vector_value;
+        });
 
     EXPECT_EQ(long_vector_value, long_vector_t);
 
@@ -4997,18 +5216,18 @@ TEST(FastCDRTests, STDVectorLong)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << long_vector_t;
-    },
+        {
+            cdr_ser_bad << long_vector_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> long_vector_value;
-    },
+        {
+            cdr_des_bad >> long_vector_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -5022,9 +5241,9 @@ TEST(FastCDRTests, STDVectorUnsignedLongLong)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << ulonglong_vector_t;
-    });
+        {
+            cdr_ser << ulonglong_vector_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -5032,9 +5251,9 @@ TEST(FastCDRTests, STDVectorUnsignedLongLong)
     std::vector<uint64_t> ulonglong_vector_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> ulonglong_vector_value;
-    });
+        {
+            cdr_des >> ulonglong_vector_value;
+        });
 
     EXPECT_EQ(ulonglong_vector_value, ulonglong_vector_t);
 
@@ -5046,18 +5265,18 @@ TEST(FastCDRTests, STDVectorUnsignedLongLong)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << ulonglong_vector_t;
-    },
+        {
+            cdr_ser_bad << ulonglong_vector_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> ulonglong_vector_value;
-    },
+        {
+            cdr_des_bad >> ulonglong_vector_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -5071,9 +5290,9 @@ TEST(FastCDRTests, STDVectorLongLong)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << longlong_vector_t;
-    });
+        {
+            cdr_ser << longlong_vector_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -5081,9 +5300,9 @@ TEST(FastCDRTests, STDVectorLongLong)
     std::vector<int64_t> longlong_vector_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> longlong_vector_value;
-    });
+        {
+            cdr_des >> longlong_vector_value;
+        });
 
     EXPECT_EQ(longlong_vector_value, longlong_vector_t);
 
@@ -5095,18 +5314,18 @@ TEST(FastCDRTests, STDVectorLongLong)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << longlong_vector_t;
-    },
+        {
+            cdr_ser_bad << longlong_vector_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> longlong_vector_value;
-    },
+        {
+            cdr_des_bad >> longlong_vector_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -5120,9 +5339,9 @@ TEST(FastCDRTests, STDVectorFloat)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << float_vector_t;
-    });
+        {
+            cdr_ser << float_vector_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -5130,9 +5349,9 @@ TEST(FastCDRTests, STDVectorFloat)
     std::vector<float> float_vector_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> float_vector_value;
-    });
+        {
+            cdr_des >> float_vector_value;
+        });
 
     EXPECT_EQ(float_vector_value, float_vector_t);
 
@@ -5144,18 +5363,18 @@ TEST(FastCDRTests, STDVectorFloat)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << float_vector_t;
-    },
+        {
+            cdr_ser_bad << float_vector_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> float_vector_value;
-    },
+        {
+            cdr_des_bad >> float_vector_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -5169,9 +5388,9 @@ TEST(FastCDRTests, STDVectorDouble)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << double_vector_t;
-    });
+        {
+            cdr_ser << double_vector_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -5179,9 +5398,9 @@ TEST(FastCDRTests, STDVectorDouble)
     std::vector<double> double_vector_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> double_vector_value;
-    });
+        {
+            cdr_des >> double_vector_value;
+        });
 
     EXPECT_EQ(double_vector_value, double_vector_t);
 
@@ -5193,18 +5412,18 @@ TEST(FastCDRTests, STDVectorDouble)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << double_vector_t;
-    },
+        {
+            cdr_ser_bad << double_vector_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> double_vector_value;
-    },
+        {
+            cdr_des_bad >> double_vector_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -5218,9 +5437,9 @@ TEST(FastCDRTests, STDVectorLongDouble)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << ldouble_vector_t;
-    });
+        {
+            cdr_ser << ldouble_vector_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -5228,9 +5447,9 @@ TEST(FastCDRTests, STDVectorLongDouble)
     std::vector<long double> ldouble_vector_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> ldouble_vector_value;
-    });
+        {
+            cdr_des >> ldouble_vector_value;
+        });
 
     EXPECT_EQ(ldouble_vector_value, ldouble_vector_t);
 
@@ -5242,18 +5461,18 @@ TEST(FastCDRTests, STDVectorLongDouble)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << ldouble_vector_t;
-    },
+        {
+            cdr_ser_bad << ldouble_vector_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> ldouble_vector_value;
-    },
+        {
+            cdr_des_bad >> ldouble_vector_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -5267,9 +5486,9 @@ TEST(FastCDRTests, STDVectorBoolean)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << bool_vector_t;
-    });
+        {
+            cdr_ser << bool_vector_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -5277,9 +5496,9 @@ TEST(FastCDRTests, STDVectorBoolean)
     std::vector<bool> bool_vector_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> bool_vector_value;
-    });
+        {
+            cdr_des >> bool_vector_value;
+        });
 
     EXPECT_EQ(bool_vector_value, bool_vector_t);
 
@@ -5291,18 +5510,18 @@ TEST(FastCDRTests, STDVectorBoolean)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << bool_vector_t;
-    },
+        {
+            cdr_ser_bad << bool_vector_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> bool_vector_value;
-    },
+        {
+            cdr_des_bad >> bool_vector_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -5316,9 +5535,9 @@ TEST(FastCDRTests, STDVectorString)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << string_vector_t;
-    });
+        {
+            cdr_ser << string_vector_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -5326,9 +5545,9 @@ TEST(FastCDRTests, STDVectorString)
     std::vector<std::string> string_vector_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> string_vector_value;
-    });
+        {
+            cdr_des >> string_vector_value;
+        });
 
     EXPECT_EQ(string_vector_value, string_vector_t);
 
@@ -5340,18 +5559,18 @@ TEST(FastCDRTests, STDVectorString)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << string_vector_t;
-    },
+        {
+            cdr_ser_bad << string_vector_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> string_vector_value;
-    },
+        {
+            cdr_des_bad >> string_vector_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -5365,9 +5584,9 @@ TEST(FastCDRTests, STDVectorWString)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << wstring_vector_t;
-    });
+        {
+            cdr_ser << wstring_vector_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -5375,9 +5594,9 @@ TEST(FastCDRTests, STDVectorWString)
     std::vector<std::wstring> string_vector_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> string_vector_value;
-    });
+        {
+            cdr_des >> string_vector_value;
+        });
 
     EXPECT_EQ(string_vector_value, wstring_vector_t);
 
@@ -5389,18 +5608,18 @@ TEST(FastCDRTests, STDVectorWString)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << wstring_vector_t;
-    },
+        {
+            cdr_ser_bad << wstring_vector_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> string_vector_value;
-    },
+        {
+            cdr_des_bad >> string_vector_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -5414,9 +5633,9 @@ TEST(FastCDRTests, STDTripleArrayUnsignedLong)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << triple_ulong_array_t;
-    });
+        {
+            cdr_ser << triple_ulong_array_t;
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -5424,9 +5643,9 @@ TEST(FastCDRTests, STDTripleArrayUnsignedLong)
     std::array<std::array<std::array<uint32_t, 3>, 2>, 2> triple_ulong_array_value;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> triple_ulong_array_value;
-    });
+        {
+            cdr_des >> triple_ulong_array_value;
+        });
 
     EXPECT_EQ(triple_ulong_array_value, triple_ulong_array_t);
 
@@ -5438,18 +5657,18 @@ TEST(FastCDRTests, STDTripleArrayUnsignedLong)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad << triple_ulong_array_t;
-    },
+        {
+            cdr_ser_bad << triple_ulong_array_t;
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad >> triple_ulong_array_value;
-    },
+        {
+            cdr_des_bad >> triple_ulong_array_value;
+        },
         NotEnoughMemoryException);
 }
 
@@ -5463,9 +5682,9 @@ TEST(FastCDRTests, SequenceOctet)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(octet_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(octet_seq_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -5473,9 +5692,9 @@ TEST(FastCDRTests, SequenceOctet)
     uint8_t* octet_seq_value = NULL; size_t octet_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(octet_seq_value, octet_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(octet_seq_value, octet_seq_len);
+        });
 
     EXPECT_EQ(octet_seq_len, 5u);
     EXPECT_ARRAY_EQ(octet_seq_value, octet_seq_t, octet_seq_len);
@@ -5490,18 +5709,18 @@ TEST(FastCDRTests, SequenceOctet)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(octet_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(octet_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(octet_seq_value, octet_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(octet_seq_value, octet_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -5515,9 +5734,9 @@ TEST(FastCDRTests, SequenceChar)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(char_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(char_seq_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -5525,9 +5744,9 @@ TEST(FastCDRTests, SequenceChar)
     char* char_seq_value = NULL; size_t char_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(char_seq_value, char_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(char_seq_value, char_seq_len);
+        });
 
     EXPECT_EQ(char_seq_len, 5u);
     EXPECT_ARRAY_EQ(char_seq_value, char_seq_t, char_seq_len);
@@ -5542,18 +5761,18 @@ TEST(FastCDRTests, SequenceChar)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(char_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(char_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(char_seq_value, char_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(char_seq_value, char_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -5567,9 +5786,9 @@ TEST(FastCDRTests, SequenceWChar)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(wchar_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(wchar_seq_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -5577,9 +5796,9 @@ TEST(FastCDRTests, SequenceWChar)
     wchar_t* char_seq_value = NULL; size_t char_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(char_seq_value, char_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(char_seq_value, char_seq_len);
+        });
 
     EXPECT_EQ(char_seq_len, 5u);
     EXPECT_ARRAY_EQ(char_seq_value, wchar_seq_t, char_seq_len);
@@ -5594,18 +5813,18 @@ TEST(FastCDRTests, SequenceWChar)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(wchar_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(wchar_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(char_seq_value, char_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(char_seq_value, char_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -5619,9 +5838,9 @@ TEST(FastCDRTests, SequenceInt8)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(int8_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(int8_seq_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -5629,9 +5848,9 @@ TEST(FastCDRTests, SequenceInt8)
     int8_t* int8_seq_value = NULL; size_t int8_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(int8_seq_value, int8_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(int8_seq_value, int8_seq_len);
+        });
 
     EXPECT_EQ(int8_seq_len, 5u);
     EXPECT_ARRAY_EQ(int8_seq_value, int8_seq_t, int8_seq_len);
@@ -5646,18 +5865,18 @@ TEST(FastCDRTests, SequenceInt8)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(int8_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(int8_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(int8_seq_value, int8_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(int8_seq_value, int8_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -5671,9 +5890,9 @@ TEST(FastCDRTests, SequenceUnsignedShort)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(ushort_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(ushort_seq_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -5681,9 +5900,9 @@ TEST(FastCDRTests, SequenceUnsignedShort)
     uint16_t* ushort_seq_value = NULL; size_t ushort_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(ushort_seq_value, ushort_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(ushort_seq_value, ushort_seq_len);
+        });
 
     EXPECT_EQ(ushort_seq_len, 5u);
     EXPECT_ARRAY_EQ(ushort_seq_value, ushort_seq_t, ushort_seq_len);
@@ -5698,18 +5917,18 @@ TEST(FastCDRTests, SequenceUnsignedShort)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(ushort_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(ushort_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(ushort_seq_value, ushort_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(ushort_seq_value, ushort_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -5723,9 +5942,9 @@ TEST(FastCDRTests, SequenceShort)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(short_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(short_seq_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -5733,9 +5952,9 @@ TEST(FastCDRTests, SequenceShort)
     int16_t* short_seq_value = NULL; size_t short_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(short_seq_value, short_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(short_seq_value, short_seq_len);
+        });
 
     EXPECT_EQ(short_seq_len, 5u);
     EXPECT_ARRAY_EQ(short_seq_value, short_seq_t, short_seq_len);
@@ -5750,18 +5969,18 @@ TEST(FastCDRTests, SequenceShort)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(short_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(short_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(short_seq_value, short_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(short_seq_value, short_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -5775,9 +5994,9 @@ TEST(FastCDRTests, SequenceUnsignedLong)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(ulong_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(ulong_seq_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -5785,9 +6004,9 @@ TEST(FastCDRTests, SequenceUnsignedLong)
     uint32_t* ulong_seq_value = NULL; size_t ulong_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(ulong_seq_value, ulong_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(ulong_seq_value, ulong_seq_len);
+        });
 
     EXPECT_EQ(ulong_seq_len, 5u);
     EXPECT_ARRAY_EQ(ulong_seq_value, ulong_seq_t, ulong_seq_len);
@@ -5802,18 +6021,18 @@ TEST(FastCDRTests, SequenceUnsignedLong)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(ulong_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(ulong_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(ulong_seq_value, ulong_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(ulong_seq_value, ulong_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -5827,9 +6046,9 @@ TEST(FastCDRTests, SequenceLong)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(long_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(long_seq_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -5837,9 +6056,9 @@ TEST(FastCDRTests, SequenceLong)
     int32_t* long_seq_value = NULL; size_t long_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(long_seq_value, long_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(long_seq_value, long_seq_len);
+        });
 
     EXPECT_EQ(long_seq_len, 5u);
     EXPECT_ARRAY_EQ(long_seq_value, long_seq_t, long_seq_len);
@@ -5854,18 +6073,18 @@ TEST(FastCDRTests, SequenceLong)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(long_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(long_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(long_seq_value, long_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(long_seq_value, long_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -5879,9 +6098,9 @@ TEST(FastCDRTests, SequenceUnsignedLongLong)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(ulonglong_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(ulonglong_seq_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -5889,9 +6108,9 @@ TEST(FastCDRTests, SequenceUnsignedLongLong)
     uint64_t* ulonglong_seq_value = NULL; size_t ulonglong_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(ulonglong_seq_value, ulonglong_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(ulonglong_seq_value, ulonglong_seq_len);
+        });
 
     EXPECT_EQ(ulonglong_seq_len, 5u);
     EXPECT_ARRAY_EQ(ulonglong_seq_value, ulonglong_seq_t, ulonglong_seq_len);
@@ -5906,18 +6125,18 @@ TEST(FastCDRTests, SequenceUnsignedLongLong)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(ulonglong_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(ulonglong_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(ulonglong_seq_value, ulonglong_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(ulonglong_seq_value, ulonglong_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -5931,9 +6150,9 @@ TEST(FastCDRTests, SequenceLongLong)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(longlong_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(longlong_seq_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -5941,9 +6160,9 @@ TEST(FastCDRTests, SequenceLongLong)
     int64_t* longlong_seq_value = NULL; size_t longlong_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(longlong_seq_value, longlong_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(longlong_seq_value, longlong_seq_len);
+        });
 
     EXPECT_EQ(longlong_seq_len, 5u);
     EXPECT_ARRAY_EQ(longlong_seq_value, longlong_seq_t, longlong_seq_len);
@@ -5958,18 +6177,18 @@ TEST(FastCDRTests, SequenceLongLong)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(longlong_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(longlong_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(longlong_seq_value, longlong_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(longlong_seq_value, longlong_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -5983,9 +6202,9 @@ TEST(FastCDRTests, SequenceFloat)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(float_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(float_seq_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -5993,9 +6212,9 @@ TEST(FastCDRTests, SequenceFloat)
     float* float_seq_value = NULL; size_t float_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(float_seq_value, float_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(float_seq_value, float_seq_len);
+        });
 
     EXPECT_EQ(float_seq_len, 5u);
     EXPECT_ARRAY_FLOAT_EQ(float_seq_value, float_seq_t, float_seq_len);
@@ -6010,18 +6229,18 @@ TEST(FastCDRTests, SequenceFloat)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(float_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(float_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(float_seq_value, float_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(float_seq_value, float_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -6035,9 +6254,9 @@ TEST(FastCDRTests, SequenceDouble)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(double_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(double_seq_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -6045,9 +6264,9 @@ TEST(FastCDRTests, SequenceDouble)
     double* double_seq_value = NULL; size_t double_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(double_seq_value, double_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(double_seq_value, double_seq_len);
+        });
 
     EXPECT_EQ(double_seq_len, 5u);
     EXPECT_ARRAY_DOUBLE_EQ(double_seq_value, double_seq_t, double_seq_len);
@@ -6062,18 +6281,18 @@ TEST(FastCDRTests, SequenceDouble)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(double_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(double_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(double_seq_value, double_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(double_seq_value, double_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -6087,9 +6306,9 @@ TEST(FastCDRTests, SequenceLongDouble)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(ldouble_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(ldouble_seq_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -6097,9 +6316,9 @@ TEST(FastCDRTests, SequenceLongDouble)
     long double* ldouble_seq_value = NULL; size_t ldouble_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(ldouble_seq_value, ldouble_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(ldouble_seq_value, ldouble_seq_len);
+        });
 
     EXPECT_EQ(ldouble_seq_len, 5u);
     EXPECT_ARRAY_LONG_DOUBLE_EQ(ldouble_seq_value, ldouble_seq_t, ldouble_seq_len);
@@ -6114,18 +6333,18 @@ TEST(FastCDRTests, SequenceLongDouble)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(ldouble_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(ldouble_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(ldouble_seq_value, ldouble_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(ldouble_seq_value, ldouble_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -6139,9 +6358,9 @@ TEST(FastCDRTests, SequenceBoolean)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(bool_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(bool_seq_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -6149,9 +6368,9 @@ TEST(FastCDRTests, SequenceBoolean)
     bool* bool_seq_value = NULL; size_t bool_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(bool_seq_value, bool_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(bool_seq_value, bool_seq_len);
+        });
 
     EXPECT_EQ(bool_seq_len, 5u);
     EXPECT_ARRAY_EQ(bool_seq_value, bool_seq_t, bool_seq_len);
@@ -6166,18 +6385,18 @@ TEST(FastCDRTests, SequenceBoolean)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(bool_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(bool_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(bool_seq_value, bool_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(bool_seq_value, bool_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -6191,9 +6410,9 @@ TEST(FastCDRTests, SequenceString)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(string_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(string_seq_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -6201,9 +6420,9 @@ TEST(FastCDRTests, SequenceString)
     std::string* string_seq_value = NULL; size_t string_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(string_seq_value, string_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(string_seq_value, string_seq_len);
+        });
 
     EXPECT_EQ(string_seq_len, 5u);
     EXPECT_ARRAY_EQ(string_seq_value, string_seq_t, string_seq_len);
@@ -6218,18 +6437,18 @@ TEST(FastCDRTests, SequenceString)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(string_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(string_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(string_seq_value, string_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(string_seq_value, string_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -6243,9 +6462,9 @@ TEST(FastCDRTests, SequenceWString)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize_sequence(wstring_seq_t, 5);
-    });
+        {
+            cdr_ser.serialize_sequence(wstring_seq_t, 5);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -6253,9 +6472,9 @@ TEST(FastCDRTests, SequenceWString)
     std::wstring* string_seq_value = NULL; size_t string_seq_len = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize_sequence(string_seq_value, string_seq_len);
-    });
+        {
+            cdr_des.deserialize_sequence(string_seq_value, string_seq_len);
+        });
 
     EXPECT_EQ(string_seq_len, 5u);
     EXPECT_ARRAY_EQ(string_seq_value, wstring_seq_t, string_seq_len);
@@ -6270,18 +6489,18 @@ TEST(FastCDRTests, SequenceWString)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize_sequence(wstring_seq_t, 5);
-    },
+        {
+            cdr_ser_bad.serialize_sequence(wstring_seq_t, 5);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize_sequence(string_seq_value, string_seq_len);
-    },
+        {
+            cdr_des_bad.deserialize_sequence(string_seq_value, string_seq_len);
+        },
         NotEnoughMemoryException);
 }
 
@@ -6295,9 +6514,9 @@ TEST(FastCDRTests, CString)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize(c_string_t);
-    });
+        {
+            cdr_ser.serialize(c_string_t);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -6305,9 +6524,9 @@ TEST(FastCDRTests, CString)
     char* c_string_value = NULL;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize(c_string_value);
-    });
+        {
+            cdr_des.deserialize(c_string_value);
+        });
 
     EXPECT_EQ(strcmp(c_string_value, c_string_t), 0);
 
@@ -6321,18 +6540,18 @@ TEST(FastCDRTests, CString)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize(c_string_t);
-    },
+        {
+            cdr_ser_bad.serialize(c_string_t);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize(c_string_value);
-    },
+        {
+            cdr_des_bad.deserialize(c_string_value);
+        },
         NotEnoughMemoryException);
 }
 
@@ -6346,9 +6565,9 @@ TEST(FastCDRTests, CWString)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser.serialize(c_wstring_t);
-    });
+        {
+            cdr_ser.serialize(c_wstring_t);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -6356,9 +6575,9 @@ TEST(FastCDRTests, CWString)
     wchar_t* c_string_value = NULL;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des.deserialize(c_string_value);
-    });
+        {
+            cdr_des.deserialize(c_string_value);
+        });
 
     EXPECT_EQ(wcscmp(c_string_value, c_wstring_t), 0);
 
@@ -6372,18 +6591,18 @@ TEST(FastCDRTests, CWString)
     FastCdr cdr_ser_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_ser_bad.serialize(c_wstring_t);
-    },
+        {
+            cdr_ser_bad.serialize(c_wstring_t);
+        },
         NotEnoughMemoryException);
 
     // Deserialization.
     FastCdr cdr_des_bad(cdrbuffer_bad);
 
     EXPECT_THROW(
-    {
-        cdr_des_bad.deserialize(c_string_value);
-    },
+        {
+            cdr_des_bad.deserialize(c_string_value);
+        },
         NotEnoughMemoryException);
 }
 
@@ -6397,44 +6616,50 @@ TEST(FastCDRTests, Complete)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser << octet_t << char_t << int8 << ushort_t << short_t << ulong_t << long_t << ulonglong_t << longlong_t <<
-            float_tt << double_tt << ldouble_tt << bool_t << string_t;
-        cdr_ser << octet_array_t << char_array_t << int8_array_t << ushort_array_t << short_array_t << ulong_array_t <<
-            long_array_t << ulonglong_array_t << longlong_array_t << float_array_t << double_array_t << ldouble_array_t << bool_array_t;
-        cdr_ser.serialize_array(octet_array_2_t,
-        5).serialize_array(char_array_2_t, 5).serialize_array(int8_array_2_t, 5).
-                serialize_array(ushort_array_2_t, 5).serialize_array(short_array_2_t,
-        5).serialize_array(ulong_array_2_t,
-        5).
-                serialize_array(long_array_2_t, 5).serialize_array(ulonglong_array_2_t,
-        5).serialize_array(longlong_array_2_t, 5).
-                serialize_array(float_array_2_t, 5).serialize_array(double_array_2_t,
-        5).serialize_array(ldouble_array_2_t,
-        5).
-                serialize_array(bool_array_2_t,
-        5);
-        cdr_ser << octet_vector_t << char_vector_t << int8_vector_t << ushort_vector_t << short_vector_t << ulong_vector_t <<
-            long_vector_t << ulonglong_vector_t << longlong_vector_t << float_vector_t << double_vector_t <<
-            ldouble_vector_t << bool_vector_t;
-        cdr_ser << triple_ulong_array_t;
-        cdr_ser.serialize_sequence(octet_seq_t, 5).serialize_sequence(char_seq_t, 5).serialize_sequence(int8_seq_t, 5).
-                serialize_sequence(ushort_seq_t, 5).serialize_sequence(short_seq_t, 5).serialize_sequence(ulong_seq_t,
-        5).
-                serialize_sequence(long_seq_t, 5).serialize_sequence(ulonglong_seq_t,
-        5).serialize_sequence(longlong_seq_t,
-        5).
-                serialize_sequence(float_seq_t, 5).serialize_sequence(double_seq_t, 5).serialize_sequence(ldouble_seq_t,
-        5);
-        cdr_ser.serialize(c_string_t);
-        // Wstring and wchar
-        cdr_ser << wchar << wstring_t;
-        cdr_ser.serialize_array(wchar_array_2_t, 5).serialize_array(wstring_array_2_t, 5);
-        cdr_ser << wchar_array_t << wstring_array_t;
-        cdr_ser << wchar_vector_t << wstring_vector_t;
-        cdr_ser.serialize_sequence(wchar_seq_t, 5).serialize_sequence(wstring_seq_t, 5);
-        cdr_ser.serialize(c_wstring_t);
-    });
+        {
+            cdr_ser << octet_t << char_t << int8 << ushort_t << short_t << ulong_t << long_t << ulonglong_t
+                    << longlong_t
+                    << float_tt << double_tt << ldouble_tt << bool_t << string_t;
+            cdr_ser << octet_array_t << char_array_t << int8_array_t << ushort_array_t << short_array_t << ulong_array_t
+                    << long_array_t << ulonglong_array_t << longlong_array_t << float_array_t << double_array_t
+                    << ldouble_array_t << bool_array_t;
+            cdr_ser.serialize_array(octet_array_2_t,
+            5).serialize_array(char_array_2_t, 5).serialize_array(int8_array_2_t, 5).
+                    serialize_array(ushort_array_2_t, 5).serialize_array(short_array_2_t,
+            5).serialize_array(ulong_array_2_t,
+            5).
+                    serialize_array(long_array_2_t, 5).serialize_array(ulonglong_array_2_t,
+            5).serialize_array(longlong_array_2_t, 5).
+                    serialize_array(float_array_2_t, 5).serialize_array(double_array_2_t,
+            5).serialize_array(ldouble_array_2_t,
+            5).
+                    serialize_array(bool_array_2_t,
+            5);
+            cdr_ser << octet_vector_t << char_vector_t << int8_vector_t << ushort_vector_t << short_vector_t
+                    << ulong_vector_t
+                    << long_vector_t << ulonglong_vector_t << longlong_vector_t << float_vector_t << double_vector_t
+                    << ldouble_vector_t << bool_vector_t;
+            cdr_ser << triple_ulong_array_t;
+            cdr_ser.serialize_sequence(octet_seq_t, 5).serialize_sequence(char_seq_t, 5).serialize_sequence(int8_seq_t,
+            5).
+                    serialize_sequence(ushort_seq_t, 5).serialize_sequence(short_seq_t,
+            5).serialize_sequence(ulong_seq_t,
+            5).
+                    serialize_sequence(long_seq_t, 5).serialize_sequence(ulonglong_seq_t,
+            5).serialize_sequence(longlong_seq_t,
+            5).
+                    serialize_sequence(float_seq_t, 5).serialize_sequence(double_seq_t,
+            5).serialize_sequence(ldouble_seq_t,
+            5);
+            cdr_ser.serialize(c_string_t);
+            // Wstring and wchar
+            cdr_ser << wchar << wstring_t;
+            cdr_ser.serialize_array(wchar_array_2_t, 5).serialize_array(wstring_array_2_t, 5);
+            cdr_ser << wchar_array_t << wstring_array_t;
+            cdr_ser << wchar_vector_t << wstring_vector_t;
+            cdr_ser.serialize_sequence(wchar_seq_t, 5).serialize_sequence(wstring_seq_t, 5);
+            cdr_ser.serialize(c_wstring_t);
+        });
 
     // Deserialization.
     FastCdr cdr_des(cdrbuffer);
@@ -6519,46 +6744,53 @@ TEST(FastCDRTests, Complete)
     std::wstring* wstring_seq_value = NULL; size_t wstring_seq_len;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des >> octet_value >> char_value >> int8_value >> ushort_value >> short_value >> ulong_value >> long_value >>
-        ulonglong_value >> longlong_value >> float_value >> double_value >> ldouble_value >> bool_value >> string_value;
-        cdr_des >> octet_array_value >> char_array_value >> int8_array_value >> ushort_array_value >> short_array_value >>
-        ulong_array_value >> long_array_value >> ulonglong_array_value >> longlong_array_value >> float_array_value >>
-        double_array_value >> ldouble_array_value >> bool_array_value;
-        cdr_des.deserialize_array(octet_array_2_value,
-        5).deserialize_array(char_array_2_value, 5).deserialize_array(int8_array_2_value, 5).
-                deserialize_array(ushort_array_2_value, 5).deserialize_array(short_array_2_value,
-        5).deserialize_array(ulong_array_2_value, 5).
-                deserialize_array(long_array_2_value, 5).deserialize_array(ulonglong_array_2_value,
-        5).deserialize_array(longlong_array_2_value, 5).
-                deserialize_array(float_array_2_value, 5).deserialize_array(double_array_2_value,
-        5).deserialize_array(ldouble_array_2_value, 5).deserialize_array(bool_array_2_value,
-        5);
-        cdr_des >> octet_vector_value >> char_vector_value >> int8_vector_value >> ushort_vector_value >> short_vector_value >>
-        ulong_vector_value >> long_vector_value >> ulonglong_vector_value >> longlong_vector_value >> float_vector_value >>
-        double_vector_value >> ldouble_vector_value >> bool_vector_value;
-        cdr_des >> triple_ulong_array_value;
-        cdr_des.deserialize_sequence(octet_seq_value, octet_seq_len).deserialize_sequence(char_seq_value, char_seq_len).
-                deserialize_sequence(int8_seq_value, int8_seq_len).deserialize_sequence(ushort_seq_value,
-        ushort_seq_len).
-                deserialize_sequence(short_seq_value, short_seq_len).deserialize_sequence(ulong_seq_value,
-        ulong_seq_len).
-                deserialize_sequence(long_seq_value, long_seq_len).deserialize_sequence(ulonglong_seq_value,
-        ulonglong_seq_len).
-                deserialize_sequence(longlong_seq_value, longlong_seq_len).deserialize_sequence(float_seq_value,
-        float_seq_len).
-                deserialize_sequence(double_seq_value, double_seq_len).deserialize_sequence(ldouble_seq_value,
-        ldouble_seq_len);
-        cdr_des.deserialize(c_string_value);
-        // WString and wchar_t
-        cdr_des >> wchar_value >> wstring_value;
-        cdr_des.deserialize_array(wchar_array_2_value, 5).deserialize_array(wstring_array_2_value, 5);
-        cdr_des >> wchar_array_value >> wstring_array_value;
-        cdr_des >> wchar_vector_value >> wstring_vector_value;
-        cdr_des.deserialize_sequence(wchar_seq_value, wchar_seq_len).deserialize_sequence(wstring_seq_value,
-        wstring_seq_len);
-        cdr_des.deserialize(c_wstring_value);
-    });
+        {
+            cdr_des >> octet_value >> char_value >> int8_value >> ushort_value >> short_value >> ulong_value
+            >> long_value
+            >> ulonglong_value >> longlong_value >> float_value >> double_value >> ldouble_value >> bool_value
+            >> string_value;
+            cdr_des >> octet_array_value >> char_array_value >> int8_array_value >> ushort_array_value
+            >> short_array_value
+            >> ulong_array_value >> long_array_value >> ulonglong_array_value >> longlong_array_value
+            >> float_array_value
+            >> double_array_value >> ldouble_array_value >> bool_array_value;
+            cdr_des.deserialize_array(octet_array_2_value,
+            5).deserialize_array(char_array_2_value, 5).deserialize_array(int8_array_2_value, 5).
+                    deserialize_array(ushort_array_2_value, 5).deserialize_array(short_array_2_value,
+            5).deserialize_array(ulong_array_2_value, 5).
+                    deserialize_array(long_array_2_value, 5).deserialize_array(ulonglong_array_2_value,
+            5).deserialize_array(longlong_array_2_value, 5).
+                    deserialize_array(float_array_2_value, 5).deserialize_array(double_array_2_value,
+            5).deserialize_array(ldouble_array_2_value, 5).deserialize_array(bool_array_2_value,
+            5);
+            cdr_des >> octet_vector_value >> char_vector_value >> int8_vector_value >> ushort_vector_value
+            >> short_vector_value
+            >> ulong_vector_value >> long_vector_value >> ulonglong_vector_value >> longlong_vector_value
+            >> float_vector_value
+            >> double_vector_value >> ldouble_vector_value >> bool_vector_value;
+            cdr_des >> triple_ulong_array_value;
+            cdr_des.deserialize_sequence(octet_seq_value, octet_seq_len).deserialize_sequence(char_seq_value,
+            char_seq_len).
+                    deserialize_sequence(int8_seq_value, int8_seq_len).deserialize_sequence(ushort_seq_value,
+            ushort_seq_len).
+                    deserialize_sequence(short_seq_value, short_seq_len).deserialize_sequence(ulong_seq_value,
+            ulong_seq_len).
+                    deserialize_sequence(long_seq_value, long_seq_len).deserialize_sequence(ulonglong_seq_value,
+            ulonglong_seq_len).
+                    deserialize_sequence(longlong_seq_value, longlong_seq_len).deserialize_sequence(float_seq_value,
+            float_seq_len).
+                    deserialize_sequence(double_seq_value, double_seq_len).deserialize_sequence(ldouble_seq_value,
+            ldouble_seq_len);
+            cdr_des.deserialize(c_string_value);
+            // WString and wchar_t
+            cdr_des >> wchar_value >> wstring_value;
+            cdr_des.deserialize_array(wchar_array_2_value, 5).deserialize_array(wstring_array_2_value, 5);
+            cdr_des >> wchar_array_value >> wstring_array_value;
+            cdr_des >> wchar_vector_value >> wstring_vector_value;
+            cdr_des.deserialize_sequence(wchar_seq_value, wchar_seq_len).deserialize_sequence(wstring_seq_value,
+            wstring_seq_len);
+            cdr_des.deserialize(c_wstring_value);
+        });
 
     EXPECT_EQ(octet_value, octet_t);
     EXPECT_EQ(char_value, char_t);
@@ -6700,9 +6932,9 @@ TEST(CDRTests, ZeroSequenceAtTheEnd)
     Cdr cdr_ser_octet(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_octet << double_tt << octet_zero_sequence;
-    });
+        {
+            cdr_ser_octet << double_tt << octet_zero_sequence;
+        });
 
     // Deserialization.
     Cdr cdr_des_octet(cdrbuffer);
@@ -6710,174 +6942,174 @@ TEST(CDRTests, ZeroSequenceAtTheEnd)
     double value = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_octet >> value >> octet_zero_sequence;
-    });
+        {
+            cdr_des_octet >> value >> octet_zero_sequence;
+        });
 
     Cdr cdr_ser_char(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_char << double_tt << char_zero_sequence;
-    });
+        {
+            cdr_ser_char << double_tt << char_zero_sequence;
+        });
 
     // Deserialization.
     Cdr cdr_des_char(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_char >> value >> char_zero_sequence;
-    });
+        {
+            cdr_des_char >> value >> char_zero_sequence;
+        });
 
     Cdr cdr_ser_int8(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_int8 << double_tt << int8_zero_sequence;
-    });
+        {
+            cdr_ser_int8 << double_tt << int8_zero_sequence;
+        });
 
     // Deserialization.
     Cdr cdr_des_int8(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_int8 >> value >> int8_zero_sequence;
-    });
+        {
+            cdr_des_int8 >> value >> int8_zero_sequence;
+        });
 
     Cdr cdr_ser_ushort(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_ushort << double_tt << ushort_zero_sequence;
-    });
+        {
+            cdr_ser_ushort << double_tt << ushort_zero_sequence;
+        });
 
     // Deserialization.
     Cdr cdr_des_ushort(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_ushort >> value >> ushort_zero_sequence;
-    });
+        {
+            cdr_des_ushort >> value >> ushort_zero_sequence;
+        });
 
     Cdr cdr_ser_short(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_short << double_tt << short_zero_sequence;
-    });
+        {
+            cdr_ser_short << double_tt << short_zero_sequence;
+        });
 
     // Deserialization.
     Cdr cdr_des_short(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_short >> value >> short_zero_sequence;
-    });
+        {
+            cdr_des_short >> value >> short_zero_sequence;
+        });
 
     Cdr cdr_ser_ulong(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_ulong << double_tt << ulong_zero_sequence;
-    });
+        {
+            cdr_ser_ulong << double_tt << ulong_zero_sequence;
+        });
 
     // Deserialization.
     Cdr cdr_des_ulong(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_ulong >> value >> ulong_zero_sequence;
-    });
+        {
+            cdr_des_ulong >> value >> ulong_zero_sequence;
+        });
 
     Cdr cdr_ser_long(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_long << double_tt << long_zero_sequence;
-    });
+        {
+            cdr_ser_long << double_tt << long_zero_sequence;
+        });
 
     // Deserialization.
     Cdr cdr_des_long(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_long >> value >> long_zero_sequence;
-    });
+        {
+            cdr_des_long >> value >> long_zero_sequence;
+        });
 
     Cdr cdr_ser_ulonglong(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_ulonglong << double_tt << ulonglong_zero_sequence;
-    });
+        {
+            cdr_ser_ulonglong << double_tt << ulonglong_zero_sequence;
+        });
 
     // Deserialization.
     Cdr cdr_des_ulonglong(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_ulonglong >> value >> ulonglong_zero_sequence;
-    });
+        {
+            cdr_des_ulonglong >> value >> ulonglong_zero_sequence;
+        });
 
     Cdr cdr_ser_float(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_float << double_tt << float_zero_sequence;
-    });
+        {
+            cdr_ser_float << double_tt << float_zero_sequence;
+        });
 
     // Deserialization.
     Cdr cdr_des_float(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_float >> value >> float_zero_sequence;
-    });
+        {
+            cdr_des_float >> value >> float_zero_sequence;
+        });
 
     Cdr cdr_ser_double(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_double << double_tt << double_zero_sequence;
-    });
+        {
+            cdr_ser_double << double_tt << double_zero_sequence;
+        });
 
     // Deserialization.
     Cdr cdr_des_double(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_double >> value >> double_zero_sequence;
-    });
+        {
+            cdr_des_double >> value >> double_zero_sequence;
+        });
 
     Cdr cdr_ser_longdouble(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_longdouble << double_tt << longdouble_zero_sequence;
-    });
+        {
+            cdr_ser_longdouble << double_tt << longdouble_zero_sequence;
+        });
 
     // Deserialization.
     Cdr cdr_des_longdouble(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_longdouble >> value >> longdouble_zero_sequence;
-    });
+        {
+            cdr_des_longdouble >> value >> longdouble_zero_sequence;
+        });
 
     Cdr cdr_ser_bool(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_bool << double_tt << bool_zero_sequence;
-    });
+        {
+            cdr_ser_bool << double_tt << bool_zero_sequence;
+        });
 
     // Deserialization.
     Cdr cdr_des_bool(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_bool >> value >> bool_zero_sequence;
-    });
+        {
+            cdr_des_bool >> value >> bool_zero_sequence;
+        });
 }
 
 TEST(FastCDRTests, ZeroSequenceAtTheEnd)
@@ -6902,9 +7134,9 @@ TEST(FastCDRTests, ZeroSequenceAtTheEnd)
     FastCdr cdr_ser_octet(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_octet << double_tt << octet_zero_sequence;
-    });
+        {
+            cdr_ser_octet << double_tt << octet_zero_sequence;
+        });
 
     // Deserialization.
     FastCdr cdr_des_octet(cdrbuffer);
@@ -6912,174 +7144,174 @@ TEST(FastCDRTests, ZeroSequenceAtTheEnd)
     double value = 0;
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_octet >> value >> octet_zero_sequence;
-    });
+        {
+            cdr_des_octet >> value >> octet_zero_sequence;
+        });
 
     FastCdr cdr_ser_char(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_char << double_tt << char_zero_sequence;
-    });
+        {
+            cdr_ser_char << double_tt << char_zero_sequence;
+        });
 
     // Deserialization.
     FastCdr cdr_des_char(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_char >> value >> char_zero_sequence;
-    });
+        {
+            cdr_des_char >> value >> char_zero_sequence;
+        });
 
     FastCdr cdr_ser_int8(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_int8 << double_tt << int8_zero_sequence;
-    });
+        {
+            cdr_ser_int8 << double_tt << int8_zero_sequence;
+        });
 
     // Deserialization.
     FastCdr cdr_des_int8(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_int8 >> value >> int8_zero_sequence;
-    });
+        {
+            cdr_des_int8 >> value >> int8_zero_sequence;
+        });
 
     FastCdr cdr_ser_ushort(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_ushort << double_tt << ushort_zero_sequence;
-    });
+        {
+            cdr_ser_ushort << double_tt << ushort_zero_sequence;
+        });
 
     // Deserialization.
     FastCdr cdr_des_ushort(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_ushort >> value >> ushort_zero_sequence;
-    });
+        {
+            cdr_des_ushort >> value >> ushort_zero_sequence;
+        });
 
     FastCdr cdr_ser_short(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_short << double_tt << short_zero_sequence;
-    });
+        {
+            cdr_ser_short << double_tt << short_zero_sequence;
+        });
 
     // Deserialization.
     FastCdr cdr_des_short(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_short >> value >> short_zero_sequence;
-    });
+        {
+            cdr_des_short >> value >> short_zero_sequence;
+        });
 
     FastCdr cdr_ser_ulong(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_ulong << double_tt << ulong_zero_sequence;
-    });
+        {
+            cdr_ser_ulong << double_tt << ulong_zero_sequence;
+        });
 
     // Deserialization.
     FastCdr cdr_des_ulong(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_ulong >> value >> ulong_zero_sequence;
-    });
+        {
+            cdr_des_ulong >> value >> ulong_zero_sequence;
+        });
 
     FastCdr cdr_ser_long(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_long << double_tt << long_zero_sequence;
-    });
+        {
+            cdr_ser_long << double_tt << long_zero_sequence;
+        });
 
     // Deserialization.
     FastCdr cdr_des_long(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_long >> value >> long_zero_sequence;
-    });
+        {
+            cdr_des_long >> value >> long_zero_sequence;
+        });
 
     FastCdr cdr_ser_ulonglong(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_ulonglong << double_tt << ulonglong_zero_sequence;
-    });
+        {
+            cdr_ser_ulonglong << double_tt << ulonglong_zero_sequence;
+        });
 
     // Deserialization.
     FastCdr cdr_des_ulonglong(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_ulonglong >> value >> ulonglong_zero_sequence;
-    });
+        {
+            cdr_des_ulonglong >> value >> ulonglong_zero_sequence;
+        });
 
     FastCdr cdr_ser_float(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_float << double_tt << float_zero_sequence;
-    });
+        {
+            cdr_ser_float << double_tt << float_zero_sequence;
+        });
 
     // Deserialization.
     FastCdr cdr_des_float(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_float >> value >> float_zero_sequence;
-    });
+        {
+            cdr_des_float >> value >> float_zero_sequence;
+        });
 
     FastCdr cdr_ser_double(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_double << double_tt << double_zero_sequence;
-    });
+        {
+            cdr_ser_double << double_tt << double_zero_sequence;
+        });
 
     // Deserialization.
     FastCdr cdr_des_double(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_double >> value >> double_zero_sequence;
-    });
+        {
+            cdr_des_double >> value >> double_zero_sequence;
+        });
 
     FastCdr cdr_ser_longdouble(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_longdouble << double_tt << longdouble_zero_sequence;
-    });
+        {
+            cdr_ser_longdouble << double_tt << longdouble_zero_sequence;
+        });
 
     // Deserialization.
     FastCdr cdr_des_longdouble(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_longdouble >> value >> longdouble_zero_sequence;
-    });
+        {
+            cdr_des_longdouble >> value >> longdouble_zero_sequence;
+        });
 
     FastCdr cdr_ser_bool(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_ser_bool << double_tt << bool_zero_sequence;
-    });
+        {
+            cdr_ser_bool << double_tt << bool_zero_sequence;
+        });
 
     // Deserialization.
     FastCdr cdr_des_bool(cdrbuffer);
 
     EXPECT_NO_THROW(
-    {
-        cdr_des_bool >> value >> bool_zero_sequence;
-    });
+        {
+            cdr_des_bool >> value >> bool_zero_sequence;
+        });
 }
 
 TEST(CDRTests, StringWithNullChars)
@@ -7091,9 +7323,9 @@ TEST(CDRTests, StringWithNullChars)
     Cdr cdr_ser(cdrbuffer);
 
     EXPECT_THROW(
-    {
-        cdr_ser << str;
-    },
+        {
+            cdr_ser << str;
+        },
         BadParamException);
 }
 
@@ -7106,9 +7338,9 @@ TEST(FastCDRTests, StringWithNullChars)
     FastCdr cdr_ser(cdrbuffer);
 
     EXPECT_THROW(
-    {
-        cdr_ser << str;
-    },
+        {
+            cdr_ser << str;
+        },
         BadParamException);
 }
 
@@ -7119,9 +7351,9 @@ TEST(CDRTests, EmptyStringSerializationSize)
     FastBuffer cdrbuffer(buffer, 256);
     Cdr cdr_ser(cdrbuffer);
     EXPECT_NO_THROW(
-    {
-        cdr_ser << str;
-    });
+        {
+            cdr_ser << str;
+        });
     EXPECT_EQ(cdr_ser.get_serialized_data_length(), 5u);
 }
 
@@ -7132,8 +7364,8 @@ TEST(FastCDRTests, EmptyStringSerializationSize)
     FastBuffer cdrbuffer(buffer, 256);
     FastCdr cdr_ser(cdrbuffer);
     EXPECT_NO_THROW(
-    {
-        cdr_ser << str;
-    });
+        {
+            cdr_ser << str;
+        });
     EXPECT_EQ(cdr_ser.get_serialized_data_length(), 5u);
 }

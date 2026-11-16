@@ -22,9 +22,10 @@ set(XCDR_TEST_SOURCE
     final.cpp
     mutable.cpp
     optional.cpp
+    type_consistency.cpp
     xcdrv1.cpp
     xcdrv2.cpp
-    )
+)
 add_executable(xcdr_tests ${XCDR_TEST_SOURCE})
 set_common_compile_options(xcdr_tests)
 target_link_libraries(xcdr_tests fastcdr GTest::gtest_main)

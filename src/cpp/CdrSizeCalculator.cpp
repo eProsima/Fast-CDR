@@ -33,11 +33,28 @@ CdrSizeCalculator::CdrSizeCalculator(
 }
 
 CdrSizeCalculator::CdrSizeCalculator(
+        const std::shared_ptr<CdrContext>& context,
+        CdrVersion cdr_version)
+    : CdrSizeCalculator(cdr_version)
+{
+    context_ = context;
+}
+
+CdrSizeCalculator::CdrSizeCalculator(
         CdrVersion cdr_version,
         EncodingAlgorithmFlag encoding)
     : CdrSizeCalculator(cdr_version)
 {
     current_encoding_ = encoding;
+}
+
+CdrSizeCalculator::CdrSizeCalculator(
+        const std::shared_ptr<CdrContext>& context,
+        CdrVersion cdr_version,
+        EncodingAlgorithmFlag encoding)
+    : CdrSizeCalculator(cdr_version, encoding)
+{
+    context_ = context;
 }
 
 CdrVersion CdrSizeCalculator::get_cdr_version() const
@@ -48,6 +65,11 @@ CdrVersion CdrSizeCalculator::get_cdr_version() const
 EncodingAlgorithmFlag CdrSizeCalculator::get_encoding() const
 {
     return current_encoding_;
+}
+
+std::shared_ptr<CdrContext> CdrSizeCalculator::get_context() const
+{
+    return context_;
 }
 
 size_t CdrSizeCalculator::begin_calculate_type_serialized_size(

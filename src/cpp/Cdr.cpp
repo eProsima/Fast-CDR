@@ -2161,10 +2161,39 @@ Cdr& Cdr::end_serialize_type(
     return (this->*end_serialize_type_)(current_state);
 }
 
+namespace {
+
+// Maximum nesting of deserialize_type() calls on one thread. Real types stay far below this;
+// it only stops remote input from nesting types until the stack overflows.
+constexpr uint32_t max_deserialization_depth = 100;
+
+thread_local uint32_t deserialization_depth = 0;
+
+struct DeserializationDepthGuard
+{
+    DeserializationDepthGuard()
+    {
+        if (deserialization_depth >= max_deserialization_depth)
+        {
+            throw eprosima::fastcdr::exception::BadParamException("Maximum deserialization depth exceeded");
+        }
+        deserialization_depth++;
+    }
+
+    ~DeserializationDepthGuard()
+    {
+        deserialization_depth--;
+    }
+
+};
+
+} // namespace
+
 Cdr& Cdr::deserialize_type(
         EncodingAlgorithmFlag type_encoding,
         std::function<bool (Cdr&, const MemberId&)> functor)
 {
+    DeserializationDepthGuard guard;
     return (this->*deserialize_type_)(type_encoding, functor);
 }
 

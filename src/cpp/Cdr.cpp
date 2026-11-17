@@ -2536,6 +2536,7 @@ struct DeserializationDepthGuard
     {
         deserialization_depth--;
     }
+
 };
 
 } // namespace

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <string>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -1515,6 +1516,72 @@ TEST_P(XCdrExternalTest, optional_external_to_locked_external)
             false), exception::BadParamException);
 }
 
+/// Auxiliary self-recursive class, as XTypes' TypeIdentifier -> PlainMapSTypeDefn -> external<TypeIdentifier>.
+struct RecursiveExternalClass
+{
+    bool has_child {false};
+    external<RecursiveExternalClass> child;
+};
+
+namespace eprosima {
+namespace fastcdr {
+
+template<>
+void deserialize(
+        Cdr& cdr,
+        RecursiveExternalClass& data)
+{
+    cdr.deserialize_type(cdr.get_encoding_flag(), [&data](Cdr& cdr_inner, const MemberId& mid) -> bool
+            {
+                bool ret_value = true;
+                switch (mid.id)
+                {
+                    case 0:
+                        cdr_inner >> data.has_child;
+                        break;
+                    case 1:
+                        if (data.has_child)
+                        {
+                            cdr_inner >> data.child;
+                        }
+                        else
+                        {
+                            ret_value = false;
+                        }
+                        break;
+                    default:
+                        ret_value = false;
+                        break;
+                }
+                return ret_value;
+            });
+}
+
+} // namespace fastcdr
+} // namespace eprosima
+
+/*!
+ * @test Tests that a type nested through externals beyond the maximum depth is rejected, instead of
+ * exhausting the stack.
+ */
+TEST(XCdrExternalTest, max_nesting_depth)
+{
+    auto deserialize_nested = [](size_t depth)
+            {
+                // In PLAIN_CDR2, each nesting level is encoded as its has_child boolean.
+                std::vector<char> buffer(depth, 1);
+                buffer.back() = 0;
+                FastBuffer fast_buffer(buffer.data(), buffer.size());
+                Cdr cdr(fast_buffer, Cdr::DEFAULT_ENDIAN, CdrVersion::XCDRv2);
+                RecursiveExternalClass data;
+                cdr >> data;
+            };
+
+    // Deeper than any real type, but not enough to exhaust the stack when no limit is enforced.
+    EXPECT_THROW(deserialize_nested(500), exception::BadParamException);
+    // A realistic depth is still accepted after a rejection on the same thread.
+    EXPECT_NO_THROW(deserialize_nested(50));
+}
 
 INSTANTIATE_TEST_SUITE_P(
     XCdrTest,

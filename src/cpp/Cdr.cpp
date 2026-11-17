@@ -437,6 +437,17 @@ std::shared_ptr<CdrContext> Cdr::get_context() const
     return context_;
 }
 
+void Cdr::set_max_deserialization_depth(
+        uint32_t max_depth)
+{
+    max_deserialization_depth_ = max_depth;
+}
+
+uint32_t Cdr::get_max_deserialization_depth() const
+{
+    return max_deserialization_depth_;
+}
+
 bool Cdr::jump(
         std::size_t num_bytes)
 {
@@ -2515,17 +2526,17 @@ Cdr& Cdr::end_serialize_type(
 
 namespace {
 
-// Maximum nesting of deserialize_type() calls on one thread. Real types stay far below this;
-// it only stops remote input from nesting types until the stack overflows.
-constexpr uint32_t max_deserialization_depth = 100;
-
+// Number of nested deserialize_type() calls on this thread, across all Cdr objects.
+// Each call compares it with the limit of the Cdr object doing the deserialization,
+// so remote input cannot nest types until the stack overflows.
 thread_local uint32_t deserialization_depth = 0;
 
 struct DeserializationDepthGuard
 {
-    DeserializationDepthGuard()
+    explicit DeserializationDepthGuard(
+            uint32_t max_depth)
     {
-        if (deserialization_depth >= max_deserialization_depth)
+        if (deserialization_depth >= max_depth)
         {
             throw eprosima::fastcdr::exception::BadParamException("Maximum deserialization depth exceeded");
         }
@@ -2545,7 +2556,7 @@ Cdr& Cdr::deserialize_type(
         EncodingAlgorithmFlag type_encoding,
         std::function<bool (Cdr&, const MemberId&)> functor)
 {
-    DeserializationDepthGuard guard;
+    DeserializationDepthGuard guard(max_deserialization_depth_);
     return (this->*deserialize_type_)(type_encoding, functor);
 }
 

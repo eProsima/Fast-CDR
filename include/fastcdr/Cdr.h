@@ -321,6 +321,19 @@ public:
             std::size_t num_bytes);
 
     /*!
+     * @brief Sets the maximum depth allowed in the deserialization.
+     * @param max_depth Maximum depth that will be set.
+     */
+    Cdr_DllAPI void set_max_deserialization_depth(
+            uint32_t max_depth);
+
+    /*!
+     * @brief Returns the maximum depth allowed in the deserialization.
+     * @return The maximum depth for deserialization.
+     */
+    Cdr_DllAPI uint32_t get_max_deserialization_depth() const;
+
+    /*!
      * @brief This function resets the alignment to the current position in the buffer.
      */
     inline void reset_alignment()
@@ -4851,6 +4864,9 @@ private:
 
     //! Whether fake deserialization mode is enabled.
     bool fake_mode_ {false};
+
+    //! Stores the maximum deserialization depth allowed to prevent stack overflows.
+    uint32_t max_deserialization_depth_ {100};
 
     //! Custom serialization context.
     std::shared_ptr<CdrContext> context_;

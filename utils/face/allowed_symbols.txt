@@ -1,0 +1,14 @@
+# Symbols the Fast CDR objects may use besides those the gold standard libraries and the default allowed definitions
+# of the FACE CTS define. One per line, mangled.
+
+# GCC C++ ABI runtime (libsupc++), called by the code the compiler generates for throw and catch. The General Purpose
+# C++11 capability set allows exceptions thrown and caught within a UoC (FACE Technical Standard 3.2, 4.2.3.3.2), but
+# the default allowed definitions of the CTS only provide the personality routine and _Unwind_Resume.
+__cxa_allocate_exception
+__cxa_free_exception
+__cxa_throw
+__cxa_begin_catch
+__cxa_end_catch
+
+# Defined by the linker for position-independent code.
+_GLOBAL_OFFSET_TABLE_

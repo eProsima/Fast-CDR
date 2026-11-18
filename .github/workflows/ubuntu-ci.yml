@@ -73,3 +73,28 @@ jobs:
                      (github.event.pull_request.head.repo.full_name == github.repository) &&
                      (!contains(github.event.pull_request.labels.*.name, 'skip-ci')) &&
                      true || false }}
+
+  # Fast CDR compiled as the FACE CTS compiles a Unit of Conformance (utils/face/check_face.py), apart from the build
+  # and test matrix: it only needs the configured sources, and fetches the gold standard files of the CTS
+  face-check:
+    if: ${{ !(github.event_name == 'pull_request') ||
+            (!contains(github.event.pull_request.labels.*.name, 'conflicts') &&
+             !contains(github.event.pull_request.labels.*.name, 'skip-ci')) }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Sync eProsima/Fast-CDR repository
+        uses: eProsima/eProsima-CI/external/checkout@v0
+        with:
+          path: src/fastcdr
+          ref: ${{ inputs.fastcdr-branch || github.ref }}
+
+      - name: Configure Fast CDR
+        run: cmake -S src/fastcdr -B build/fastcdr
+
+      - name: FACE check (C++11 General Purpose capability set)
+        run: |
+          python3 src/fastcdr/utils/face/check_face.py \
+            --source-dir src/fastcdr \
+            --build-dir build/fastcdr \
+            --work-dir build/face \
+            --define FASTCDR_SOURCE

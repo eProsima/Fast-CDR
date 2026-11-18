@@ -16,18 +16,18 @@
 #define _FASTCDR_CDRBUFFER_H_
 
 #include "fastcdr_dll.h"
-#include <stdint.h>
+#include <cstdint>
 #include <cstdio>
-#include <string.h>
+#include <cstring>
 #include <cstddef>
 #include <utility>
 
-inline uint32_t size_to_uint32(
-        size_t val)
+inline std::uint32_t size_to_uint32(
+        std::size_t val)
 {
   #if defined(_WIN32) || !defined(FASTCDR_ARM32)
     // On 64 bit platforms and all Windows architectures (because of C4267), explicitly cast.
-    return static_cast<uint32_t>(val);
+    return static_cast<std::uint32_t>(val);
   #else
     // Skip useless cast on 32-bit builds.
     return val;
@@ -57,7 +57,7 @@ public:
      */
     explicit _FastBuffer_iterator(
             char* buffer,
-            size_t index)
+            std::size_t index)
         : buffer_(buffer)
         , current_position_(&buffer_[index])
     {
@@ -73,7 +73,7 @@ public:
     void operator <<(
             const _FastBuffer_iterator& iterator)
     {
-        ptrdiff_t diff = current_position_ - buffer_;
+        std::ptrdiff_t diff = current_position_ - buffer_;
         buffer_ = iterator.buffer_;
         current_position_ = buffer_ + diff;
     }
@@ -87,7 +87,7 @@ public:
     void operator >>(
             const _FastBuffer_iterator& iterator)
     {
-        ptrdiff_t diff = iterator.current_position_ - iterator.buffer_;
+        std::ptrdiff_t diff = iterator.current_position_ - iterator.buffer_;
         current_position_ = buffer_ + diff;
     }
 
@@ -101,7 +101,7 @@ public:
     void operator <<(
             const _T& data)
     {
-        memcpy(current_position_, &data, sizeof(_T));
+        std::memcpy(current_position_, &data, sizeof(_T));
     }
 
     /*!
@@ -114,7 +114,7 @@ public:
     void operator >>(
             _T& data)
     {
-        memcpy(&data, current_position_, sizeof(_T));
+        std::memcpy(&data, current_position_, sizeof(_T));
     }
 
     /*!
@@ -125,11 +125,11 @@ public:
     inline
     void memcopy(
             const void* src,
-            const size_t size)
+            const std::size_t size)
     {
         if (size > 0)
         {
-            memcpy(current_position_, src, size);
+            std::memcpy(current_position_, src, size);
         }
     }
 
@@ -141,11 +141,11 @@ public:
     inline
     void rmemcopy(
             void* dst,
-            const size_t size)
+            const std::size_t size)
     {
         if (size > 0)
         {
-            memcpy(dst, current_position_, size);
+            std::memcpy(dst, current_position_, size);
         }
     }
 
@@ -155,14 +155,14 @@ public:
      */
     inline
     void operator +=(
-            size_t num_bytes)
+            std::size_t num_bytes)
     {
         current_position_ += num_bytes;
     }
 
     inline
     void operator -=(
-            size_t num_bytes)
+            std::size_t num_bytes)
     {
         current_position_ -= num_bytes;
     }
@@ -173,10 +173,10 @@ public:
      * @return The result of subtract the current iterator's position and the source iterator's position.
      */
     inline
-    size_t operator -(
+    std::size_t operator -(
             const _FastBuffer_iterator& it) const
     {
-        return static_cast<size_t>(current_position_ - it.current_position_);
+        return static_cast<std::size_t>(current_position_ - it.current_position_);
     }
 
     /*!
@@ -262,7 +262,7 @@ public:
      */
     FastBuffer(
             char* const buffer,
-            const size_t bufferSize);
+            const std::size_t bufferSize);
 
     //! Move constructor
     FastBuffer(
@@ -304,7 +304,7 @@ public:
      * @brief This function returns the size of the allocated memory of the stream that the eprosima::fastcdr::FastBuffers uses to serialize data.
      * @return The size of the allocated memory of the stream used by the eprosima::fastcdr::FastBuffers to serialize data.
      */
-    inline size_t getBufferSize() const
+    inline std::size_t getBufferSize() const
     {
         return size_;
     }
@@ -335,7 +335,7 @@ public:
      * @return True if the allocation suceeded. False if the raw buffer was set externally or is already allocated.
      */
     bool reserve(
-            size_t size);
+            std::size_t size);
 
     /*!
      * @brief This function resizes the raw buffer. It will call the user's defined function for this purpose.
@@ -343,7 +343,7 @@ public:
      * @return True if the operation works. False if it does not.
      */
     bool resize(
-            size_t min_size_inc);
+            std::size_t min_size_inc);
 
 private:
 
@@ -357,7 +357,7 @@ private:
     char* buffer_ { nullptr };
 
     //! @brief The total size of the user's buffer.
-    size_t size_ { 0 };
+    std::size_t size_ { 0 };
 
     //! @brief This variable indicates if the managed buffer is internal or is from the user.
     bool m_internalBuffer { true };

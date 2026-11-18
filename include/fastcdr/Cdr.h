@@ -43,11 +43,7 @@
 #include "xcdr/MemberId.hpp"
 #include "xcdr/optional.hpp"
 
-#if !__APPLE__ && !__FreeBSD__ && !__VXWORKS__
-#include <malloc.h>
-#else
-#include <stdlib.h>
-#endif // if !__APPLE__ && !__FreeBSD__ && !__VXWORKS__
+#include <cstdlib>
 
 namespace eprosima {
 namespace fastcdr {
@@ -75,7 +71,7 @@ public:
     /*!
      * @brief This enumeration represents endianness types.
      */
-    typedef enum : uint8_t
+    typedef enum : std::uint8_t
     {
         //! @brief Big endianness.
         BIG_ENDIANNESS = 0x0,
@@ -139,13 +135,13 @@ public:
         bool swap_bytes_ {false};
 
         //! Stores the last datasize serialized/deserialized when the state was created.
-        size_t last_data_size_ {0};
+        std::size_t last_data_size_ {0};
 
         //! Not related with the state. Next member id which will be encoded.
         MemberId next_member_id_;
 
         //! Not related with the state. Used by encoding algorithms to set the encoded member size.
-        uint32_t member_size_ {0};
+        std::uint32_t member_size_ {0};
 
         //! Not related with the state. Used by encoding algorithms to store the selected member header version.
         XCdrHeaderSelection header_selection_ {XCdrHeaderSelection::AUTO_WITH_SHORT_HEADER_BY_DEFAULT};
@@ -231,14 +227,14 @@ public:
      * @brief This function returns the option flags when the CDR type is eprosima::fastcdr::DDS_CDR.
      * @return The option flags.
      */
-    Cdr_DllAPI std::array<uint8_t, 2> get_dds_cdr_options() const;
+    Cdr_DllAPI std::array<std::uint8_t, 2> get_dds_cdr_options() const;
 
     /*!
      * @brief This function sets the option flags when the CDR type is eprosima::fastcdr::DDS_CDR.
      * @param options New value for the option flags.
      */
     Cdr_DllAPI void set_dds_cdr_options(
-            const std::array<uint8_t, 2>& options);
+            const std::array<std::uint8_t, 2>& options);
 
     /*!
      * @brief This function sets the current endianness used by the CDR type.
@@ -265,7 +261,7 @@ public:
      * @return True is returned when it works successfully. Otherwise, false is returned.
      */
     Cdr_DllAPI bool jump(
-            size_t num_bytes);
+            std::size_t num_bytes);
 
     /*!
      * @brief This function resets the current position in the buffer to the beginning.
@@ -288,7 +284,7 @@ public:
      * @brief This function returns the length of the serialized data inside the stream.
      * @return The length of the serialized data.
      */
-    Cdr_DllAPI size_t get_serialized_data_length() const;
+    Cdr_DllAPI std::size_t get_serialized_data_length() const;
 
     /*!
      * @brief Returns the number of bytes needed to align a position to certain data size.
@@ -296,9 +292,9 @@ public:
      * @param data_size Size of next data to process (should be power of two).
      * @return Number of required alignment bytes.
      */
-    inline static size_t alignment(
-            size_t current_alignment,
-            size_t data_size)
+    inline static std::size_t alignment(
+            std::size_t current_alignment,
+            std::size_t data_size)
     {
         return (data_size - (current_alignment % data_size)) & (data_size - 1);
     }
@@ -322,7 +318,7 @@ public:
      * @return True If alignment was moved successfully.
      */
     Cdr_DllAPI bool move_alignment_forward(
-            size_t num_bytes);
+            std::size_t num_bytes);
 
     /*!
      * @brief This function resets the alignment to the current position in the buffer.
@@ -478,11 +474,11 @@ public:
     template<class _T,
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            int32_t>::value>::type* = nullptr>
+            std::int32_t>::value>::type* = nullptr>
     Cdr& serialize(
             const _T& value)
     {
-        return serialize(static_cast<int32_t>(value));
+        return serialize(static_cast<std::int32_t>(value));
     }
 
     /*!
@@ -496,11 +492,11 @@ public:
     template<class _T,
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            uint32_t>::value>::type* = nullptr>
+            std::uint32_t>::value>::type* = nullptr>
     Cdr& serialize(
             const _T& value)
     {
-        return serialize(static_cast<uint32_t>(value));
+        return serialize(static_cast<std::uint32_t>(value));
     }
 
     /*!
@@ -514,11 +510,11 @@ public:
     template<class _T,
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            int16_t>::value>::type* = nullptr>
+            std::int16_t>::value>::type* = nullptr>
     Cdr& serialize(
             const _T& value)
     {
-        return serialize(static_cast<int16_t>(value));
+        return serialize(static_cast<std::int16_t>(value));
     }
 
     /*!
@@ -532,11 +528,11 @@ public:
     template<class _T,
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            uint16_t>::value>::type* = nullptr>
+            std::uint16_t>::value>::type* = nullptr>
     Cdr& serialize(
             const _T& value)
     {
-        return serialize(static_cast<uint16_t>(value));
+        return serialize(static_cast<std::uint16_t>(value));
     }
 
     /*!
@@ -550,11 +546,11 @@ public:
     template<class _T,
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            int8_t>::value>::type* = nullptr>
+            std::int8_t>::value>::type* = nullptr>
     Cdr& serialize(
             const _T& value)
     {
-        return serialize(static_cast<int8_t>(value));
+        return serialize(static_cast<std::int8_t>(value));
     }
 
     /*!
@@ -568,11 +564,11 @@ public:
     template<class _T,
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            uint8_t>::value>::type* = nullptr>
+            std::uint8_t>::value>::type* = nullptr>
     Cdr& serialize(
             const _T& value)
     {
-        return serialize(static_cast<uint8_t>(value));
+        return serialize(static_cast<std::uint8_t>(value));
     }
 
     /*!
@@ -582,7 +578,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
     Cdr_DllAPI Cdr& serialize(
-            const uint8_t& octet_t);
+            const std::uint8_t& octet_t);
 
     /*!
      * @brief This function serializes a character.
@@ -600,7 +596,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
     Cdr_DllAPI Cdr& serialize(
-            const int8_t int8);
+            const std::int8_t int8);
 
     /*!
      * @brief This function serializes an unsigned short.
@@ -609,7 +605,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
     Cdr_DllAPI Cdr& serialize(
-            const uint16_t ushort_t);
+            const std::uint16_t ushort_t);
 
     /*!
      * @brief This function serializes a short.
@@ -618,7 +614,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
     Cdr_DllAPI Cdr& serialize(
-            const int16_t short_t);
+            const std::int16_t short_t);
 
     /*!
      * @brief This function serializes an unsigned long.
@@ -627,7 +623,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
     Cdr_DllAPI Cdr& serialize(
-            const uint32_t ulong_t);
+            const std::uint32_t ulong_t);
 
     /*!
      * @brief This function serializes a long.
@@ -636,7 +632,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
     Cdr_DllAPI Cdr& serialize(
-            const int32_t long_t);
+            const std::int32_t long_t);
 
     /*!
      * @brief This function serializes a wide-char.
@@ -654,7 +650,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
     Cdr_DllAPI Cdr& serialize(
-            const uint64_t ulonglong_t);
+            const std::uint64_t ulonglong_t);
 
     /*!
      * @brief This function serializes a long long.
@@ -663,7 +659,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
     Cdr_DllAPI Cdr& serialize(
-            const int64_t longlong_t);
+            const std::int64_t longlong_t);
 
     /*!
      * @brief This function serializes a float.
@@ -742,7 +738,7 @@ public:
     {
         // Check there are no null characters in the string.
         const char* c_str = string_t.c_str();
-        const auto str_len = strlen(c_str);
+        const auto str_len = std::strlen(c_str);
         if (string_t.size() > str_len)
         {
             throw exception::BadParamException("The string contains null characters");
@@ -771,7 +767,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to encode into a buffer
      * position that exceeds the internal memory size.
      */
-    template<size_t MAX_CHARS>
+    template<std::size_t MAX_CHARS>
     Cdr& serialize(
             const fixed_string<MAX_CHARS>& value)
     {
@@ -784,7 +780,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    template<class _T, size_t _Size>
+    template<class _T, std::size_t _Size>
     Cdr& serialize(
             const std::array<_T, _Size>& array_t)
     {
@@ -817,7 +813,7 @@ public:
     {
         Cdr::state dheader_state {allocate_xcdrv2_dheader()};
 
-        serialize(static_cast<int32_t>(vector_t.size()));
+        serialize(static_cast<std::int32_t>(vector_t.size()));
 
         try
         {
@@ -847,7 +843,7 @@ public:
     {
         state state_before_error(*this);
 
-        serialize(static_cast<int32_t>(vector_t.size()));
+        serialize(static_cast<std::int32_t>(vector_t.size()));
 
         try
         {
@@ -893,7 +889,7 @@ public:
     {
         Cdr::state dheader_state {allocate_xcdrv2_dheader()};
 
-        serialize(static_cast<int32_t>(map_t.size()));
+        serialize(static_cast<std::int32_t>(map_t.size()));
 
         try
         {
@@ -927,7 +923,7 @@ public:
     {
         state state_(*this);
 
-        serialize(static_cast<int32_t>(map_t.size()));
+        serialize(static_cast<std::int32_t>(map_t.size()));
 
         try
         {
@@ -954,32 +950,32 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to encode into a buffer
      * position that exceeds the internal memory size.
      */
-    template<size_t N, typename std::enable_if < (N < 9) > ::type* = nullptr>
+    template<std::size_t N, typename std::enable_if < (N < 9) > ::type* = nullptr>
     Cdr& serialize(
             const std::bitset<N>& value)
     {
-        return serialize(static_cast<uint8_t>(value.to_ulong()));
+        return serialize(static_cast<std::uint8_t>(value.to_ulong()));
     }
 
-    template<size_t N, typename std::enable_if < (8 < N && N < 17) > ::type* = nullptr>
+    template<std::size_t N, typename std::enable_if < (8 < N && N < 17) > ::type* = nullptr>
     Cdr& serialize(
             const std::bitset<N>& value)
     {
-        return serialize(static_cast<uint16_t>(value.to_ulong()));
+        return serialize(static_cast<std::uint16_t>(value.to_ulong()));
     }
 
-    template<size_t N, typename std::enable_if < (16 < N && N < 33) > ::type* = nullptr>
+    template<std::size_t N, typename std::enable_if < (16 < N && N < 33) > ::type* = nullptr>
     Cdr& serialize(
             const std::bitset<N>& value)
     {
-        return serialize(static_cast<uint32_t>(value.to_ulong()));
+        return serialize(static_cast<std::uint32_t>(value.to_ulong()));
     }
 
-    template<size_t N, typename std::enable_if < (32 < N && N < 65) > ::type* = nullptr>
+    template<std::size_t N, typename std::enable_if < (32 < N && N < 65) > ::type* = nullptr>
     Cdr& serialize(
             const std::bitset<N>& value)
     {
-        return serialize(static_cast<uint64_t>(value.to_ullong()));
+        return serialize(static_cast<std::uint64_t>(value.to_ullong()));
     }
 
     /*!
@@ -996,9 +992,9 @@ public:
     template<class _T>
     Cdr& serialize_array(
             const _T* value,
-            size_t num_elements)
+            std::size_t num_elements)
     {
-        for (size_t count = 0; count < num_elements; ++count)
+        for (std::size_t count = 0; count < num_elements; ++count)
         {
             serialize(value[count]);
         }
@@ -1016,7 +1012,7 @@ public:
     template<class _T>
     Cdr& serialize_array(
             const _T* type_t,
-            size_t num_elements,
+            std::size_t num_elements,
             Endianness endianness)
     {
         bool aux_swap = swap_bytes_;
@@ -1046,8 +1042,8 @@ public:
      */
     TEMPLATE_SPEC
     Cdr& serialize_array(
-            const uint8_t* octet_t,
-            size_t num_elements)
+            const std::uint8_t* octet_t,
+            std::size_t num_elements)
     {
         return serialize_array(reinterpret_cast<const char*>(octet_t), num_elements);
     }
@@ -1061,7 +1057,7 @@ public:
      */
     Cdr_DllAPI Cdr& serialize_array(
             const char* char_t,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function serializes an array of int8_t.
@@ -1072,8 +1068,8 @@ public:
      */
     TEMPLATE_SPEC
     Cdr& serialize_array(
-            const int8_t* int8,
-            size_t num_elements)
+            const std::int8_t* int8,
+            std::size_t num_elements)
     {
         return serialize_array(reinterpret_cast<const char*>(int8), num_elements);
     }
@@ -1087,10 +1083,10 @@ public:
      */
     TEMPLATE_SPEC
     Cdr& serialize_array(
-            const uint16_t* ushort_t,
-            size_t num_elements)
+            const std::uint16_t* ushort_t,
+            std::size_t num_elements)
     {
-        return serialize_array(reinterpret_cast<const int16_t*>(ushort_t), num_elements);
+        return serialize_array(reinterpret_cast<const std::int16_t*>(ushort_t), num_elements);
     }
 
     /*!
@@ -1101,8 +1097,8 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
     Cdr_DllAPI Cdr& serialize_array(
-            const int16_t* short_t,
-            size_t num_elements);
+            const std::int16_t* short_t,
+            std::size_t num_elements);
 
     /*!
      * @brief This function serializes an array of unsigned longs.
@@ -1113,10 +1109,10 @@ public:
      */
     TEMPLATE_SPEC
     Cdr& serialize_array(
-            const uint32_t* ulong_t,
-            size_t num_elements)
+            const std::uint32_t* ulong_t,
+            std::size_t num_elements)
     {
-        return serialize_array(reinterpret_cast<const int32_t*>(ulong_t), num_elements);
+        return serialize_array(reinterpret_cast<const std::int32_t*>(ulong_t), num_elements);
     }
 
     /*!
@@ -1127,8 +1123,8 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
     Cdr_DllAPI Cdr& serialize_array(
-            const int32_t* long_t,
-            size_t num_elements);
+            const std::int32_t* long_t,
+            std::size_t num_elements);
 
     /*!
      * @brief This function serializes an array of wide-chars.
@@ -1139,7 +1135,7 @@ public:
      */
     Cdr_DllAPI Cdr& serialize_array(
             const wchar_t* wchar,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function serializes an array of unsigned long longs.
@@ -1150,10 +1146,10 @@ public:
      */
     TEMPLATE_SPEC
     Cdr& serialize_array(
-            const uint64_t* ulonglong_t,
-            size_t num_elements)
+            const std::uint64_t* ulonglong_t,
+            std::size_t num_elements)
     {
-        return serialize_array(reinterpret_cast<const int64_t*>(ulonglong_t), num_elements);
+        return serialize_array(reinterpret_cast<const std::int64_t*>(ulonglong_t), num_elements);
     }
 
     /*!
@@ -1164,8 +1160,8 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
     Cdr_DllAPI Cdr& serialize_array(
-            const int64_t* longlong_t,
-            size_t num_elements);
+            const std::int64_t* longlong_t,
+            std::size_t num_elements);
 
     /*!
      * @brief This function serializes an array of floats.
@@ -1176,7 +1172,7 @@ public:
      */
     Cdr_DllAPI Cdr& serialize_array(
             const float* float_t,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function serializes an array of doubles.
@@ -1187,7 +1183,7 @@ public:
      */
     Cdr_DllAPI Cdr& serialize_array(
             const double* double_t,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function serializes an array of long doubles.
@@ -1199,7 +1195,7 @@ public:
      */
     Cdr_DllAPI Cdr& serialize_array(
             const long double* ldouble_t,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function serializes an array of booleans.
@@ -1210,7 +1206,7 @@ public:
      */
     Cdr_DllAPI Cdr& serialize_array(
             const bool* bool_t,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function serializes an array of strings.
@@ -1222,9 +1218,9 @@ public:
     TEMPLATE_SPEC
     Cdr& serialize_array(
             const std::string* string_t,
-            size_t num_elements)
+            std::size_t num_elements)
     {
-        for (size_t count = 0; count < num_elements; ++count)
+        for (std::size_t count = 0; count < num_elements; ++count)
         {
             serialize(string_t[count].c_str());
         }
@@ -1241,9 +1237,9 @@ public:
     TEMPLATE_SPEC
     Cdr& serialize_array(
             const std::wstring* string_t,
-            size_t num_elements)
+            std::size_t num_elements)
     {
-        for (size_t count = 0; count < num_elements; ++count)
+        for (std::size_t count = 0; count < num_elements; ++count)
         {
             serialize(string_t[count].c_str());
         }
@@ -1258,12 +1254,12 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to encode into a buffer
      * position that exceeds the internal memory size.
      */
-    template<size_t MAX_CHARS>
+    template<std::size_t MAX_CHARS>
     Cdr& serialize_array(
             const fixed_string<MAX_CHARS>* value,
-            size_t num_elements)
+            std::size_t num_elements)
     {
-        for (size_t count = 0; count < num_elements; ++count)
+        for (std::size_t count = 0; count < num_elements; ++count)
         {
             serialize(value[count].c_str());
         }
@@ -1366,11 +1362,11 @@ public:
             !std::is_arithmetic<_T>::value>::type* = nullptr>
     Cdr& serialize_sequence(
             const _T* sequence_t,
-            size_t num_elements)
+            std::size_t num_elements)
     {
         Cdr::state dheader_state {allocate_xcdrv2_dheader()};
 
-        serialize(static_cast<int32_t>(num_elements));
+        serialize(static_cast<std::int32_t>(num_elements));
 
         try
         {
@@ -1398,11 +1394,11 @@ public:
             std::is_arithmetic<_T>::value>::type* = nullptr>
     Cdr& serialize_sequence(
             const _T* sequence_t,
-            size_t num_elements)
+            std::size_t num_elements)
     {
         state state_before_error(*this);
 
-        serialize(static_cast<int32_t>(num_elements));
+        serialize(static_cast<std::int32_t>(num_elements));
 
         try
         {
@@ -1433,7 +1429,7 @@ public:
     template<class _T>
     Cdr& serialize_sequence(
             const _T* sequence_t,
-            size_t num_elements,
+            std::size_t num_elements,
             Endianness endianness)
     {
         bool aux_swap = swap_bytes_;
@@ -1513,11 +1509,11 @@ public:
     template<class _T,
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            int32_t>::value>::type* = nullptr>
+            std::int32_t>::value>::type* = nullptr>
     Cdr& deserialize(
             _T& value)
     {
-        int32_t decode_value {0};
+        std::int32_t decode_value {0};
         deserialize(decode_value);
         value = static_cast<_T>(decode_value);
         return *this;
@@ -1533,11 +1529,11 @@ public:
     template<class _T,
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            uint32_t>::value>::type* = nullptr>
+            std::uint32_t>::value>::type* = nullptr>
     Cdr& deserialize(
             _T& value)
     {
-        uint32_t decode_value {0};
+        std::uint32_t decode_value {0};
         deserialize(decode_value);
         value = static_cast<_T>(decode_value);
         return *this;
@@ -1553,11 +1549,11 @@ public:
     template<class _T,
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            int16_t>::value>::type* = nullptr>
+            std::int16_t>::value>::type* = nullptr>
     Cdr& deserialize(
             _T& value)
     {
-        int16_t decode_value {0};
+        std::int16_t decode_value {0};
         deserialize(decode_value);
         value = static_cast<_T>(decode_value);
         return *this;
@@ -1573,11 +1569,11 @@ public:
     template<class _T,
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            uint16_t>::value>::type* = nullptr>
+            std::uint16_t>::value>::type* = nullptr>
     Cdr& deserialize(
             _T& value)
     {
-        uint16_t decode_value {0};
+        std::uint16_t decode_value {0};
         deserialize(decode_value);
         value = static_cast<_T>(decode_value);
         return *this;
@@ -1593,11 +1589,11 @@ public:
     template<class _T,
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            int8_t>::value>::type* = nullptr>
+            std::int8_t>::value>::type* = nullptr>
     Cdr& deserialize(
             _T& value)
     {
-        int8_t decode_value {0};
+        std::int8_t decode_value {0};
         deserialize(decode_value);
         value = static_cast<_T>(decode_value);
         return *this;
@@ -1613,11 +1609,11 @@ public:
     template<class _T,
             typename std::enable_if<std::is_enum<_T>::value>::type* = nullptr,
             typename std::enable_if<std::is_same<typename std::underlying_type<_T>::type,
-            uint8_t>::value>::type* = nullptr>
+            std::uint8_t>::value>::type* = nullptr>
     Cdr& deserialize(
             _T& value)
     {
-        uint8_t decode_value {0};
+        std::uint8_t decode_value {0};
         deserialize(decode_value);
         value = static_cast<_T>(decode_value);
         return *this;
@@ -1631,7 +1627,7 @@ public:
      */
     TEMPLATE_SPEC
     Cdr& deserialize(
-            uint8_t& octet_t)
+            std::uint8_t& octet_t)
     {
         return deserialize(reinterpret_cast<char&>(octet_t));
     }
@@ -1653,7 +1649,7 @@ public:
      */
     TEMPLATE_SPEC
     Cdr& deserialize(
-            int8_t& int8)
+            std::int8_t& int8)
     {
         return deserialize(reinterpret_cast<char&>(int8));
     }
@@ -1666,9 +1662,9 @@ public:
      */
     TEMPLATE_SPEC
     Cdr& deserialize(
-            uint16_t& ushort_t)
+            std::uint16_t& ushort_t)
     {
-        return deserialize(reinterpret_cast<int16_t&>(ushort_t));
+        return deserialize(reinterpret_cast<std::int16_t&>(ushort_t));
     }
 
     /*!
@@ -1678,7 +1674,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
     Cdr_DllAPI Cdr& deserialize(
-            int16_t& short_t);
+            std::int16_t& short_t);
 
     /*!
      * @brief This function deserializes an unsigned long.
@@ -1688,9 +1684,9 @@ public:
      */
     TEMPLATE_SPEC
     Cdr& deserialize(
-            uint32_t& ulong_t)
+            std::uint32_t& ulong_t)
     {
-        return deserialize(reinterpret_cast<int32_t&>(ulong_t));
+        return deserialize(reinterpret_cast<std::int32_t&>(ulong_t));
     }
 
     /*!
@@ -1700,7 +1696,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
     Cdr_DllAPI Cdr& deserialize(
-            int32_t& long_t);
+            std::int32_t& long_t);
 
     /*!
      * @brief This function deserializes a wide-char.
@@ -1712,7 +1708,7 @@ public:
     Cdr& deserialize(
             wchar_t& wchar)
     {
-        uint16_t ret;
+        std::uint16_t ret;
         deserialize(ret);
         wchar = static_cast<wchar_t>(ret);
         return *this;
@@ -1726,9 +1722,9 @@ public:
      */
     TEMPLATE_SPEC
     Cdr& deserialize(
-            uint64_t& ulonglong_t)
+            std::uint64_t& ulonglong_t)
     {
-        return deserialize(reinterpret_cast<int64_t&>(ulonglong_t));
+        return deserialize(reinterpret_cast<std::int64_t&>(ulonglong_t));
     }
 
     /*!
@@ -1738,7 +1734,7 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
     Cdr_DllAPI Cdr& deserialize(
-            int64_t& longlong_t);
+            std::int64_t& longlong_t);
 
     /*!
      * @brief This function deserializes a float.
@@ -1816,7 +1812,7 @@ public:
     Cdr_DllAPI Cdr& deserialize(
             char*& string_t,
             CdrTryConstructFlag consistency_flag,
-            uint32_t max_length);
+            std::uint32_t max_length);
 
     /*!
      * @brief This function deserializes a wide-string.
@@ -1856,7 +1852,7 @@ public:
     Cdr_DllAPI Cdr& deserialize(
             wchar_t*& string_t,
             CdrTryConstructFlag consistency_flag,
-            uint32_t max_length);
+            std::uint32_t max_length);
 
     /*!
      * @brief This function deserializes a std::string.
@@ -1868,7 +1864,7 @@ public:
     Cdr& deserialize(
             std::string& string_t)
     {
-        uint32_t length {(std::numeric_limits<uint32_t>::max)()};
+        std::uint32_t length {(std::numeric_limits<std::uint32_t>::max)()};
         const char* str = read_string(length, CdrTryConstructFlag::FAIL);
         string_t.assign(str, length);
         return *this;
@@ -1898,9 +1894,9 @@ public:
     Cdr& deserialize(
             std::string& string_t,
             CdrTryConstructFlag consistency_flag,
-            uint32_t max_length)
+            std::uint32_t max_length)
     {
-        uint32_t length {max_length};
+        std::uint32_t length {max_length};
         const char* str = read_string(length, consistency_flag);
         string_t.assign(str, length);
         return *this;
@@ -1916,7 +1912,7 @@ public:
     Cdr& deserialize(
             std::wstring& string_t)
     {
-        uint32_t length {(std::numeric_limits<uint32_t>::max)()};
+        std::uint32_t length {(std::numeric_limits<std::uint32_t>::max)()};
         string_t = read_wstring(length, CdrTryConstructFlag::FAIL);
         return *this;
     }
@@ -1945,9 +1941,9 @@ public:
     Cdr& deserialize(
             std::wstring& string_t,
             CdrTryConstructFlag consistency_flag,
-            uint32_t max_length)
+            std::uint32_t max_length)
     {
-        uint32_t length {max_length};
+        std::uint32_t length {max_length};
         string_t = read_wstring(length, consistency_flag);
         return *this;
     }
@@ -1959,11 +1955,11 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
      * position that exceeds the internal memory size.
      */
-    template<size_t MAX_CHARS>
+    template<std::size_t MAX_CHARS>
     Cdr& deserialize(
             fixed_string<MAX_CHARS>& value)
     {
-        uint32_t length {MAX_CHARS};
+        std::uint32_t length {MAX_CHARS};
         const char* str = read_string(length, CdrTryConstructFlag::FAIL);
         value.assign(str, length);
         return *this;
@@ -1992,12 +1988,12 @@ public:
      * @exception exception::BadParamException This exception is thrown when @p consistency_flag is
      *            @ref CdrTryConstructFlag::FAIL and the deserialized string does not fit in @c MAX_CHARS .
      */
-    template<size_t MAX_CHARS>
+    template<std::size_t MAX_CHARS>
     Cdr& deserialize(
             fixed_string<MAX_CHARS>& value,
             CdrTryConstructFlag consistency_flag)
     {
-        uint32_t length {MAX_CHARS};
+        std::uint32_t length {MAX_CHARS};
         const char* str = read_string(length, consistency_flag);
         value.assign(str, length);
         return *this;
@@ -2009,7 +2005,7 @@ public:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    template<class _T, size_t _Size>
+    template<class _T, std::size_t _Size>
     Cdr& deserialize(
             std::array<_T, _Size>& array_t)
     {
@@ -2017,7 +2013,7 @@ public:
 
         if (CdrVersion::XCDRv2 == cdr_version_ && !is_multi_array_primitive(&array_t))
         {
-            uint32_t dheader {0};
+            std::uint32_t dheader {0};
             deserialize_framing(dheader);
 
             if ((end_ - offset_) < dheader)
@@ -2027,7 +2023,7 @@ public:
                           exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
             }
 
-            uint32_t count {0};
+            std::uint32_t count {0};
             auto last_offset = offset_;
             last_offset += dheader;
 
@@ -2070,12 +2066,12 @@ public:
     Cdr& deserialize(
             std::vector<_T>& vector_t)
     {
-        uint32_t sequence_length {0};
+        std::uint32_t sequence_length {0};
         state state_before_error(*this);
 
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
-            uint32_t dheader {0};
+            std::uint32_t dheader {0};
             deserialize_framing(dheader);
 
             if (((end_ - offset_) < dheader) || (dheader < 4))
@@ -2107,7 +2103,7 @@ public:
                 {
                     vector_t.resize(sequence_length);
 
-                    uint32_t count {0};
+                    std::uint32_t count {0};
                     while (last_offset - offset_ > 0 && count < sequence_length)
                     {
                         deserialize(vector_t.data()[count]);
@@ -2170,7 +2166,7 @@ public:
     Cdr& deserialize(
             std::vector<_T>& vector_t)
     {
-        uint32_t sequence_length = 0;
+        std::uint32_t sequence_length = 0;
         state state_before_error(*this);
 
         deserialize_framing(sequence_length);
@@ -2213,7 +2209,7 @@ public:
             std::vector<bool>& vector_t)
     {
         return deserialize_bool_sequence(vector_t, CdrTryConstructFlag::FAIL,
-                       (std::numeric_limits<uint32_t>::max)());
+                       (std::numeric_limits<std::uint32_t>::max)());
     }
 
     /*!
@@ -2241,9 +2237,9 @@ public:
     Cdr& deserialize(
             std::vector<_T>& vector_t,
             CdrTryConstructFlag consistency_flag,
-            uint32_t max_length)
+            std::uint32_t max_length)
     {
-        uint32_t sequence_length = 0;
+        std::uint32_t sequence_length = 0;
         state state_before_error(*this);
 
         deserialize_framing(sequence_length);
@@ -2262,7 +2258,7 @@ public:
                       exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
         }
 
-        uint32_t length_to_read {sequence_length};
+        std::uint32_t length_to_read {sequence_length};
 
         if (sequence_length > max_length)
         {
@@ -2293,7 +2289,7 @@ public:
             {
                 fake_mode_scope discarding {*this, true};
 
-                for (uint32_t count {length_to_read}; count < sequence_length; ++count)
+                for (std::uint32_t count {length_to_read}; count < sequence_length; ++count)
                 {
                     _T discarded;
                     deserialize(discarded);
@@ -2335,14 +2331,14 @@ public:
     Cdr& deserialize(
             std::vector<_T>& vector_t,
             CdrTryConstructFlag consistency_flag,
-            uint32_t max_length)
+            std::uint32_t max_length)
     {
-        uint32_t sequence_length {0};
+        std::uint32_t sequence_length {0};
         state state_before_error(*this);
 
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
-            uint32_t dheader {0};
+            std::uint32_t dheader {0};
             deserialize_framing(dheader);
 
             if (((end_ - offset_) < dheader) || (dheader < 4))
@@ -2358,14 +2354,14 @@ public:
 
             vector_t.clear();
 
-            if ((dheader - static_cast<uint32_t>(offset_ - offset)) < sequence_length)
+            if ((dheader - static_cast<std::uint32_t>(offset_ - offset)) < sequence_length)
             {
                 set_state(state_before_error);
                 throw exception::NotEnoughMemoryException(
                           exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
             }
 
-            uint32_t length_to_read {sequence_length};
+            std::uint32_t length_to_read {sequence_length};
 
             if (sequence_length > max_length)
             {
@@ -2384,7 +2380,7 @@ public:
                 }
             }
 
-            uint32_t count {0};
+            std::uint32_t count {0};
 
             try
             {
@@ -2413,7 +2409,7 @@ public:
 
             if (offset_ - offset < dheader)
             {
-                uint32_t remaining_bytes = dheader - static_cast<uint32_t>(offset_ - offset);
+                std::uint32_t remaining_bytes = dheader - static_cast<std::uint32_t>(offset_ - offset);
                 if (!jump(remaining_bytes))
                 {
                     set_state(state_before_error);
@@ -2440,7 +2436,7 @@ public:
                           exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
             }
 
-            uint32_t length_to_read {sequence_length};
+            std::uint32_t length_to_read {sequence_length};
 
             if (sequence_length > max_length)
             {
@@ -2471,7 +2467,7 @@ public:
                 {
                     fake_mode_scope discarding {*this, true};
 
-                    for (uint32_t count {length_to_read}; count < sequence_length; ++count)
+                    for (std::uint32_t count {length_to_read}; count < sequence_length; ++count)
                     {
                         _T discarded;
                         deserialize(discarded);
@@ -2492,7 +2488,7 @@ public:
     Cdr& deserialize(
             std::vector<bool>& vector_t,
             CdrTryConstructFlag consistency_flag,
-            uint32_t max_length)
+            std::uint32_t max_length)
     {
         return deserialize_bool_sequence(vector_t, consistency_flag, max_length);
     }
@@ -2514,7 +2510,7 @@ public:
 
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
-            uint32_t dheader {0};
+            std::uint32_t dheader {0};
             deserialize_framing(dheader);
 
             if (((end_ - offset_) < dheader) || (dheader < 4))
@@ -2527,12 +2523,12 @@ public:
             auto last_offset = offset_;
             last_offset += dheader;
 
-            uint32_t map_length {0};
+            std::uint32_t map_length {0};
             deserialize_framing(map_length);
 
             try
             {
-                uint32_t count {0};
+                std::uint32_t count {0};
                 while (last_offset - offset_ > 0 && count < map_length)
                 {
                     _K key;
@@ -2557,13 +2553,13 @@ public:
         }
         else
         {
-            uint32_t sequence_length = 0;
+            std::uint32_t sequence_length = 0;
 
             deserialize_framing(sequence_length);
 
             try
             {
-                for (uint32_t i = 0; i < sequence_length; ++i)
+                for (std::uint32_t i = 0; i < sequence_length; ++i)
                 {
                     _K key;
                     _T value;
@@ -2596,7 +2592,7 @@ public:
     Cdr& deserialize(
             std::map<_K, _T>& map_t)
     {
-        uint32_t sequence_length = 0;
+        std::uint32_t sequence_length = 0;
         state state_(*this);
         std::map<_K, _T> map;
 
@@ -2604,7 +2600,7 @@ public:
 
         try
         {
-            for (uint32_t i = 0; i < sequence_length; ++i)
+            for (std::uint32_t i = 0; i < sequence_length; ++i)
             {
                 _K key;
                 _T value;
@@ -2652,14 +2648,14 @@ public:
     Cdr& deserialize(
             std::map<_K, _T>& map_t,
             CdrTryConstructFlag consistency_flag,
-            uint32_t max_length)
+            std::uint32_t max_length)
     {
         state state_before_error(*this);
         std::map<_K, _T> map;
 
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
-            uint32_t dheader {0};
+            std::uint32_t dheader {0};
             deserialize_framing(dheader);
 
             if (((end_ - offset_) < dheader) || (dheader < 4))
@@ -2671,10 +2667,10 @@ public:
 
             auto offset = offset_;
 
-            uint32_t map_length {0};
+            std::uint32_t map_length {0};
             deserialize_framing(map_length);
 
-            uint32_t length_to_read {map_length};
+            std::uint32_t length_to_read {map_length};
 
             if (map_length > max_length)
             {
@@ -2693,7 +2689,7 @@ public:
                 }
             }
 
-            uint32_t count {0};
+            std::uint32_t count {0};
 
             try
             {
@@ -2724,7 +2720,7 @@ public:
 
             if (offset_ - offset < dheader)
             {
-                uint32_t remaining_bytes = dheader - static_cast<uint32_t>(offset_ - offset);
+                std::uint32_t remaining_bytes = dheader - static_cast<std::uint32_t>(offset_ - offset);
                 if (!jump(remaining_bytes))
                 {
                     set_state(state_before_error);
@@ -2735,10 +2731,10 @@ public:
         }
         else
         {
-            uint32_t map_length {0};
+            std::uint32_t map_length {0};
             deserialize_framing(map_length);
 
-            uint32_t length_to_read {map_length};
+            std::uint32_t length_to_read {map_length};
 
             if (map_length > max_length)
             {
@@ -2759,7 +2755,7 @@ public:
 
             try
             {
-                for (uint32_t i {0}; i < length_to_read; ++i)
+                for (std::uint32_t i {0}; i < length_to_read; ++i)
                 {
                     _K key;
                     _T value;
@@ -2774,7 +2770,7 @@ public:
                 {
                     fake_mode_scope discarding {*this, true};
 
-                    for (uint32_t i {length_to_read}; i < map_length; ++i)
+                    for (std::uint32_t i {length_to_read}; i < map_length; ++i)
                     {
                         _K key;
                         _T value;
@@ -2823,15 +2819,15 @@ public:
     Cdr& deserialize(
             std::map<_K, _T>& map_t,
             CdrTryConstructFlag consistency_flag,
-            uint32_t max_length)
+            std::uint32_t max_length)
     {
         state state_before_error(*this);
         std::map<_K, _T> map;
 
-        uint32_t map_length {0};
+        std::uint32_t map_length {0};
         deserialize_framing(map_length);
 
-        uint32_t length_to_read {map_length};
+        std::uint32_t length_to_read {map_length};
 
         if (map_length > max_length)
         {
@@ -2852,7 +2848,7 @@ public:
 
         try
         {
-            for (uint32_t i {0}; i < length_to_read; ++i)
+            for (std::uint32_t i {0}; i < length_to_read; ++i)
             {
                 _K key;
                 _T value;
@@ -2867,7 +2863,7 @@ public:
             {
                 fake_mode_scope discarding {*this, true};
 
-                for (uint32_t i {length_to_read}; i < map_length; ++i)
+                for (std::uint32_t i {length_to_read}; i < map_length; ++i)
                 {
                     _K key;
                     _T value;
@@ -2894,41 +2890,41 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to decode from a buffer
      * position that exceeds the internal memory size.
      */
-    template<size_t N, typename std::enable_if < (N < 9) > ::type* = nullptr>
+    template<std::size_t N, typename std::enable_if < (N < 9) > ::type* = nullptr>
     Cdr& deserialize(
             std::bitset<N>& value)
     {
-        uint8_t decode_value {0};
+        std::uint8_t decode_value {0};
         deserialize(decode_value);
         value = decode_value;
         return *this;
     }
 
-    template<size_t N, typename std::enable_if < (8 < N && N < 17) > ::type* = nullptr>
+    template<std::size_t N, typename std::enable_if < (8 < N && N < 17) > ::type* = nullptr>
     Cdr& deserialize(
             std::bitset<N>& value)
     {
-        uint16_t decode_value {0};
+        std::uint16_t decode_value {0};
         deserialize(decode_value);
         value = decode_value;
         return *this;
     }
 
-    template<size_t N, typename std::enable_if < (16 < N && N < 33) > ::type* = nullptr>
+    template<std::size_t N, typename std::enable_if < (16 < N && N < 33) > ::type* = nullptr>
     Cdr& deserialize(
             std::bitset<N>& value)
     {
-        uint32_t decode_value {0};
+        std::uint32_t decode_value {0};
         deserialize(decode_value);
         value = decode_value;
         return *this;
     }
 
-    template<size_t N, typename std::enable_if < (32 < N && N < 65) > ::type* = nullptr>
+    template<std::size_t N, typename std::enable_if < (32 < N && N < 65) > ::type* = nullptr>
     Cdr& deserialize(
             std::bitset<N>& value)
     {
-        uint64_t decode_value {0};
+        std::uint64_t decode_value {0};
         deserialize(decode_value);
         value = decode_value;
         return *this;
@@ -2948,9 +2944,9 @@ public:
     template<class _T>
     Cdr& deserialize_array(
             _T* value,
-            size_t num_elements)
+            std::size_t num_elements)
     {
-        for (size_t count = 0; count < num_elements; ++count)
+        for (std::size_t count = 0; count < num_elements; ++count)
         {
             deserialize(value[count]);
         }
@@ -2968,7 +2964,7 @@ public:
     template<class _T>
     Cdr& deserialize_array(
             _T* type_t,
-            size_t num_elements,
+            std::size_t num_elements,
             Endianness endianness)
     {
         bool aux_swap = swap_bytes_;
@@ -2998,8 +2994,8 @@ public:
      */
     TEMPLATE_SPEC
     Cdr& deserialize_array(
-            uint8_t* octet_t,
-            size_t num_elements)
+            std::uint8_t* octet_t,
+            std::size_t num_elements)
     {
         return deserialize_array(reinterpret_cast<char*>(octet_t), num_elements);
     }
@@ -3013,7 +3009,7 @@ public:
      */
     Cdr_DllAPI Cdr& deserialize_array(
             char* char_t,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function deserializes an array of int8_t.
@@ -3024,8 +3020,8 @@ public:
      */
     TEMPLATE_SPEC
     Cdr& deserialize_array(
-            int8_t* int8,
-            size_t num_elements)
+            std::int8_t* int8,
+            std::size_t num_elements)
     {
         return deserialize_array(reinterpret_cast<char*>(int8), num_elements);
     }
@@ -3039,10 +3035,10 @@ public:
      */
     TEMPLATE_SPEC
     Cdr& deserialize_array(
-            uint16_t* ushort_t,
-            size_t num_elements)
+            std::uint16_t* ushort_t,
+            std::size_t num_elements)
     {
-        return deserialize_array(reinterpret_cast<int16_t*>(ushort_t), num_elements);
+        return deserialize_array(reinterpret_cast<std::int16_t*>(ushort_t), num_elements);
     }
 
     /*!
@@ -3053,8 +3049,8 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
     Cdr_DllAPI Cdr& deserialize_array(
-            int16_t* short_t,
-            size_t num_elements);
+            std::int16_t* short_t,
+            std::size_t num_elements);
 
     /*!
      * @brief This function deserializes an array of unsigned longs.
@@ -3065,10 +3061,10 @@ public:
      */
     TEMPLATE_SPEC
     Cdr& deserialize_array(
-            uint32_t* ulong_t,
-            size_t num_elements)
+            std::uint32_t* ulong_t,
+            std::size_t num_elements)
     {
-        return deserialize_array(reinterpret_cast<int32_t*>(ulong_t), num_elements);
+        return deserialize_array(reinterpret_cast<std::int32_t*>(ulong_t), num_elements);
     }
 
     /*!
@@ -3079,8 +3075,8 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
     Cdr_DllAPI Cdr& deserialize_array(
-            int32_t* long_t,
-            size_t num_elements);
+            std::int32_t* long_t,
+            std::size_t num_elements);
 
     /*!
      * @brief This function deserializes an array of wide-chars.
@@ -3091,7 +3087,7 @@ public:
      */
     Cdr_DllAPI Cdr& deserialize_array(
             wchar_t* wchar,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function deserializes an array of unsigned long longs.
@@ -3102,10 +3098,10 @@ public:
      */
     TEMPLATE_SPEC
     Cdr& deserialize_array(
-            uint64_t* ulonglong_t,
-            size_t num_elements)
+            std::uint64_t* ulonglong_t,
+            std::size_t num_elements)
     {
-        return deserialize_array(reinterpret_cast<int64_t*>(ulonglong_t), num_elements);
+        return deserialize_array(reinterpret_cast<std::int64_t*>(ulonglong_t), num_elements);
     }
 
     /*!
@@ -3116,8 +3112,8 @@ public:
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
     Cdr_DllAPI Cdr& deserialize_array(
-            int64_t* longlong_t,
-            size_t num_elements);
+            std::int64_t* longlong_t,
+            std::size_t num_elements);
 
     /*!
      * @brief This function deserializes an array of floats.
@@ -3128,7 +3124,7 @@ public:
      */
     Cdr_DllAPI Cdr& deserialize_array(
             float* float_t,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function deserializes an array of doubles.
@@ -3139,7 +3135,7 @@ public:
      */
     Cdr_DllAPI Cdr& deserialize_array(
             double* double_t,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function deserializes an array of long doubles.
@@ -3151,7 +3147,7 @@ public:
      */
     Cdr_DllAPI Cdr& deserialize_array(
             long double* ldouble_t,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief This function deserializes an array of booleans.
@@ -3162,7 +3158,7 @@ public:
      */
     Cdr_DllAPI Cdr& deserialize_array(
             bool* bool_t,
-            size_t num_elements);
+            std::size_t num_elements);
 
     /*!
      * @brief Decodes an array of primitives on a std::vector.
@@ -3203,7 +3199,7 @@ public:
 
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
-            uint32_t dheader {0};
+            std::uint32_t dheader {0};
             deserialize_framing(dheader);
 
             if ((end_ - offset_) < dheader)
@@ -3213,7 +3209,7 @@ public:
                           exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
             }
 
-            uint32_t count {0};
+            std::uint32_t count {0};
             auto last_offset = offset_;
             last_offset += dheader;
             try
@@ -3310,14 +3306,14 @@ public:
             !std::is_arithmetic<_T>::value>::type* = nullptr>
     Cdr& deserialize_sequence(
             _T*& sequence_t,
-            size_t& num_elements)
+            std::size_t& num_elements)
     {
-        uint32_t sequence_length {0};
+        std::uint32_t sequence_length {0};
         state state_before_error(*this);
 
         if (CdrVersion::XCDRv2 == cdr_version_)
         {
-            uint32_t dheader {0};
+            std::uint32_t dheader {0};
             deserialize_framing(dheader);
 
             if (((end_ - offset_) < dheader) || (dheader < 4))
@@ -3347,9 +3343,9 @@ public:
 
             try
             {
-                sequence_t = reinterpret_cast<_T*>(calloc(sequence_length, sizeof(_T)));
+                sequence_t = reinterpret_cast<_T*>(std::calloc(sequence_length, sizeof(_T)));
 
-                uint32_t count {0};
+                std::uint32_t count {0};
                 while (last_offset - offset_ > 0 && count < sequence_length)
                 {
                     deserialize(sequence_t[count]);
@@ -3363,7 +3359,7 @@ public:
             }
             catch (exception::Exception& ex)
             {
-                free(sequence_t);
+                std::free(sequence_t);
                 sequence_t = NULL;
                 set_state(state_before_error);
                 ex.raise();
@@ -3382,12 +3378,12 @@ public:
 
             try
             {
-                sequence_t = reinterpret_cast<_T*>(calloc(sequence_length, sizeof(_T)));
+                sequence_t = reinterpret_cast<_T*>(std::calloc(sequence_length, sizeof(_T)));
                 deserialize_array(sequence_t, sequence_length);
             }
             catch (exception::Exception& ex)
             {
-                free(sequence_t);
+                std::free(sequence_t);
                 sequence_t = NULL;
                 set_state(state_before_error);
                 ex.raise();
@@ -3411,21 +3407,21 @@ public:
             std::is_arithmetic<_T>::value>::type* = nullptr>
     Cdr& deserialize_sequence(
             _T*& sequence_t,
-            size_t& num_elements)
+            std::size_t& num_elements)
     {
-        uint32_t sequence_length = 0;
+        std::uint32_t sequence_length = 0;
         state state_before_error(*this);
 
         deserialize_framing(sequence_length);
 
         try
         {
-            sequence_t = reinterpret_cast<_T*>(calloc(sequence_length, sizeof(_T)));
+            sequence_t = reinterpret_cast<_T*>(std::calloc(sequence_length, sizeof(_T)));
             deserialize_array(sequence_t, sequence_length);
         }
         catch (exception::Exception& ex)
         {
-            free(sequence_t);
+            std::free(sequence_t);
             sequence_t = NULL;
             set_state(state_before_error);
             ex.raise();
@@ -3448,7 +3444,7 @@ public:
     template<class _T>
     Cdr& deserialize_sequence(
             _T*& sequence_t,
-            size_t& num_elements,
+            std::size_t& num_elements,
             Endianness endianness)
     {
         bool aux_swap = swap_bytes_;
@@ -3481,7 +3477,7 @@ public:
     TEMPLATE_SPEC
     Cdr& deserialize_sequence(
             std::string*& sequence_t,
-            size_t& num_elements)
+            std::size_t& num_elements)
     {
         return deserialize_string_sequence(sequence_t, num_elements);
     }
@@ -3498,7 +3494,7 @@ public:
     TEMPLATE_SPEC
     Cdr& deserialize_sequence(
             std::wstring*& sequence_t,
-            size_t& num_elements)
+            std::size_t& num_elements)
     {
         return deserialize_wstring_sequence(sequence_t, num_elements);
     }
@@ -3587,8 +3583,8 @@ public:
             {
                 deserialize(member_value);
             }
-            size_t member_size {current_state.member_size_};
-            size_t diff {offset_ - prev_offset};
+            std::size_t member_size {current_state.member_size_};
+            std::size_t diff {offset_ - prev_offset};
             if (member_size < diff)
             {
                 throw exception::BadParamException(
@@ -3632,8 +3628,8 @@ public:
             {
                 deserialize(member_value);
             }
-            size_t member_size {current_state.member_size_};
-            size_t diff {offset_ - prev_offset};
+            std::size_t member_size {current_state.member_size_};
+            std::size_t diff {offset_ - prev_offset};
             if (member_size < diff)
             {
                 throw exception::BadParamException(
@@ -3685,7 +3681,7 @@ public:
     Cdr& deserialize_member(
             optional<_T>& member_value,
             CdrTryConstructFlag consistency_flag,
-            uint32_t max_length)
+            std::uint32_t max_length)
     {
         return deserialize_member_try_construct(member_value, consistency_flag, max_length);
     }
@@ -3725,7 +3721,7 @@ public:
     Cdr& deserialize_member(
             optional<external<_T>>& member_value,
             CdrTryConstructFlag consistency_flag,
-            uint32_t max_length)
+            std::uint32_t max_length)
     {
         return deserialize_member_try_construct(member_value, consistency_flag, max_length);
     }
@@ -3931,7 +3927,7 @@ public:
     Cdr& deserialize(
             optional<_T>& value,
             CdrTryConstructFlag consistency_flag,
-            uint32_t max_length)
+            std::uint32_t max_length)
     {
         return deserialize_try_construct(value, consistency_flag, max_length);
     }
@@ -3969,7 +3965,7 @@ public:
     Cdr& deserialize(
             external<_T>& value,
             CdrTryConstructFlag consistency_flag,
-            uint32_t max_length)
+            std::uint32_t max_length)
     {
         return deserialize_try_construct(value, consistency_flag, max_length);
     }
@@ -4009,7 +4005,7 @@ public:
     Cdr& deserialize(
             optional<external<_T>>& value,
             CdrTryConstructFlag consistency_flag,
-            uint32_t max_length)
+            std::uint32_t max_length)
     {
         return deserialize_try_construct(value, consistency_flag, max_length);
     }
@@ -4054,8 +4050,8 @@ private:
             {
                 deserialize(member_value, consistency_flag, std::forward<_Args>(args)...);
             }
-            size_t member_size {current_state.member_size_};
-            size_t diff {offset_ - prev_offset};
+            std::size_t member_size {current_state.member_size_};
+            std::size_t diff {offset_ - prev_offset};
             if (member_size < diff)
             {
                 throw exception::BadParamException(
@@ -4099,8 +4095,8 @@ private:
             {
                 deserialize(member_value, consistency_flag, std::forward<_Args>(args)...);
             }
-            size_t member_size {current_state.member_size_};
-            size_t diff {offset_ - prev_offset};
+            std::size_t member_size {current_state.member_size_};
+            std::size_t diff {offset_ - prev_offset};
             if (member_size < diff)
             {
                 throw exception::BadParamException(
@@ -4210,15 +4206,15 @@ private:
     Cdr_DllAPI Cdr& deserialize_bool_sequence(
             std::vector<bool>& vector_t,
             CdrTryConstructFlag consistency_flag,
-            uint32_t max_length);
+            std::uint32_t max_length);
 
     Cdr_DllAPI Cdr& deserialize_string_sequence(
             std::string*& sequence_t,
-            size_t& num_elements);
+            std::size_t& num_elements);
 
     Cdr_DllAPI Cdr& deserialize_wstring_sequence(
             std::wstring*& sequence_t,
-            size_t& num_elements);
+            std::size_t& num_elements);
 
     /*!
      * @brief Serializes the canonical @c uint8_t representation of @p bool_t.
@@ -4237,10 +4233,10 @@ private:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to serialize a position that exceeds the internal memory size.
      */
-    template<class _T, size_t _Size>
+    template<class _T, std::size_t _Size>
     Cdr& serialize_array(
             const std::array<_T, _Size>* array_t,
-            size_t num_elements)
+            std::size_t num_elements)
     {
         if (num_elements == 0 || array_t == nullptr)
         {
@@ -4256,10 +4252,10 @@ private:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    template<class _T, size_t _Size>
+    template<class _T, std::size_t _Size>
     Cdr& deserialize_array(
             std::array<_T, _Size>* array_t,
-            size_t num_elements)
+            std::size_t num_elements)
     {
         if (num_elements == 0 || array_t == nullptr)
         {
@@ -4276,10 +4272,10 @@ private:
      * @return Reference to the eprosima::fastcdr::Cdr object.
      * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
      */
-    template<class _T, size_t _Size>
+    template<class _T, std::size_t _Size>
     Cdr& deserialize_array(
             std::array<_T, _Size>* array_t,
-            size_t num_elements,
+            std::size_t num_elements,
             Endianness endianness)
     {
         if (num_elements == 0 || array_t == nullptr)
@@ -4295,8 +4291,8 @@ private:
      * @param data_size The size of the data that will be serialized.
      * @return The size needed for the alignment.
      */
-    inline size_t alignment(
-            size_t data_size) const
+    inline std::size_t alignment(
+            std::size_t data_size) const
     {
         return data_size > last_data_size_ ? (data_size - ((offset_ - origin_) % data_size)) & (data_size - 1) : 0;
     }
@@ -4306,7 +4302,7 @@ private:
      * @param align The number of bytes to be skipped.
      */
     inline void make_alignment(
-            size_t align)
+            std::size_t align)
     {
         offset_ += align;
         last_data_size_ = 0;
@@ -4318,7 +4314,7 @@ private:
      * @return True if the resize was succesful, false if it was not
      */
     bool resize(
-            size_t min_size_inc);
+            std::size_t min_size_inc);
 
     /*!
      * @brief Sets @c fake_mode_ for the lifetime of the object, restoring its previous value on destruction
@@ -4356,15 +4352,15 @@ private:
     };
 
     Cdr_DllAPI const char* read_string(
-            uint32_t& length);
+            std::uint32_t& length);
     Cdr_DllAPI const std::wstring read_wstring(
-            uint32_t& length);
+            std::uint32_t& length);
 
     Cdr_DllAPI const char* read_string(
-            uint32_t& length,
+            std::uint32_t& length,
             CdrTryConstructFlag consistency_flag);
     Cdr_DllAPI const std::wstring read_wstring(
-            uint32_t& length,
+            std::uint32_t& length,
             CdrTryConstructFlag consistency_flag);
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -4391,7 +4387,7 @@ private:
      */
     void xcdr1_end_short_member_header(
             const MemberId& member_id,
-            size_t member_serialized_size);
+            std::size_t member_serialized_size);
 
     /*!
      * @brief Encodes a long member header of a member according to XCDRv1.
@@ -4411,7 +4407,7 @@ private:
      */
     void xcdr1_end_long_member_header(
             const MemberId& member_id,
-            size_t member_serialized_size);
+            std::size_t member_serialized_size);
 
     /*!
      * @brief Changes the previous encoded long header to a short header according to XCDRv1.
@@ -4424,7 +4420,7 @@ private:
      */
     void xcdr1_change_to_short_member_header(
             const MemberId& member_id,
-            size_t member_serialized_size);
+            std::size_t member_serialized_size);
 
     /*!
      * @brief Changes the previous encoded short header to a long header according to XCDRv1.
@@ -4435,7 +4431,7 @@ private:
      */
     void xcdr1_change_to_long_member_header(
             const MemberId& member_id,
-            size_t member_serialized_size);
+            std::size_t member_serialized_size);
 
     /*!
      * @brief Decodes a member header according to XCDRv1.
@@ -4470,7 +4466,7 @@ private:
      */
     void xcdr2_end_short_member_header(
             const MemberId& member_id,
-            size_t member_serialized_size);
+            std::size_t member_serialized_size);
 
     /*!
      * @brief Encodes a long member header of a member according to XCDRv2.
@@ -4492,7 +4488,7 @@ private:
      */
     void xcdr2_end_long_member_header(
             const MemberId& member_id,
-            size_t member_serialized_size);
+            std::size_t member_serialized_size);
 
     /*!
      * @brief Changes the previous encoded long header to a short header according to XCDRv2.
@@ -4505,7 +4501,7 @@ private:
      */
     void xcdr2_change_to_short_member_header(
             const MemberId& member_id,
-            size_t member_serialized_size);
+            std::size_t member_serialized_size);
 
     /*!
      * @brief Changes the previous encoded long header to a short header according to XCDRv2.
@@ -4517,7 +4513,7 @@ private:
      */
     void xcdr2_change_to_long_member_header(
             const MemberId& member_id,
-            size_t member_serialized_size);
+            std::size_t member_serialized_size);
 
     /*!
      * @brief Join the previous encoded long header with the next DHEADER which was serialized after.
@@ -4807,16 +4803,16 @@ private:
     EncodingAlgorithmFlag current_encoding_ {EncodingAlgorithmFlag::PLAIN_CDR2};
 
     //! @brief This attribute stores the option flags when the CDR type is DDS_CDR;
-    std::array<uint8_t, 2> options_{{0}};
+    std::array<std::uint8_t, 2> options_{{0}};
 
     //! @brief The endianness that will be applied over the buffer.
-    uint8_t endianness_ {Endianness::LITTLE_ENDIANNESS};
+    std::uint8_t endianness_ {Endianness::LITTLE_ENDIANNESS};
 
     //! @brief This attribute specifies if it is needed to swap the bytes.
     bool swap_bytes_ {false};
 
     //! @brief Stores the last datasize serialized/deserialized. It's used to optimize.
-    size_t last_data_size_ {0};
+    std::size_t last_data_size_ {0};
 
     //! @brief The current position in the serialization/deserialization process.
     FastBuffer::iterator offset_;
@@ -4831,7 +4827,7 @@ private:
     MemberId next_member_id_;
 
     //! Align for types equal or greater than 64bits.
-    size_t align64_ {4};
+    std::size_t align64_ {4};
 
     /*!
      * When serializing a member's type using XCDRv2, this enumerator is used to inform the type was serialized with a
@@ -4859,11 +4855,11 @@ private:
     //! Custom serialization context.
     std::shared_ptr<CdrContext> context_;
 
-    uint32_t get_long_lc(
+    std::uint32_t get_long_lc(
             SerializedMemberSizeForNextInt serialized_member_size);
 
-    uint32_t get_short_lc(
-            size_t member_serialized_size);
+    std::uint32_t get_short_lc(
+            std::size_t member_serialized_size);
 
     template<class _T, typename std::enable_if<std::is_enum<_T>::value ||
             std::is_arithmetic<_T>::value>::type* = nullptr>

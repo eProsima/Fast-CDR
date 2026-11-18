@@ -14,6 +14,8 @@
 
 #include <fastcdr/exceptions/NotEnoughMemoryException.h>
 
+#include <utility>
+
 using namespace eprosima::fastcdr::exception;
 
 const char* const NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT =

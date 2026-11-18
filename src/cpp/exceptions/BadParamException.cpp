@@ -14,6 +14,8 @@
 
 #include <fastcdr/exceptions/BadParamException.h>
 
+#include <utility>
+
 using namespace eprosima::fastcdr::exception;
 
 const char* const BadParamException::BAD_PARAM_MESSAGE_DEFAULT = "Bad parameter";

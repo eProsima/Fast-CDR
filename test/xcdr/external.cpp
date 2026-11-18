@@ -1583,6 +1583,30 @@ TEST(XCdrExternalTest, max_nesting_depth)
     EXPECT_NO_THROW(deserialize_nested(50));
 }
 
+/*!
+ * @test Tests that a type nested through externals beyond the maximum depth is rejected
+ * according to a custom depth limit, instead of exhausting the stack.
+ */
+TEST(XCdrExternalTest, max_nesting_with_custom_depth)
+{
+    auto deserialize_nested = [](size_t depth, uint32_t max_depth)
+            {
+                // In PLAIN_CDR2, each nesting level is encoded as its has_child boolean.
+                std::vector<char> buffer(depth, 1);
+                buffer.back() = 0;
+                FastBuffer fast_buffer(buffer.data(), buffer.size());
+                Cdr cdr(fast_buffer, Cdr::DEFAULT_ENDIAN, CdrVersion::XCDRv2);
+                cdr.set_max_deserialization_depth(max_depth);
+                RecursiveExternalClass data;
+                cdr >> data;
+            };
+
+    EXPECT_NO_THROW(deserialize_nested(50, 100));
+    EXPECT_THROW(deserialize_nested(50, 10), exception::BadParamException);
+    EXPECT_NO_THROW(deserialize_nested(5, 10));
+    EXPECT_NO_THROW(deserialize_nested(5, 100));
+}
+
 INSTANTIATE_TEST_SUITE_P(
     XCdrTest,
     XCdrExternalTest,

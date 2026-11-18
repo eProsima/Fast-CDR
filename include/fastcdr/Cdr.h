@@ -2199,8 +2199,7 @@ public:
 
         try
         {
-            vector_t.resize(sequence_length);
-            return deserialize_array(vector_t.data(), vector_t.size());
+            return deserialize_sequence_elements(vector_t, sequence_length);
         }
         catch (exception::Exception& ex)
         {
@@ -2290,11 +2289,9 @@ public:
             }
         }
 
-        vector_t.resize(length_to_read);
-
         try
         {
-            deserialize_array(vector_t.data(), length_to_read);
+            deserialize_sequence_elements(vector_t, length_to_read);
 
             // Consume the elements that do not fit in the destination. They are read into a
             // discarded object instead of the destination, which may be shorter or empty.
@@ -4228,6 +4225,55 @@ private:
     Cdr_DllAPI Cdr& deserialize_wstring_sequence(
             std::wstring*& sequence_t,
             std::size_t& num_elements);
+
+    /*!
+     * @brief Deserializes the elements of a sequence of primitives.
+     * @param vector_t The variable that will store the elements read from the buffer.
+     * @param num_elements Number of elements to read. The caller has checked that the buffer holds them.
+     * @return Reference to the eprosima::fastcdr::Cdr object.
+     * @exception exception::NotEnoughMemoryException This exception is thrown when trying to deserialize a position that exceeds the internal memory size.
+     */
+    template<class _T>
+    Cdr& deserialize_sequence_elements(
+            std::vector<_T>& vector_t,
+            std::uint32_t num_elements)
+    {
+        constexpr bool single_byte = std::is_arithmetic<_T>::value && 1 == sizeof(_T) &&
+                !std::is_same<_T, bool>::value;
+        return deserialize_sequence_elements(vector_t, num_elements, std::integral_constant<bool, single_byte>());
+    }
+
+    /*!
+     * @brief Copies single-byte elements straight from the buffer, as resizing the vector first would zero-fill it.
+     */
+    template<class _T>
+    Cdr& deserialize_sequence_elements(
+            std::vector<_T>& vector_t,
+            std::uint32_t num_elements,
+            std::true_type)
+    {
+        if (!fake_mode_)
+        {
+            const char* elements = &offset_;
+            vector_t.assign(elements, elements + num_elements);
+        }
+        offset_ += num_elements;
+        last_data_size_ = sizeof(_T);
+        return *this;
+    }
+
+    /*!
+     * @brief Resizes the vector and deserializes the elements into it.
+     */
+    template<class _T>
+    Cdr& deserialize_sequence_elements(
+            std::vector<_T>& vector_t,
+            std::uint32_t num_elements,
+            std::false_type)
+    {
+        vector_t.resize(num_elements);
+        return deserialize_array(vector_t.data(), vector_t.size());
+    }
 
     /*!
      * @brief Serializes the canonical @c uint8_t representation of @p bool_t.

@@ -2094,6 +2094,7 @@ TEST_P(XCdrOptionalTest, char_optional)
     serialize_optional(expected_streams, encoding, endianness, char_value, false);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 /*!
  * @test Test a structure with an optional field of wchar type.
  * @code{.idl}
@@ -2193,6 +2194,7 @@ TEST_P(XCdrOptionalTest, wchar_optional)
 
     serialize_optional(expected_streams, encoding, endianness, wchar_value, false);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 /*!
  * @test Test a structure with a field of octet type and an empty optional field of octet type.
@@ -6911,6 +6913,7 @@ TEST_P(XCdrOptionalTest, char_align_4_optional)
     align_serialize_optional(expected_streams, encoding, endianness, align_value, char_value, false);
 }
 
+#if !FASTCDR_DISABLE_WSTRINGS
 /*!
  * @test Test a structure with a field of octet type and an optional of wchar type.
  * @code{.idl}
@@ -7028,7 +7031,9 @@ TEST_P(XCdrOptionalTest, wchar_align_1_optional)
 
     align_serialize_optional(expected_streams, encoding, endianness, align_value, wchar_value, false);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
+#if !FASTCDR_DISABLE_WSTRINGS
 /*!
  * @test Test a structure with a field of unsigned short type and an optional of wchar type.
  * @code{.idl}
@@ -7152,7 +7157,9 @@ TEST_P(XCdrOptionalTest, wchar_align_2_optional)
 
     align_serialize_optional(expected_streams, encoding, endianness, align_value, wchar_value, false);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
+#if !FASTCDR_DISABLE_WSTRINGS
 /*!
  * @test Test a structure with a field of unsigned long type and an optional of wchar type.
  * @code{.idl}
@@ -7270,6 +7277,7 @@ TEST_P(XCdrOptionalTest, wchar_align_4_optional)
 
     align_serialize_optional(expected_streams, encoding, endianness, align_value, wchar_value, false);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 /*!
  * @test Test a structure with two fields of optional struct type where inner optionals are null.

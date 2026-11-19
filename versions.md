@@ -1,5 +1,7 @@
 # v2.5.0
 
+* Add FASTCDR_DISABLE_WSTRINGS CMake option to leave out the wide character and string API
+
 # v2.4.0
 
 * Add STRICT_BOOL CMake option to enforce canonical bool serialization

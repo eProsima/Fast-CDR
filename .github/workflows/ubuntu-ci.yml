@@ -76,7 +76,7 @@ jobs:
 
   # Fast CDR compiled as the FACE CTS compiles a Unit of Conformance (utils/face/check_face.py), apart from the build
   # and test matrix: it only needs the configured sources, and fetches the gold standard files of the CTS
-  face-check:
+  tss-check:
     if: ${{ !(github.event_name == 'pull_request') ||
             (!contains(github.event.pull_request.labels.*.name, 'conflicts') &&
              !contains(github.event.pull_request.labels.*.name, 'skip-ci')) }}

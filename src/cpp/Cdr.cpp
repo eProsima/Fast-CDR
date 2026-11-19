@@ -441,12 +441,12 @@ std::shared_ptr<CdrContext> Cdr::get_context() const
 }
 
 void Cdr::set_max_deserialization_depth(
-        uint32_t max_depth)
+        std::uint32_t max_depth)
 {
     max_deserialization_depth_ = max_depth;
 }
 
-uint32_t Cdr::get_max_deserialization_depth() const
+std::uint32_t Cdr::get_max_deserialization_depth() const
 {
     return max_deserialization_depth_;
 }
@@ -2556,12 +2556,12 @@ namespace {
 // Number of nested deserialize_type() calls on this thread, across all Cdr objects.
 // Each call compares it with the limit of the Cdr object doing the deserialization,
 // so remote input cannot nest types until the stack overflows.
-thread_local uint32_t deserialization_depth = 0;
+thread_local std::uint32_t deserialization_depth = 0;
 
 struct DeserializationDepthGuard
 {
     explicit DeserializationDepthGuard(
-            uint32_t max_depth)
+            std::uint32_t max_depth)
     {
         if (deserialization_depth >= max_depth)
         {

@@ -202,6 +202,7 @@ public:
         return serialize(long_t);
     }
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This operator serializes a wide-char.
      * @param wchar The value of the wide-char that will be serialized in the buffer.
@@ -213,6 +214,8 @@ public:
     {
         return serialize(wchar);
     }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This operator serializes an unsigned long long.
@@ -298,6 +301,7 @@ public:
         return serialize(string_t);
     }
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This operator serializes a null-terminated wide-string.
      * @param string_t The value of the wide-string that will be serialized in the buffer.
@@ -309,6 +313,8 @@ public:
     {
         return serialize(string_t);
     }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This operator serializes a string.
@@ -322,6 +328,7 @@ public:
         return serialize(string_t);
     }
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This operator serializes a wstring.
      * @param string_t The wstring that will be serialized in the buffer.
@@ -333,6 +340,8 @@ public:
     {
         return serialize(string_t);
     }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This operator template is used to serialize arrays.
@@ -458,6 +467,7 @@ public:
         return deserialize(long_t);
     }
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This operator deserializes a wide-char.
      * @param wchar The variable that will store the wide-char read from the buffer.
@@ -469,6 +479,8 @@ public:
     {
         return deserialize(wchar);
     }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This operator deserializes an unsigned long long.
@@ -570,6 +582,7 @@ public:
         return deserialize(string_t);
     }
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This operator deserializes a wstring.
      * @param string_t The variable that will store the wstring read from the buffer.
@@ -581,6 +594,8 @@ public:
     {
         return deserialize(string_t);
     }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This operator template is used to deserialize arrays.
@@ -738,6 +753,7 @@ public:
                   exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This function serializes a wide-char.
      * @param wchar The value of the wide-char that will be serialized in the buffer.
@@ -750,6 +766,8 @@ public:
     {
         return serialize(static_cast<std::uint32_t>(wchar));
     }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This function serializes an unsigned long long.
@@ -874,6 +892,7 @@ public:
     FastCdr& serialize(
             const char* string_t);
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This function serializes a wstring.
      * @param string_t The pointer to the wstring that will be serialized in the buffer.
@@ -882,6 +901,7 @@ public:
      */
     FastCdr& serialize(
             const wchar_t* string_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This function serializes a std::string.
@@ -905,6 +925,7 @@ public:
         return serialize(c_str);
     }
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This function serializes a std::wstring.
      * @param string_t The wstring that will be serialized in the buffer.
@@ -917,6 +938,8 @@ public:
     {
         return serialize(string_t.c_str());
     }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This function template serializes an array.
@@ -1094,6 +1117,7 @@ public:
             const std::int32_t* long_t,
             std::size_t num_elements);
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This function serializes an array of wide-chars.
      * @param wchar The array of wide-chars that will be serialized in the buffer.
@@ -1104,6 +1128,7 @@ public:
     FastCdr& serialize_array(
             const wchar_t* wchar,
             std::size_t num_elements);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This function serializes an array of unsigned long longs.
@@ -1194,6 +1219,7 @@ public:
         return *this;
     }
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This function serializes an array of wstrings.
      * @param string_t The array of wstrings that will be serialized in the buffer.
@@ -1212,6 +1238,8 @@ public:
         }
         return *this;
     }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This function template serializes an array of sequences.
@@ -1396,6 +1424,7 @@ public:
                   exception::NotEnoughMemoryException::NOT_ENOUGH_MEMORY_MESSAGE_DEFAULT);
     }
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This function deserializes a wide-char.
      * @param wchar The variable that will store the wide-char read from the buffer.
@@ -1411,6 +1440,8 @@ public:
         wchar = static_cast<wchar_t>(ret);
         return *this;
     }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This function deserializes an unsigned long long.
@@ -1538,6 +1569,7 @@ public:
     FastCdr& deserialize(
             char*& string_t);
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This function deserializes a wide string.
      * This function allocates memory to store the wide string. The user pointer will be set to point this allocated memory.
@@ -1549,6 +1581,7 @@ public:
      */
     FastCdr& deserialize(
             wchar_t*& string_t);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This function deserializes a std::string.
@@ -1566,6 +1599,7 @@ public:
         return *this;
     }
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This function deserializes a std::wstring.
      * @param string_t The variable that will store the wstring read from the buffer.
@@ -1580,6 +1614,8 @@ public:
         string_t = read_wstring(length);
         return *this;
     }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This function template deserializes an array.
@@ -1759,6 +1795,7 @@ public:
             std::int32_t* long_t,
             std::size_t num_elements);
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This function deserializes an array of wide-chars.
      * @param wchar The variable that will store the array of wide-chars read from the buffer.
@@ -1769,6 +1806,7 @@ public:
     FastCdr& deserialize_array(
             wchar_t* wchar,
             std::size_t num_elements);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This function deserializes an array of unsigned long longs.
@@ -1859,6 +1897,7 @@ public:
         return *this;
     }
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This function deserializes an array of wide-strings.
      * @param string_t The variable that will store the array of strings read from the buffer.
@@ -1877,6 +1916,8 @@ public:
         }
         return *this;
     }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This function template deserializes an array of sequences.
@@ -1933,6 +1974,7 @@ public:
         return deserialize_string_sequence(sequence_t, num_elements);
     }
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This function template deserializes a wide-string sequence.
      * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
@@ -1949,6 +1991,8 @@ public:
     {
         return deserialize_wstring_sequence(sequence_t, num_elements);
     }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This function template deserializes a raw sequence.
@@ -2004,6 +2048,7 @@ public:
         return deserialize_string_sequence(sequence_t, num_elements);
     }
 
+#if !FASTCDR_DISABLE_WSTRINGS
     /*!
      * @brief This function template deserializes a wide-string sequence.
      * This function allocates memory to store the sequence. The user pointer will be set to point this allocated memory.
@@ -2020,6 +2065,8 @@ public:
     {
         return deserialize_wstring_sequence(sequence_t, num_elements);
     }
+
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 #endif // ifdef _MSC_VER
 
@@ -2051,9 +2098,11 @@ private:
             std::string*& sequence_t,
             std::size_t& num_elements);
 
+#if !FASTCDR_DISABLE_WSTRINGS
     FastCdr& deserialize_wstring_sequence(
             std::wstring*& sequence_t,
             std::size_t& num_elements);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     /*!
      * @brief This function template detects the content type of the STD container array and serializes the array.
@@ -2099,8 +2148,10 @@ private:
     const char* read_string(
             std::uint32_t& length);
 
+#if !FASTCDR_DISABLE_WSTRINGS
     std::wstring read_wstring(
             std::uint32_t& length);
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
     //! @brief Reference to the buffer that will be serialized/deserialized.
     FastBuffer& cdr_buffer_;

@@ -653,6 +653,7 @@ TEST_P(XCdrTypeConsistencyTest, StdString_Trim)
 }
 
 
+#if !FASTCDR_DISABLE_WSTRINGS
 // =====================================================================================
 // std::wstring
 // =====================================================================================
@@ -802,6 +803,7 @@ TEST_P(XCdrTypeConsistencyTest, StdWstring_Trim)
     ASSERT_NO_THROW(cdr_des.deserialize(output, CdrTryConstructFlag::TRIM, 5));
     EXPECT_EQ(output, std::wstring(L"hello"));
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 
 // =====================================================================================
@@ -970,6 +972,7 @@ TEST_P(XCdrTypeConsistencyTest, CharPtr_Trim)
 }
 
 
+#if !FASTCDR_DISABLE_WSTRINGS
 // =====================================================================================
 // wchar_t*&
 // =====================================================================================
@@ -1133,6 +1136,7 @@ TEST_P(XCdrTypeConsistencyTest, WcharPtr_Trim)
     EXPECT_EQ(std::wcscmp(output, L"hello"), 0);
     free(output);
 }
+#endif // if !FASTCDR_DISABLE_WSTRINGS
 
 
 // =====================================================================================

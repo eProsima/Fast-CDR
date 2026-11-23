@@ -47,3 +47,13 @@ if(STRICT_BOOL)
     target_link_libraries(BoolStrictTests fastcdr GTest::gtest_main)
     gtest_discover_tests(BoolStrictTests)
 endif()
+
+###############################################################################
+# No wide characters nor strings in the public headers
+###############################################################################
+if(FASTCDR_DISABLE_WSTRINGS AND (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
+    add_executable(NoWideStringsTests NoWideStringsTest.cpp)
+    set_common_compile_options(NoWideStringsTests)
+    target_link_libraries(NoWideStringsTests fastcdr)
+    add_test(NAME NoWideStringsTests COMMAND NoWideStringsTests)
+endif()

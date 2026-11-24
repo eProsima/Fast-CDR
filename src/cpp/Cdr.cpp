@@ -2709,6 +2709,13 @@ Cdr& Cdr::deserialize_bool_array(
 }
 
 Cdr& Cdr::deserialize_bool_sequence(
+        std::vector<bool>& vector_t)
+{
+    return deserialize_bool_sequence(vector_t, CdrTryConstructFlag::FAIL,
+                   (std::numeric_limits<std::uint32_t>::max)());
+}
+
+Cdr& Cdr::deserialize_bool_sequence(
         std::vector<bool>& vector_t,
         CdrTryConstructFlag consistency_flag,
         std::uint32_t max_length)

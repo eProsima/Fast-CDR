@@ -919,6 +919,59 @@ TEST(CDRTests, STDVectorOctet)
     check_bad_length_deserialization(octet_vector_t, false);
 }
 
+TEST(CDRTests, STDVectorOctetReplacesContent)
+{
+    char buffer[BUFFER_LENGTH];
+
+    // Serialization.
+    {
+        FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+        Cdr cdr_ser(cdrbuffer);
+        EXPECT_NO_THROW(cdr_ser << octet_vector_t << std::vector<uint8_t>());
+    }
+
+    // Deserialization replaces the previous content, also with an empty sequence.
+    {
+        FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+        Cdr cdr_des(cdrbuffer);
+        std::vector<uint8_t> output_value(2 * octet_vector_t.size(), 0xFF);
+
+        EXPECT_NO_THROW(cdr_des >> output_value);
+        EXPECT_EQ(output_value, octet_vector_t);
+        EXPECT_NO_THROW(cdr_des >> output_value);
+        EXPECT_TRUE(output_value.empty());
+    }
+}
+
+TEST(CDRTests, STDVectorOctetTrimmed)
+{
+    char buffer[BUFFER_LENGTH];
+    const std::vector<std::vector<uint8_t>> octet_vectors {octet_vector_t, octet_vector_t};
+
+    // Serialization.
+    {
+        FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+        Cdr cdr_ser(cdrbuffer);
+        EXPECT_NO_THROW(cdr_ser << octet_vector_t << octet_vectors << octet_vector_t);
+    }
+
+    // Trimming keeps the first elements and consumes the others, also when they are octet sequences.
+    {
+        FastBuffer cdrbuffer(buffer, BUFFER_LENGTH);
+        Cdr cdr_des(cdrbuffer);
+        std::vector<uint8_t> octets;
+        std::vector<std::vector<uint8_t>> sequences;
+        std::vector<uint8_t> last;
+
+        EXPECT_NO_THROW(cdr_des.deserialize(octets, CdrTryConstructFlag::TRIM, 2));
+        EXPECT_EQ(std::vector<uint8_t>(octet_vector_t.begin(), octet_vector_t.begin() + 2), octets);
+        EXPECT_NO_THROW(cdr_des.deserialize(sequences, CdrTryConstructFlag::TRIM, 1));
+        EXPECT_EQ(std::vector<std::vector<uint8_t>> {octet_vector_t}, sequences);
+        EXPECT_NO_THROW(cdr_des >> last);
+        EXPECT_EQ(octet_vector_t, last);
+    }
+}
+
 TEST(CDRTests, STDVectorChar)
 {
     check_good_case(char_vector_t);

@@ -2241,8 +2241,7 @@ public:
     Cdr& deserialize(
             std::vector<bool>& vector_t)
     {
-        return deserialize_bool_sequence(vector_t, CdrTryConstructFlag::FAIL,
-                       (std::numeric_limits<std::uint32_t>::max)());
+        return deserialize_bool_sequence(vector_t);
     }
 
     /*!
@@ -4239,6 +4238,9 @@ private:
             const std::vector<bool>& vector_t);
 
     Cdr_DllAPI Cdr& deserialize_bool_array(
+            std::vector<bool>& vector_t);
+
+    Cdr_DllAPI Cdr& deserialize_bool_sequence(
             std::vector<bool>& vector_t);
 
     Cdr_DllAPI Cdr& deserialize_bool_sequence(

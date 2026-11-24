@@ -2074,10 +2074,10 @@ public:
                 ex.raise();
             }
 
-            if (last_offset - offset_ != 0)
+            if (last_offset - offset_ != 0 || count < _Size)
             {
                 set_state(state_before_error);
-                throw exception::BadParamException("Member size greater than size specified by DHEADER");
+                throw exception::BadParamException("Member size differs from the size specified by DHEADER");
             }
         }
         else
@@ -2119,6 +2119,8 @@ public:
 
             deserialize_framing(sequence_length);
 
+            std::uint32_t count {0};
+
             if (0 == sequence_length)
             {
                 vector_t.clear();
@@ -2136,7 +2138,7 @@ public:
                 {
                     vector_t.resize(sequence_length);
 
-                    std::uint32_t count {0};
+                    count = 0;
                     while (last_offset - offset_ > 0 && count < sequence_length)
                     {
                         deserialize(vector_t.data()[count]);
@@ -2150,7 +2152,7 @@ public:
                 }
             }
 
-            if (last_offset - offset_ != 0)
+            if (last_offset - offset_ != 0 || count < sequence_length)
             {
                 set_state(state_before_error);
                 throw exception::BadParamException("Member size differs from the size specified by DHEADER");
@@ -2559,9 +2561,11 @@ public:
             std::uint32_t map_length {0};
             deserialize_framing(map_length);
 
+            std::uint32_t count {0};
+
             try
             {
-                std::uint32_t count {0};
+                count = 0;
                 while (last_offset - offset_ > 0 && count < map_length)
                 {
                     _K key;
@@ -2578,10 +2582,10 @@ public:
                 ex.raise();
             }
 
-            if (last_offset - offset_ != 0)
+            if (last_offset - offset_ != 0 || count < map_length)
             {
                 set_state(state_before_error);
-                throw exception::BadParamException("Member size greater than size specified by DHEADER");
+                throw exception::BadParamException("Member size differs from the size specified by DHEADER");
             }
         }
         else

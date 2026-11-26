@@ -959,6 +959,11 @@ public:
             ex.raise();
         }
 
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            serialized_member_size_ = NO_SERIALIZED_MEMBER_SIZE;
+        }
+
         return *this;
     }
 

@@ -3981,6 +3981,183 @@ TEST_P(XCdrBasicTypesTest, map_ulong)
 }
 
 /*!
+ * @test Test a structure with a field of map with string keys and unsigned long values.
+ * @code{.idl}
+ *
+ * struct StringULongMapStruct
+ * {
+ *     map<string, unsigned long> var_stringulongmap;
+ * };
+ * @endcode
+ */
+TEST_P(XCdrBasicTypesTest, map_string_ulong)
+{
+    const std::map<std::string, uint32_t> map_value {{"AB", 0xCDCDCDDCu}, {"BA", 0xCDCDCDDCu}};
+    const std::map<fixed_string<16>, uint32_t> bounded_map_value {{"AB", 0xCDCDCDDCu}, {"BA", 0xCDCDCDDCu}};
+    constexpr uint8_t ival {0xCD};
+    constexpr uint8_t fval {0xDC};
+    constexpr uint8_t valA {65};
+    constexpr uint8_t valB {66};
+
+    //{ Defining expected XCDR streams
+    XCdrStreamValues expected_streams;
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x00, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x02, // Map length
+        0x00, 0x00, 0x00, 0x03, // String length
+        valA, valB, 0x00,       // String
+        0x00,                   // Alignment
+        ival, ival, ival, fval, // ULong
+        0x00, 0x00, 0x00, 0x03, // String length
+        valB, valA, 0x00,       // String
+        0x00,                   // Alignment
+        ival, ival, ival, fval  // ULong
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x01, 0x00, 0x00, // Encapsulation
+        0x02, 0x00, 0x00, 0x00, // Map length
+        0x03, 0x00, 0x00, 0x00, // String length
+        valA, valB, 0x00,       // String
+        0x00,                   // Alignment
+        fval, ival, ival, ival, // ULong
+        0x03, 0x00, 0x00, 0x00, // String length
+        valB, valA, 0x00,       // String
+        0x00,                   // Alignment
+        fval, ival, ival, ival  // ULong
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x02, 0x00, 0x00, // Encapsulation
+        0x00, 0x01, 0x00, 0x1C, // ShortMemberHeader
+        0x00, 0x00, 0x00, 0x02, // Map length
+        0x00, 0x00, 0x00, 0x03, // String length
+        valA, valB, 0x00,       // String
+        0x00,                   // Alignment
+        ival, ival, ival, fval, // ULong
+        0x00, 0x00, 0x00, 0x03, // String length
+        valB, valA, 0x00,       // String
+        0x00,                   // Alignment
+        ival, ival, ival, fval, // ULong
+        0x3F, 0x02, 0x00, 0x00  // Sentinel
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x03, 0x00, 0x00, // Encapsulation
+        0x01, 0x00, 0x1C, 0x00, // ShortMemberHeader
+        0x02, 0x00, 0x00, 0x00, // Map length
+        0x03, 0x00, 0x00, 0x00, // String length
+        valA, valB, 0x00,       // String
+        0x00,                   // Alignment
+        fval, ival, ival, ival, // ULong
+        0x03, 0x00, 0x00, 0x00, // String length
+        valB, valA, 0x00,       // String
+        0x00,                   // Alignment
+        fval, ival, ival, ival, // ULong
+        0x02, 0x3F, 0x00, 0x00  // Sentinel
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x06, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x02, // Map length
+        0x00, 0x00, 0x00, 0x03, // String length
+        valA, valB, 0x00,       // String
+        0x00,                   // Alignment
+        ival, ival, ival, fval, // ULong
+        0x00, 0x00, 0x00, 0x03, // String length
+        valB, valA, 0x00,       // String
+        0x00,                   // Alignment
+        ival, ival, ival, fval  // ULong
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PLAIN_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x07, 0x00, 0x00, // Encapsulation
+        0x02, 0x00, 0x00, 0x00, // Map length
+        0x03, 0x00, 0x00, 0x00, // String length
+        valA, valB, 0x00,       // String
+        0x00,                   // Alignment
+        fval, ival, ival, ival, // ULong
+        0x03, 0x00, 0x00, 0x00, // String length
+        valB, valA, 0x00,       // String
+        0x00,                   // Alignment
+        fval, ival, ival, ival  // ULong
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x08, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x1C, // DHEADER
+        0x00, 0x00, 0x00, 0x02, // Map length
+        0x00, 0x00, 0x00, 0x03, // String length
+        valA, valB, 0x00,       // String
+        0x00,                   // Alignment
+        ival, ival, ival, fval, // ULong
+        0x00, 0x00, 0x00, 0x03, // String length
+        valB, valA, 0x00,       // String
+        0x00,                   // Alignment
+        ival, ival, ival, fval  // ULong
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::DELIMIT_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x09, 0x00, 0x00, // Encapsulation
+        0x1C, 0x00, 0x00, 0x00, // DHEADER
+        0x02, 0x00, 0x00, 0x00, // Map length
+        0x03, 0x00, 0x00, 0x00, // String length
+        valA, valB, 0x00,       // String
+        0x00,                   // Alignment
+        fval, ival, ival, ival, // ULong
+        0x03, 0x00, 0x00, 0x00, // String length
+        valB, valA, 0x00,       // String
+        0x00,                   // Alignment
+        fval, ival, ival, ival  // ULong
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::BIG_ENDIANNESS] =
+    {
+        0x00, 0x0A, 0x00, 0x00, // Encapsulation
+        0x00, 0x00, 0x00, 0x24, // DHEADER
+        0x40, 0x00, 0x00, 0x01, // EMHEADER1(M) with NEXTINT
+        0x00, 0x00, 0x00, 0x1C, // NEXTINT
+        0x00, 0x00, 0x00, 0x02, // Map length
+        0x00, 0x00, 0x00, 0x03, // String length
+        valA, valB, 0x00,       // String
+        0x00,                   // Alignment
+        ival, ival, ival, fval, // ULong
+        0x00, 0x00, 0x00, 0x03, // String length
+        valB, valA, 0x00,       // String
+        0x00,                   // Alignment
+        ival, ival, ival, fval  // ULong
+    };
+    expected_streams[0 + EncodingAlgorithmFlag::PL_CDR2 + Cdr::Endianness::LITTLE_ENDIANNESS] =
+    {
+        0x00, 0x0B, 0x00, 0x00, // Encapsulation
+        0x24, 0x00, 0x00, 0x00, // DHEADER
+        0x01, 0x00, 0x00, 0x40, // EMHEADER1(M) with NEXTINT
+        0x1C, 0x00, 0x00, 0x00, // NEXTINT
+        0x02, 0x00, 0x00, 0x00, // Map length
+        0x03, 0x00, 0x00, 0x00, // String length
+        valA, valB, 0x00,       // String
+        0x00,                   // Alignment
+        fval, ival, ival, ival, // ULong
+        0x03, 0x00, 0x00, 0x00, // String length
+        valB, valA, 0x00,       // String
+        0x00,                   // Alignment
+        fval, ival, ival, ival  // ULong
+    };
+    //}
+
+    EncodingAlgorithmFlag encoding = std::get<0>(GetParam());
+    Cdr::Endianness endianness = std::get<1>(GetParam());
+
+    serialize(expected_streams, encoding, endianness, map_value, true);
+
+    serialize(expected_streams, encoding, endianness, map_value, false);
+
+    serialize(expected_streams, encoding, endianness, bounded_map_value, true);
+
+    serialize(expected_streams, encoding, endianness, bounded_map_value, false);
+}
+
+/*!
  * @test Test a structure with a field of map of struct type.
  * @code{.idl}
  * struct InnerBasicTypesShortStruct

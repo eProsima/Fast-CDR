@@ -700,6 +700,11 @@ public:
             calculated_size += calculate_serialized_size(it->second, current_alignment);
         }
 
+        if (CdrVersion::XCDRv2 == cdr_version_)
+        {
+            serialized_member_size_ = NO_SERIALIZED_MEMBER_SIZE;
+        }
+
         return calculated_size;
     }
 

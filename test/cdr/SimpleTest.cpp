@@ -19,9 +19,13 @@
 #include <fastcdr/exceptions/Exception.h>
 #include <fastcdr/exceptions/NotEnoughMemoryException.h>
 
+#include <array>
+#include <cstdint>
+#include <map>
 #include <stdio.h>
 #include <limits>
 #include <iostream>
+#include <vector>
 
 #include <gtest/gtest.h>
 
@@ -7548,4 +7552,109 @@ TEST(FastCDRTests, EmptyStringSerializationSize)
             cdr_ser << str;
         });
     EXPECT_EQ(cdr_ser.get_serialized_data_length(), 5u);
+}
+
+/*
+ * The DHEADER of an XCDR2 sequence covers fewer elements than the length field declares.
+ * Deserialization must reject the stream instead of filling the missing elements with defaults.
+ */
+TEST(CDRTests, Xcdr2VectorDheaderLengthMismatch)
+{
+    // Valid stream: DHEADER covers the length field plus two inner sequences.
+    unsigned char valid[] = {
+        20, 0, 0, 0,     // DHEADER: 4 (length) + 2 * 8 (inner sequences)
+        2, 0, 0, 0,      // length: 2
+        1, 0, 0, 0,      // inner sequence 1: length
+        10, 0, 0, 0,     // inner sequence 1: element
+        1, 0, 0, 0,      // inner sequence 2: length
+        11, 0, 0, 0      // inner sequence 2: element
+    };
+    FastBuffer valid_buffer(reinterpret_cast<char*>(valid), sizeof(valid));
+    Cdr valid_cdr(valid_buffer, Cdr::Endianness::LITTLE_ENDIANNESS, CdrVersion::XCDRv2);
+    std::vector<std::vector<std::uint32_t>> valid_value;
+    ASSERT_NO_THROW(valid_cdr.deserialize(valid_value));
+    ASSERT_EQ(valid_value.size(), 2u);
+
+    // Invalid stream: same DHEADER, but the length field declares three elements.
+    unsigned char invalid[] = {
+        20, 0, 0, 0,     // DHEADER: 4 (length) + 2 * 8 (inner sequences)
+        3, 0, 0, 0,      // length: 3, only two are encoded
+        1, 0, 0, 0,      // inner sequence 1: length
+        10, 0, 0, 0,     // inner sequence 1: element
+        1, 0, 0, 0,      // inner sequence 2: length
+        11, 0, 0, 0      // inner sequence 2: element
+    };
+    FastBuffer invalid_buffer(reinterpret_cast<char*>(invalid), sizeof(invalid));
+    Cdr invalid_cdr(invalid_buffer, Cdr::Endianness::LITTLE_ENDIANNESS, CdrVersion::XCDRv2);
+    std::vector<std::vector<std::uint32_t>> invalid_value;
+    EXPECT_THROW(invalid_cdr.deserialize(invalid_value), BadParamException);
+}
+
+/*
+ * Same inconsistency for a map: the DHEADER covers one pair while the length field declares five.
+ */
+TEST(CDRTests, Xcdr2MapDheaderLengthMismatch)
+{
+    // Valid stream: DHEADER covers the length field and one key/value pair.
+    unsigned char valid[] = {
+        16, 0, 0, 0,     // DHEADER: 4 (length) + 4 (key) + 8 (value sequence)
+        1, 0, 0, 0,      // length: 1
+        1, 0, 0, 0,      // key
+        1, 0, 0, 0,      // value sequence: length
+        10, 0, 0, 0      // value sequence: element
+    };
+    FastBuffer valid_buffer(reinterpret_cast<char*>(valid), sizeof(valid));
+    Cdr valid_cdr(valid_buffer, Cdr::Endianness::LITTLE_ENDIANNESS, CdrVersion::XCDRv2);
+    std::map<std::uint32_t, std::vector<std::uint32_t>> valid_value;
+    ASSERT_NO_THROW(valid_cdr.deserialize(valid_value));
+    ASSERT_EQ(valid_value.size(), 1u);
+
+    // Invalid stream: same DHEADER, but the length field declares five pairs.
+    unsigned char invalid[] = {
+        16, 0, 0, 0,     // DHEADER: 4 (length) + 4 (key) + 8 (value sequence)
+        5, 0, 0, 0,      // length: 5, only one pair is encoded
+        1, 0, 0, 0,      // key
+        1, 0, 0, 0,      // value sequence: length
+        10, 0, 0, 0      // value sequence: element
+    };
+    FastBuffer invalid_buffer(reinterpret_cast<char*>(invalid), sizeof(invalid));
+    Cdr invalid_cdr(invalid_buffer, Cdr::Endianness::LITTLE_ENDIANNESS, CdrVersion::XCDRv2);
+    std::map<std::uint32_t, std::vector<std::uint32_t>> invalid_value;
+    EXPECT_THROW(invalid_cdr.deserialize(invalid_value), BadParamException);
+}
+
+/*
+ * Same inconsistency for a fixed-size array: the DHEADER covers two of the four elements.
+ */
+TEST(CDRTests, Xcdr2ArrayDheaderLengthMismatch)
+{
+    // Valid stream: DHEADER covers four inner sequences.
+    unsigned char valid[] = {
+        32, 0, 0, 0,     // DHEADER: 4 * 8 (inner sequences)
+        1, 0, 0, 0,      // inner sequence 1: length
+        10, 0, 0, 0,     // inner sequence 1: element
+        1, 0, 0, 0,      // inner sequence 2: length
+        11, 0, 0, 0,     // inner sequence 2: element
+        1, 0, 0, 0,      // inner sequence 3: length
+        12, 0, 0, 0,     // inner sequence 3: element
+        1, 0, 0, 0,      // inner sequence 4: length
+        13, 0, 0, 0      // inner sequence 4: element
+    };
+    FastBuffer valid_buffer(reinterpret_cast<char*>(valid), sizeof(valid));
+    Cdr valid_cdr(valid_buffer, Cdr::Endianness::LITTLE_ENDIANNESS, CdrVersion::XCDRv2);
+    std::array<std::vector<std::uint32_t>, 4> valid_value;
+    ASSERT_NO_THROW(valid_cdr.deserialize(valid_value));
+
+    // Invalid stream: the DHEADER covers only two of the four elements.
+    unsigned char invalid[] = {
+        16, 0, 0, 0,     // DHEADER: 2 * 8 (inner sequences)
+        1, 0, 0, 0,      // inner sequence 1: length
+        10, 0, 0, 0,     // inner sequence 1: element
+        1, 0, 0, 0,      // inner sequence 2: length
+        11, 0, 0, 0      // inner sequence 2: element
+    };
+    FastBuffer invalid_buffer(reinterpret_cast<char*>(invalid), sizeof(invalid));
+    Cdr invalid_cdr(invalid_buffer, Cdr::Endianness::LITTLE_ENDIANNESS, CdrVersion::XCDRv2);
+    std::array<std::vector<std::uint32_t>, 4> invalid_value;
+    EXPECT_THROW(invalid_cdr.deserialize(invalid_value), BadParamException);
 }
